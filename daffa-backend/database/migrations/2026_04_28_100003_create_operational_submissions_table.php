@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('operational_submissions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('workflow_id')->constrained('operational_workflows')->cascadeOnDelete();
+            $table->foreignId('unit_id')->constrained('operational_units')->cascadeOnDelete();
+            $table->tinyInteger('unit_number');
+            $table->string('status')->default('not_started');
+            $table->json('form_data')->nullable();
+            $table->text('consultant_notes')->nullable();
+            $table->tinyInteger('revision_count')->default(0);
+            $table->timestamp('submitted_at')->nullable();
+            $table->timestamp('reviewed_at')->nullable();
+            $table->timestamps();
+
+            $table->unique(['workflow_id', 'unit_id']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('operational_submissions');
+    }
+};

@@ -1,0 +1,27 @@
+# Only track backend and frontend
+/*
+!/.gitignore
+!/daffa-backend/
+!/daffa-frontend/
+
+# Dependencies & builds
+node_modules/
+/daffa-backend/vendor/
+/daffa-frontend/dist/
+
+# Environment / secrets
+.env
+.env.backup
+/daffa-backend/.env.production
+
+# Logs & local test artifacts
+*.log
+/daffa-frontend/screenshot_*.png
+/daffa-frontend/test_screenshots/
+/daffa-frontend/test_*.mjs
+
+# Editor / tooling
+.claude/
+CLAUDE.md
+.vscode/
+.idea/
