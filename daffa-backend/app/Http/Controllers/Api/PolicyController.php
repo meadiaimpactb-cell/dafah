@@ -10,46 +10,46 @@ use App\Models\Order;
 use App\Models\PolicySelection;
 use App\Models\PolicyTypeContent;
 use App\Models\PolicyWorkflow;
+use App\Models\QuestionnaireSection;
 use App\Models\ServiceSetting;
+use App\Support\PolicyCatalog;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Mpdf\Mpdf;
 
 class PolicyController extends Controller
 {
-    // ── Static defaults for 7 policy types ──────────────────────────────────
-    private static function policyDefaults(): array
-    {
-        return [
-            ['id'=>1,'name'=>'لائحة الموارد البشرية',    'icon'=>'👥','description'=>'تنظيم شؤون الموظفين والتوظيف والتدريب والإجازات',    'price'=>1500,'sections'=>['معلومات المنظمة','التوظيف والاستقطاب','ساعات العمل والإجازات','التعويضات والمزايا','تقييم الأداء','التدريب والتطوير','إنهاء الخدمة','السلوك والانضباط']],
-            ['id'=>2,'name'=>'السياسات الإعلامية',        'icon'=>'📢','description'=>'ضبط التواصل الإعلامي والمحتوى والعلاقات العامة',       'price'=>1200,'sections'=>['معلومات المنظمة','الهوية البصرية','التواصل الإعلامي','وسائل التواصل الاجتماعي','الأزمات الإعلامية','المتحدث الرسمي']],
-            ['id'=>3,'name'=>'سياسات الحوكمة',            'icon'=>'⚖️','description'=>'تنظيم الحوكمة ومسؤوليات مجلس الإدارة واللجان',        'price'=>1800,'sections'=>['معلومات المنظمة','مجلس الإدارة','اللجان','التصويت واتخاذ القرار','تضارب المصالح','الشفافية والإفصاح','المحاسبية']],
-            ['id'=>4,'name'=>'لائحة تنظيم التبرعات',    'icon'=>'💰','description'=>'تنظيم استقبال وإدارة وتوثيق التبرعات',                   'price'=>1000,'sections'=>['معلومات المنظمة','قنوات استقبال التبرعات','أنواع التبرعات','التوثيق والإيصالات','التبرعات المشروطة','الإفصاح المالي']],
-            ['id'=>5,'name'=>'سياسة الموارد المالية',    'icon'=>'🏦','description'=>'ضبط الإدارة المالية والميزانيات والصرف',                  'price'=>1500,'sections'=>['معلومات المنظمة','الميزانية السنوية','صلاحيات الصرف','المشتريات','التقارير المالية','التدقيق والمراجعة']],
-            ['id'=>6,'name'=>'سياسة الخصوصية والسرية', 'icon'=>'🔒','description'=>'حماية بيانات المستفيدين والسرية والإفصاح',               'price'=>1200,'sections'=>['معلومات المنظمة','جمع البيانات','تخزين البيانات','مشاركة البيانات','حقوق المستفيد','الإفصاح والشفافية']],
-            ['id'=>7,'name'=>'سياسات المتابعة والتقييم','icon'=>'📊','description'=>'آليات المتابعة وتقييم الأداء والبرامج',                   'price'=>1000,'sections'=>['معلومات المنظمة','إطار المتابعة','أدوات التقييم','مؤشرات الأداء','التقارير الدورية','التحسين المستمر']],
-        ];
-    }
-
-    // ── Catalog merged with DB overrides (name, description, price) ──────────
+    // ── Catalog (حزمة v3.0 + الإصدار السابق) merged with admin DB overrides ──
     public static function policyTypes(): array
     {
         $overrides = PolicyTypeContent::all()->keyBy('policy_type_id');
 
-        return collect(self::policyDefaults())->map(function ($t) use ($overrides) {
+        return collect(PolicyCatalog::all())->map(function ($t) use ($overrides) {
             $o = $overrides->get($t['id']);
             return array_merge($t, [
                 'name'                => ($o && $o->name)             ? $o->name             : $t['name'],
                 'description'         => ($o && $o->description)      ? $o->description      : $t['description'],
                 'price'               => ($o && $o->price !== null)   ? (float) $o->price    : $t['price'],
-                'overview'            => $o?->overview,
+                'overview'            => ($o && $o->overview)         ? $o->overview         : $t['overview'],
                 'written_description' => $o?->written_description,
-                'tip'                 => $o?->tip,
+                'tip'                 => ($o && $o->tip)              ? $o->tip              : $t['tip'],
                 'video_url'           => $o?->video_url,
                 'video_duration'      => $o?->video_duration,
+                'has_template'        => (bool) PolicyCatalog::templatePath($t['template'], 'docx'),
             ]);
         })->values()->toArray();
+    }
+
+    /** Questionnaire sections + questions of a policy type (for PDF rendering). */
+    public static function questionnaireFor(int $policyTypeId)
+    {
+        return QuestionnaireSection::with(['questions' => fn ($q) => $q->orderBy('sort_order')->orderBy('id')])
+            ->where('policy_type_id', $policyTypeId)
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
     }
 
     // ── GET /api/policies/workflows ───────────────────────────────────────────
@@ -201,7 +201,7 @@ class PolicyController extends Controller
     {
         $request->validate([
             'policy_type_ids'    => 'required|array|min:1',
-            'policy_type_ids.*'  => 'integer|between:1,7',
+            'policy_type_ids.*'  => ['integer', 'distinct', Rule::in(PolicyCatalog::activeIds())],
         ]);
 
         $workflow = $this->userWorkflow($request);
@@ -228,7 +228,7 @@ class PolicyController extends Controller
         $request->validate([
             'payment_method'       => 'required|in:card,mada,apple_pay,bank_transfer',
             'policy_type_ids'      => 'required|array|min:1',
-            'policy_type_ids.*'    => 'integer|between:1,7',
+            'policy_type_ids.*'    => ['integer', 'distinct', Rule::in(PolicyCatalog::activeIds())],
             'discount_code'        => 'nullable|string|max:50',
             'include_arbitration'  => 'nullable|boolean',
         ]);
@@ -544,9 +544,10 @@ class PolicyController extends Controller
             ->where('id', $selectionId)
             ->firstOrFail();
 
-        $policyType = $typeMap->get($selection->policy_type_id);
+        $policyType    = $typeMap->get($selection->policy_type_id);
+        $questionnaire = self::questionnaireFor($selection->policy_type_id);
 
-        return view('pdf.policy', compact('workflow', 'selection', 'policyType'));
+        return view('pdf.policy', compact('workflow', 'selection', 'policyType', 'questionnaire'));
     }
 
     // ── GET /api/policies/workflow/pdf/{selectionId} (direct mPDF) ────────────
@@ -563,9 +564,10 @@ class PolicyController extends Controller
         $selection  = PolicySelection::where('workflow_id', $workflow->id)
             ->where('id', $selectionId)
             ->firstOrFail();
-        $policyType = $typeMap->get($selection->policy_type_id);
+        $policyType    = $typeMap->get($selection->policy_type_id);
+        $questionnaire = self::questionnaireFor($selection->policy_type_id);
 
-        $html = view('pdf.policy', compact('workflow', 'selection', 'policyType'))->render();
+        $html = view('pdf.policy', compact('workflow', 'selection', 'policyType', 'questionnaire'))->render();
 
         set_error_handler(fn() => true, E_WARNING | E_NOTICE);
         try {
@@ -596,6 +598,28 @@ class PolicyController extends Controller
             'Content-Length'      => strlen($pdfContent),
             'Cache-Control'       => 'no-cache, no-store, must-revalidate',
         ]);
+    }
+
+    // ── GET /api/policies/selections/{id}/template?format=docx|pdf ────────────
+    // النموذج المرجعي للسياسة (حزمة v3.0 المصححة) — يُتاح بعد اعتماد المستشار
+    public function downloadTemplate(Request $request, int $id)
+    {
+        $request->validate(['format' => 'nullable|in:docx,pdf']);
+
+        $workflow  = $this->userWorkflow($request);
+        $selection = PolicySelection::where('workflow_id', $workflow->id)->where('id', $id)->firstOrFail();
+
+        abort_if($selection->status !== 'approved', 403, 'يُتاح النموذج المرجعي بعد اعتماد المستشار للسياسة.');
+
+        $type   = PolicyCatalog::find($selection->policy_type_id);
+        $format = $request->query('format', 'docx');
+        $path   = PolicyCatalog::templatePath($type['template'] ?? null, $format);
+
+        abort_if(!$path, 404, 'لا يتوفر نموذج مرجعي لهذه السياسة.');
+
+        $filename = "{$type['code']} - {$type['name']} v{$type['version']}.{$format}";
+
+        return response()->download($path, $filename);
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────

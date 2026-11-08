@@ -195,6 +195,18 @@ const Stepper = ({ step, allDone, realStep, onStepClick }) => {
 };
 
 // ── Step 0: Intro ──────────────────────────────────────────────────────────────
+// السياسات المتاحة للشراء (حزمة الإصدار 3.0) مجمّعة حسب المجموعة
+const groupActivePolicies = (policyTypes) => {
+  const groups = [];
+  policyTypes.filter(p => p.active !== false).forEach(p => {
+    const name = p.group_name || "السياسات";
+    let g = groups.find(x => x.name === name);
+    if (!g) { g = { name, items: [] }; groups.push(g); }
+    g.items.push(p);
+  });
+  return groups;
+};
+
 const StepIntro = ({ policyTypes, onStart, loading, operationalCompleted }) => (
   <div className="animate-in">
     <Card style={{ padding: 32, textAlign: "center", marginBottom: 20, borderBottom: `3px solid ${C.orange}` }}>
@@ -231,16 +243,24 @@ const StepIntro = ({ policyTypes, onStart, loading, operationalCompleted }) => (
       </Card>
 
       <Card>
-        <h3 style={{ fontSize: 16, fontWeight: 700, color: C.tealDark, marginBottom: 14 }}>السياسات المتاحة ({policyTypes.length})</h3>
-        {policyTypes.map((p, i) => (
-          <div key={p.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: i < policyTypes.length - 1 ? `1px solid ${C.grayLight}` : "none" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ color: C.teal }}><IcDocument width={16} height={16}/></span>
-              <span style={{ fontSize: 13 }}>{p.name}</span>
+        <h3 style={{ fontSize: 16, fontWeight: 700, color: C.tealDark, marginBottom: 4 }}>السياسات المتاحة ({policyTypes.filter(p => p.active !== false).length})</h3>
+        <div style={{ fontSize: 11, color: C.gray, marginBottom: 10 }}>حزمة سياسات ولوائح القطاع غير الربحي — الإصدار 3.0</div>
+        <div style={{ maxHeight: 360, overflowY: "auto" }}>
+          {groupActivePolicies(policyTypes).map(g => (
+            <div key={g.name} style={{ marginBottom: 8 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: C.orange, padding: "6px 0 2px" }}>{g.name}</div>
+              {g.items.map((p, i) => (
+                <div key={p.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "6px 0", borderBottom: i < g.items.length - 1 ? `1px solid ${C.grayLight}` : "none" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ color: C.teal, flexShrink: 0 }}><IcDocument width={14} height={14}/></span>
+                    <span style={{ fontSize: 12 }}>{p.name}</span>
+                  </div>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: C.teal, whiteSpace: "nowrap" }}>{p.price.toLocaleString('en-US')} ريال</span>
+                </div>
+              ))}
             </div>
-            <span style={{ fontSize: 12, fontWeight: 700, color: C.teal }}>{p.price.toLocaleString('en-US')} ريال</span>
-          </div>
-        ))}
+          ))}
+        </div>
       </Card>
     </div>
 
@@ -261,8 +281,10 @@ const StepIntro = ({ policyTypes, onStart, loading, operationalCompleted }) => (
 
 // ── Step 1: Select policies ───────────────────────────────────────────────────
 const StepSelect = ({ policyTypes, workflow, onNext, onSave, loading }) => {
+  const activeIds = policyTypes.filter(p => p.active !== false).map(p => p.id);
   const saved = workflow?.selected_policies || [];
-  const [selected, setSelected] = useState(saved.map(Number));
+  // سياسات الإصدار السابق لم تعد متاحة للشراء — تُستبعد من الاختيار المحفوظ
+  const [selected, setSelected] = useState(saved.map(Number).filter(id => activeIds.includes(id)));
 
   const toggle = (id) => setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
   const total  = selected.reduce((sum, id) => sum + (policyTypes.find(p => p.id === id)?.price || 0), 0);
@@ -275,28 +297,44 @@ const StepSelect = ({ policyTypes, workflow, onNext, onSave, loading }) => {
   return (
     <div className="animate-in">
       <h2 style={{ fontSize: 20, fontWeight: 700, color: C.tealDark, marginBottom: 6 }}>اختر السياسات واللوائح المرادة</h2>
-      <p style={{ fontSize: 13, color: C.gray, marginBottom: 20 }}>يمكنك اختيار سياسة واحدة أو أكثر — التسعير مستقل لكل سياسة</p>
+      <p style={{ fontSize: 13, color: C.gray, marginBottom: 20 }}>يمكنك اختيار سياسة واحدة أو أكثر — التسعير مستقل لكل سياسة. جميع النماذج من حزمة سياسات دفة الإصدار 3.0.</p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 16 }}>
-        {policyTypes.map(p => {
-          const sel = selected.includes(p.id);
-          return (
-            <Card key={p.id} style={{ cursor: "pointer", border: sel ? `2px solid ${C.orange}` : "2px solid transparent", transition: "all 0.2s" }}
-              onClick={() => toggle(p.id)}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div style={{ width: 48, height: 48, borderRadius: "50%", background: C.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", color: C.orange }}><IcDocument width={22} height={22}/></div>
-                {sel && <div style={{ width: 26, height: 26, borderRadius: "50%", background: C.orange, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}><IcCheck width={14} height={14}/></div>}
-              </div>
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: C.tealDark, marginTop: 10 }}>{p.name}</h3>
-              <p style={{ fontSize: 11, color: C.gray, marginTop: 4, lineHeight: 1.5 }}>{p.description}</p>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                <span style={{ fontSize: 16, fontWeight: 800, color: C.teal }}>{p.price.toLocaleString('en-US')} ريال</span>
-                <span style={{ fontSize: 11, color: C.gray }}>{p.sections.length} أقسام</span>
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+      {groupActivePolicies(policyTypes).map(g => {
+        const groupIds = g.items.map(p => p.id);
+        const allSel   = groupIds.every(id => selected.includes(id));
+        return (
+          <div key={g.name} style={{ marginBottom: 22 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, paddingBottom: 6, borderBottom: `2px solid ${C.orangeLight}` }}>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: C.tealDark }}>{g.name} <span style={{ fontSize: 12, color: C.gray, fontWeight: 400 }}>({g.items.length})</span></h3>
+              <button onClick={() => setSelected(s => allSel ? s.filter(id => !groupIds.includes(id)) : [...new Set([...s, ...groupIds])])}
+                style={{ fontSize: 12, color: C.teal, background: "none", border: "none", cursor: "pointer", fontFamily: "'Cairo',sans-serif", fontWeight: 600 }}>
+                {allSel ? "إلغاء تحديد المجموعة" : "تحديد المجموعة"}
+              </button>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))", gap: 14 }}>
+              {g.items.map(p => {
+                const sel = selected.includes(p.id);
+                return (
+                  <Card key={p.id} style={{ cursor: "pointer", border: sel ? `2px solid ${C.orange}` : "2px solid transparent", transition: "all 0.2s", display: "flex", flexDirection: "column" }}
+                    onClick={() => toggle(p.id)}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                      <div style={{ width: 44, height: 44, borderRadius: "50%", background: C.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", color: C.orange }}><IcDocument width={20} height={20}/></div>
+                      {sel && <div style={{ width: 26, height: 26, borderRadius: "50%", background: C.orange, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}><IcCheck width={14} height={14}/></div>}
+                    </div>
+                    {p.code && <div style={{ fontSize: 10, color: C.teal, fontWeight: 700, marginTop: 10, direction: "ltr", textAlign: "right" }}>{p.code}</div>}
+                    <h3 style={{ fontSize: 14, fontWeight: 700, color: C.tealDark, marginTop: 4 }}>{p.name}</h3>
+                    <p style={{ fontSize: 11, color: C.gray, marginTop: 4, lineHeight: 1.6, flex: 1 }}>{p.description}</p>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+                      <span style={{ fontSize: 16, fontWeight: 800, color: C.teal }}>{p.price.toLocaleString('en-US')} ريال</span>
+                      <span style={{ fontSize: 11, color: C.gray }}>{p.sections.length} أقسام</span>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
 
       {selected.length > 0 && (
         <div style={{ position: "sticky", bottom: 0, background: C.white, padding: "14px 20px", borderTop: `2px solid ${C.grayBorder}`, borderRadius: "14px 14px 0 0", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 -4px 12px rgba(0,0,0,0.1)" }}>
@@ -1105,21 +1143,32 @@ const StepApproval = ({ workflow, selections, policyTypes, onNext, onView }) => 
 );
 
 // ── Step 6: Download ──────────────────────────────────────────────────────────
-const StepDownload = ({ policyTypes, selections, workflow, onNext, onDownload, loadingId, onView }) => (
+const StepDownload = ({ policyTypes, selections, workflow, onNext, onDownload, onTemplateDownload, loadingId, onView }) => (
   <div className="animate-in">
-    <h2 style={{ fontSize: 20, fontWeight: 700, color: C.tealDark, marginBottom: 20, textAlign: "center" }}>تحميل السياسات</h2>
+    <h2 style={{ fontSize: 20, fontWeight: 700, color: C.tealDark, marginBottom: 8, textAlign: "center" }}>تحميل السياسات</h2>
+    <p style={{ fontSize: 12, color: C.gray, textAlign: "center", marginBottom: 20, lineHeight: 1.7 }}>
+      لكل سياسة ملف بحقول التخصيص الخاصة بجهتك، والنموذج المرجعي الكامل (الإصدار 3.0) بصيغتي Word وPDF.
+      <br/>الوثائق نماذج استرشادية تصبح نافذة بعد صدور قرار الاعتماد من صاحب الصلاحية في جهتك.
+    </p>
     {selections.map(sel => {
       const p = policyTypes.find(x => x.id === sel.policy_type_id) || sel.policy_type;
+      const canTemplate = p?.has_template && sel.status === "approved" && onTemplateDownload;
+      const tplBtn = { fontSize: 11, color: C.orange, background: `${C.orange}10`, border: `1px solid ${C.orange}30`, borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontFamily: "'Cairo',sans-serif", fontWeight: 600 };
       return (
-        <Card key={sel.id} style={{ marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Card key={sel.id} style={{ marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 44, height: 44, borderRadius: 10, background: C.tealCard, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}><IcDocument width={20} height={20}/></div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 600 }}>{p?.name || "سياسة"}</div>
-              <div style={{ fontSize: 11, color: C.gray }}>تصميم تلقائي — PDF</div>
+              <div style={{ fontSize: 11, color: C.gray }}>{p?.code ? `${p.code} — ` : ""}حقول التخصيص — PDF</div>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            {canTemplate && ["docx", "pdf"].map(fmt => (
+              <button key={fmt} onClick={() => onTemplateDownload(sel, fmt)} disabled={loadingId === `${sel.id}-${fmt}`} style={tplBtn}>
+                {loadingId === `${sel.id}-${fmt}` ? "جارٍ التحميل..." : `النموذج المرجعي ${fmt === "pdf" ? "PDF" : "Word"}`}
+              </button>
+            ))}
             {onView && (
               <button onClick={() => onView(sel.id)}
                 style={{ fontSize: 11, color: C.teal, background: `${C.teal}10`, border: `1px solid ${C.teal}30`, borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontFamily: "'Cairo',sans-serif", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 3 }}>
@@ -2059,6 +2108,25 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
     } finally { setDlLoading(null); }
   };
 
+  // النموذج المرجعي v3.0 (Word / PDF) — متاح بعد اعتماد المستشار للسياسة
+  const handleTemplateDownload = async (sel, format) => {
+    const key = `${sel.id}-${format}`;
+    setDlLoading(key);
+    try {
+      const res  = await policiesApi.downloadTemplate(workflowId, sel.id, format);
+      const type = format === "pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+      const url  = window.URL.createObjectURL(new Blob([res.data], { type }));
+      const p    = policyTypes.find(x => x.id === sel.policy_type_id) || sel.policy_type;
+      const a    = document.createElement("a");
+      a.href = url;
+      a.download = `${p?.code || "policy"} - ${p?.name || ""}.${format}`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      alert("تعذّر تحميل النموذج المرجعي.");
+    } finally { setDlLoading(null); }
+  };
+
   const handleComplete = async (wantDesign, method, brief, logoFile) => {
     setActLoading(true);
     try {
@@ -2249,7 +2317,7 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
 
       {displayStep === 6 && (
         <StepDownload policyTypes={policyTypes} selections={selections} workflow={workflow}
-          onNext={() => setStep(7)} onDownload={handleDownload} loadingId={dlLoading} onView={setViewingId} />
+          onNext={() => setStep(7)} onDownload={handleDownload} onTemplateDownload={handleTemplateDownload} loadingId={dlLoading} onView={setViewingId} />
       )}
 
       {displayStep === 7 && (

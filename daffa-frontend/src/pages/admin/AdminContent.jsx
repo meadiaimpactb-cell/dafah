@@ -14,7 +14,7 @@ const C = {
 const TABS = [
   { key: 'strategic',   label: 'التخطيط الاستراتيجي',  count: 11 },
   { key: 'operational', label: 'التخطيط التشغيلي',      count: 5  },
-  { key: 'policies',    label: 'السياسات واللوائح',     count: 7  },
+  { key: 'policies',    label: 'السياسات واللوائح',     count: 19 },
 ];
 
 // Content fields with their sections and labels
@@ -415,7 +415,8 @@ export default function AdminContent() {
         adminApi.getOperationalContent(),
         adminApi.getPoliciesContent(),
       ]);
-      setData({ strategic: s.data, operational: o.data, policies: p.data });
+      // السياسات المتاحة فقط (حزمة الإصدار 3.0) — الإصدار السابق غير متاح للشراء
+      setData({ strategic: s.data, operational: o.data, policies: p.data.filter(x => x.active !== false) });
     } catch { showToast('فشل تحميل البيانات', 'error'); }
     finally { setLoading(false); }
   }, []);
@@ -463,7 +464,7 @@ export default function AdminContent() {
             style={{ padding: '8px 18px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: activeTab === t.key ? 700 : 400, background: activeTab === t.key ? C.white : 'transparent', color: activeTab === t.key ? C.teal : C.gray, boxShadow: activeTab === t.key ? '0 1px 4px rgba(0,0,0,.1)' : 'none', transition: 'all .18s', whiteSpace: 'nowrap' }}>
             {t.label}
             <span style={{ marginRight: 6, padding: '1px 7px', borderRadius: 12, background: activeTab === t.key ? C.tealLight : 'transparent', color: activeTab === t.key ? C.teal : C.gray, fontSize: 11, fontWeight: 700, fontFamily: 'inherit' }}>
-              {t.count}
+              {data[t.key]?.length || t.count}
             </span>
           </button>
         ))}

@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(ServiceSettingSeeder::class);
         $this->call(QuestionnaireSeeder::class);
+        $this->call(PolicyQuestionnaireV3Seeder::class);
     }
 }

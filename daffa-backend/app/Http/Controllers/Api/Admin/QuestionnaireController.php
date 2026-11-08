@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\QuestionnaireSection;
 use App\Models\QuestionnaireQuestion;
+use App\Support\PolicyCatalog;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class QuestionnaireController extends Controller
 {
@@ -27,7 +29,7 @@ class QuestionnaireController extends Controller
     {
         $request->validate([
             'name'           => 'required|string|max:100',
-            'policy_type_id' => 'nullable|integer|min:1|max:7',
+            'policy_type_id' => ['nullable', 'integer', Rule::in(PolicyCatalog::allIds())],
         ]);
 
         $maxOrder = QuestionnaireSection::where('policy_type_id', $request->policy_type_id)->max('sort_order') ?? 0;

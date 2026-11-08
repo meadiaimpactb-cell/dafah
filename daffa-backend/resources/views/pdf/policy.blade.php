@@ -215,6 +215,22 @@ body {
 .stamp-val  { font-size: 14px; font-weight: bold; color: #ffffff; margin-bottom: 8px; }
 .stamp-date { font-size: 11px; color: #b2d8df; }
 
+/* ══ بيانات الوثيقة وحالتها ══ */
+.doc-meta-table td { font-size: 10px; padding: 6px 10px; border: 1px solid #e5e7eb; }
+.doc-meta-lbl { background-color: #f0f9fb; color: #1A6B7C; font-weight: bold; width: 28%; }
+.status-box {
+    background-color: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-right: 4px solid #E8620A;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 10px;
+    color: #7c2d12;
+    line-height: 1.8;
+}
+.status-box-lbl { font-weight: bold; color: #c2410c; }
+.chapter-item { font-size: 11px; color: #374151; padding: 5px 10px; border-bottom: 1px dashed #e5e7eb; }
+
 .empty-val   { color: #9ca3af; font-style: italic; }
 .page-break  { page-break-before: always; }
 .spacer      { height: 14px; }
@@ -228,8 +244,11 @@ body {
     $orgType    = $workflow->user->org_type   ?? '';
     $consultant = $workflow->consultant->name ?? '—';
     $approvedAt = ($selection->reviewed_at ?? $workflow->completed_at ?? now())->format('Y/m/d');
-    $sections   = $policyType['sections'] ?? [];
     $formData   = $selection->form_data ?? [];
+    $code       = $policyType['code'] ?? null;
+    $version    = $policyType['version'] ?? null;
+    $chapters   = $policyType['chapters'] ?? [];
+    $isApproved = $selection->status === 'approved';
 
     $logoWhite  = public_path('logo-white.png');
     $logoNormal = public_path('logo.png');
@@ -247,14 +266,36 @@ body {
         'notes'      => 'ملاحظات وإضافات خاصة',
     ];
 
-    // تجميع الإجابات حسب رقم القسم
-    $grouped = [];
-    foreach ($formData as $key => $value) {
-        if (preg_match('/^s(\d+)_(.+)$/', $key, $m)) {
-            $grouped[(int)$m[1]][$m[2]] = $value;
+    // تجميع الإجابات حسب أقسام الاستبيان (الإجابات محفوظة بمفتاح q{رقم السؤال})
+    $grouped  = [];
+    $sections = [];
+    foreach (($questionnaire ?? collect()) as $section) {
+        $fields = [];
+        foreach ($section->questions as $q) {
+            $fields[] = ['label' => $q->question, 'value' => $formData['q' . $q->id] ?? null];
+        }
+        $sections[] = $section->name;
+        $grouped[]  = $fields;
+    }
+
+    // صيغة قديمة (s{رقم القسم}_{الحقل}) لبيانات سابقة لا تطابق أسئلة الاستبيان
+    $hasAnswers = collect($grouped)->flatten(1)->contains(fn ($f) => $f['value'] !== null && $f['value'] !== '' && $f['value'] !== []);
+    if (!$hasAnswers) {
+        $legacy = [];
+        foreach ($formData as $key => $value) {
+            if (preg_match('/^s(\d+)_(.+)$/', $key, $m)) {
+                $legacy[(int) $m[1]][] = ['label' => $fieldLabels[$m[2]] ?? $m[2], 'value' => $value];
+            }
+        }
+        if ($legacy) {
+            ksort($legacy);
+            $sections = $policyType['sections'] ?? [];
+            $grouped  = [];
+            foreach ($legacy as $idx => $fields) {
+                $grouped[$idx] = $fields;
+            }
         }
     }
-    ksort($grouped);
 @endphp
 
 <div class="page-wrapper">
@@ -277,7 +318,7 @@ body {
                 @endif
             </td>
             <td align="left" style="vertical-align:middle;">
-                <span class="cover-badge-span">سياسة رسمية معتمدة</span>
+                <span class="cover-badge-span">{{ $version ? 'نموذج مخصص — الإصدار ' . $version : 'نموذج مخصص للجهة' }}</span>
             </td>
         </tr>
     </table>
@@ -286,12 +327,14 @@ body {
         <div class="cover-org-type-text">{{ $orgType }}</div>
     @endif
     <div class="cover-title-text">{{ $orgName }}</div>
-    <div class="cover-sub-text">السياسات واللوائح الداخلية المعتمدة</div>
+    <div class="cover-sub-text">السياسات واللوائح الداخلية</div>
     <div class="cover-line-div"></div>
 
     {{-- بطاقة السياسة --}}
     <div class="policy-card">
-        <div class="policy-card-icon">{{ $policyType['icon'] ?? '📜' }}</div>
+        @if($code)
+        <div class="policy-card-desc" style="letter-spacing:1px;">{{ $code }}</div>
+        @endif
         <div class="policy-card-name">{{ $policyType['name'] ?? 'السياسة' }}</div>
         <div class="policy-card-divider"></div>
         <div class="policy-card-desc">{{ $policyType['description'] ?? '' }}</div>
@@ -315,7 +358,7 @@ body {
             </td>
             <td>
                 <div class="cover-card-div">
-                    <div class="cover-card-lbl">تاريخ الاعتماد</div>
+                    <div class="cover-card-lbl">{{ $isApproved ? 'تاريخ مراجعة المستشار' : 'تاريخ الإصدار' }}</div>
                     <div class="cover-card-val">{{ $approvedAt }}</div>
                 </div>
             </td>
@@ -336,9 +379,40 @@ body {
 {{-- ════ المحتوى ════ --}}
 <div class="content-area">
 
+    {{-- بيانات الوثيقة وحالتها --}}
+    <div class="page-break"></div>
+    <div class="toc-header-div">بيانات الوثيقة</div>
+    <table width="100%" cellpadding="0" cellspacing="0" class="doc-meta-table">
+        @if($code)
+        <tr><td class="doc-meta-lbl">رمز الوثيقة</td><td>{{ $code }}</td></tr>
+        @endif
+        <tr><td class="doc-meta-lbl">اسم الوثيقة</td><td>{{ $policyType['name'] ?? '—' }}</td></tr>
+        @if($version)
+        <tr><td class="doc-meta-lbl">إصدار النموذج المرجعي</td><td>{{ $version }}</td></tr>
+        @endif
+        @if(!empty($policyType['group_name']))
+        <tr><td class="doc-meta-lbl">المجموعة</td><td>{{ $policyType['group_name'] }}</td></tr>
+        @endif
+        <tr><td class="doc-meta-lbl">الجهة</td><td>{{ $orgName }}</td></tr>
+        <tr><td class="doc-meta-lbl">المستشار المشرف</td><td>{{ $consultant }}</td></tr>
+    </table>
+    <div class="status-box">
+        <span class="status-box-lbl">حالة الوثيقة: </span>{{ \App\Support\PolicyCatalog::STATUS_NOTE }}
+        <br>
+        <span class="status-box-lbl">قاعدة التعارض: </span>{{ \App\Support\PolicyCatalog::CONFLICT_RULE }}
+    </div>
+
+    @if(count($chapters))
+    <div class="spacer"></div>
+    <div class="toc-header-div">هيكل الوثيقة المرجعية (الإصدار {{ $version }})</div>
+    @foreach($chapters as $chapter)
+    <div class="chapter-item">{{ $chapter }}</div>
+    @endforeach
+    @endif
+
     {{-- فهرس الأقسام --}}
     <div class="page-break"></div>
-    <div class="toc-header-div">فهرس أقسام السياسة</div>
+    <div class="toc-header-div">فهرس حقول التخصيص</div>
     <table width="100%" cellpadding="4" cellspacing="4">
         @foreach(collect($sections)->chunk(2) as $chunk)
         <tr>
@@ -368,25 +442,19 @@ body {
                 </td>
                 <td style="vertical-align:middle;">
                     <span class="section-title-span">{{ $sections[$sIdx] ?? ('القسم ' . ($sIdx + 1)) }}</span>
-                    @if($sIdx === 0)
-                    <div class="section-subtitle">المعلومات الأساسية عن المنظمة</div>
-                    @elseif($sIdx === 1)
-                    <div class="section-subtitle">المتطلبات والممارسات الحالية للقسم</div>
-                    @else
-                    <div class="section-subtitle">آلية العمل والإجراءات الداخلية</div>
-                    @endif
+                    <div class="section-subtitle">بيانات الجهة وقراراتها لهذا القسم من الوثيقة</div>
                 </td>
             </tr>
         </table>
     </div>
     <div class="spacer"></div>
 
-    @foreach($fields as $field => $value)
+    @foreach($fields as $fIdx => $field)
     @php
-        $isAccent = in_array($field, ['org_name','main_tasks','procedure']);
+        $value = $field['value'];
     @endphp
-    <div class="field-block {{ $isAccent ? 'field-block-accent' : '' }}">
-        <div class="field-label">{{ $fieldLabels[$field] ?? $field }}</div>
+    <div class="field-block {{ $fIdx === 0 ? 'field-block-accent' : '' }}">
+        <div class="field-label">{{ $field['label'] }}</div>
         <div class="field-value">
             @if(is_array($value))
                 @if(count($value) > 0)
@@ -443,15 +511,16 @@ body {
                 <span style="font-size:20px; font-weight:bold; color:#fff;">دفة</span>
             @endif
         </div>
-        <div class="closing-title">{{ $policyType['icon'] ?? '📜' }} تم اعتماد {{ $policyType['name'] ?? 'السياسة' }}</div>
+        <div class="closing-title">{{ $policyType['name'] ?? 'السياسة' }}{{ $code ? ' — ' . $code : '' }}</div>
         <p class="closing-text">
-            اعتُمدت هذه السياسة رسمياً بناءً على استبيان ذكي موجّه<br>
-            بإشراف مستشار متخصص عبر منصة دفة للتخطيط المؤسسي
+            {{ $isApproved ? 'راجع المستشار المتخصص حقول التخصيص في هذه الوثيقة واعتمد اكتمالها' : 'أُعدّت حقول التخصيص في هذه الوثيقة عبر استبيان موجّه' }} عبر منصة دفة.<br>
+            تصبح الوثيقة نافذة بعد صدور قرار الاعتماد من صاحب الصلاحية في الجهة<br>
+            والحصول على الموافقات النظامية اللازمة.
         </p>
         <div class="stamp-box">
             <div class="stamp-lbl">المنظمة</div>
             <div class="stamp-val">{{ $orgName }}</div>
-            <div class="stamp-lbl">معتمد من المستشار</div>
+            <div class="stamp-lbl">{{ $isApproved ? 'راجعها المستشار' : 'المستشار المشرف' }}</div>
             <div class="stamp-val">{{ $consultant }}</div>
             <div class="stamp-date">{{ $approvedAt }}</div>
         </div>

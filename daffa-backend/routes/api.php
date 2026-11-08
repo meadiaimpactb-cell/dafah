@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Route;
 
 // ── Public endpoints (no auth) ────────────────────────────────────────────────
 Route::get('/site-content',        [AdminSiteContentController::class, 'publicIndex']);
-Route::get('/public/policy-types', [AdminContentController::class,     'policyTypes']);
+Route::get('/public/policy-types', [AdminContentController::class,     'publicPolicyTypes']);
 Route::get('/faqs',                [FaqController::class,              'index']);
 Route::post('/auth/forgot-password', [PasswordResetController::class, 'sendLink']);
 Route::post('/auth/reset-password',  [PasswordResetController::class, 'reset']);
@@ -136,6 +136,7 @@ Route::middleware('auth:sanctum')->prefix('policies')->group(function () {
     Route::get('/selections/{id}',                    [PolicyController::class, 'selection']);
     Route::post('/selections/{id}/save',              [PolicyController::class, 'saveSelection']);
     Route::post('/selections/{id}/submit',            [PolicyController::class, 'submitSelection']);
+    Route::get('/selections/{id}/template',           [PolicyController::class, 'downloadTemplate']);
     Route::get('/workflow/pdf/{selectionId}',         [PolicyController::class, 'downloadPDF']);
     Route::get('/workflow/pdf-link/{selectionId}',    [PolicyController::class, 'getPdfLink']);
 });

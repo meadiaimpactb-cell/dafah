@@ -26,6 +26,7 @@ export const policiesApi = {
   submitSelection: (wid, id, data)         => api.post(`/policies/selections/${id}/submit`, b(wid, data)),
   getPdfLink:      (wid, selId)            => api.get(`/policies/workflow/pdf-link/${selId}`, { params: p(wid) }),
   downloadPdf:     (wid, selId)            => api.get(`/policies/workflow/pdf/${selId}`, { params: p(wid), responseType: 'blob' }),
+  downloadTemplate:(wid, selId, format)    => api.get(`/policies/selections/${selId}/template`, { params: p(wid, { format }), responseType: 'blob' }),
 };
 
 export const policiesDesignApi = {

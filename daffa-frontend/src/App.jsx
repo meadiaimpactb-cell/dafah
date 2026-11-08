@@ -2423,23 +2423,15 @@ export default function DaffaPlatform() {
     </div>
   );
 
-  // ── بيانات السياسات — الثابتة كـ fallback، يُستبدل بالبيانات من API ──────
-  const POLICY_DEFAULTS = [
-    { id:1, icon:'👥', name:'لائحة الموارد البشرية',                             price:1500, sections:['معلومات المنظمة','رؤية الموارد البشرية','الهيكل التنظيمي','التوظيف والتعيين','التدريب والتطوير','الرواتب والمزايا','سياسة الإجازات','إنهاء الخدمة'] },
-    { id:2, icon:'📢', name:'السياسات الإعلامية',                                 price:1200, sections:['معلومات المنظمة','الهوية البصرية','التواصل الإعلامي','وسائل التواصل الاجتماعي','الأزمات الإعلامية','المتحدث الرسمي'] },
-    { id:3, icon:'⚖️', name:'سياسات الحوكمة',                                    price:1800, sections:['معلومات المنظمة','مجلس الإدارة','اللجان','التصويت واتخاذ القرار','تضارب المصالح','الشفافية والإفصاح','المحاسبية'] },
-    { id:4, icon:'🏦', name:'لائحة تنظيم التبرعات',                              price:1000, sections:['معلومات المنظمة','أهداف التبرع','آليات التبرع','الشفافية والمساءلة','الضوابط القانونية','التقارير والإفصاح'] },
-    { id:5, icon:'💰', name:'سياسة الموارد المالية',                              price:1500, sections:['معلومات المنظمة','الميزانية التقديرية','الرقابة المالية','الشفافية المالية','الصلاحيات المالية','التدقيق والمراجعة'] },
-    { id:6, icon:'🔒', name:'سياسة خصوصية المستفيد والسرية والافصاح',            price:1200, sections:['معلومات المنظمة','تعريف البيانات','جمع البيانات','حماية البيانات','حقوق المستفيدين','الإفصاح والشفافية'] },
-    { id:7, icon:'📊', name:'سياسات المتابعة والتقييم',                          price:1000, sections:['معلومات المنظمة','إطار المتابعة','أدوات التقييم','مؤشرات الأداء','التقارير الدورية','التحسين المستمر'] },
+  // ── السياسات المتاحة (حزمة سياسات دفة الإصدار 3.0) — من API ──────────────
+  // الـ fallback عند تعذّر الاتصال: مجموعات الحزمة الأربع فقط
+  const POLICY_GROUPS_FALLBACK = [
+    { id: 'g1', name: 'الحوكمة واللوائح الأساسية' },
+    { id: 'g2', name: 'المالية والامتثال' },
+    { id: 'g3', name: 'الموارد البشرية والتطوع والسلامة' },
+    { id: 'g4', name: 'التقنية والإعلام والأخلاقيات' },
   ];
-  // دمج البيانات الديناميكية من API مع الـ fallback الثابت
-  const allPolicies = publicPolicies.length > 0
-    ? publicPolicies.map(p => {
-        const def = POLICY_DEFAULTS.find(d => d.id === p.id) || {};
-        return { ...def, ...p, icon: def.icon || '📋' };
-      })
-    : POLICY_DEFAULTS;
+  const allPolicies = publicPolicies.length > 0 ? publicPolicies : POLICY_GROUPS_FALLBACK;
 
   // ============== SERVICES PAGE ==============
   const ServicesPage = () => (
@@ -2494,7 +2486,7 @@ export default function DaffaPlatform() {
               <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.tealDark, marginBottom: 6 }}>نظام بناء السياسات واللوائح</h2>
               <p style={{ fontSize: 14, color: colors.gray, lineHeight: 1.8, marginBottom: 16 }}>{sc('policies_service_desc','بناء السياسات واللوائح الداخلية عبر استبيانات ذكية موجهة.')}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
-                {allPolicies.map(p => <Badge key={p.id} text={`${p.icon} ${p.name}`} color="teal" small />)}
+                {allPolicies.map(p => <Badge key={p.id} text={p.name} color="teal" small />)}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                 <span style={{ fontSize: 14, color: colors.gray }}>تسعير مستقل لكل سياسة — يبدأ من</span>
@@ -2573,12 +2565,13 @@ export default function DaffaPlatform() {
         <Card style={{ padding: 24 }}>
           <h3 style={{ fontSize: 18, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>تسعير السياسات واللوائح (مستقل)</h3>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead><tr>{["السياسة", "الأقسام", "السعر"].map(h => <th key={h} style={{ padding: "10px 12px", background: colors.tealCard, color: "white", fontSize: 12, textAlign: "right" }}>{h}</th>)}</tr></thead>
-            <tbody>{allPolicies.map((p, i) => (
-              <tr key={i} style={{ borderBottom: `1px solid ${colors.grayLight}` }}>
-                <td style={{ padding: "10px 12px", fontSize: 13, fontWeight: 600 }}>{p.icon} {p.name}</td>
-                <td style={{ padding: "10px 12px", fontSize: 12, color: colors.gray }}>{p.sections.length} أقسام</td>
-                <td style={{ padding: "10px 12px", fontSize: 14, fontWeight: 700, color: colors.teal }}>{p.price.toLocaleString('en-US')} ريال</td>
+            <thead><tr>{["الرمز", "السياسة", "المجموعة", "السعر"].map(h => <th key={h} style={{ padding: "10px 12px", background: colors.tealCard, color: "white", fontSize: 12, textAlign: "right" }}>{h}</th>)}</tr></thead>
+            <tbody>{publicPolicies.map((p, i) => (
+              <tr key={p.id ?? i} style={{ borderBottom: `1px solid ${colors.grayLight}` }}>
+                <td style={{ padding: "10px 12px", fontSize: 11, color: colors.gray, direction: "ltr", textAlign: "right", whiteSpace: "nowrap" }}>{p.code}</td>
+                <td style={{ padding: "10px 12px", fontSize: 13, fontWeight: 600 }}>{p.name}</td>
+                <td style={{ padding: "10px 12px", fontSize: 12, color: colors.gray }}>{p.group_name}</td>
+                <td style={{ padding: "10px 12px", fontSize: 14, fontWeight: 700, color: colors.teal, whiteSpace: "nowrap" }}>{Number(p.price).toLocaleString('en-US')} ريال</td>
               </tr>
             ))}</tbody>
           </table>
@@ -4201,18 +4194,10 @@ export default function DaffaPlatform() {
   // ============== ADMIN PAGES ==============
   // AdminOrgs is imported from ./pages/admin/AdminOrgs
 
-  const POLICY_TYPES = [
-    { id: 1, name: "لائحة الموارد البشرية" },
-    { id: 2, name: "السياسات الإعلامية" },
-    { id: 3, name: "سياسات الحوكمة" },
-    { id: 4, name: "لائحة تنظيم التبرعات" },
-    { id: 5, name: "سياسة الموارد المالية" },
-    { id: 6, name: "سياسة الخصوصية والسرية" },
-    { id: 7, name: "سياسات المتابعة والتقييم" },
-  ];
-
   const AdminQuestionnaire = () => {
-    const [activePolicyId, setActivePolicyId] = React.useState(1);
+    // أنواع السياسات من الكتالوج (حزمة الإصدار 3.0 + الإصدار السابق للطلبات القديمة)
+    const [policyTypes,    setPolicyTypes]    = React.useState([]);
+    const [activePolicyId, setActivePolicyId] = React.useState(null);
     const [sections,      setSections]      = React.useState([]);
     const [activeId,      setActiveId]      = React.useState(null);
     const [questions,     setQuestions]     = React.useState([]);
@@ -4242,7 +4227,20 @@ export default function DaffaPlatform() {
         setQuestions([]);
       });
     };
-    React.useEffect(() => { loadSections(activePolicyId); }, [activePolicyId]);
+    React.useEffect(() => {
+      api.get('/admin/content/policies').then(r => {
+        setPolicyTypes(r.data);
+        const first = r.data.find(p => p.active !== false) || r.data[0];
+        if (first) setActivePolicyId(first.id);
+      }).catch(() => {});
+    }, []);
+    React.useEffect(() => { if (activePolicyId) loadSections(activePolicyId); }, [activePolicyId]);
+    const activePolicy = policyTypes.find(p => p.id === activePolicyId);
+    const policyGroups = policyTypes.reduce((acc, p) => {
+      const g = p.active === false ? 'الإصدار السابق (غير متاح للشراء)' : (p.group_name || 'السياسات');
+      (acc[g] = acc[g] || []).push(p);
+      return acc;
+    }, {});
 
     // load questions when section changes
     React.useEffect(() => {
@@ -4328,17 +4326,24 @@ export default function DaffaPlatform() {
 
         <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>بناء الاستبيانات</h2>
 
-        {/* Policy Type Tabs */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-          {POLICY_TYPES.map(p => (
-            <button key={p.id} onClick={() => setActivePolicyId(p.id)} style={{ padding: "7px 14px", borderRadius: 20, border: `2px solid ${activePolicyId === p.id ? colors.teal : colors.grayBorder}`, background: activePolicyId === p.id ? colors.teal : "#fff", color: activePolicyId === p.id ? "#fff" : colors.gray, fontSize: 12, fontWeight: activePolicyId === p.id ? 700 : 400, cursor: "pointer", fontFamily: "'Cairo',sans-serif", transition: "all 0.15s" }}>{p.name}</button>
-          ))}
+        {/* Policy Type Selector */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
+          <label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark }}>السياسة:</label>
+          <select value={activePolicyId || ""} onChange={e => setActivePolicyId(Number(e.target.value))}
+            style={{ minWidth: 320, padding: "8px 12px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "'Cairo',sans-serif", background: "#fff" }}>
+            {Object.entries(policyGroups).map(([g, items]) => (
+              <optgroup key={g} label={g}>
+                {items.map(p => <option key={p.id} value={p.id}>{p.code ? `${p.code} — ` : ""}{p.name}</option>)}
+              </optgroup>
+            ))}
+          </select>
+          {activePolicy?.active === false && <Badge text="إصدار سابق" color="orange" small />}
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 16 }}>
           {/* Sections sidebar */}
           <Card style={{ padding: 12 }}>
-            <h4 style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>أقسام {POLICY_TYPES.find(p => p.id === activePolicyId)?.name}</h4>
+            <h4 style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>أقسام {activePolicy?.name}</h4>
             {sections.map(s => (
               <div key={s.id} onClick={() => setActiveId(s.id)} style={{ padding: "8px 10px", borderRadius: 8, marginBottom: 4, background: activeId === s.id ? `${colors.teal}10` : "transparent", borderRight: activeId === s.id ? `3px solid ${colors.teal}` : "3px solid transparent", fontSize: 12, fontWeight: activeId === s.id ? 600 : 400, cursor: "pointer", color: activeId === s.id ? colors.teal : colors.gray, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ display: "flex", alignItems: "center", gap: 6 }}><IcBars width={12} height={12}/> {s.name}</span>

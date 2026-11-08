@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\PolicyController;
 use App\Models\OperationalUnit;
 use App\Models\PolicyTypeContent;
 use App\Models\StrategicUnit;
+use App\Support\PolicyCatalog;
 use Illuminate\Http\Request;
 
 class ContentController extends Controller
@@ -85,27 +86,27 @@ class ContentController extends Controller
         $types    = collect(PolicyController::policyTypes());
         $contents = PolicyTypeContent::all()->keyBy('policy_type_id');
 
-        $data = $types->map(function ($t) use ($contents) {
-            $c = $contents->get($t['id']);
-            return array_merge($t, [
-                'name'                => $c?->name          ?? $t['name'],
-                'description'         => $c?->description   ?? $t['description'],
-                'price'               => $c?->price          ?? $t['price'],
-                'overview'            => $c?->overview,
-                'written_description' => $c?->written_description,
-                'tip'                 => $c?->tip,
-                'video_url'           => $c?->video_url,
-                'video_duration'      => $c?->video_duration,
-                'content_id'          => $c?->id,
-            ]);
-        });
+        // policyTypes() already merges admin overrides over the catalog defaults
+        $data = $types->map(fn ($t) => array_merge($t, [
+            'content_id' => $contents->get($t['id'])?->id,
+        ]));
 
-        return response()->json($data);
+        return response()->json($data->values());
+    }
+
+    // ── GET /api/public/policy-types — السياسات المتاحة للشراء فقط ───────────
+    public function publicPolicyTypes()
+    {
+        return response()->json(
+            collect(PolicyController::policyTypes())->where('active', true)->values()
+        );
     }
 
     // ── PUT /api/admin/content/policies/{typeId} ──────────────────────────────
     public function updatePolicy(Request $request, int $typeId)
     {
+        abort_unless(in_array($typeId, PolicyCatalog::allIds(), true), 404);
+
         $request->validate($this->policyRules());
 
         $content = PolicyTypeContent::updateOrCreate(

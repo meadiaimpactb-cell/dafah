@@ -10,8 +10,10 @@ class QuestionnaireSeeder extends Seeder
 {
     public function run(): void
     {
-        QuestionnaireQuestion::query()->delete();
-        QuestionnaireSection::query()->delete();
+        // استبيانات الإصدار السابق (1–7) فقط — استبيانات الإصدار 3.0 في PolicyQuestionnaireV3Seeder
+        $legacySectionIds = QuestionnaireSection::whereIn('policy_type_id', range(1, 7))->pluck('id');
+        QuestionnaireQuestion::whereIn('section_id', $legacySectionIds)->delete();
+        QuestionnaireSection::whereIn('id', $legacySectionIds)->delete();
 
         $policies = [
             1 => [
