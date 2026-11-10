@@ -13,8 +13,27 @@ const C = {
 };
 const FONT = "'Cairo', sans-serif";
 
-// ملفات PDF الخاصة بكل وحدة في public/guides/strategic
-export const pdfUrl = (templateType, kind) => `/guides/strategic/${templateType}-${kind}.pdf`;
+// ملفات PDF الخاصة بكل وحدة في public/guides/strategic — بالأسماء المحددة في المواصفات
+// («الشرح التفصيلي — اسم الوحدة.pdf» و«الإرشادات التفصيلية — اسم الوحدة.pdf») ليظهر الاسم نفسه عند التنزيل
+const PDF_UNIT_NAMES = {
+  swot: 'تحليل البيئة الداخلية',
+  pestel: 'تحليل البيئة الخارجية',
+  needs: 'دراسة الاحتياجات المجتمعية',
+  toc: 'بناء نظرية التغيير',
+  tows: 'التحليل الاستراتيجي',
+  directions: 'التوجهات الاستراتيجية',
+  initiatives: 'المبادرات الاستراتيجية',
+  bmc: 'نموذج عمل المنظمة',
+  kpis: 'مؤشرات الأداء',
+  orgchart: 'الهيكل التنظيمي',
+  document: 'الوثيقة الاستراتيجية',
+};
+export const pdfUrl = (templateType, kind) => {
+  const name = PDF_UNIT_NAMES[templateType];
+  if (!name) return `/guides/strategic/${templateType}-${kind}.pdf`;
+  const prefix = kind === 'guidelines' ? 'الإرشادات التفصيلية' : 'الشرح التفصيلي';
+  return `/guides/strategic/${encodeURIComponent(`${prefix} — ${name}.pdf`)}`;
+};
 
 // اسم «نوع النموذج» بالعربية عند غياب قيمة محددة في المواصفات
 const TEMPLATE_LABELS = {
@@ -422,15 +441,16 @@ export function ExplanationContent({ unit }) {
             <p style={{ fontSize: 13, color: '#4b5563', lineHeight: 1.9, margin: '0 0 12px' }}>{e.deep_dive.text}</p>
           </>
         )}
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-          <PdfButton href={pdfUrl(unit.template_type, 'explanation')} label={e.pdf_button || 'قراءة الشرح التفصيلي'} caption={e.pdf_caption} />
-        </div>
+        {/* الترتيب وفق المواصفات: زر المثال أولًا، ثم زر الشرح التفصيلي */}
         {(e.example || e.example_2) && (
-          <div style={{ marginTop: 12, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <div style={{ marginBottom: 12, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-start' }}>
             {e.example && <ExampleToggle label={e.example_button} example={e.example} />}
             {e.example_2 && <ExampleToggle label={e.example_button_2} example={e.example_2} />}
           </div>
         )}
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <PdfButton href={pdfUrl(unit.template_type, 'explanation')} label={e.pdf_button || 'قراءة الشرح التفصيلي'} caption={e.pdf_caption} />
+        </div>
       </div>
     </div>
   );
