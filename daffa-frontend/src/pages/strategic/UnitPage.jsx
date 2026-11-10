@@ -4,6 +4,7 @@ import { strategicApi } from '../../api/strategic';
 import TemplateRenderer from './TemplateRenderer';
 import { DEMO_DATA } from './demoData';
 import { validateTemplate } from './templateValidation';
+import { OverviewContent, ExplanationContent, GuidelinesContent, templateLabel } from './UnitContent';
 
 const colors = { teal: '#1A6B7C', tealDark: '#14505E', orange: '#E8620A' };
 
@@ -221,6 +222,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
               formData={formData}
               setFormData={setFormData}
               disabled={isLocked}
+              context={{ plan_period: unitData?.plan_period }}
             />
           )}
         </div>
@@ -356,6 +358,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
 
 /* ─── تبويب النبذة ─── */
 function TabOverview({ unit }) {
+  if (unit.content?.overview) return <OverviewContent unit={unit} />;
   return (
     <div>
       <div style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 10 }}>عن هذه الوحدة</div>
@@ -365,9 +368,8 @@ function TabOverview({ unit }) {
           {unit.overview2}
         </p>
       )}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        <InfoBox label="مدة الفيديو"  value={unit.video_duration || '—'} />
-        <InfoBox label="نوع النموذج" value={unit.template_type || '—'} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', maxWidth: 360 }}>
+        <InfoBox label="نوع النموذج" value={templateLabel(unit)} />
       </div>
     </div>
   );
@@ -375,6 +377,7 @@ function TabOverview({ unit }) {
 
 /* ─── تبويب الشرح المكتوب ─── */
 function TabDescription({ unit }) {
+  if (unit.content?.explanation) return <ExplanationContent unit={unit} />;
   const topics = unit.topics || [];
   const hasText = !!unit.written_description;
   const hasTopics = topics.length > 0;
@@ -412,6 +415,7 @@ function TabDescription({ unit }) {
 
 /* ─── تبويب الإرشادات ─── */
 function TabGuide({ unit }) {
+  if (unit.content?.guidelines) return <GuidelinesContent unit={unit} />;
   const steps = unit.steps || [];
   return (
     <div>

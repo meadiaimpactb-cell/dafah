@@ -4,7 +4,7 @@ const LABELS = {
   programs:'البرامج والخدمات', partners:'الشركاء', resources:'الموارد',
   challenges:'التحديات', description:'الوصف', notes:'ملاحظات',
   strengths:'نقاط القوة', weaknesses:'نقاط الضعف',
-  opportunities:'الفرص', threats:'التهديدات',
+  opportunities:'فرص التحسين', threats:'المخاطر الداخلية',
   needs:'الاحتياجات', community_definition:'تعريف المجتمع المستهدف',
   need_description:'وصف الاحتياج', priority:'الأولوية', source:'المصدر',
   positions:'المناصب', dept:'القسم', title:'المسمى الوظيفي',
@@ -23,7 +23,7 @@ const LABELS = {
   assumptions:'الافتراضات',
   so:'ق+ف', st:'ق+ت', wo:'ض+ف', wt:'ض+ت',
   tows:'مصفوفة TOWS', toc:'نظرية التغيير', bmc:'نموذج العمل',
-  directions:'التوجهات الاستراتيجية', matrix:'مصفوفة SWOT',
+  directions:'التوجهات الاستراتيجية', matrix:'ملخص التحليل الداخلي المستند إلى إطار SWOT',
   table:'الجدول', needs_table:'جدول الاحتياجات',
   factors:'عوامل PESTEL', stakeholders:'أصحاب المصلحة',
   gap_analysis:'تحليل الفجوة', goals_list:'الأهداف الاستراتيجية',
@@ -108,7 +108,7 @@ function renderFormData(formData) {
   if (!formData || typeof formData !== 'object') return '<p class="empty">لا توجد بيانات</p>';
   if (isCompoundTable(formData)) return renderCompoundTable(formData);
 
-  return Object.entries(formData).map(([key, val]) => {
+  return Object.entries(formData).filter(([key]) => key !== 'needs_items').map(([key, val]) => {
     const isEmpty = val===null||val===undefined||val===''||(Array.isArray(val)&&val.length===0);
     if (isEmpty) return '';
 

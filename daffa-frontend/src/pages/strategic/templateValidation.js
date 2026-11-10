@@ -1,3 +1,5 @@
+import { swotAutoPoints, needsItems } from './TemplateRenderer';
+
 const notEmpty = v => (v || '').trim().length > 0;
 
 /**
@@ -9,11 +11,12 @@ export function validateTemplate(templateType, formData, unit) {
 
   switch (templateType) {
     case 'swot': {
+      // نقاط القوة والضعف تظهر تلقائيًا في الملخص من الجدول
       const matrix = formData.matrix || {};
-      if (!notEmpty(matrix.strengths))     errors.push('نقاط القوة (S)');
-      if (!notEmpty(matrix.weaknesses))    errors.push('نقاط الضعف (W)');
-      if (!notEmpty(matrix.opportunities)) errors.push('الفرص (O)');
-      if (!notEmpty(matrix.threats))       errors.push('التهديدات (T)');
+      if (!swotAutoPoints(unit || {}, formData.table, 'strength').length) errors.push('نقاط القوة (سجّلها في جدول الموارد)');
+      if (!swotAutoPoints(unit || {}, formData.table, 'weakness').length) errors.push('نقاط الضعف (سجّلها في جدول الموارد)');
+      if (!notEmpty(matrix.opportunities)) errors.push('فرص التحسين');
+      if (!notEmpty(matrix.threats))       errors.push('المخاطر الداخلية');
       break;
     }
 
@@ -30,12 +33,10 @@ export function validateTemplate(templateType, formData, unit) {
     case 'needs': {
       if (!notEmpty(formData.target_community)) errors.push('تعريف المجتمع المستهدف');
       if (!notEmpty(formData.gap_analysis))     errors.push('تحليل الفجوات');
-      const rows = unit?.table_rows || ['الدعم التعليمي', 'التأهيل المهني', 'الدعم النفسي', 'الرعاية الصحية', 'الإسكان'];
-      const tbl = formData.needs_table || {};
-      rows.forEach(row => {
-        if (!notEmpty(tbl[`${row}__desc`]))
-          errors.push(`${row}: وصف الاحتياج`);
-      });
+      // لا يُشترط استكمال الصفوف غير المستخدمة؛ يكفي احتياج واحد موصوف
+      const items = needsItems(formData, unit || {});
+      if (!items.some(it => notEmpty(it.name) && notEmpty(it.desc)))
+        errors.push('جدول الاحتياجات: احتياج واحد على الأقل مع وصفه');
       break;
     }
 

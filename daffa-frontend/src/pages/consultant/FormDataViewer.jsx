@@ -9,7 +9,7 @@ const colors = {
 // ── ترجمة المفاتيح ─────────────────────────────────────────────────────────────
 const LABELS = {
   // هيكل عام
-  table: 'الجدول', matrix: 'المصفوفة', tows: 'مصفوفة TOWS',
+  table: 'الجدول', matrix: 'ملخص التحليل الداخلي المستند إلى إطار SWOT', tows: 'مصفوفة TOWS',
   factors: 'عوامل البيئة الخارجية', stakeholders: 'أصحاب المصلحة',
   needs_table: 'جدول الاحتياجات', target_community: 'المجتمع المستهدف',
   gap_analysis: 'تحليل الفجوات', positions: 'الهيكل الوظيفي',
@@ -20,7 +20,7 @@ const LABELS = {
 
   // SWOT
   strengths: 'نقاط القوة', weaknesses: 'نقاط الضعف',
-  opportunities: 'الفرص', threats: 'التهديدات',
+  opportunities: 'فرص التحسين', threats: 'المخاطر الداخلية',
 
   // TOC / بنية TOC
   inputs: 'المدخلات', activities: 'الأنشطة', outputs: 'المخرجات',
@@ -430,7 +430,8 @@ export default function FormDataViewer({ data }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {Object.entries(data).map(([k, v]) => renderSection(k, v))}
+      {/* needs_items مصدر تحرير الجدول؛ يُعرض محتواه عبر needs_table */}
+      {Object.entries(data).filter(([k]) => k !== 'needs_items').map(([k, v]) => renderSection(k, v))}
     </div>
   );
 }

@@ -10,7 +10,7 @@ class StrategicUnit extends Model
         'unit_number', 'name', 'template_type', 'video_duration',
         'overview', 'overview2', 'table_headers', 'table_rows',
         'topics', 'steps', 'tip',
-        'written_description', 'tips', 'video_url',
+        'written_description', 'tips', 'video_url', 'content',
     ];
 
     protected $casts = [
@@ -19,5 +19,6 @@ class StrategicUnit extends Model
         'topics'        => 'array',
         'steps'         => 'array',
         'tips'          => 'array',
+        'content'       => 'array',
     ];
 }

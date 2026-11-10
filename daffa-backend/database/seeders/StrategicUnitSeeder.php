@@ -74,7 +74,7 @@ class StrategicUnitSeeder extends Seeder
                 'tip' => 'أشرك أفراد من المجتمع المستهدف مباشرة في عملية تحديد الاحتياجات.',
             ],
             [
-                'unit_number'   => 4,
+                'unit_number'   => 5,
                 'name'          => 'التحليل الاستراتيجي',
                 'template_type' => 'tows',
                 'video_duration'=> '14:00',
@@ -96,7 +96,7 @@ class StrategicUnitSeeder extends Seeder
                 'tip' => 'ركّز على 3-5 استراتيجيات رئيسية بدلاً من الإكثار من الخيارات.',
             ],
             [
-                'unit_number'   => 5,
+                'unit_number'   => 7,
                 'name'          => 'المبادرات الاستراتيجية',
                 'template_type' => 'initiatives',
                 'video_duration'=> '16:30',
@@ -137,7 +137,7 @@ class StrategicUnitSeeder extends Seeder
                 'tip' => 'الرؤية الجيدة تكون طموحة لكن قابلة للتصديق، ومحفزة للعمل.',
             ],
             [
-                'unit_number'   => 7,
+                'unit_number'   => 4,
                 'name'          => 'بناء نظرية التغيير',
                 'template_type' => 'toc',
                 'video_duration'=> '20:00',
@@ -242,9 +242,11 @@ class StrategicUnitSeeder extends Seeder
 
         foreach ($units as $data) {
             \App\Models\StrategicUnit::updateOrCreate(
-                ['unit_number' => $data['unit_number']],
+                ['template_type' => $data['template_type']],
                 $data
             );
         }
+
+        $this->call(StrategicUnitContentSeeder::class);
     }
 }

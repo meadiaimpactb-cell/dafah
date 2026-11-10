@@ -255,7 +255,8 @@ class StrategicController extends Controller
     public function units(Request $request)
     {
         $workflow = $this->userWorkflow($request);
-        $units    = StrategicUnit::orderBy('unit_number')->get();
+        // المحتوى المنظَّم كبير ويُجلب مع الوحدة المفردة فقط
+        $units    = StrategicUnit::orderBy('unit_number')->get()->makeHidden('content');
 
         $submissions = UnitSubmission::where('workflow_id', $workflow->id)
             ->get()->keyBy('unit_number');
@@ -283,9 +284,26 @@ class StrategicController extends Controller
             ->first();
 
         return response()->json([
-            'unit'       => $unit,
-            'submission' => $submission,
+            'unit'        => $unit,
+            'submission'  => $submission,
+            // الوثيقة الاستراتيجية تعرض فترة الخطة الفعلية بدل تاريخ ثابت
+            'plan_period' => $unit->template_type === 'document' ? $this->planPeriod($workflow->id) : null,
         ]);
+    }
+
+    /** فترة الخطة من تواريخ البداية والنهاية في وحدة المبادرات الاستراتيجية (أقدم سنة – أحدث سنة) */
+    private function planPeriod(int $workflowId): ?array
+    {
+        $unitId = StrategicUnit::where('template_type', 'initiatives')->value('id');
+        $rows   = UnitSubmission::where('workflow_id', $workflowId)->where('unit_id', $unitId)->value('form_data');
+        $rows   = (is_string($rows) ? json_decode($rows, true) : $rows)['initiatives'] ?? [];
+
+        $years = collect($rows)
+            ->flatMap(fn ($r) => [$r['start_date'] ?? null, $r['end_date'] ?? null])
+            ->filter(fn ($d) => is_string($d) && preg_match('/^\d{4}/', $d))
+            ->map(fn ($d) => (int) substr($d, 0, 4));
+
+        return $years->isEmpty() ? null : ['start' => $years->min(), 'end' => $years->max()];
     }
 
     // ── POST /api/strategic/units/{id}/save ───────────────────────────────────

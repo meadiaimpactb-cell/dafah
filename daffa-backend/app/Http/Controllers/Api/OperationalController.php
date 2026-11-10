@@ -11,6 +11,7 @@ use App\Models\OperationalUnit;
 use App\Models\OperationalWorkflow;
 use App\Models\Order;
 use App\Models\ServiceSetting;
+use App\Models\StrategicUnit;
 use App\Models\StrategicWorkflow;
 use App\Models\UnitSubmission;
 use Illuminate\Http\Request;
@@ -495,7 +496,7 @@ class OperationalController extends Controller
     }
 
     // ── GET /api/operational/strategic-initiatives ────────────────────────────
-    // جلب مبادرات الخطة الاستراتيجية (وحدة 5) لاستخدامها في الوحدة 1
+    // جلب مبادرات الخطة الاستراتيجية (وحدة المبادرات) لاستخدامها في الوحدة 1
     public function strategicInitiatives(Request $request)
     {
         $strategicWorkflow = StrategicWorkflow::where('user_id', $request->user()->id)
@@ -507,11 +508,13 @@ class OperationalController extends Controller
             return response()->json(['initiatives' => [], 'message' => 'لا توجد خطة استراتيجية مكتملة.']);
         }
 
-        $unit5Submission = UnitSubmission::where('workflow_id', $strategicWorkflow->id)
-            ->where('unit_number', 5)
+        // بالنوع لا بالرقم: ترتيب الوحدات قابل للتغيير (المبادرات الآن الوحدة 7)
+        $initiativesUnitId = StrategicUnit::where('template_type', 'initiatives')->value('id');
+        $initiativesSubmission = UnitSubmission::where('workflow_id', $strategicWorkflow->id)
+            ->where('unit_id', $initiativesUnitId)
             ->first();
 
-        $formData = $unit5Submission?->form_data ?? [];
+        $formData = $initiativesSubmission?->form_data ?? [];
         $initiatives = [];
 
         // استخراج المبادرات من البيانات المحفوظة
@@ -522,7 +525,12 @@ class OperationalController extends Controller
                 ->values()
                 ->toArray();
         } elseif (!empty($formData['initiatives'])) {
-            $initiatives = $formData['initiatives'];
+            // بطاقات المبادرات كائنات؛ الواجهة التشغيلية تحتاج أسماءها فقط
+            $initiatives = collect($formData['initiatives'])
+                ->map(fn($r) => is_array($r) ? trim((string) ($r['name'] ?? '')) : trim((string) $r))
+                ->filter()
+                ->values()
+                ->toArray();
         } elseif (!empty($formData)) {
             // محاولة استخراج أي نص كمبادرة
             foreach ($formData as $key => $value) {

@@ -470,6 +470,13 @@ export default function AdminContent() {
         ))}
       </div>
 
+      {activeTab === 'strategic' && (
+        <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 12.5, color: '#92400e', lineHeight: 1.8, fontFamily: 'inherit' }}>
+          تُعرض النبذة والشرح والإرشادات وتعليمات النماذج للوحدات الاستراتيجية من المحتوى المعتمد في وثائق تحسينات المنصة،
+          لذلك لا يظهر تعديل هذه الحقول هنا للعميل. يبقى رابط الفيديو قابلًا للتعديل.
+        </div>
+      )}
+
       {loading ? (
         <div style={{ padding: 60, textAlign: 'center', color: C.gray, fontSize: 13, fontFamily: 'inherit' }}>جارٍ التحميل...</div>
       ) : (
