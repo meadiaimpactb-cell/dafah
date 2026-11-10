@@ -78,7 +78,6 @@ export function OrgNode({ node, depth = 0 }) {
         border: node.top ? `2px solid ${colors.orange}` : 'none', lineHeight: 1.5,
       }}>
         {node.title}
-        {node.dept && <div style={{ fontSize: 10, fontWeight: 400, opacity: 0.85 }}>{node.dept}</div>}
       </div>
       {node.children.length > 0 && (
         <>

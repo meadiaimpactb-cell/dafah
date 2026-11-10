@@ -47,10 +47,18 @@ const InfoIcon = ({ size = 15 }) => (
  * تُرسم عبر Portal حتى لا تقصّها حاويات الجداول القابلة للتمرير.
  */
 export function InfoTip({ text, example, title, label }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen]     = useState(false);
+  const [pinned, setPinned] = useState(false); // فُتح بالنقر/اللمس/لوحة المفاتيح: يبقى حتى الإغلاق
   const [pos, setPos]   = useState(null);
   const btnRef = useRef(null);
   const popRef = useRef(null);
+  const hideTimer = useRef(null);
+
+  // المرور بالمؤشر يعرض التوضيح أيضًا (دون أن يكون الطريقة الوحيدة)
+  const hoverIn  = () => { clearTimeout(hideTimer.current); if (!open) setOpen(true); };
+  const hoverOut = () => { if (!pinned) hideTimer.current = setTimeout(() => setOpen(false), 180); };
+  const close    = () => { setOpen(false); setPinned(false); };
+  useEffect(() => () => clearTimeout(hideTimer.current), []);
 
   const place = () => {
     const r = btnRef.current?.getBoundingClientRect();
@@ -64,10 +72,10 @@ export function InfoTip({ text, example, title, label }) {
 
   useEffect(() => {
     if (!open) return undefined;
-    const onKey = e => { if (e.key === 'Escape') { setOpen(false); btnRef.current?.focus(); } };
+    const onKey = e => { if (e.key === 'Escape') { close(); btnRef.current?.focus(); } };
     const onDown = e => {
       if (popRef.current?.contains(e.target) || btnRef.current?.contains(e.target)) return;
-      setOpen(false);
+      close();
     };
     const onScroll = () => place();
     document.addEventListener('keydown', onKey);
@@ -91,7 +99,13 @@ export function InfoTip({ text, example, title, label }) {
       <button
         ref={btnRef}
         type="button"
-        onClick={e => { e.preventDefault(); e.stopPropagation(); setOpen(o => !o); }}
+        onClick={e => {
+          e.preventDefault(); e.stopPropagation();
+          clearTimeout(hideTimer.current);
+          if (open && pinned) close(); else { setOpen(true); setPinned(true); }
+        }}
+        onMouseEnter={hoverIn}
+        onMouseLeave={hoverOut}
         aria-label={example ? 'عرض مثال إرشادي' : `توضيح: ${label || ''}`}
         aria-expanded={open}
         style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', verticalAlign: 'middle', background: 'none', border: 'none', padding: '0 4px', cursor: 'pointer', color: 'inherit', opacity: 0.85, lineHeight: 1 }}
@@ -103,11 +117,13 @@ export function InfoTip({ text, example, title, label }) {
           ref={popRef}
           role="dialog"
           aria-label={title || label || 'توضيح'}
+          onMouseEnter={hoverIn}
+          onMouseLeave={hoverOut}
           style={{ position: 'fixed', top: pos.top, right: pos.right, width: pos.width, zIndex: 100000, background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, boxShadow: '0 12px 32px rgba(0,0,0,0.18)', padding: '12px 14px', direction: 'rtl', fontFamily: FONT, color: C.grayText, textAlign: 'right' }}
         >
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: C.tealDark }}>{title || example?.title || label}</div>
-            <button type="button" onClick={() => { setOpen(false); btnRef.current?.focus(); }} aria-label="إغلاق"
+            <button type="button" onClick={() => { close(); btnRef.current?.focus(); }} aria-label="إغلاق"
               style={{ background: '#f3f4f6', border: 'none', borderRadius: 6, width: 22, height: 22, cursor: 'pointer', fontSize: 13, lineHeight: '22px', flexShrink: 0, color: C.gray }}>✕</button>
           </div>
           {text && <div style={{ fontSize: 12.5, lineHeight: 1.8, marginTop: 6 }}>{text}</div>}
