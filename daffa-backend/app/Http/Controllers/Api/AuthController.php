@@ -193,6 +193,13 @@ class AuthController extends Controller
     {
         $request->validate(['token' => 'required|string']);
 
+        // لا يُقبل الدخول عبر Google إلا بمعرّف عميل مضبوط، ويجب أن يكون الرمز صادرًا له تحديدًا
+        // (بدونه يمكن استعمال رمز Google صادر لموقع آخر للدخول إلى حساب هنا)
+        $clientId = config('services.google.client_id');
+        if (!$clientId) {
+            return response()->json(['message' => 'تسجيل الدخول عبر Google غير مفعّل حاليًا.'], 503);
+        }
+
         $response = Http::get('https://oauth2.googleapis.com/tokeninfo', [
             'id_token' => $request->token,
         ]);
@@ -203,8 +210,7 @@ class AuthController extends Controller
 
         $data = $response->json();
 
-        $clientId = config('services.google.client_id');
-        if ($clientId && isset($data['aud']) && $data['aud'] !== $clientId) {
+        if (($data['aud'] ?? null) !== $clientId) {
             return response()->json(['message' => 'رمز Google غير مصرح به.'], 422);
         }
 
