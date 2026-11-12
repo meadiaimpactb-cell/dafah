@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Rules\RealEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -36,14 +37,16 @@ class UserController extends Controller
     // POST /api/admin/users
     public function store(Request $request)
     {
+        $request->merge(['email' => RealEmail::normalize($request->input('email'))]);
         $request->validate([
             'rep_name' => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
+            'email'    => RealEmail::rules(),
             'role'     => 'required|in:admin,consultant,client',
             'password' => 'required|string|min:8',
             'phone'    => 'nullable|string|max:20',
             'org_name' => 'nullable|string|max:255',
-        ]);
+        ], RealEmail::messages());
+        // الحساب الجديد يؤكد بريده برمز عند أول دخول (email_verified_at = null)
 
         $user = User::create([
             'rep_name' => $request->rep_name,
@@ -63,16 +66,23 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
+        if ($request->has('email')) {
+            $request->merge(['email' => RealEmail::normalize($request->input('email'))]);
+        }
         $request->validate([
             'rep_name' => 'sometimes|string|max:255',
-            'email'    => 'sometimes|email|unique:users,email,' . $id,
+            'email'    => array_merge(['sometimes'], RealEmail::rules($id)),
             'role'     => 'sometimes|in:admin,consultant,client',
             'phone'    => 'nullable|string|max:20',
             'org_name' => 'nullable|string|max:255',
             'password' => 'nullable|string|min:8',
-        ]);
+        ], RealEmail::messages());
 
         $data = $request->only(['rep_name', 'email', 'role', 'phone', 'org_name', 'org_type', 'is_active']);
+        // تغيير البريد من لوحة التحكم: يؤكده صاحبه برمز عند دخوله القادم
+        if (!empty($data['email']) && mb_strtolower($data['email']) !== mb_strtolower($user->email)) {
+            $user->email_verified_at = null;
+        }
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }

@@ -43,7 +43,9 @@ export default function Register({ onLogin, onGoLogin }) {
       if (res.data.needs_verification) {
         setVerification({
           email: res.data.email || form.email,
-          message: res.data.message || 'تم إرسال رمز التحقق إلى بريدك الإلكتروني.',
+          message: res.data.message || 'أرسلنا رمز التأكيد إلى بريدك الإلكتروني.',
+          retryAfter: res.data.retry_after ?? 60,
+          sendFailed: res.data.send_status === 'failed',
         });
         return;
       }
@@ -75,6 +77,8 @@ export default function Register({ onLogin, onGoLogin }) {
           <OtpVerification
             email={verification.email}
             message={verification.message}
+            retryAfter={verification.retryAfter}
+            sendFailed={verification.sendFailed}
             onVerified={onLogin}
             onBack={() => setVerification(null)}
           />

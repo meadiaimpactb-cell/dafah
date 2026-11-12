@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import api from '../../api/axios';
+import OtpVerification from '../auth/OtpVerification';
 import { IcCheck, IcLightbulb, IcShield, IcBriefcase, IcBuilding, IcUser, IcLock, IcDocument, IcSave } from '../../utils/icons';
 
 const C = {
@@ -122,6 +123,8 @@ export default function ProfilePage({ authUser, onUpdate }) {
   const [pwSaving,   setPwSaving]  = useState(false);
   const [toast,      setToast]     = useState(null);
   const [errors,     setErrors]    = useState({});
+  // تغيير البريد بانتظار التأكيد برمز يُرسل إلى البريد الجديد: { email, message, retryAfter, sendFailed }
+  const [emailChange, setEmailChange] = useState(null);
   const [pwErrors,   setPwErrors]  = useState({});
   const [avatarUrl,  setAvatarUrl] = useState(authUser?.logo_url || null);
   const [uploading,  setUploading] = useState(false);
@@ -195,10 +198,21 @@ export default function ProfilePage({ authUser, onUpdate }) {
     setErrors({});
     try {
       const res = await api.put('/auth/profile', form);
-      const updated = { ...authUser, ...res.data };
+      const { email_change: change, ...fresh } = res.data;
+      const updated = { ...authUser, ...fresh };
       localStorage.setItem('user', JSON.stringify(updated));
       onUpdate?.(updated);
-      showToast('success', 'تم حفظ الملف الشخصي بنجاح');
+      if (change) {
+        setEmailChange({
+          email: change.pending,
+          message: change.message,
+          retryAfter: change.retry_after ?? 60,
+          sendFailed: change.send_status === 'failed',
+        });
+        showToast('success', 'تم حفظ البيانات — أكّد البريد الجديد بالرمز المرسل إليه');
+      } else {
+        showToast('success', 'تم حفظ الملف الشخصي بنجاح');
+      }
     } catch (err) {
       if (err.response?.status === 422) {
         setErrors(err.response.data.errors || {});
@@ -358,6 +372,38 @@ export default function ProfilePage({ authUser, onUpdate }) {
                 <Field label="الدور" name="_role" value="مدير النظام" disabled />
               </div>
             </>
+          )}
+
+          {/* تأكيد البريد الجديد قبل تطبيقه */}
+          {emailChange && (
+            <div style={{ border: `1.5px solid ${C.teal}40`, background: '#f8fbfc', borderRadius: 12, padding: '14px 18px', marginBottom: 18, maxWidth: 520 }}>
+              <OtpVerification
+                compact
+                key={emailChange.email}
+                title="تأكيد البريد الإلكتروني الجديد"
+                submitLabel="تأكيد البريد الجديد"
+                email={emailChange.email}
+                message={emailChange.message}
+                retryAfter={emailChange.retryAfter}
+                sendFailed={emailChange.sendFailed}
+                verifyRequest={code => api.post('/auth/profile/email/confirm', { email: emailChange.email, code })}
+                resendRequest={() => api.post('/auth/profile/email/resend', { email: emailChange.email })}
+                onVerified={(user) => {
+                  const updated = { ...authUser, ...user };
+                  localStorage.setItem('user', JSON.stringify(updated));
+                  onUpdate?.(updated);
+                  setEmailChange(null);
+                  showToast('success', 'تم تأكيد البريد الجديد وتحديثه');
+                }}
+                onBack={() => {
+                  setEmailChange(null);
+                  setForm(f => ({ ...f, email: authUser?.email || '' }));
+                }}
+              />
+              <div style={{ fontSize: 12, color: C.gray, marginTop: 8, lineHeight: 1.7 }}>
+                يبقى بريد حسابك الحالي <strong dir="ltr" style={{ unicodeBidi: 'isolate' }}>{authUser?.email}</strong> فعّالًا حتى تأكيد البريد الجديد.
+              </div>
+            </div>
           )}
 
           {/* Error messages */}

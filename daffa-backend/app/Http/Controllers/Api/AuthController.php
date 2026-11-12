@@ -3,50 +3,52 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Mail\EmailVerificationMail;
 use App\Models\ActivityLog;
-use App\Models\EmailVerification;
 use App\Models\User;
+use App\Rules\RealEmail;
+use App\Support\EmailOtp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    // ── Helper: generate & store OTP ────────────────────────────────────────────
-    private function sendOtp(string $email, string $name): void
+    // ── Helper: إرسال رمز تأكيد البريد (انظر App\Support\EmailOtp) ──────────────
+    private function sendOtp(User $user): array
     {
-        EmailVerification::where('email', $email)->delete();
+        return EmailOtp::send($user->email, $user->org_name ?: $user->rep_name ?: '', EmailOtp::VERIFY, $user->id);
+    }
 
-        $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-
-        EmailVerification::create([
-            'email'      => $email,
-            'code'       => $code,
-            'expires_at' => now()->addMinutes(10),
-        ]);
-
-        Mail::to($email)->send(new EmailVerificationMail($code, $name));
+    /** استجابة «يلزم تأكيد البريد» الموحّدة (لا تحتوي الرمز أبدًا) */
+    private function needsVerification(User $user, array $sent, string $sentText, int $status)
+    {
+        return response()->json([
+            'needs_verification' => true,
+            'email'              => $user->email,
+            'send_status'        => $sent['status'],
+            'retry_after'        => $sent['retry_after'],
+            'message'            => EmailOtp::sendMessage($sent, $sentText),
+        ], $status);
     }
 
     // ── POST /api/auth/register ──────────────────────────────────────────────────
     public function register(Request $request)
     {
+        $request->merge(['email' => RealEmail::normalize($request->input('email'))]);
+
         $validated = $request->validate([
             'org_name'         => 'required|string|max:255',
             'org_type'         => 'required|string|max:100',
             'rep_name'         => 'required|string|max:255',
-            'email'            => 'required|email|unique:users,email',
+            'email'            => RealEmail::rules(),
             'phone'            => 'required|string|max:20|unique:users,phone',
             'sector'           => 'nullable|string|max:100',
             'logo'             => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'password'         => 'required|string|min:8|confirmed',
-        ], [
-            'email.unique' => 'البريد الإلكتروني مسجّل مسبقاً',
+        ], RealEmail::messages() + [
             'phone.unique' => 'رقم الهاتف مسجّل مسبقاً',
         ]);
 
@@ -68,48 +70,45 @@ class AuthController extends Controller
             'email_verified_at' => null,
         ]);
 
-        $this->sendOtp($user->email, $user->org_name ?: $user->rep_name);
+        $sent = $this->sendOtp($user);
 
         ActivityLog::record($user->id, 'تسجيل حساب جديد — بانتظار التحقق', 'auth', 'client',
             $user->org_name . ' — ' . $user->email);
 
-        return response()->json([
-            'needs_verification' => true,
-            'email'              => $user->email,
-            'message'            => 'تم التسجيل. أُرسل رمز التحقق إلى بريدك الإلكتروني.',
-        ], 201);
+        return $this->needsVerification($user, $sent,
+            'تم إنشاء حسابك. أرسلنا رمز التأكيد إلى بريدك الإلكتروني — أدخله لتفعيل الحساب.', 201);
     }
 
     // ── POST /api/auth/verify-email ──────────────────────────────────────────────
     public function verifyEmail(Request $request)
     {
+        $request->merge(['email' => RealEmail::normalize($request->input('email'))]);
         $request->validate([
             'email' => 'required|email',
-            'code'  => 'required|string|size:6',
+            'code'  => ['required', 'string', 'regex:/^[0-9]{6}$/'],
+        ], [
+            'code.required' => 'رمز التحقق مطلوب.',
+            'code.regex'    => 'الرمز يتكوّن من 6 أرقام.',
         ]);
 
-        $verification = EmailVerification::where('email', $request->email)
-            ->whereNull('used_at')
-            ->latest()
-            ->first();
-
-        if (!$verification || $verification->isExpired()) {
-            return response()->json(['message' => 'الرمز منتهي الصلاحية، اطلب رمزاً جديداً.'], 422);
-        }
-
-        if ($verification->code !== $request->code) {
-            return response()->json(['message' => 'الرمز غير صحيح، تحقق وأعد المحاولة.'], 422);
-        }
-
-        $verification->update(['used_at' => now()]);
-
         $user = User::where('email', $request->email)->first();
+        $result = $user ? EmailOtp::check($user->email, $request->code, EmailOtp::VERIFY) : 'expired';
 
-        if (!$user) {
-            return response()->json(['message' => 'المستخدم غير موجود.'], 404);
+        if ($result !== 'ok') {
+            return response()->json([
+                'message' => EmailOtp::checkMessage($result),
+                'errors'  => ['code' => [EmailOtp::checkMessage($result)]],
+                'locked'  => $result === 'locked',
+            ], 422);
         }
 
-        $user->update(['email_verified_at' => now()]);
+        if (!$user->is_active) {
+            return response()->json(['message' => 'الحساب موقوف، تواصل مع الإدارة.'], 403);
+        }
+
+        if (!$user->email_verified_at) {
+            $user->update(['email_verified_at' => now()]);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -125,22 +124,32 @@ class AuthController extends Controller
     // ── POST /api/auth/resend-otp ────────────────────────────────────────────────
     public function resendOtp(Request $request)
     {
-        $request->validate(['email' => 'required|email|exists:users,email']);
+        $request->merge(['email' => RealEmail::normalize($request->input('email'))]);
+        $request->validate(['email' => 'required|email']);
 
         $user = User::where('email', $request->email)->first();
 
-        if ($user->email_verified_at) {
-            return response()->json(['message' => 'البريد الإلكتروني محقق مسبقاً.'], 422);
+        // لا نكشف وجود الحساب أو حالته: الرد نفسه إن لم يكن هناك حساب بانتظار التأكيد
+        if (!$user || $user->email_verified_at) {
+            return response()->json([
+                'message'     => 'إن كان هذا البريد بانتظار التأكيد فسيصلك رمز جديد خلال دقائق.',
+                'retry_after' => EmailOtp::RESEND_SECONDS,
+            ]);
         }
 
-        $this->sendOtp($user->email, $user->org_name ?: $user->rep_name);
+        $sent = $this->sendOtp($user);
+        $status = ['sent' => 200, 'throttled' => 429, 'failed' => 503][$sent['status']];
 
-        return response()->json(['message' => 'تم إرسال رمز جديد إلى بريدك الإلكتروني.']);
+        return response()->json([
+            'message'     => EmailOtp::sendMessage($sent, 'أرسلنا رمزًا جديدًا إلى بريدك الإلكتروني.'),
+            'retry_after' => $sent['retry_after'],
+        ], $status);
     }
 
     // ── POST /api/auth/login ─────────────────────────────────────────────────────
     public function login(Request $request)
     {
+        $request->merge(['email' => RealEmail::normalize($request->input('email'))]);
         $request->validate([
             'email'    => 'required|email',
             'password' => 'required|string',
@@ -158,14 +167,10 @@ class AuthController extends Controller
             return response()->json(['message' => 'الحساب موقوف، تواصل مع الإدارة.'], 403);
         }
 
-        // If email not verified, send new OTP
+        // البريد غير مؤكَّد: نرسل رمزًا (مع مهلة إعادة الإرسال) ونطلب التأكيد قبل الدخول
         if (!$user->email_verified_at) {
-            $this->sendOtp($user->email, $user->org_name ?: $user->rep_name);
-            return response()->json([
-                'needs_verification' => true,
-                'email'              => $user->email,
-                'message'            => 'يجب التحقق من بريدك الإلكتروني أولاً. أُرسل رمز جديد.',
-            ], 403);
+            return $this->needsVerification($user, $this->sendOtp($user),
+                'يجب تأكيد بريدك الإلكتروني قبل الدخول. أرسلنا رمز التأكيد إلى بريدك.', 403);
         }
 
         if (Hash::needsRehash($user->password)) {
@@ -340,9 +345,11 @@ class AuthController extends Controller
     {
         $user = $request->user();
 
+        $request->merge(['email' => RealEmail::normalize($request->input('email'))]);
+
         $rules = [
             'rep_name' => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email,' . $user->id,
+            'email'    => RealEmail::rules($user->id),
             'phone'    => 'nullable|string|max:20',
         ];
 
@@ -352,7 +359,22 @@ class AuthController extends Controller
             $rules['sector']   = 'nullable|string|max:100';
         }
 
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, RealEmail::messages());
+
+        // تغيير البريد لا يُطبَّق مباشرة: يُرسل رمز إلى البريد الجديد ولا يتغير إلا بعد تأكيده
+        $newEmail = $validated['email'];
+        unset($validated['email']);
+        $emailChange = null;
+        if (mb_strtolower($newEmail) !== mb_strtolower($user->email)) {
+            $sent = EmailOtp::send($newEmail, $user->org_name ?: $user->rep_name ?: '', EmailOtp::EMAIL_CHANGE, $user->id);
+            $emailChange = [
+                'pending'     => $newEmail,
+                'send_status' => $sent['status'],
+                'retry_after' => $sent['retry_after'],
+                'message'     => EmailOtp::sendMessage($sent, "أرسلنا رمز التأكيد إلى {$newEmail}. لن يتغير بريد حسابك إلا بعد إدخال الرمز."),
+            ];
+        }
+
         $user->update($validated);
 
         if ($user->role === 'consultant') {
@@ -366,6 +388,58 @@ class AuthController extends Controller
                 ], fn($v) => $v !== null));
             }
         }
+
+        $data = $user->fresh()->toArray();
+        if ($emailChange) {
+            $data['email_change'] = $emailChange;
+        }
+        return response()->json($data);
+    }
+
+    // ── POST /api/auth/profile/email/resend ─────────────────────────────────────
+    // إعادة إرسال رمز تأكيد البريد الجديد
+    public function resendEmailChange(Request $request)
+    {
+        $user = $request->user();
+        $request->merge(['email' => RealEmail::normalize($request->input('email'))]);
+        $request->validate(['email' => RealEmail::rules($user->id)], RealEmail::messages());
+
+        $sent = EmailOtp::send($request->email, $user->org_name ?: $user->rep_name ?: '', EmailOtp::EMAIL_CHANGE, $user->id);
+        $status = ['sent' => 200, 'throttled' => 429, 'failed' => 503][$sent['status']];
+
+        return response()->json([
+            'message'     => EmailOtp::sendMessage($sent, 'أرسلنا رمزًا جديدًا إلى البريد الجديد.'),
+            'retry_after' => $sent['retry_after'],
+        ], $status);
+    }
+
+    // ── POST /api/auth/profile/email/confirm ────────────────────────────────────
+    // تأكيد البريد الجديد بالرمز ثم تطبيق التغيير
+    public function confirmEmailChange(Request $request)
+    {
+        $user = $request->user();
+        $request->merge(['email' => RealEmail::normalize($request->input('email'))]);
+        $request->validate([
+            'email' => RealEmail::rules($user->id),
+            'code'  => ['required', 'string', 'regex:/^[0-9]{6}$/'],
+        ], RealEmail::messages() + [
+            'code.required' => 'رمز التحقق مطلوب.',
+            'code.regex'    => 'الرمز يتكوّن من 6 أرقام.',
+        ]);
+
+        $result = EmailOtp::check($request->email, $request->code, EmailOtp::EMAIL_CHANGE, $user->id);
+        if ($result !== 'ok') {
+            return response()->json([
+                'message' => EmailOtp::checkMessage($result),
+                'errors'  => ['code' => [EmailOtp::checkMessage($result)]],
+                'locked'  => $result === 'locked',
+            ], 422);
+        }
+
+        $old = $user->email;
+        $user->update(['email' => $request->email, 'email_verified_at' => now()]);
+
+        ActivityLog::record($user->id, 'تغيير البريد الإلكتروني بعد التأكيد', 'auth', $user->role, "{$old} ← {$request->email}");
 
         return response()->json($user->fresh());
     }

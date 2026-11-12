@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\StrategicWorkflow;
 use App\Models\OperationalWorkflow;
 use App\Models\PolicyWorkflow;
+use App\Rules\RealEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -51,15 +52,16 @@ class OrganizationController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge(['email' => RealEmail::normalize($request->input('email'))]);
         $request->validate([
             'org_name' => 'required|string|max:100',
             'org_type' => 'required|string|max:50',
             'rep_name' => 'required|string|max:100',
-            'email'    => 'required|email|unique:users,email',
+            'email'    => RealEmail::rules(),
             'phone'    => 'required|string|max:20|unique:users,phone',
             'sector'   => 'nullable|string|max:100',
             'password' => 'required|string|min:6',
-        ], [
+        ], RealEmail::messages() + [
             'email.unique' => 'البريد الإلكتروني مسجّل مسبقاً في حساب آخر',
             'phone.unique' => 'رقم الهاتف مسجّل مسبقاً في منظمة أخرى',
             'password.min' => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
@@ -84,15 +86,18 @@ class OrganizationController extends Controller
     {
         $user = User::where('role', 'client')->findOrFail($id);
 
+        if ($request->has('email')) {
+            $request->merge(['email' => RealEmail::normalize($request->input('email'))]);
+        }
         $request->validate([
             'org_name' => 'sometimes|string|max:100',
             'org_type' => 'sometimes|string|max:50',
             'rep_name' => 'sometimes|string|max:100',
-            'email'    => "sometimes|email|unique:users,email,{$id}",
+            'email'    => array_merge(['sometimes'], RealEmail::rules($id)),
             'phone'    => "sometimes|string|max:20|unique:users,phone,{$id}",
             'sector'   => 'nullable|string|max:100',
             'password' => 'nullable|string|min:6',
-        ], [
+        ], RealEmail::messages() + [
             'email.unique' => 'البريد الإلكتروني مسجّل مسبقاً في حساب آخر',
             'phone.unique' => 'رقم الهاتف مسجّل مسبقاً في منظمة أخرى',
             'password.min' => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
@@ -100,6 +105,10 @@ class OrganizationController extends Controller
 
         $data = $request->only(['org_name', 'org_type', 'rep_name', 'email', 'phone', 'sector']);
         $data = array_filter($data, fn($v) => $v !== null);
+        // تغيير البريد من لوحة التحكم: يؤكده صاحبه برمز عند دخوله القادم
+        if (!empty($data['email']) && mb_strtolower($data['email']) !== mb_strtolower($user->email)) {
+            $user->email_verified_at = null;
+        }
 
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);

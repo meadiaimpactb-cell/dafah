@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Consultant;
 use App\Models\User;
+use App\Rules\RealEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -26,6 +27,9 @@ class ConsultantController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->filled('email')) {
+            $request->merge(['email' => RealEmail::normalize($request->input('email'))]);
+        }
         $request->validate([
             'name'               => 'required|string|max:100',
             'specialty'          => 'required|string|max:100',
@@ -35,9 +39,9 @@ class ConsultantController extends Controller
             'rating'             => 'required|numeric|min:0|max:5',
             'available'          => 'boolean',
             'avatar_initial'     => 'nullable|string|max:5',
-            'email'              => 'nullable|email|unique:users,email',
+            'email'              => RealEmail::rules(null, false),
             'password'           => 'nullable|string|min:6|required_with:email',
-        ], [
+        ], RealEmail::messages() + [
             'email.unique'           => 'البريد الإلكتروني مسجّل مسبقاً في حساب آخر',
             'password.required_with' => 'كلمة المرور مطلوبة عند إدخال البريد الإلكتروني',
             'password.min'           => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
@@ -83,9 +87,10 @@ class ConsultantController extends Controller
     public function update(Request $request, Consultant $consultant)
     {
         $existingUserId = $consultant->user_id;
-        $emailRule = $existingUserId
-            ? "nullable|email|unique:users,email,{$existingUserId}"
-            : 'nullable|email|unique:users,email';
+        $emailRule = RealEmail::rules($existingUserId ?: null, false);
+        if ($request->filled('email')) {
+            $request->merge(['email' => RealEmail::normalize($request->input('email'))]);
+        }
 
         $request->validate([
             'name'               => 'sometimes|string|max:100',
@@ -98,7 +103,7 @@ class ConsultantController extends Controller
             'avatar_initial'     => 'nullable|string|max:5',
             'email'              => $emailRule,
             'password'           => 'nullable|string|min:6|required_with:email',
-        ], [
+        ], RealEmail::messages() + [
             'email.unique'           => 'البريد الإلكتروني مسجّل مسبقاً في حساب آخر',
             'password.required_with' => 'كلمة المرور مطلوبة عند إدخال البريد الإلكتروني',
             'password.min'           => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',

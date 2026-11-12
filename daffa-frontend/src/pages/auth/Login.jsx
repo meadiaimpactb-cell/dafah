@@ -126,7 +126,9 @@ function LoginForm({ onLogin, onGoRegister, onForgot, onNeedsVerification }) {
       if (data?.needs_verification && data?.email) {
         onNeedsVerification({
           email: data.email,
-          message: data.message || 'تم إرسال رمز تحقق جديد إلى بريدك الإلكتروني.',
+          message: data.message || 'أرسلنا رمز التأكيد إلى بريدك الإلكتروني.',
+          retryAfter: data.retry_after ?? 60,
+          sendFailed: data.send_status === 'failed',
         });
         return;
       }
@@ -295,6 +297,8 @@ export default function Login({ onLogin, onGoRegister }) {
           <OtpVerification
             email={verification.email}
             message={verification.message}
+            retryAfter={verification.retryAfter}
+            sendFailed={verification.sendFailed}
             onVerified={onLogin}
             onBack={() => setView('login')}
           />

@@ -14,13 +14,16 @@ class EmailVerificationMail extends Mailable
 
     public function __construct(
         public string $code,
-        public string $orgName
+        public string $orgName,
+        public string $purpose = 'verify' // verify | email_change
     ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'رمز التحقق من بريدك الإلكتروني — دافة',
+            subject: $this->purpose === 'email_change'
+                ? 'تأكيد بريدك الإلكتروني الجديد — منصة دفة'
+                : 'رمز تأكيد بريدك الإلكتروني — منصة دفة',
         );
     }
 
@@ -28,6 +31,8 @@ class EmailVerificationMail extends Mailable
     {
         return new Content(
             view: 'emails.verify-otp',
+            text: 'emails.verify-otp-text', // نسخة نصية تحسّن وصول الرسالة إلى صندوق الوارد
+            with: ['minutes' => \App\Support\EmailOtp::TTL_MINUTES],
         );
     }
 }
