@@ -67,8 +67,9 @@ class OperationalController extends Controller
         // جلب المستشار من التخطيط الاستراتيجي لعرضه قبل بدء التشغيلي
         $strategicConsultant = $strategicWorkflow?->load('consultant')?->consultant;
 
-        // مزامنة المستشار: إذا كان الـ workflow موجوداً بمستشار مختلف → نحدّثه
-        if ($workflow && $strategicWorkflow && $workflow->consultant_id !== $strategicWorkflow->consultant_id) {
+        // الأنظمة مستقلة: مستشار الخطة الاستراتيجية (إن وُجدت) افتراضي فقط لخطة بلا مستشار،
+        // ولا يستبدل مستشارًا اختاره العميل لهذه الخطة
+        if ($workflow && !$workflow->consultant_id && $strategicWorkflow?->consultant_id) {
             $workflow->update(['consultant_id' => $strategicWorkflow->consultant_id]);
             $workflow->load(['consultant', 'submissions.unit', 'user']);
         }
@@ -175,8 +176,9 @@ class OperationalController extends Controller
 
         $workflow = $this->userWorkflow($request);
 
-        if ($workflow->current_step !== 1) {
-            return response()->json(['message' => 'الخطوة غير صحيحة.'], 422);
+        // يُختار المستشار قبل الدفع، أو في أي وقت إن لم يكن للخطة مستشار (خطة مستقلة بدأت دون خطة استراتيجية)
+        if ($workflow->payment_status === 'paid' && $workflow->consultant_id) {
+            return response()->json(['message' => 'تم تحديد المستشار لهذه الخطة مسبقًا.'], 422);
         }
 
         $consultant = Consultant::findOrFail($request->consultant_id);
@@ -186,7 +188,7 @@ class OperationalController extends Controller
 
         $workflow->update([
             'consultant_id' => $consultant->id,
-            'current_step'  => 2,
+            'current_step'  => max((int) $workflow->current_step, 2),
         ]);
 
         return response()->json(['workflow' => $workflow->fresh('consultant')]);
@@ -204,6 +206,11 @@ class OperationalController extends Controller
 
         if ($workflow->current_step !== 2) {
             return response()->json(['message' => 'الخطوة غير صحيحة.'], 422);
+        }
+
+        // لا تبدأ خطة دون مستشار يراجعها
+        if (!$workflow->consultant_id) {
+            return response()->json(['message' => 'اختر المستشار قبل إتمام الدفع.'], 422);
         }
 
         $discount = 0;

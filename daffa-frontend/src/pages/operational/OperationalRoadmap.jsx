@@ -3,6 +3,7 @@ import { operationalApi } from '../../api/operational';
 import { chatApi } from '../../api/chat';
 import { ConsultantRating } from '../strategic/steps/StepApproval';
 import { PaymentReceipt } from '../strategic/steps/StepPayment';
+import ConsultantPicker from '../shared/ConsultantPicker';
 import { PayLogo, PaymentMethodPicker, ApplePayButton, SecurePaymentBadge, CardNetworkLogo, detectCardNetwork } from '../shared/PaymentBrand';
 import { IcClock, IcUpload, IcCheckCircle, IcArrowPath, IcSearch, IcWarning, IcLock, IcCog, IcLightbulb, IcSave, IcDocument, IcUser, IcCalendar, IcSparkles, IcCheck, IcChat, IcMoney, IcXMark, IcBeaker } from '../../utils/icons';
 
@@ -1130,7 +1131,7 @@ const OpStepInfo = ({ strategicCompleted, units, catalog, pricing, consultant, o
         <span style={{ flexShrink: 0, color: colors.blue }}><IcLightbulb width={22} height={22}/></span>
         <div>
           <div style={{ fontSize: 14, fontWeight: 700, color: colors.blue, marginBottom: 4 }}>ملاحظة</div>
-          <div style={{ fontSize: 13, color: "#1e40af", lineHeight: 1.7 }}>يمكنك البدء في التخطيط التشغيلي بشكل مستقل. إن أكملت خطتك الاستراتيجية لاحقاً سيتم ربط المستشار تلقائياً.</div>
+          <div style={{ fontSize: 13, color: "#1e40af", lineHeight: 1.7 }}>التخطيط التشغيلي نظام مستقل: يمكنك البدء فيه مباشرة دون خطة استراتيجية، وتختار مستشارك في خطوة الدفع.</div>
         </div>
       </div>
     )}
@@ -1196,7 +1197,7 @@ const OpStepInfo = ({ strategicCompleted, units, catalog, pricing, consultant, o
 };
 
 // ─── Step 1: OpStepPayment ───────────────────────────────────────
-const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant }) => {
+const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant, onWorkflowUpdate }) => {
   const EMPTY_CARD = { number: '', expiry: '', cvv: '', name: '' };
   const [payMethod,     setPayMethod]     = useState(0);
   const [card,          setCard]          = useState(EMPTY_CARD);
@@ -1205,7 +1206,9 @@ const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant }) => {
   const [payError,      setPayError]      = useState(null);
 
   const methodKeys  = PAY_METHODS.map(m => m.key);
-  const consultant  = workflow?.consultant || strategicConsultant;
+  const consultant  = workflow?.consultant || null;
+  // خطة مستقلة بلا مستشار موروث: يختار العميل مستشاره قبل الدفع
+  const needsConsultant = !workflow?.consultant_id;
   const alreadyPaid = workflow?.payment_status === 'paid' || workflow?.status === 'active';
 
   // ── Read actual amounts from workflow (set by start() on the server) ───────
@@ -1217,6 +1220,7 @@ const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant }) => {
 
   const handlePay = async () => {
     setPayError(null);
+    if (needsConsultant) { setPayError('اختر المستشار أولًا لإتمام الدفع.'); return; }
     setPaying(true);
     const method = methodKeys[payMethod];
     try {
@@ -1253,6 +1257,19 @@ const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant }) => {
   return (
     <div className="animate-in">
       <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 20 }}>إتمام الدفع — التخطيط التشغيلي</h2>
+
+      {(needsConsultant || workflow?.consultant_selected_here) && (
+        <ConsultantPicker
+          selectedId={workflow?.consultant_id}
+          subtitle="يراجع المستشار وحدات التخطيط التشغيلي ويعتمدها. اختر مستشارًا لمتابعة هذه الخطة."
+          loadConsultants={() => operationalApi.getConsultants()}
+          onSelect={async id => {
+            const res = await operationalApi.selectConsultant(workflow.id, { consultant_id: id });
+            onWorkflowUpdate?.({ ...res.data.workflow, consultant_selected_here: true });
+            setPayError(null);
+          }}
+        />
+      )}
 
       {payError && (
         <div style={{ padding: "12px 16px", background: "#fee2e2", borderRadius: 10, color: "#dc2626", fontSize: 13, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 6 }}>
@@ -1330,7 +1347,7 @@ const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant }) => {
 
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 24 }}>
         <Btn variant="secondary" onClick={() => setOpStep(0)}>→ السابق</Btn>
-        <Btn disabled={paying} onClick={handlePay}>
+        <Btn disabled={paying || needsConsultant} onClick={handlePay}>
           {paying
             ? <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
                 <svg style={{ animation: "spin 1s linear infinite" }} viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5"><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
@@ -2050,7 +2067,7 @@ export default function OperationalRoadmap({ navigate, workflowId, onWorkflowSel
       </div>
       <OpWorkflowStepper opStep={opStep} setOpStep={setOpStep} workflow={workflow} />
       {opStep === 0 && <OpStepInfo strategicCompleted={strategicCompleted} units={units} catalog={catalog} pricing={pricing} consultant={strategicConsultant} onStart={handleStart} loading={starting} />}
-      {opStep === 1 && <OpStepPayment workflow={workflow} setOpStep={setOpStep} onPay={handlePay} strategicConsultant={strategicConsultant} />}
+      {opStep === 1 && <OpStepPayment workflow={workflow} setOpStep={setOpStep} onPay={handlePay} strategicConsultant={strategicConsultant} onWorkflowUpdate={setWorkflow} />}
       {opStep === 2 && <OpStepWork units={units} setOpStep={setOpStep} setActiveUnit={setActiveUnit} readOnly={opStep < mapStep(workflow)} />}
       {opStep === 3 && <OpStepReview units={units} setOpStep={setOpStep} refreshData={refreshData} />}
       {opStep === 4 && <OpStepApproval workflow={workflow} setWorkflow={setWorkflow} setOpStep={setOpStep} navigate={navigate} workflowId={workflowId} />}

@@ -9,6 +9,8 @@ export const policiesApi = {
   getPolicyTypes:  ()                       => api.get('/policies/policy-types'),
   start:           (forceNew = false)       => api.post('/policies/workflow/start', forceNew ? { force_new: true } : {}),
   selectPolicies:  (wid, data)             => api.post('/policies/workflow/select-policies', b(wid, data)),
+  getConsultants:  ()                       => api.get('/policies/consultants'),
+  selectConsultant:(wid, data)             => api.post('/policies/workflow/consultant', b(wid, data)),
   pay:             (wid, data)             => api.post('/policies/workflow/pay', b(wid, data)),
   requestDesign:   (wid, data)             => api.post('/policies/workflow/design', b(wid, data)),
   requestDesignWithBrief: (wid, brief, logoFile, paymentMethod) => {

@@ -4,6 +4,7 @@ import { policiesApi, policiesDesignApi } from "../../api/policies";
 import api from "../../api/axios";
 import { ConsultantRating } from "../strategic/steps/StepApproval";
 import { PaymentReceipt } from "../strategic/steps/StepPayment";
+import ConsultantPicker from "../shared/ConsultantPicker";
 import { PaymentMethodPicker, ApplePayButton, SecurePaymentBadge, CardNetworkLogo, detectCardNetwork } from "../shared/PaymentBrand";
 import { IcCheckCircle, IcArrowPath, IcUpload, IcSearch, IcWarning, IcLock, IcLightbulb, IcSave, IcDocument, IcUser, IcCalendar, IcCreditCard, IcSparkles, IcCheck, IcPencil, IcEye, IcPalette, IcBeaker, IcChat, IcScroll, IcClock } from '../../utils/icons';
 
@@ -208,7 +209,7 @@ const groupActivePolicies = (policyTypes) => {
   return groups;
 };
 
-const StepIntro = ({ policyTypes, onStart, loading, operationalCompleted }) => (
+const StepIntro = ({ policyTypes, onStart, loading }) => (
   <div className="animate-in">
     <Card style={{ padding: 32, textAlign: "center", marginBottom: 20, borderBottom: `3px solid ${C.orange}` }}>
       <div style={{ width: 64, height: 64, borderRadius: "50%", background: C.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: C.orange }}><IcScroll width={28} height={28}/></div>
@@ -218,19 +219,15 @@ const StepIntro = ({ policyTypes, onStart, loading, operationalCompleted }) => (
       </p>
     </Card>
 
-    {!operationalCompleted && (
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 14, padding: "14px 18px", background: C.yellowLight, border: `1.5px solid ${C.yellow}`, borderRadius: 12, marginBottom: 20 }}>
-        <span style={{ flexShrink: 0, color: "#92400E" }}><IcWarning width={22} height={22}/></span>
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "#92400E", marginBottom: 4 }}>
-            يتطلب إكمال التخطيط التشغيلي أولاً
-          </div>
-          <div style={{ fontSize: 13, color: "#78350F", lineHeight: 1.7 }}>
-            يجب اعتماد جميع وحدات التخطيط التشغيلي الخمس واكتمال مرحلة المراجعة قبل البدء بمرحلة السياسات واللوائح.
-          </div>
+    <div style={{ display: "flex", alignItems: "flex-start", gap: 14, padding: "14px 18px", background: C.blueLight, border: `1.5px solid ${C.blue}`, borderRadius: 12, marginBottom: 20 }}>
+      <span style={{ flexShrink: 0, color: C.blue }}><IcLightbulb width={22} height={22}/></span>
+      <div>
+        <div style={{ fontSize: 14, fontWeight: 700, color: C.blue, marginBottom: 4 }}>نظام مستقل</div>
+        <div style={{ fontSize: 13, color: "#1e40af", lineHeight: 1.7 }}>
+          يمكنك البدء ببناء السياسات واللوائح مباشرة دون التخطيط الاستراتيجي أو التشغيلي، وتختار مستشارك في خطوة الدفع.
         </div>
       </div>
-    )}
+    </div>
 
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
       <Card>
@@ -267,14 +264,9 @@ const StepIntro = ({ policyTypes, onStart, loading, operationalCompleted }) => (
 
     <div style={{ display: "flex", justifyContent: "center" }}>
       <div style={{ textAlign: "center" }}>
-        <Btn onClick={onStart} disabled={loading || !operationalCompleted}>
+        <Btn onClick={onStart} disabled={loading}>
           {loading ? "جارٍ التحميل..." : "التالي: اختيار السياسات ←"}
         </Btn>
-        {!operationalCompleted && (
-          <div style={{ marginTop: 8, fontSize: 12, color: C.yellow, fontWeight: 600, display: "flex", alignItems: "center", gap: 4, justifyContent: "center" }}>
-            <IcLock width={12} height={12}/> أكمل التخطيط التشغيلي أولاً للمتابعة
-          </div>
-        )}
       </div>
     </div>
   </div>
@@ -400,7 +392,10 @@ const CardInputForm = ({ card, onChange, isMada }) => {
   );
 };
 
-const StepPayment = ({ policyTypes, workflow, onPay, onBack }) => {
+const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate }) => {
+  // خطة مستقلة بلا مستشار موروث: يختار العميل مستشاره قبل الدفع
+  const needsConsultant = !workflow?.consultant_id;
+  const [pickedHere, setPickedHere] = useState(false);
   const [methodIdx,    setMethodIdx]   = useState(0);
   const [card,         setCard]        = useState(EMPTY_CARD);
   const [discountCode, setDiscountCode]= useState('');
@@ -453,6 +448,7 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack }) => {
 
   const handlePay = async () => {
     setPayError(null);
+    if (needsConsultant) { setPayError('اختر المستشار أولًا لإتمام الدفع.'); return; }
     setPaying(true);
     try {
       await gatewayCharge({ method: methodKey, card });
@@ -472,6 +468,21 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack }) => {
   return (
     <div className="animate-in">
       <h2 style={{ fontSize: 20, fontWeight: 700, color: C.tealDark, marginBottom: 20 }}>إتمام الدفع — السياسات واللوائح</h2>
+
+      {(needsConsultant || pickedHere) && (
+        <ConsultantPicker
+          selectedId={workflow?.consultant_id}
+          subtitle="يراجع المستشار السياسات التي تعبّئها ويعتمدها. اختر مستشارًا لمتابعة هذه الخطة."
+          loadConsultants={() => policiesApi.getConsultants()}
+          onSelect={async id => {
+            const res = await policiesApi.selectConsultant(workflow.id, { consultant_id: id });
+            setPickedHere(true);
+            setPayError(null);
+            const w = res.data.workflow;
+            onWorkflowUpdate?.({ consultant_id: w.consultant_id, consultant: w.consultant });
+          }}
+        />
+      )}
 
       {payError && (
         <div style={{ marginBottom: 16, padding: '12px 16px', background: C.redLight, border: `1.5px solid ${C.red}30`, borderRadius: 10, fontSize: 13, color: C.red, fontWeight: 600 }}>
@@ -548,8 +559,8 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack }) => {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 24 }}>
         <Btn variant="secondary" onClick={onBack} disabled={paying}>→ السابق</Btn>
-        <button onClick={handlePay} disabled={paying}
-          style={{ padding: '14px 40px', background: paying ? C.gray : C.orange, color: '#fff', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: paying ? 'not-allowed' : 'pointer', fontFamily: "'Cairo',sans-serif", display: 'flex', alignItems: 'center', gap: 8, boxShadow: paying ? 'none' : `0 4px 16px ${C.orange}40`, transition: 'all 0.2s' }}>
+        <button onClick={handlePay} disabled={paying || needsConsultant}
+          style={{ padding: '14px 40px', background: paying || needsConsultant ? C.gray : C.orange, color: '#fff', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: paying || needsConsultant ? 'not-allowed' : 'pointer', fontFamily: "'Cairo',sans-serif", display: 'flex', alignItems: 'center', gap: 8, boxShadow: paying ? 'none' : `0 4px 16px ${C.orange}40`, transition: 'all 0.2s' }}>
           <IcLock width={16} height={16}/>
           {paying ? '⏳ جارٍ معالجة الدفع…' : `ادفع الآن — ${total.toLocaleString('en-US')} ريال`}
         </button>
@@ -2032,6 +2043,9 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
     }
   }, [workflowId]);
 
+  // تحديث حقول الخطة محليًا دون إعادة التحميل (تبقى الخطوة الحالية كما هي) — مثل اختيار المستشار قبل الدفع
+  const patchWorkflow = (patch) => setPageData(prev => ({ ...prev, workflow: { ...prev.workflow, ...patch } }));
+
   useEffect(() => {
     // Reset overlay state whenever the active workflow changes
     setViewingId(null);
@@ -2272,7 +2286,6 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
       {displayStep === 0 && (
         <StepIntro
           policyTypes={policyTypes}
-          operationalCompleted={pageData?.operational_completed ?? false}
           onStart={async () => {
             if (!workflow) await handleStart();
             setStep(1);
@@ -2288,7 +2301,7 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
 
       {displayStep === 2 && (
         <StepPayment policyTypes={policyTypes} workflow={workflow} onPay={handlePay}
-          onBack={() => setStep(1)} loading={actLoading} />
+          onBack={() => setStep(1)} loading={actLoading} onWorkflowUpdate={patchWorkflow} />
       )}
 
       {displayStep === 3 && (

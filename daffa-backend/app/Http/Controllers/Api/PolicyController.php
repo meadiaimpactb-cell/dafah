@@ -12,6 +12,7 @@ use App\Models\PolicyTypeContent;
 use App\Models\PolicyWorkflow;
 use App\Models\QuestionnaireSection;
 use App\Models\ServiceSetting;
+use App\Models\StrategicWorkflow;
 use App\Support\PolicyCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -113,6 +114,12 @@ class PolicyController extends Controller
 
         $workflow = $workflowQuery->first();
 
+        // الأنظمة مستقلة: خطة بلا مستشار تأخذ مستشار آخر خطة تشغيلية/استراتيجية مكتملة إن وُجدت (افتراضي فقط)
+        if ($workflow && !$workflow->consultant_id && ($defaultId = $this->defaultConsultantId($user->id))) {
+            $workflow->update(['consultant_id' => $defaultId]);
+            $workflow->load(['consultant', 'selections', 'user']);
+        }
+
         $operationalConsultant = $operationalWorkflow?->load('consultant')?->consultant;
 
         $selectionsWithTypes = null;
@@ -179,14 +186,10 @@ class PolicyController extends Controller
             }
         }
 
-        $operationalWorkflow = OperationalWorkflow::where('user_id', $user->id)
-            ->where('status', 'completed')
-            ->latest()
-            ->first();
-
         $workflow = PolicyWorkflow::create([
             'user_id'       => $user->id,
-            'consultant_id' => $operationalWorkflow?->consultant_id,
+            // مستقلة عن التخطيط التشغيلي والاستراتيجي: مستشارهما (إن وُجد) افتراضي، وإلا يختار العميل مستشاره قبل الدفع
+            'consultant_id' => $this->defaultConsultantId($user->id),
             'current_step'  => 0,
             'status'        => 'pending',
             'started_at'    => now(),
@@ -237,6 +240,11 @@ class PolicyController extends Controller
 
         if ($workflow->payment_status === 'paid') {
             return response()->json(['message' => 'تم الدفع مسبقاً.'], 422);
+        }
+
+        // لا تبدأ خطة دون مستشار يراجع السياسات
+        if (!$workflow->consultant_id) {
+            return response()->json(['message' => 'اختر المستشار قبل إتمام الدفع.'], 422);
         }
 
         $types    = collect(self::policyTypes())->whereIn('id', $request->policy_type_ids);
@@ -366,15 +374,9 @@ class PolicyController extends Controller
 
         $workflow  = $this->userWorkflow($request);
 
-        // Auto-heal: if consultant_id is missing, inherit from the completed operational workflow
-        if (!$workflow->consultant_id) {
-            $opWorkflow = OperationalWorkflow::where('user_id', $workflow->user_id)
-                ->where('status', 'completed')
-                ->latest()
-                ->first();
-            if ($opWorkflow?->consultant_id) {
-                $workflow->update(['consultant_id' => $opWorkflow->consultant_id]);
-            }
+        // Auto-heal: خطة بلا مستشار تأخذ مستشار آخر خطة تشغيلية/استراتيجية مكتملة إن وُجدت
+        if (!$workflow->consultant_id && ($defaultId = $this->defaultConsultantId($workflow->user_id))) {
+            $workflow->update(['consultant_id' => $defaultId]);
         }
 
         $selection = PolicySelection::where('workflow_id', $workflow->id)->where('id', $id)->firstOrFail();
@@ -623,6 +625,43 @@ class PolicyController extends Controller
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
+    /** مستشار افتراضي: آخر خطة تشغيلية مكتملة، ثم آخر خطة استراتيجية مكتملة (أو null) */
+    private function defaultConsultantId(int $userId): ?int
+    {
+        return OperationalWorkflow::where('user_id', $userId)->where('status', 'completed')
+                ->whereNotNull('consultant_id')->latest()->value('consultant_id')
+            ?? StrategicWorkflow::where('user_id', $userId)->where('status', 'completed')
+                ->whereNotNull('consultant_id')->latest()->value('consultant_id');
+    }
+
+    // ── GET /api/policies/consultants ─────────────────────────────────────────
+    public function consultants()
+    {
+        return response()->json(Consultant::all());
+    }
+
+    // ── POST /api/policies/workflow/consultant ────────────────────────────────
+    // اختيار مستشار للخطة: قبل الدفع، أو في أي وقت إن لم يكن لها مستشار
+    public function selectConsultant(Request $request)
+    {
+        $request->validate(['consultant_id' => 'required|exists:consultants,id']);
+
+        $workflow = $this->userWorkflow($request);
+
+        if ($workflow->payment_status === 'paid' && $workflow->consultant_id) {
+            return response()->json(['message' => 'تم تحديد المستشار لهذه الخطة مسبقًا.'], 422);
+        }
+
+        $consultant = Consultant::findOrFail($request->consultant_id);
+        if (!$consultant->available) {
+            return response()->json(['message' => 'المستشار غير متاح حالياً.'], 422);
+        }
+
+        $workflow->update(['consultant_id' => $consultant->id]);
+
+        return response()->json(['workflow' => $workflow->fresh(['consultant', 'selections'])]);
+    }
+
     private function userWorkflow(Request $request): PolicyWorkflow
     {
         $uid = $request->user()->id;

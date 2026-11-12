@@ -130,6 +130,8 @@ Route::middleware('auth:sanctum')->prefix('policies')->group(function () {
     Route::get('/policy-types',                       fn() => response()->json(PolicyController::policyTypes()));
     Route::post('/workflow/start',                    [PolicyController::class, 'start']);
     Route::post('/workflow/select-policies',          [PolicyController::class, 'selectPolicies']);
+    Route::get('/consultants',                        [PolicyController::class, 'consultants']);
+    Route::post('/workflow/consultant',               [PolicyController::class, 'selectConsultant']);
     Route::post('/workflow/pay',                      [PolicyController::class, 'pay']);
     Route::post('/workflow/design',                   [PolicyController::class, 'requestDesign']);
     Route::post('/design/approve',                    [PolicyController::class, 'approveDesign']);
