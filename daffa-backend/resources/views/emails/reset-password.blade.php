@@ -8,8 +8,6 @@
   body { font-family: Tahoma, Arial, sans-serif; direction: rtl; background: #f8fafb; margin: 0; padding: 20px; color: #1a1a2e; }
   .container { max-width: 480px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
   .header { background: #1A6B7C; padding: 28px 32px; text-align: center; }
-  .header h1 { color: #fff; margin: 0; font-size: 22px; font-weight: bold; }
-  .header p { color: #b2dde6; margin: 6px 0 0; font-size: 13px; }
   .body { padding: 32px; text-align: center; }
   .greeting { font-size: 16px; font-weight: bold; margin: 0 0 8px; }
   .subtitle { color: #4b5563; font-size: 14px; line-height: 1.8; margin: 0 0 22px; }
@@ -22,10 +20,7 @@
 </head>
 <body>
 <div class="container">
-  <div class="header">
-    <h1>منصة دفة</h1>
-    <p>للتخطيط الاستراتيجي وصناعة السياسات</p>
-  </div>
+  @include('emails.partials.header')
   <div class="body">
     <p class="greeting">مرحبًا {{ $name }}،</p>
     <p class="subtitle">وصلنا طلب لإعادة تعيين كلمة المرور لحسابك في منصة دفة.<br>اضغط الزر التالي لاختيار كلمة مرور جديدة:</p>
@@ -38,10 +33,7 @@
     </p>
   </div>
   <hr class="divider">
-  <div class="footer">
-    رسالة آلية من منصة دفة — daffah.org<br>
-    © {{ date('Y') }} منصة دفة — جميع الحقوق محفوظة
-  </div>
+  @include('emails.partials.footer')
 </div>
 </body>
 </html>

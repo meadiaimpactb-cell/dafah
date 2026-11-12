@@ -307,6 +307,13 @@ export default function ProfilePage({ authUser, onUpdate }) {
       {tab === 'profile' && (
         <div style={{ background: 'white', borderRadius: 16, padding: 28, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
 
+          {/* تنبيه إكمال البيانات (حساب جديد عبر Google بلا رقم جوال) */}
+          {role === 'client' && !authUser?.phone && (
+            <div role="status" style={{ background: '#FFF7ED', border: '1px solid #fed7aa', borderRadius: 12, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#9a3412', lineHeight: 1.8 }}>
+              <strong>أكمل بيانات منظمتك:</strong> راجع اسم المنظمة ونوعها وأضف رقم الجوال، ثم اضغط «حفظ التغييرات».
+            </div>
+          )}
+
           {/* ── Client Fields ── */}
           {role === 'client' && (
             <>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../../api/axios';
 import OtpVerification from './OtpVerification';
+import GoogleAuthButton, { GOOGLE_ENABLED, OrDivider } from './GoogleAuthButton';
 
 const SECTORS = ['تعليم', 'صحة', 'بيئة', 'اجتماعي', 'ثقافة', 'رياضة', 'تنمية', 'حقوق الإنسان', 'أخرى'];
 
@@ -96,6 +97,20 @@ export default function Register({ onLogin, onGoLogin }) {
         </div>
 
         <h2 style={styles.title}>إنشاء حساب جديد</h2>
+
+        {GOOGLE_ENABLED && (
+          <div style={{ marginBottom: 6 }}>
+            <GoogleAuthButton
+              text="signup_with"
+              onLogin={onLogin}
+              onError={msg => setErrors(msg ? { general: msg } : {})}
+            />
+            <p style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', margin: '8px 0 0', lineHeight: 1.7 }}>
+              بالتسجيل عبر Google يُؤكَّد بريدك تلقائيًا، وتوافق على الشروط والأحكام. ستُكمل بيانات منظمتك بعد الدخول.
+            </p>
+            <OrDivider label="أو سجّل بالبريد الإلكتروني" />
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div style={styles.row}>

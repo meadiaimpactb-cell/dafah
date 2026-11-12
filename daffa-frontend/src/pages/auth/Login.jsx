@@ -1,104 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import api from '../../api/axios';
 import OtpVerification from './OtpVerification';
-
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-const GOOGLE_SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
-let googleScriptPromise = null;
-
-function loadGoogleIdentityScript() {
-  if (window.google?.accounts?.id) {
-    return Promise.resolve();
-  }
-
-  if (!googleScriptPromise) {
-    googleScriptPromise = new Promise((resolve, reject) => {
-      const existingScript = document.querySelector(`script[src="${GOOGLE_SCRIPT_SRC}"]`);
-
-      if (existingScript) {
-        existingScript.addEventListener('load', resolve, { once: true });
-        existingScript.addEventListener('error', reject, { once: true });
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.src = GOOGLE_SCRIPT_SRC;
-      script.async = true;
-      script.defer = true;
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  }
-
-  return googleScriptPromise;
-}
-
-function GoogleLoginButton({ onLogin, onError }) {
-  const buttonRef = useRef(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!GOOGLE_CLIENT_ID || !buttonRef.current) return undefined;
-
-    let cancelled = false;
-
-    loadGoogleIdentityScript()
-      .then(() => {
-        if (cancelled || !buttonRef.current) return;
-
-        window.google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID,
-          callback: async (response) => {
-            if (!response?.credential) {
-              onError('تعذر الحصول على بيانات Google.');
-              return;
-            }
-
-            setLoading(true);
-            onError('');
-
-            try {
-              const res = await api.post('/auth/google', { token: response.credential });
-              localStorage.setItem('token', res.data.token);
-              localStorage.setItem('user', JSON.stringify(res.data.user));
-              onLogin(res.data.user, { needsProfile: res.data.needs_profile });
-            } catch (err) {
-              onError(err.response?.data?.message || 'تعذر تسجيل الدخول عبر Google.');
-            } finally {
-              setLoading(false);
-            }
-          },
-        });
-
-        buttonRef.current.innerHTML = '';
-        window.google.accounts.id.renderButton(buttonRef.current, {
-          theme: 'outline',
-          size: 'large',
-          type: 'standard',
-          shape: 'rectangular',
-          text: 'continue_with',
-          width: Math.min(buttonRef.current.offsetWidth || 320, 360),
-          locale: 'ar',
-        });
-      })
-      .catch(() => {
-        onError('تعذر تحميل خدمة تسجيل الدخول عبر Google.');
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [onError, onLogin]);
-
-  if (!GOOGLE_CLIENT_ID) return null;
-
-  return (
-    <div style={S.googleWrap}>
-      <div ref={buttonRef} style={{ display: 'flex', justifyContent: 'center', opacity: loading ? 0.65 : 1 }} />
-    </div>
-  );
-}
+import GoogleAuthButton, { GOOGLE_ENABLED, OrDivider } from './GoogleAuthButton';
 
 function LoginForm({ onLogin, onGoRegister, onForgot, onNeedsVerification }) {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -182,15 +85,8 @@ function LoginForm({ onLogin, onGoRegister, onForgot, onNeedsVerification }) {
           {loading ? 'جاري الدخول...' : 'دخول'}
         </button>
 
-        {GOOGLE_CLIENT_ID && (
-          <div style={S.divider}>
-            <span style={S.dividerLine} />
-            <span style={S.dividerText}>أو</span>
-            <span style={S.dividerLine} />
-          </div>
-        )}
-
-        <GoogleLoginButton onLogin={onLogin} onError={setError} />
+        {GOOGLE_ENABLED && <OrDivider />}
+        <GoogleAuthButton text="signin_with" onLogin={onLogin} onError={setError} />
 
         <p style={S.footer}>
           ليس لديك حساب؟{' '}

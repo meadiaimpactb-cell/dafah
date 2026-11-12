@@ -214,7 +214,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'رمز Google غير مصرح به.'], 422);
         }
 
-        $email    = $data['email'] ?? null;
+        $email    = RealEmail::normalize($data['email'] ?? null);
         $name     = $data['name'] ?? ($data['given_name'] ?? 'مستخدم Google');
         $googleId = $data['sub'] ?? null;
         $emailVerified = filter_var($data['email_verified'] ?? false, FILTER_VALIDATE_BOOLEAN);
@@ -224,16 +224,22 @@ class AuthController extends Controller
         }
 
         if (!$emailVerified) {
-            return response()->json(['message' => 'Google email is not verified.'], 422);
+            return response()->json(['message' => 'بريد حساب Google هذا غير مؤكَّد لدى Google. أكّده أولًا ثم أعد المحاولة.'], 422);
         }
 
         if (!$googleId) {
-            return response()->json(['message' => 'Google account id is missing.'], 422);
+            return response()->json(['message' => 'تعذّر التعرف على حساب Google. حاول مرة أخرى.'], 422);
         }
 
-        $user = User::where('email', $email)->orWhere('google_id', $googleId)->first();
+        $user = User::where('google_id', $googleId)->first() ?: User::where('email', $email)->first();
+        $isNew = false;
 
         if (!$user) {
+            $domain = substr(strrchr($email, '@') ?: '', 1);
+            if ($domain === '' || RealEmail::isDisposable($domain)) {
+                return response()->json(['message' => 'لا يُقبل البريد المؤقت أو الوهمي — استخدم حساب Google ببريد حقيقي.'], 422);
+            }
+            $isNew = true;
             $user = User::create([
                 'org_name'          => $name,
                 'org_type'          => 'غير ربحية',
@@ -274,7 +280,8 @@ class AuthController extends Controller
         return response()->json([
             'user'          => $user->fresh(),
             'token'         => $token,
-            'needs_profile' => !$user->phone,
+            'needs_profile' => $user->role === 'client' && !$user->phone,
+            'is_new'        => $isNew,
         ]);
     }
 
