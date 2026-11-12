@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
+import StrategicContentEditor from './StrategicContentEditor';
 
 const C = {
   teal: '#1A6B7C', tealDark: '#14505E', tealLight: '#E8F4F6',
@@ -23,6 +24,15 @@ const CONTENT_FIELDS = [
   { key: 'written_description', label: 'شرح',     section: 'content' },
   { key: 'tip',                 label: 'إرشادات', section: 'content' },
   { key: 'video_url',           label: 'فيديو',   section: 'content' },
+];
+
+// حالة محتوى الوحدة الاستراتيجية (من المحتوى المنظَّم الذي يراه المستخدم فعلًا)
+const STRATEGIC_FIELDS = [
+  { key: 'overview',    label: 'النبذة',      tab: 'overview',    filled: u => (u.content?.overview?.paragraphs || []).some(Boolean) },
+  { key: 'explanation', label: 'الشرح',       tab: 'explanation', filled: u => (u.content?.explanation?.cards || []).length > 0 },
+  { key: 'guidelines',  label: 'الإرشادات',   tab: 'guidelines',  filled: u => (u.content?.guidelines?.steps || []).length > 0 },
+  { key: 'form',        label: 'نماذج العمل', tab: 'form',        filled: u => (u.content?.form?.blocks || []).length > 0 || (u.content?.form?.tooltips || []).length > 0 },
+  { key: 'video',       label: 'فيديو',       tab: 'general',     filled: u => !!u.video_url },
 ];
 
 // ─── Primitives ──────────────────────────────────────────────────────────────
@@ -336,7 +346,7 @@ function UnitRow({ unit, section, onEdit }) {
         {/* Left: number + name (clickable → opens on 'name' field) */}
         <div
           style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flex: 1, minWidth: 0, cursor: 'pointer' }}
-          onClick={() => onEdit(unit, 'name')}
+          onClick={() => onEdit(unit, section === 'strategic' ? 'general' : 'name')}
           title="اضغط لتعديل الاسم"
         >
           <div style={{ width: 30, height: 30, borderRadius: 8, background: C.teal, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0, fontFamily: 'inherit', marginTop: 2 }}>
@@ -360,12 +370,24 @@ function UnitRow({ unit, section, onEdit }) {
         </div>
 
         {/* Right: clickable content badges */}
+        {section === 'strategic' ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            {STRATEGIC_FIELDS.map(f => (
+              <ContentBadge key={f.key} filled={f.filled(unit)} label={f.label} onClick={() => onEdit(unit, f.tab)} />
+            ))}
+            <span title="ملفات PDF المرفوعة من لوحة التحكم (وإلا يُستخدم الملف المعتمد الافتراضي)"
+              style={{ fontSize: 11, color: C.gray, fontFamily: 'inherit', padding: '4px 6px' }}>
+              PDF: {Object.values(unit.pdf_urls || {}).filter(Boolean).length ? `${Object.values(unit.pdf_urls).filter(Boolean).length} مرفوع` : 'المعتمد'}
+            </span>
+          </div>
+        ) : (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           <ContentBadge filled={!!unit.overview}            label="نبذة"    onClick={() => onEdit(unit, 'overview')} />
           <ContentBadge filled={!!unit.written_description} label="شرح"     onClick={() => onEdit(unit, 'written_description')} />
           <ContentBadge filled={!!unit.tip}                 label="إرشادات" onClick={() => onEdit(unit, 'tip')} />
           <ContentBadge filled={!!unit.video_url}           label="فيديو"   onClick={() => onEdit(unit, 'video_url')} />
         </div>
+        )}
       </div>
     </div>
   );
@@ -376,11 +398,14 @@ function UnitRow({ unit, section, onEdit }) {
 function ProgressBar({ units, section }) {
   const extraFields = section === 'policies' ? ['name', 'description', 'price'] : ['name'];
   const allFields   = [...extraFields, ...CONTENT_FIELDS.map(f => f.key)];
-  const total  = units.length * allFields.length;
-  const filled = units.reduce((acc, u) => acc + allFields.filter(k => {
-    const v = u[k];
-    return v !== null && v !== undefined && v !== '' && v !== 0;
-  }).length, 0);
+  const strategic   = section === 'strategic';
+  const total  = units.length * (strategic ? STRATEGIC_FIELDS.length : allFields.length);
+  const filled = strategic
+    ? units.reduce((acc, u) => acc + STRATEGIC_FIELDS.filter(f => f.filled(u)).length, 0)
+    : units.reduce((acc, u) => acc + allFields.filter(k => {
+      const v = u[k];
+      return v !== null && v !== undefined && v !== '' && v !== 0;
+    }).length, 0);
   const pct = total > 0 ? Math.round((filled / total) * 100) : 0;
   return (
     <div style={{ marginBottom: 16, padding: '12px 18px', background: C.grayLight, borderRadius: 10 }}>
@@ -439,7 +464,16 @@ export default function AdminContent() {
   return (
     <div style={{ direction: 'rtl', fontFamily: 'inherit' }}>
       {toast && <Toast msg={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
-      {editState && (
+      {editState && activeTab === 'strategic' && (
+        <StrategicContentEditor
+          unit={editState.unit}
+          initialTab={editState.focusField || 'general'}
+          onClose={() => setEditState(null)}
+          onSaved={updated => setData(prev => ({ ...prev, strategic: prev.strategic.map(u => (u.id === updated.id ? { ...u, ...updated } : u)) }))}
+          notify={showToast}
+        />
+      )}
+      {editState && activeTab !== 'strategic' && (
         <EditModal
           unit={editState.unit}
           section={activeTab}
@@ -471,9 +505,9 @@ export default function AdminContent() {
       </div>
 
       {activeTab === 'strategic' && (
-        <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 12.5, color: '#92400e', lineHeight: 1.8, fontFamily: 'inherit' }}>
-          تُعرض النبذة والشرح والإرشادات وتعليمات النماذج للوحدات الاستراتيجية من المحتوى المعتمد في وثائق تحسينات المنصة،
-          لذلك لا يظهر تعديل هذه الحقول هنا للعميل. يبقى رابط الفيديو قابلًا للتعديل.
+        <div style={{ background: C.tealLight, border: `1px solid ${C.teal}30`, borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 12.5, color: C.tealDark, lineHeight: 1.8, fontFamily: 'inherit' }}>
+          كل ما يظهر للمستخدم في الوحدات الاستراتيجية قابل للتعديل من هنا: الاسم ونوع النموذج والفيديو، النبذة، الشرح وأمثلته،
+          الإرشادات، تعليمات نماذج العمل وتوضيحات ⓘ وأمثلتها، وملفات PDF. التعديل يُنشر للمستخدمين فور الحفظ، مع معاينة مباشرة قبل الحفظ.
         </div>
       )}
 

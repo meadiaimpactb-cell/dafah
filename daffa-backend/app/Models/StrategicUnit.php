@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\StrategicContent;
 use Illuminate\Database\Eloquent\Model;
 
 class StrategicUnit extends Model
@@ -21,4 +22,12 @@ class StrategicUnit extends Model
         'tips'          => 'array',
         'content'       => 'array',
     ];
+
+    // روابط ملفات PDF المرفوعة من لوحة التحكم (null = الملف المعتمد الافتراضي في الواجهة)
+    protected $appends = ['pdf_urls'];
+
+    public function getPdfUrlsAttribute(): array
+    {
+        return StrategicContent::pdfUrls($this->content);
+    }
 }

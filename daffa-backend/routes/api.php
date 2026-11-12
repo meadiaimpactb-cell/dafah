@@ -209,6 +209,9 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     // Content Management
     Route::get('/content/strategic',              [AdminContentController::class, 'strategicUnits']);
     Route::put('/content/strategic/{id}',         [AdminContentController::class, 'updateStrategic']);
+    Route::get('/content/strategic/{id}/default',         [AdminContentController::class, 'strategicDefault']);
+    Route::post('/content/strategic/{id}/pdf/{kind}',     [AdminContentController::class, 'uploadStrategicPdf']);
+    Route::delete('/content/strategic/{id}/pdf/{kind}',   [AdminContentController::class, 'removeStrategicPdf']);
     Route::get('/content/operational',            [AdminContentController::class, 'operationalUnits']);
     Route::put('/content/operational/{id}',       [AdminContentController::class, 'updateOperational']);
     Route::get('/content/policies',               [AdminContentController::class, 'policyTypes']);

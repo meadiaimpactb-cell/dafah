@@ -28,6 +28,8 @@ const PDF_UNIT_NAMES = {
   orgchart: 'الهيكل التنظيمي',
   document: 'الوثيقة الاستراتيجية',
 };
+/** رابط ملف PDF: الملف المرفوع من لوحة التحكم إن وُجد، وإلا الملف المعتمد الافتراضي */
+export const unitPdfUrl = (unit, kind) => unit?.pdf_urls?.[kind] || pdfUrl(unit?.template_type, kind);
 export const pdfUrl = (templateType, kind) => {
   const name = PDF_UNIT_NAMES[templateType];
   if (!name) return `/guides/strategic/${templateType}-${kind}.pdf`;
@@ -229,7 +231,7 @@ function FieldsLayout({ b }) {
   );
 }
 
-function ExampleBody({ example, compact }) {
+export function ExampleBody({ example, compact }) {
   const fs = compact ? 12 : 13;
   return (
     <div style={{ fontSize: fs, lineHeight: 1.85, color: C.grayText }}>
@@ -329,6 +331,8 @@ export function formGuide(unit) {
     blocks: anchor => blocks.filter(b => b.anchor === anchor),
     tip: (anchor, label) => tooltips.find(t => norm(t.label) === norm(label) && (!anchor || t.anchor === anchor))
       || tooltips.find(t => norm(t.label) === norm(label)) || null,
+    // مطابقة داخل الموضع نفسه فقط (حين يتكرر العنوان في أكثر من موضع)
+    tipIn: (anchor, label) => tooltips.find(t => t.anchor === anchor && norm(t.label) === norm(label)) || null,
     rename: label => renames.find(r => norm(r.from) === norm(label))?.to || label,
   };
 }
@@ -465,7 +469,7 @@ export function ExplanationContent({ unit }) {
           </div>
         )}
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-          <PdfButton href={pdfUrl(unit.template_type, 'explanation')} label={e.pdf_button || 'قراءة الشرح التفصيلي'} caption={e.pdf_caption} />
+          <PdfButton href={unitPdfUrl(unit, 'explanation')} label={e.pdf_button || 'قراءة الشرح التفصيلي'} caption={e.pdf_caption} />
         </div>
       </div>
     </div>
@@ -500,7 +504,7 @@ export function GuidelinesContent({ unit }) {
         </div>
       )}
       {g.example && <div style={{ marginBottom: 12 }}><ExampleToggle label={g.example_button} example={g.example} /></div>}
-      <PdfButton href={pdfUrl(unit.template_type, 'guidelines')} label={g.pdf_button || 'قراءة الإرشادات التفصيلية'} caption={g.pdf_caption} />
+      <PdfButton href={unitPdfUrl(unit, 'guidelines')} label={g.pdf_button || 'قراءة الإرشادات التفصيلية'} caption={g.pdf_caption} />
     </div>
   );
 }

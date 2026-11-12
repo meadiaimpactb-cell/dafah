@@ -84,14 +84,26 @@ const thStyle = {
   fontSize: 12, fontWeight: 600, textAlign: 'right', whiteSpace: 'nowrap',
 };
 
-/** عنوان عمود/حقل مع ⓘ عند وجود توضيح له في المواصفات */
+/**
+ * توضيح ⓘ لحقل: يُبحث داخل موضعه بالاسم الظاهر (مع الرمز إن وُجد مثل «(S)»)، ثم بالاسم الظاهر، ثم بالاسم الأصلي
+ * (حتى لا ينفصل التوضيح إذا أعاد المدير تسمية الحقل). المحرر في لوحة التحكم يستخدم الدالة نفسها.
+ */
+export const resolveTip = (guide, anchor, label, suffix = '') => {
+  const shown = guide.rename(label);
+  return (suffix && guide.tipIn(anchor, `${shown}${suffix}`))
+    || guide.tipIn(anchor, shown)
+    || (shown !== label && guide.tipIn(anchor, label))
+    || null;
+};
+
+/** عنوان عمود/حقل مع ⓘ عند وجود توضيح له */
 const Th = ({ guide, anchor, label, style }) => (
   <th style={{ ...thStyle, ...style }}>
-    <LabelWithTip label={guide.rename(label)} tip={guide.tip(anchor, guide.rename(label))} />
+    <LabelWithTip label={guide.rename(label)} tip={resolveTip(guide, anchor, label)} />
   </th>
 );
-const Lbl = ({ guide, anchor, label }) => (
-  <LabelWithTip label={guide.rename(label)} tip={guide.tip(anchor, guide.rename(label))} />
+const Lbl = ({ guide, anchor, label, suffix }) => (
+  <LabelWithTip label={guide.rename(label)} tip={resolveTip(guide, anchor, label, suffix)} />
 );
 const SectionTitleTip = ({ guide, anchor, label }) => (
   <SectionTitle><Lbl guide={guide} anchor={anchor} label={label} /></SectionTitle>
@@ -132,7 +144,7 @@ function SwotTemplate({ formData, set, setFormData, disabled, unit, guide }) {
     setFormData(prev => ({ ...prev, matrix: { ...(prev.matrix || {}), strengths: sJoined, weaknesses: wJoined } }));
   }, [sJoined, wJoined, disabled]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const summaryTip = guide.tip('summary', SWOT_SUMMARY_TITLE);
+  const summaryTip = resolveTip(guide, 'summary', SWOT_SUMMARY_TITLE);
   const autoBox = (points, empty) => (
     <div style={{ minHeight: 88, padding: '8px 12px', fontSize: 12, lineHeight: 1.9, color: '#374151', background: '#fafafa' }}>
       {points.length > 0
@@ -185,7 +197,7 @@ function SwotTemplate({ formData, set, setFormData, disabled, unit, guide }) {
         ].map(q => (
           <div key={q.key} style={{ border: `2px solid ${q.color}25`, borderRadius: 10, overflow: 'hidden' }}>
             <div style={{ padding: '7px 12px', background: q.bg, fontSize: 13, fontWeight: 600, color: q.color, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span><Lbl guide={guide} anchor="summary" label={q.label} /> ({q.code})</span>
+              <span><Lbl guide={guide} anchor="summary" label={q.label} suffix={` (${q.code})`} /> ({q.code})</span>
               {q.auto && <span style={{ fontSize: 10.5, fontWeight: 500, color: '#6b7280' }}>تظهر تلقائيًا من الجدول</span>}
             </div>
             {q.auto
@@ -374,7 +386,7 @@ function TowsTemplate({ formData, set, disabled, guide }) {
       <GuideBlocks guide={guide} anchor="top" sectionTitle="مصفوفة TOWS (التحليل المتقاطع) التحليل الاستراتيجي" />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         {cells.map(c => {
-          const tip = guide.tip(c.key, c.key.toUpperCase());
+          const tip = resolveTip(guide, c.key, c.key.toUpperCase());
           return (
           <div key={c.key} style={{ border: `2px solid ${c.color}25`, borderRadius: 10, overflow: 'hidden' }}>
             <div style={{ padding: '9px 12px', background: c.bg }}>
@@ -849,3 +861,83 @@ const FieldBoxTip = ({ guide, anchor, label, children, style }) => (
     {children}
   </div>
 );
+
+/* ─────────────── خريطة مواضع التعليمات والحقول (يستخدمها محرر لوحة التحكم) ───────────────
+ * anchors: المواضع التي تُعرض فيها إطارات التعليمات (GuideBlocks) في كل نموذج.
+ * fields : الحقول التي يمكن أن تحمل توضيح ⓘ (resolveTip)، وهل يمكن تغيير اسمها الظاهر (rename).
+ *          rows: true = أسماء صفوف الجدول من unit.table_rows.
+ * يجب تحديثها عند إضافة حقل أو موضع جديد في النماذج أعلاه.
+ */
+const F = (anchor, label, extra = {}) => ({ anchor, label, renamable: true, ...extra });
+export const GUIDE_SPEC = {
+  swot: {
+    anchors: { table: 'أعلى جدول «تحليل الموارد الداخلية»', summary: `أعلى «${SWOT_SUMMARY_TITLE}»` },
+    fields: [
+      F('table', 'العنصر'), F('table', 'نقاط القوة'), F('table', 'نقاط الضعف'), F('table', 'ملاحظات'),
+      { anchor: 'table', rows: true, renamable: true },
+      F('summary', SWOT_SUMMARY_TITLE, { renamable: false }),
+      F('summary', 'نقاط القوة', { suffix: ' (S)' }), F('summary', 'نقاط الضعف', { suffix: ' (W)' }),
+      F('summary', 'فرص التحسين', { suffix: ' (O)' }), F('summary', 'المخاطر الداخلية', { suffix: ' (T)' }),
+    ],
+  },
+  pestel: {
+    anchors: { pestel: 'جدول «تحليل PESTEL» (أزرار الأمثلة تظهر أسفل الجدول)', stakeholders: 'جدول «خريطة أصحاب المصلحة» (أزرار الأمثلة تظهر أسفل الجدول)' },
+    fields: [
+      F('pestel', 'العامل'), F('pestel', 'وصف العامل'), F('pestel', 'التأثير'), F('pestel', 'المستوى'),
+      F('stakeholders', 'صاحب المصلحة'), F('stakeholders', 'مستوى التأثير'), F('stakeholders', 'مستوى الاهتمام'), F('stakeholders', 'استراتيجية التعامل'),
+    ],
+  },
+  needs: {
+    anchors: { top: 'أعلى النموذج', community: '«تعريف المجتمع المستهدف»', needs_table: '«جدول الاحتياجات»', gaps: '«تحليل الفجوات»' },
+    fields: [
+      F('community', 'تعريف المجتمع المستهدف'),
+      F('needs_table', 'جدول الاحتياجات'), F('needs_table', 'الاحتياج'), F('needs_table', 'الوصف'), F('needs_table', 'الأولوية'), F('needs_table', 'المصدر'),
+      F('gaps', 'تحليل الفجوات'),
+    ],
+  },
+  tows: {
+    anchors: { top: 'أعلى «مصفوفة TOWS»' },
+    fields: [
+      F('so', 'SO', { renamable: false, title: 'SO — استراتيجيات القوة والفرص' }),
+      F('wo', 'WO', { renamable: false, title: 'WO — استراتيجيات الضعف والفرص' }),
+      F('st', 'ST', { renamable: false, title: 'ST — استراتيجيات القوة والتهديدات' }),
+      F('wt', 'WT', { renamable: false, title: 'WT — استراتيجيات الضعف والتهديدات' }),
+    ],
+  },
+  initiatives: {
+    anchors: { top: 'أعلى «المبادرات الاستراتيجية»' },
+    fields: ['اسم المبادرة', 'الهدف الاستراتيجي المرتبط', 'وصف المبادرة', 'المخرجات المتوقعة', 'الميزانية التقديرية (ريال)', 'تاريخ البداية', 'تاريخ النهاية', 'المسؤول'].map(l => F('top', l)),
+  },
+  directions: {
+    anchors: { top: 'أعلى النموذج', vision: '«الرؤية»', mission: '«الرسالة»', values: '«القيم»', goals: '«الأهداف الاستراتيجية»' },
+    fields: [F('vision', 'الرؤية'), F('mission', 'الرسالة'), F('values', 'القيم'), F('goals', 'الأهداف الاستراتيجية')],
+  },
+  toc: {
+    anchors: { top: 'أعلى النموذج', chain: '«سلسلة نظرية التغيير»', assumptions: '«الافتراضات الأساسية»' },
+    fields: [
+      F('chain', 'سلسلة نظرية التغيير'),
+      ...['المدخلات', 'الأنشطة', 'المخرجات', 'النتائج', 'الأثر'].map(l => F('chain', l)),
+      F('assumptions', 'الافتراضات الأساسية'),
+    ],
+  },
+  bmc: {
+    anchors: { top: 'أعلى «نموذج عمل المنظمة»' },
+    fields: [...BMC_ROW1, ...BMC_ROW2, ...BMC_ROW3].map(b => F('top', b.t)),
+  },
+  kpis: {
+    anchors: { top: 'أعلى «جدول مؤشرات الأداء»' },
+    fields: ['المؤشر', 'الهدف المرتبط', 'المستهدف', 'طريقة القياس', 'التكرار', 'المسؤول'].map(l => F('top', l)),
+  },
+  orgchart: {
+    anchors: { top: 'أعلى «الهيكل التنظيمي»' },
+    fields: ['المسمى الوظيفي', 'القسم', 'يتبع لـ'].map(l => F('top', l)),
+  },
+  document: {
+    anchors: { top: 'أعلى حقول «الوثيقة الاستراتيجية»' },
+    fields: ['الملخص التنفيذي', 'أبرز النتائج والتحليلات', 'الخطة التنفيذية (ملخص)', 'آلية المتابعة والتقييم', 'ملاحظات ختامية'].map(l => F('top', l)),
+  },
+};
+
+/** حقول نموذج الوحدة بعد توسيع صفوف الجدول (للمحرر) */
+export const guideFields = unit => (GUIDE_SPEC[unit?.template_type]?.fields || []).flatMap(f =>
+  f.rows ? (unit.table_rows || []).map(r => ({ anchor: f.anchor, label: r, renamable: f.renamable })) : [f]);

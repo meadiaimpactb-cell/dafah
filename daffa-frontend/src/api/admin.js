@@ -25,6 +25,16 @@ export const adminApi = {
   // Content Management
   getStrategicContent:    ()        => api.get('/admin/content/strategic'),
   updateStrategicContent: (id, d)   => api.put(`/admin/content/strategic/${id}`, d),
+  getStrategicDefault:    (id)      => api.get(`/admin/content/strategic/${id}/default`),
+  uploadStrategicPdf:     (id, kind, file, onProgress) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    return api.post(`/admin/content/strategic/${id}/pdf/${kind}`, fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: e => onProgress && e.total && onProgress(Math.round((e.loaded / e.total) * 100)),
+    });
+  },
+  removeStrategicPdf:     (id, kind) => api.delete(`/admin/content/strategic/${id}/pdf/${kind}`),
   getOperationalContent:  ()        => api.get('/admin/content/operational'),
   updateOperationalContent:(id, d)  => api.put(`/admin/content/operational/${id}`, d),
   getPoliciesContent:     ()        => api.get('/admin/content/policies'),
