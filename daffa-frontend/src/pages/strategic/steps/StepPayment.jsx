@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { strategicApi } from '../../../api/strategic';
+import { PayLogo, PaymentMethodPicker, ApplePayButton, SecurePaymentBadge } from '../../shared/PaymentBrand';
 
 const C = {
   teal: '#1A6B7C', tealDark: '#14505E', tealLight: '#E8F4F6',
@@ -9,32 +10,11 @@ const C = {
   red: '#DC2626', redLight: '#FEE2E2',
 };
 
-// ── SVG Brand Icons ──────────────────────────────────────────────────────────
-export const IcVisa = () => (
-  <svg viewBox="0 0 48 16" width="42" height="14">
-    <text x="0" y="13" fontFamily="Arial" fontWeight="900" fontSize="16" fill="#1a1f71">VISA</text>
-  </svg>
-);
-export const IcMastercard = () => (
-  <svg viewBox="0 0 38 24" width="38" height="24">
-    <circle cx="13" cy="12" r="12" fill="#EB001B"/>
-    <circle cx="25" cy="12" r="12" fill="#F79E1B"/>
-    <path d="M19 5.26a12 12 0 0 1 0 13.48A12 12 0 0 1 19 5.26z" fill="#FF5F00"/>
-  </svg>
-);
-export const IcMada = ({ height = 22 }) => (
-  <svg viewBox="0 0 68 22" width={Math.round(68 * (height / 22))} height={height} xmlns="http://www.w3.org/2000/svg">
-    <rect width="68" height="22" rx="4" fill="#00623b"/>
-    <text x="34" y="16" textAnchor="middle" fontFamily="Arial Black, Arial, sans-serif" fontWeight="900" fontSize="13" fill="#fff" letterSpacing="1">mada</text>
-  </svg>
-);
-export const IcApplePay = () => (
-  <svg viewBox="0 0 60 24" width="54" height="24">
-    <rect width="60" height="24" rx="4" fill="#000"/>
-    <text x="6" y="17" fontFamily="-apple-system,sans-serif" fontWeight="600" fontSize="11" fill="#fff"> Pay</text>
-    <path d="M10 7.5C9.2 7.5 8.5 7.9 8.1 8.5c-.4.7-.3 1.5.1 2.1.4.5 1 .9 1.7.9.7 0 1.3-.4 1.7-.9.3-.6.4-1.3 0-1.9-.3-.7-1-.9-1.6-.7" fill="#fff"/>
-  </svg>
-);
+// ── شعارات الشبكات الرسمية (public/payments) — بنفس الأسماء المستخدمة في الصفحات ──
+export const IcVisa = () => <PayLogo name="visa" height={14} />;
+export const IcMastercard = () => <PayLogo name="mastercard" height={22} />;
+export const IcMada = ({ height = 22 }) => <PayLogo name="mada" height={height} />;
+export const IcApplePay = () => <PayLogo name="apple_pay" height={22} />;
 export const IcBank = () => (
   <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke={C.teal} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
@@ -117,9 +97,11 @@ export const CardPreview = ({ cardNum, name, expiry, brand }) => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
         <div style={{ fontSize: 11, opacity: 0.8, letterSpacing: 1 }}>بطاقة الدفع</div>
         <div>
-          {brand === 'visa' && <div style={{ background: '#fff', borderRadius: 4, padding: '3px 8px' }}><IcVisa /></div>}
-          {brand === 'mc' && <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 4, padding: '2px 6px' }}><IcMastercard /></div>}
-          {brand === 'mada' && <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 4, padding: '2px 6px' }}><IcMada /></div>}
+          {brand && (
+            <div style={{ background: '#fff', borderRadius: 6, padding: '4px 8px', display: 'flex', alignItems: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>
+              {brand === 'visa' ? <IcVisa /> : brand === 'mc' ? <IcMastercard /> : <IcMada height={18} />}
+            </div>
+          )}
         </div>
       </div>
       <div style={{ fontFamily: "'Courier New', monospace", fontSize: 18, fontWeight: 700, letterSpacing: 3, marginBottom: 20 }}>
@@ -227,29 +209,11 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
           {/* أزرار طرق الدفع */}
           <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(0,0,0,0.06)', marginBottom: 16 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: C.tealDark, marginBottom: 14 }}>اختر طريقة الدفع</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
-              {[
-                { key: 'card',          label: 'بطاقة ائتمان', icon: <IcCard /> },
-                { key: 'mada',          label: 'مدى',           icon: <IcMada /> },
-                { key: 'apple_pay',     label: 'Apple Pay',      icon: <IcApplePay /> },
-                { key: 'bank_transfer', label: 'تحويل بنكي',    icon: <IcBank /> },
-              ].map(m => (
-                <button
-                  key={m.key}
-                  onClick={() => { setMethod(m.key); setCardNum(''); setExpiry(''); setCvv(''); setHolder(''); setError(''); }}
-                  style={{
-                    padding: '14px 8px', border: `2px solid ${method === m.key ? C.teal : C.grayBorder}`,
-                    borderRadius: 12, background: method === m.key ? C.tealLight : '#fff',
-                    cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s',
-                    fontFamily: "'Cairo',sans-serif",
-                    boxShadow: method === m.key ? `0 0 0 3px ${C.teal}22` : 'none',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 6 }}>{m.icon}</div>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: method === m.key ? C.teal : '#374151' }}>{m.label}</div>
-                </button>
-              ))}
-            </div>
+            <PaymentMethodPicker
+              value={method}
+              columns={4}
+              onChange={k => { setMethod(k); setCardNum(''); setExpiry(''); setCvv(''); setHolder(''); setError(''); }}
+            />
           </div>
 
           {/* ── بطاقة ائتمان / مدى ── */}
@@ -326,36 +290,17 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
                 />
               </div>
 
-              {/* بيانات الدعم */}
-              <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-                <div style={{ fontSize: 11, color: C.gray, display: 'flex', alignItems: 'center', gap: 4 }}><IcLock /> مشفّر بـ SSL 256-bit</div>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <div style={{ background: '#1a1f71', borderRadius: 4, padding: '2px 7px' }}><IcVisa /></div>
-                  <IcMastercard />
-                  <IcMada />
-                </div>
-              </div>
             </div>
           )}
 
           {/* ── Apple Pay ── */}
           {method === 'apple_pay' && (
             <div style={{ background: '#fff', borderRadius: 14, padding: 32, boxShadow: '0 1px 8px rgba(0,0,0,0.06)', textAlign: 'center' }}>
-              <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                <svg viewBox="0 0 30 36" width="30" height="36" fill="#fff">
-                  <path d="M14.9 7.3c.9-1.1 1.5-2.6 1.3-4.1-1.3.1-2.9.9-3.8 2C11.5 6.3 10.8 7.8 11 9.2c1.4.1 2.9-.7 3.9-1.9zM16.2 9.4c-2.2-.1-4 1.2-5.1 1.2-1.1 0-2.7-1.2-4.5-1.1-2.3.1-4.4 1.3-5.6 3.4-2.4 4.1-.6 10.2 1.7 13.5 1.1 1.6 2.4 3.4 4.2 3.4 1.6-.1 2.3-1.1 4.2-1.1 2 0 2.6 1.1 4.4 1.1 1.8-.1 3-1.7 4.1-3.4.8-1.3 1.1-1.9 1.7-3.3-4.4-1.7-5.1-8.1-.8-10.4-.9-1.8-2.6-3.1-4.3-3.3z"/>
-                </svg>
-              </div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: '#111', marginBottom: 8 }}>Apple Pay</div>
-              <p style={{ fontSize: 13, color: C.gray, marginBottom: 24, maxWidth: 300, margin: '0 auto 24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}><PayLogo name="apple_pay" height={44} /></div>
+              <p style={{ fontSize: 13, color: C.gray, maxWidth: 300, margin: '0 auto 22px', lineHeight: 1.8 }}>
                 ادفع بأمان باستخدام Apple Pay من جهازك — لا تحتاج إلى إدخال بيانات البطاقة
               </p>
-              <div style={{ background: '#000', borderRadius: 10, padding: '14px 0', cursor: 'pointer', maxWidth: 280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <svg viewBox="0 0 30 36" width="20" height="24" fill="#fff">
-                  <path d="M14.9 7.3c.9-1.1 1.5-2.6 1.3-4.1-1.3.1-2.9.9-3.8 2C11.5 6.3 10.8 7.8 11 9.2c1.4.1 2.9-.7 3.9-1.9zM16.2 9.4c-2.2-.1-4 1.2-5.1 1.2-1.1 0-2.7-1.2-4.5-1.1-2.3.1-4.4 1.3-5.6 3.4-2.4 4.1-.6 10.2 1.7 13.5 1.1 1.6 2.4 3.4 4.2 3.4 1.6-.1 2.3-1.1 4.2-1.1 2 0 2.6 1.1 4.4 1.1 1.8-.1 3-1.7 4.1-3.4.8-1.3 1.1-1.9 1.7-3.3-4.4-1.7-5.1-8.1-.8-10.4-.9-1.8-2.6-3.1-4.3-3.3z"/>
-                </svg>
-                <span style={{ color: '#fff', fontSize: 15, fontWeight: 600, fontFamily: '-apple-system,sans-serif' }}>Pay</span>
-              </div>
+              <div style={{ maxWidth: 300, margin: '0 auto' }}><ApplePayButton /></div>
             </div>
           )}
 
@@ -384,6 +329,8 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
               </div>
             </div>
           )}
+
+          <SecurePaymentBadge />
         </div>
 
         {/* ── ملخص الطلب ────────────────────────────── */}

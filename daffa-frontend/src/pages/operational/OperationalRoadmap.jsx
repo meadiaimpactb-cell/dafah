@@ -3,6 +3,7 @@ import { operationalApi } from '../../api/operational';
 import { chatApi } from '../../api/chat';
 import { ConsultantRating } from '../strategic/steps/StepApproval';
 import { PaymentReceipt } from '../strategic/steps/StepPayment';
+import { PayLogo, PaymentMethodPicker, ApplePayButton, SecurePaymentBadge, CardNetworkLogo, detectCardNetwork } from '../shared/PaymentBrand';
 import { IcClock, IcUpload, IcCheckCircle, IcArrowPath, IcSearch, IcWarning, IcLock, IcCog, IcLightbulb, IcSave, IcDocument, IcUser, IcCalendar, IcSparkles, IcCheck, IcChat, IcMoney, IcXMark, IcBeaker } from '../../utils/icons';
 
 // ─── Colors ─────────────────────────────────────────────────────
@@ -276,20 +277,19 @@ const CardForm = ({ card, onChange, isMada }) => {
       <div style={{ padding: "8px 12px", background: "#f0fdf4", borderRadius: 8, fontSize: 11, color: "#15803d", direction: "rtl" }}>
         بطاقة الاختبار: <strong>4111 1111 1111 1111</strong> | تاريخ: <strong>12/26</strong> | CVV: <strong>123</strong>
       </div>
-      {isMada && (
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <svg viewBox="0 0 68 22" width={74} height={24}>
-            <rect width="68" height="22" rx="4" fill="#00623b"/>
-            <text x="34" y="16" textAnchor="middle" fontFamily="Arial Black, Arial, sans-serif" fontWeight="900" fontSize="13" fill="#fff" letterSpacing="1">mada</text>
-          </svg>
-        </div>
-      )}
-      <input
-        placeholder="رقم البطاقة — XXXX XXXX XXXX XXXX"
-        style={inp} maxLength={19}
-        value={card.number}
-        onChange={e => onChange({ ...card, number: fmtCard(e.target.value) })}
-      />
+      <div style={{ position: "relative" }}>
+        <input
+          placeholder="رقم البطاقة — XXXX XXXX XXXX XXXX"
+          aria-label="رقم البطاقة"
+          inputMode="numeric" autoComplete="cc-number"
+          style={{ ...inp, paddingRight: 70 }} maxLength={19}
+          value={card.number}
+          onChange={e => onChange({ ...card, number: fmtCard(e.target.value) })}
+        />
+        <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", pointerEvents: "none" }}>
+          <CardNetworkLogo brand={isMada ? "mada" : detectCardNetwork(card.number)} />
+        </span>
+      </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <input
           placeholder="تاريخ الانتهاء — MM/YY"
@@ -316,10 +316,7 @@ const CardForm = ({ card, onChange, isMada }) => {
 
 const ApplePayForm = () => (
   <div style={{ textAlign: "center", padding: "16px 0" }}>
-    <button style={{ background: "black", color: "white", border: "none", borderRadius: 12, padding: "14px 0", width: "100%", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 16, fontFamily: "sans-serif" }}>
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-      Apple Pay
-    </button>
+    <ApplePayButton />
     <p style={{ fontSize: 12, color: colors.gray, marginTop: 10, fontFamily: "'Cairo', sans-serif" }}>سيتم فتح نافذة Apple Pay لإتمام عملية الدفع</p>
   </div>
 );
@@ -1314,17 +1311,11 @@ const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant }) => {
         {/* ── Payment method ─────────────────────────────────────── */}
         <Card>
           <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>طريقة الدفع</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
-            {PAY_METHODS.map((m, i) => (
-              <button
-                key={m.key}
-                onClick={() => { setPayMethod(i); setCard(EMPTY_CARD); setPayError(null); }}
-                style={{ padding: "12px 8px", borderRadius: 10, border: i===payMethod ? `2px solid ${colors.teal}` : `1.5px solid ${colors.grayBorder}`, background: i===payMethod ? `${colors.teal}10` : "white", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 5, fontFamily: "'Cairo', sans-serif", transition: "all 0.2s", color: i===payMethod ? colors.teal : colors.gray }}
-              >
-                <span style={{ color: i===payMethod ? colors.teal : colors.gray }}>{m.icon}</span>
-                <span style={{ fontSize: 11, fontWeight: i===payMethod ? 700 : 500 }}>{m.label}</span>
-              </button>
-            ))}
+          <div style={{ marginBottom: 16 }}>
+            <PaymentMethodPicker
+              value={PAY_METHODS[payMethod]?.key}
+              onChange={k => { setPayMethod(Math.max(0, PAY_METHODS.findIndex(m => m.key === k))); setCard(EMPTY_CARD); setPayError(null); }}
+            />
           </div>
 
           {/* Controlled payment forms */}
@@ -1333,10 +1324,7 @@ const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant }) => {
           {(payMethod === 2) && <ApplePayForm />}
           {(payMethod === 3) && <BankTransferInfo />}
 
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 14, padding: "10px 14px", background: colors.greenLight, borderRadius: 8, fontSize: 12, color: colors.green }}>
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke={colors.green} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            عملية دفع آمنة ومشفرة
-          </div>
+          <SecurePaymentBadge />
         </Card>
       </div>
 

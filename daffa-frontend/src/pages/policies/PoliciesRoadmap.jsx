@@ -4,6 +4,7 @@ import { policiesApi, policiesDesignApi } from "../../api/policies";
 import api from "../../api/axios";
 import { ConsultantRating } from "../strategic/steps/StepApproval";
 import { PaymentReceipt } from "../strategic/steps/StepPayment";
+import { PaymentMethodPicker, ApplePayButton, SecurePaymentBadge, CardNetworkLogo, detectCardNetwork } from "../shared/PaymentBrand";
 import { IcCheckCircle, IcArrowPath, IcUpload, IcSearch, IcWarning, IcLock, IcLightbulb, IcSave, IcDocument, IcUser, IcCalendar, IcCreditCard, IcSparkles, IcCheck, IcPencil, IcEye, IcPalette, IcBeaker, IcChat, IcScroll, IcClock } from '../../utils/icons';
 
 // ── Payment Gateway Mock ──────────────────────────────────────────────────────
@@ -367,18 +368,16 @@ const CardInputForm = ({ card, onChange, isMada }) => {
       <div style={{ padding: '8px 12px', background: '#f0fdf4', borderRadius: 8, fontSize: 11, color: '#15803d', direction: 'rtl', lineHeight: 1.8 }}>
         بطاقة الاختبار: <strong>4111 1111 1111 1111</strong> | تاريخ: <strong>12/26</strong> | CVV: <strong>123</strong>
       </div>
-      {isMada && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <svg viewBox="0 0 68 22" width={74} height={24}>
-            <rect width="68" height="22" rx="4" fill="#00623b"/>
-            <text x="34" y="16" textAnchor="middle" fontFamily="Arial Black, Arial, sans-serif" fontWeight="900" fontSize="13" fill="#fff" letterSpacing="1">mada</text>
-          </svg>
-        </div>
-      )}
       <div>
         <label style={{ fontSize: 12, fontWeight: 600, color: C.tealDark, display: 'block', marginBottom: 4 }}>رقم البطاقة</label>
-        <input value={card.number} onChange={e => onChange({ ...card, number: fmtCardNum(e.target.value) })}
-          placeholder="XXXX XXXX XXXX XXXX" maxLength={19} style={inp} />
+        <div style={{ position: 'relative' }}>
+          <input value={card.number} onChange={e => onChange({ ...card, number: fmtCardNum(e.target.value) })}
+            placeholder="XXXX XXXX XXXX XXXX" maxLength={19} inputMode="numeric" autoComplete="cc-number" aria-label="رقم البطاقة"
+            style={{ ...inp, paddingRight: 70 }} />
+          <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
+            <CardNetworkLogo brand={isMada ? 'mada' : detectCardNetwork(card.number)} />
+          </span>
+        </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         <div>
@@ -517,13 +516,11 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack }) => {
         {/* ── Payment method ── */}
         <Card>
           <h3 style={{ fontSize: 15, fontWeight: 700, color: C.tealDark, marginBottom: 14 }}>طريقة الدفع</h3>
-          <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-            {PAY_METHODS.map((m, i) => (
-              <button key={i} onClick={() => { setMethodIdx(i); setCard(EMPTY_CARD); setPayError(null); }}
-                style={{ flex: 1, padding: '10px 8px', borderRadius: 10, border: methodIdx === i ? `2px solid ${C.teal}` : `1.5px solid ${C.grayBorder}`, background: methodIdx === i ? `${C.teal}08` : C.white, fontSize: 11, fontWeight: methodIdx === i ? 700 : 400, fontFamily: "'Cairo',sans-serif", cursor: 'pointer', color: methodIdx === i ? C.teal : C.gray, transition: 'all 0.15s' }}>
-                {m.label}
-              </button>
-            ))}
+          <div style={{ marginBottom: 16 }}>
+            <PaymentMethodPicker
+              value={methodKey}
+              onChange={k => { setMethodIdx(Math.max(0, PAY_METHODS.findIndex(m => m.key === k))); setCard(EMPTY_CARD); setPayError(null); }}
+            />
           </div>
 
           {(methodKey === 'card' || methodKey === 'mada') && (
@@ -531,10 +528,7 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack }) => {
           )}
           {methodKey === 'apple_pay' && (
             <div style={{ textAlign: 'center', padding: '16px 0' }}>
-              <button style={{ background: 'black', color: 'white', border: 'none', borderRadius: 12, padding: '14px 0', width: '100%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontSize: 16, fontFamily: 'sans-serif' }}>
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-                Apple Pay
-              </button>
+              <ApplePayButton />
               <p style={{ fontSize: 12, color: C.gray, marginTop: 10, fontFamily: "'Cairo',sans-serif" }}>سيتم فتح نافذة Apple Pay لإتمام عملية الدفع</p>
             </div>
           )}
@@ -548,9 +542,7 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack }) => {
             </div>
           )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 16, padding: '10px 14px', background: C.greenLight, borderRadius: 8, fontSize: 12, color: C.green }}>
-            <IcLock width={12} height={12}/> دفع آمن ومشفر
-          </div>
+          <SecurePaymentBadge />
         </Card>
       </div>
 
