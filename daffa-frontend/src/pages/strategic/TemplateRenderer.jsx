@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { formGuide, GuideBlocks, LabelWithTip, InfoTip } from './UnitContent';
+import { formGuide, GuideBlocks, GuideExamples, LabelWithTip, InfoTip } from './UnitContent';
 import { buildOrgTree, OrgNode } from './OrgChart';
 
 const colors = { teal: '#1A6B7C', tealDark: '#14505E', orange: '#E8620A' };
@@ -212,7 +212,8 @@ function PestelTemplate({ formData, set, disabled, unit, guide }) {
   return (
     <div>
       <SectionTitle>تحليل PESTEL</SectionTitle>
-      <GuideBlocks guide={guide} anchor="pestel" sectionTitle="تحليل PESTEL" />
+      {/* وفق المواصفات: التعليمات فوق الجدول، وزر «عرض مثال مكتمل» أسفله */}
+      <GuideBlocks guide={guide} anchor="pestel" sectionTitle="تحليل PESTEL" examplesBelow />
       <div style={{ overflowX: 'auto', marginBottom: 8 }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
           <thead>
@@ -235,9 +236,10 @@ function PestelTemplate({ formData, set, disabled, unit, guide }) {
           </tbody>
         </table>
       </div>
+      <GuideExamples guide={guide} anchor="pestel" />
 
       <SectionTitle>خريطة أصحاب المصلحة</SectionTitle>
-      <GuideBlocks guide={guide} anchor="stakeholders" sectionTitle="خريطة أصحاب المصلحة" />
+      <GuideBlocks guide={guide} anchor="stakeholders" sectionTitle="خريطة أصحاب المصلحة" examplesBelow />
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
           <thead>
@@ -260,6 +262,7 @@ function PestelTemplate({ formData, set, disabled, unit, guide }) {
           </tbody>
         </table>
       </div>
+      <GuideExamples guide={guide} anchor="stakeholders" />
     </div>
   );
 }

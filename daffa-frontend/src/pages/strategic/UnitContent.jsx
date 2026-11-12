@@ -339,7 +339,7 @@ const sameTitle = (a, b) => {
 };
 
 /** محتوى قسم تعليمات واحد (يُجمع أكثر من قسم للموضع نفسه في إطار واحد) */
-function GuidePart({ block, hideTitle }) {
+function GuidePart({ block, hideTitle, hideExamples }) {
   const items = block.items || [];
   const List = block.ordered === false ? 'ul' : 'ol';
   return (
@@ -352,30 +352,46 @@ function GuidePart({ block, hideTitle }) {
         </List>
       )}
       {block.note && <div style={{ fontSize: 12, color: C.gray, marginTop: 6 }}>{block.note}</div>}
-      {(block.example || block.example_2) && (
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-          {block.example && <ExampleToggle label={block.example_button} example={block.example} small />}
-          {block.example_2 && <ExampleToggle label={block.example_button_2} example={block.example_2} small />}
-        </div>
-      )}
+      {!hideExamples && <BlockExamples block={block} />}
+    </div>
+  );
+}
+
+/** أزرار أمثلة قسم التعليمات (تفتح المثال وتغلقه داخل الصفحة) */
+function BlockExamples({ block }) {
+  if (!block.example && !block.example_2) return null;
+  return (
+    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+      {block.example && <ExampleToggle label={block.example_button} example={block.example} small />}
+      {block.example_2 && <ExampleToggle label={block.example_button_2} example={block.example_2} small />}
     </div>
   );
 }
 
 /** إطار التعليمات أعلى الجدول/القسم؛ يُخفى العنوان إذا كرّر عنوان القسم الظاهر فوقه */
-export function GuideFrame({ blocks, sectionTitle }) {
+export function GuideFrame({ blocks, sectionTitle, hideExamples }) {
   if (!blocks?.length) return null;
   return (
     <div style={{ background: C.blueBg, border: `1.5px solid ${C.blueBorder}`, borderRadius: 10, padding: '12px 16px 8px', margin: '10px 0 12px', direction: 'rtl' }}>
-      {blocks.map((b, i) => <GuidePart key={i} block={b} hideTitle={sameTitle(b.title, sectionTitle)} />)}
+      {blocks.map((b, i) => <GuidePart key={i} block={b} hideTitle={sameTitle(b.title, sectionTitle)} hideExamples={hideExamples} />)}
     </div>
   );
 }
 
-/** تعليمات موضع معيّن في إطار واحد */
-export const GuideBlocks = ({ guide, anchor, sectionTitle }) => (
-  <GuideFrame blocks={guide.blocks(anchor)} sectionTitle={sectionTitle} />
+/**
+ * تعليمات موضع معيّن في إطار واحد.
+ * examplesBelow: تُعرض أزرار الأمثلة لاحقًا عبر <GuideExamples> (أسفل الجدول) بدل داخل الإطار.
+ */
+export const GuideBlocks = ({ guide, anchor, sectionTitle, examplesBelow }) => (
+  <GuideFrame blocks={guide.blocks(anchor)} sectionTitle={sectionTitle} hideExamples={examplesBelow} />
 );
+
+/** أزرار أمثلة موضع معيّن أسفل الجدول (حين تضعها المواصفات بعد الجدول) */
+export const GuideExamples = ({ guide, anchor }) => {
+  const blocks = guide.blocks(anchor).filter(b => b.example || b.example_2);
+  if (!blocks.length) return null;
+  return <div style={{ margin: '4px 0 8px' }}>{blocks.map((b, i) => <BlockExamples key={i} block={b} />)}</div>;
+};
 
 /* ─────────── التبويبات ─────────── */
 
