@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useId } from 'react';
 import { formGuide, GuideBlocks, GuideExamples, LabelWithTip, InfoTip } from './UnitContent';
 import { buildOrgTree, OrgNode } from './OrgChart';
 
@@ -31,8 +31,9 @@ const SectionTitle = ({ children }) => (
   <div style={{ fontSize: 14, fontWeight: 700, color: colors.teal, marginBottom: 10, marginTop: 20 }}>{children}</div>
 );
 
-const TaInput = ({ value, onChange, placeholder, rows = 3, disabled }) => (
+const TaInput = ({ value, onChange, placeholder, rows = 3, disabled, id }) => (
   <textarea
+    id={id}
     value={value || ''}
     onChange={e => onChange(e.target.value)}
     placeholder={placeholder}
@@ -77,6 +78,11 @@ const SelectInput = ({ value, onChange, options, disabled }) => (
   >
     {options.map(o => <option key={o} value={o}>{o}</option>)}
   </select>
+);
+
+/** عنوان خانة إدخال مرتبط بها (الضغط عليه ينقل المؤشر إلى الخانة) */
+const FieldLabel = ({ htmlFor, children }) => (
+  <label htmlFor={htmlFor} style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#374151', marginBottom: 6 }}>{children}</label>
 );
 
 const thStyle = {
@@ -293,6 +299,7 @@ export const needsItems = (formData, unit) => {
 
 function NeedsTemplate({ formData, setFormData, set, disabled, unit, guide }) {
   const items = needsItems(formData, unit);
+  const communityId = useId();
 
   const commit = next => {
     const table = {};
@@ -317,7 +324,9 @@ function NeedsTemplate({ formData, setFormData, set, disabled, unit, guide }) {
       <GuideBlocks guide={guide} anchor="top" />
       <SectionTitleTip guide={guide} anchor="community" label="تعريف المجتمع المستهدف" />
       <GuideBlocks guide={guide} anchor="community" sectionTitle="تعريف المجتمع المستهدف" />
-      <TaInput value={formData.target_community} onChange={v => set('target_community', v)}
+      {/* عنوان الخانة نفسها (يتبع الاسم الظاهر للحقل إن غيّره المدير من لوحة التحكم) */}
+      <FieldLabel htmlFor={communityId}>{guide.rename('تعريف المجتمع المستهدف')}</FieldLabel>
+      <TaInput id={communityId} value={formData.target_community} onChange={v => set('target_community', v)}
         placeholder="صف الفئة المستهدفة بدقة: من هم؟ أين يقعون؟ ما خصائصهم؟" rows={3} disabled={disabled} />
 
       <SectionTitleTip guide={guide} anchor="needs_table" label="جدول الاحتياجات" />
