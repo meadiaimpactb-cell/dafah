@@ -12,7 +12,7 @@
 body {
     font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, Arial, sans-serif;
     direction: rtl;
-    color: #1B1746;
+    color: #0E2A3D;
     background: #D9D3C7;
     font-size: 13px;
     line-height: 1.75;
@@ -22,8 +22,8 @@ body {
 .print-bar {
     position: fixed;
     top: 0; left: 0; right: 0;
-    background: #1B1746;
-    color: #E7E5FD;
+    background: #0E2A3D;
+    color: #D9E8F1;
     padding: 0 28px;
     height: 56px;
     display: flex;
@@ -34,10 +34,10 @@ body {
     gap: 16px;
 }
 .print-bar-brand { font-size: 15px; font-weight: 800; color: #fff; }
-.print-bar-title { font-size: 13px; color: #B0A9F6; flex: 1; text-align: center; }
+.print-bar-title { font-size: 13px; color: #86B5D0; flex: 1; text-align: center; }
 .print-btn {
-    background: #F5A524;
-    color: #1B1746;
+    background: #EF6A2C;
+    color: #0E2A3D;
     border: none;
     padding: 10px 30px;
     border-radius: 8px;
@@ -48,7 +48,7 @@ body {
     transition: background 0.2s;
     white-space: nowrap;
 }
-.print-btn:hover { background: #9A5B07; }
+.print-btn:hover { background: #A33F12; }
 
 /* ═══ DOCUMENT WRAPPER ═══ */
 .doc-wrap {
@@ -67,7 +67,7 @@ body {
 
 /* ═══ HEADER ═══ */
 .inv-header {
-    background: linear-gradient(145deg, #1B1746 0%, #1B1746 40%, #5546D6 100%);
+    background: linear-gradient(145deg, #0E2A3D 0%, #0E2A3D 40%, #235D7F 100%);
     color: #fff;
     padding: 32px 36px 28px;
     position: relative;
@@ -92,8 +92,8 @@ body {
 }
 .inv-brand { font-size: 22px; font-weight: 900; color: #fff; }
 .inv-badge {
-    background: #F5A524;
-    color: #1B1746;
+    background: #EF6A2C;
+    color: #0E2A3D;
     padding: 6px 20px;
     border-radius: 20px;
     font-size: 15px;
@@ -106,7 +106,7 @@ body {
     gap: 16px;
 }
 .inv-meta-item { }
-.inv-meta-label { font-size: 11px; color: #B0A9F6; margin-bottom: 2px; }
+.inv-meta-label { font-size: 11px; color: #86B5D0; margin-bottom: 2px; }
 .inv-meta-value { font-size: 14px; font-weight: 700; color: #fff; }
 
 /* ═══ BODY ═══ */
@@ -131,9 +131,9 @@ body {
     padding: 9px 14px;
     font-size: 12px;
     font-weight: 800;
-    color: #1B1746;
+    color: #0E2A3D;
     border-bottom: 1px solid #E8E3DA;
-    border-right: 3px solid #E0920F;
+    border-right: 3px solid #E05A1F;
 }
 .info-row {
     display: flex;
@@ -143,15 +143,15 @@ body {
     font-size: 12px;
 }
 .info-row:last-child { border-bottom: none; }
-.info-label { color: #67637A; }
-.info-value { color: #1B1746; font-weight: 600; text-align: left; }
+.info-label { color: #5E6B78; }
+.info-value { color: #0E2A3D; font-weight: 600; text-align: left; }
 
 /* ═══ SERVICE TABLE ═══ */
 .section-title {
     font-size: 13px;
     font-weight: 800;
-    color: #1B1746;
-    border-right: 3px solid #E0920F;
+    color: #0E2A3D;
+    border-right: 3px solid #E05A1F;
     padding-right: 10px;
     margin-bottom: 12px;
 }
@@ -162,7 +162,7 @@ table.items {
     font-size: 12px;
 }
 table.items th {
-    background: #1B1746;
+    background: #0E2A3D;
     color: #fff;
     padding: 10px 12px;
     text-align: right;
@@ -200,22 +200,22 @@ table.items .amount { text-align: left; font-weight: 700; }
     background: #EAF4FD;
     font-size: 14px;
     font-weight: 800;
-    color: #1B1746;
+    color: #0E2A3D;
     padding: 12px 14px;
 }
-.totals-label { color: #67637A; }
-.totals-value { font-weight: 700; color: #1B1746; }
-.totals-row:last-child .totals-value { color: #1B1746; }
+.totals-label { color: #5E6B78; }
+.totals-value { font-weight: 700; color: #0E2A3D; }
+.totals-row:last-child .totals-value { color: #0E2A3D; }
 .discount-value { color: #086449; font-weight: 700; }
 
 /* ═══ VAT NOTE ═══ */
 .vat-note {
-    background: #FFF8EA;
-    border: 1px solid #FCD98B;
+    background: #FEF3EC;
+    border: 1px solid #FBC3A3;
     border-radius: 8px;
     padding: 10px 14px;
     font-size: 11px;
-    color: #7A4706;
+    color: #7F310E;
     margin-bottom: 20px;
 }
 
@@ -239,7 +239,7 @@ table.items .amount { text-align: left; font-weight: 700; }
 }
 .auto-note {
     font-size: 11px;
-    color: #8F8BA3;
+    color: #8C97A3;
     text-align: left;
 }
 
@@ -336,7 +336,7 @@ table.items .amount { text-align: left; font-weight: 700; }
           <tr>
             <td class="num">1</td>
             <td>{{ $serviceLabel }}</td>
-            <td style="color:#67637A;">{{ $serviceDesc }}</td>
+            <td style="color:#5E6B78;">{{ $serviceDesc }}</td>
             <td class="amount">{{ number_format($order->subtotal + ($order->discount_amount ?? 0), 2) }}</td>
           </tr>
           @if($order->discount_amount && $order->discount_amount > 0)
@@ -391,7 +391,7 @@ table.items .amount { text-align: left; font-weight: 700; }
 
       <div style="margin-top:28px; padding-top:16px; border-top:1px solid #E8E3DA; display:flex; justify-content:space-between; align-items:center;">
         <img src="/logo.png" alt="منصة دافة" style="height:38px; max-width:120px; object-fit:contain; opacity:0.85;" />
-        <div style="font-size:11px; color:#8F8BA3; text-align:left;">
+        <div style="font-size:11px; color:#8C97A3; text-align:left;">
           منصة دافة للتخطيط الاستراتيجي والمؤسسي<br>
           {{ $supportEmail ?? '' }}
         </div>

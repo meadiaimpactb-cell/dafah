@@ -6,9 +6,9 @@ import { adminApi } from '../../api/admin';
 import { PERMISSIONS_BY_ROLE, getAllPermKeys, syncPermissionsToStorage, usePermissions } from '../../utils/permissions';
 
 const C = {
-  primary: '#5546D6', ink: '#1B1746', primarySoft: '#E7E5FD',
-  orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F', green: '#0B7F5D', red: '#D03F2A',
-  gray: '#67637A', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
+  primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
+  orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F', green: '#0B7F5D', red: '#C53A3A',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
 };
 
 const CACHE_KEY = 'admin_users_cache';
@@ -27,7 +27,7 @@ const ROLES = [
 ];
 
 const ROLE_META = {
-  admin:      { label: 'مدير نظام', bg: '#FEEDC6', color: '#9A5B07' },
+  admin:      { label: 'مدير نظام', bg: '#FDE2D2', color: '#A33F12' },
   consultant: { label: 'مستشار',    bg: C.primarySoft, color: C.primary },
   client:     { label: 'عميل',      bg: '#EAF4FD',  color: '#1A65AD' },
 };
@@ -36,7 +36,7 @@ const ROLE_META = {
 // ── Toast ──────────────────────────────────────────────────────────────────────
 const Toast = ({ toast }) =>
   toast ? ReactDOM.createPortal(
-    <div style={{ position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)', zIndex: 9999999, padding: '12px 24px', borderRadius: 12, background: toast.type === 'success' ? '#086449' : '#8F2415', color: 'white', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', boxShadow: '0 4px 20px rgba(27,23,70,0.3)', whiteSpace: 'nowrap' }}>
+    <div style={{ position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)', zIndex: 9999999, padding: '12px 24px', borderRadius: 12, background: toast.type === 'success' ? '#086449' : '#842525', color: 'white', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', boxShadow: '0 4px 20px rgba(14,42,61,0.3)', whiteSpace: 'nowrap' }}>
       {toast.msg}
     </div>, document.body
   ) : null;
@@ -44,9 +44,9 @@ const Toast = ({ toast }) =>
 // ── Confirm Delete Modal ───────────────────────────────────────────────────────
 const ConfirmDelete = ({ user, onConfirm, onCancel }) =>
   ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(27,23,70,0.5)', backdropFilter: 'blur(4px)' }}>
-      <div style={{ background: 'white', borderRadius: 20, padding: 32, width: 420, textAlign: 'center', boxShadow: '0 24px 64px rgba(27,23,70,0.25)', animation: 'modalIn 0.22s ease-out both' }}>
-        <div style={{ width: 64, height: 64, borderRadius: '50%', margin: '0 auto 20px', background: '#FDECE9', border: '2px solid #F5B8AE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: 26, color: C.red, fontWeight: 700 }}>!</span></div>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(14,42,61,0.5)', backdropFilter: 'blur(4px)' }}>
+      <div style={{ background: 'white', borderRadius: 20, padding: 32, width: 420, textAlign: 'center', boxShadow: '0 24px 64px rgba(14,42,61,0.25)', animation: 'modalIn 0.22s ease-out both' }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', margin: '0 auto 20px', background: '#FCEBEB', border: '2px solid #F1B2B2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: 26, color: C.red, fontWeight: 700 }}>!</span></div>
         <div style={{ fontSize: 18, fontWeight: 800, color: C.ink, marginBottom: 8 }}>حذف المستخدم</div>
         <div style={{ fontSize: 13, color: C.gray, lineHeight: 1.8, marginBottom: 24 }}>
           هل أنت متأكد من حذف <strong style={{ color: C.red }}>{user?.name}</strong>؟<br />لا يمكن التراجع عن هذا الإجراء.
@@ -117,8 +117,8 @@ const PermissionsModal = ({ user, onClose, onSaved }) => {
   const isNone        = totalSelected === 0;
 
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(27,23,70,0.45)', backdropFilter: 'blur(4px)' }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 20, padding: 28, width: 560, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(27,23,70,0.2)', animation: 'modalIn 0.22s ease-out both' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(14,42,61,0.45)', backdropFilter: 'blur(4px)' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 20, padding: 28, width: 560, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(14,42,61,0.2)', animation: 'modalIn 0.22s ease-out both' }}>
 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
@@ -137,8 +137,8 @@ const PermissionsModal = ({ user, onClose, onSaved }) => {
         ) : (
           <>
             {/* Status + global actions */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 14px', borderRadius: 10, marginBottom: 14, background: isFullAccess ? '#E8F8F2' : isNone ? '#FDECE9' : '#FEEDC6', border: `1px solid ${isFullAccess ? '#A9E4CF' : isNone ? '#F5B8AE' : '#FCD98B'}` }}>
-              <span style={{ fontSize: 13, fontWeight: 700, fontFamily: 'inherit', color: isFullAccess ? C.green : isNone ? C.red : '#7A4706' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 14px', borderRadius: 10, marginBottom: 14, background: isFullAccess ? '#E8F8F2' : isNone ? '#FCEBEB' : '#FDE2D2', border: `1px solid ${isFullAccess ? '#A9E4CF' : isNone ? '#F1B2B2' : '#FBC3A3'}` }}>
+              <span style={{ fontSize: 13, fontWeight: 700, fontFamily: 'inherit', color: isFullAccess ? C.green : isNone ? C.red : '#7F310E' }}>
                 {isFullAccess ? 'وصول كامل' : isNone ? 'بدون أي صلاحية' : `${totalSelected} من ${allKeys.length} صلاحية مفعّلة`}
               </span>
               <div style={{ display: 'flex', gap: 6 }}>
@@ -152,19 +152,19 @@ const PermissionsModal = ({ user, onClose, onSaved }) => {
               {modules.map(mod => {
                 const status  = moduleStatus(mod);
                 const modKeys = mod.actions.map(a => `${mod.module}.${a.key}`);
-                const borderColor = status === 'all' ? C.primary : status === 'partial' ? '#9A5B07' : C.grayBorder;
-                const bgColor     = status === 'all' ? `${C.primary}07` : status === 'partial' ? '#FFF8EA' : 'white';
+                const borderColor = status === 'all' ? C.primary : status === 'partial' ? '#A33F12' : C.grayBorder;
+                const bgColor     = status === 'all' ? `${C.primary}07` : status === 'partial' ? '#FEF3EC' : 'white';
                 return (
                   <div key={mod.module} style={{ borderRadius: 12, border: `1.5px solid ${borderColor}`, background: bgColor, overflow: 'hidden' }}>
                     {/* Module header */}
                     <div onClick={() => toggleModule(mod)}
                       style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', cursor: 'pointer', userSelect: 'none' }}>
                       {/* Module checkbox */}
-                      <div style={{ width: 20, height: 20, borderRadius: 5, border: `2px solid ${status === 'all' ? C.primary : status === 'partial' ? '#E0920F' : C.grayBorder}`, background: status === 'all' ? C.primary : status === 'partial' ? '#F5A524' : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <div style={{ width: 20, height: 20, borderRadius: 5, border: `2px solid ${status === 'all' ? C.primary : status === 'partial' ? '#E05A1F' : C.grayBorder}`, background: status === 'all' ? C.primary : status === 'partial' ? '#EF6A2C' : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         {status === 'all'     && <span style={{ color: 'white', fontSize: 12, fontWeight: 700, lineHeight: 1 }}>✓</span>}
                         {status === 'partial' && <span style={{ color: 'white', fontSize: 12, fontWeight: 700, lineHeight: 1 }}>−</span>}
                       </div>
-                      <span style={{ flexShrink: 0, display: "flex", color: "#5546D6" }}><DfIcon name={mod.icon} size={18} /></span>
+                      <span style={{ flexShrink: 0, display: "flex", color: "#235D7F" }}><DfIcon name={mod.icon} size={18} /></span>
                       <span style={{ fontSize: 13, fontWeight: 700, color: C.ink, flex: 1 }}>{mod.label}</span>
                       <span style={{ fontSize: 10, color: C.gray, flexShrink: 0 }}>
                         {modKeys.filter(k => selected.has(k)).length}/{modKeys.length}
@@ -193,7 +193,7 @@ const PermissionsModal = ({ user, onClose, onSaved }) => {
           </>
         )}
 
-        {saveError && <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 8, background: '#FDECE9', color: C.red, fontSize: 13, fontWeight: 600, fontFamily: 'inherit' }}>{saveError}</div>}
+        {saveError && <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 8, background: '#FCEBEB', color: C.red, fontSize: 13, fontWeight: 600, fontFamily: 'inherit' }}>{saveError}</div>}
 
         <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
           <button onClick={onClose} style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: `1.5px solid ${C.grayBorder}`, background: 'white', color: C.gray, fontSize: 14, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>إلغاء</button>
@@ -292,8 +292,8 @@ const UserModal = ({ mode, user, onClose, onSaved }) => {
   const initials   = (form.rep_name || '?')[0];
 
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(27,23,70,0.45)', backdropFilter: 'blur(4px)' }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 20, padding: 28, width: 500, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(27,23,70,0.2)', animation: 'modalIn 0.22s ease-out both' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(14,42,61,0.45)', backdropFilter: 'blur(4px)' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 20, padding: 28, width: 500, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(14,42,61,0.2)', animation: 'modalIn 0.22s ease-out both' }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
           <div style={{ fontSize: 17, fontWeight: 800, color: C.ink }}>{isEdit ? 'تعديل المستخدم' : '➕ إضافة مستخدم جديد'}</div>
@@ -301,7 +301,7 @@ const UserModal = ({ mode, user, onClose, onSaved }) => {
         </div>
 
         {formError && (
-          <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FDECE9', border: `1px solid #F5B8AE`, color: C.red, fontSize: 12, fontWeight: 600, marginBottom: 14 }}>
+          <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FCEBEB', border: `1px solid #F1B2B2`, color: C.red, fontSize: 12, fontWeight: 600, marginBottom: 14 }}>
             <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />{formError}
           </div>
         )}
@@ -484,18 +484,18 @@ export default function AdminUsers() {
         <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink, margin: 0 }}>إدارة المستخدمين</h2>
         {can('admin.users.add') && (
           <button onClick={() => setModal({ mode: 'add' })}
-            style={{ padding: '9px 20px', borderRadius: 12, border: 'none', background: C.amber, color: '#1B1746', fontWeight: 700, fontSize: 13, fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, boxShadow: `0 3px 10px ${C.amberLine}40` }}>
+            style={{ padding: '9px 20px', borderRadius: 12, border: 'none', background: C.amber, color: '#0E2A3D', fontWeight: 700, fontSize: 13, fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, boxShadow: `0 3px 10px ${C.amberLine}40` }}>
             + إضافة مستخدم
           </button>
         )}
       </div>
 
       {/* Tabs + Search */}
-      <div style={{ background: 'white', borderRadius: 14, padding: '14px 18px', marginBottom: 16, boxShadow: '0 1px 4px rgba(27,23,70,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+      <div style={{ background: 'white', borderRadius: 14, padding: '14px 18px', marginBottom: 16, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
         <div style={{ display: 'flex', gap: 4, background: C.grayLight, borderRadius: 12, padding: 3 }}>
           {ROLES.map(r => (
             <button key={r.key} onClick={() => setRoleFilter(r.key)}
-              style={{ padding: '7px 16px', borderRadius: 10, border: 'none', background: roleFilter === r.key ? 'white' : 'transparent', color: roleFilter === r.key ? C.primary : C.gray, fontWeight: roleFilter === r.key ? 700 : 400, fontSize: 13, fontFamily: 'inherit', cursor: 'pointer', transition: 'all 0.2s', boxShadow: roleFilter === r.key ? '0 1px 3px rgba(27,23,70,0.08)' : 'none', whiteSpace: 'nowrap' }}>
+              style={{ padding: '7px 16px', borderRadius: 10, border: 'none', background: roleFilter === r.key ? 'white' : 'transparent', color: roleFilter === r.key ? C.primary : C.gray, fontWeight: roleFilter === r.key ? 700 : 400, fontSize: 13, fontFamily: 'inherit', cursor: 'pointer', transition: 'all 0.2s', boxShadow: roleFilter === r.key ? '0 1px 3px rgba(14,42,61,0.08)' : 'none', whiteSpace: 'nowrap' }}>
               {r.label}
               <span style={{ marginRight: 4, padding: '0 6px', borderRadius: 10, background: roleFilter === r.key ? `${C.primary}15` : 'transparent', color: roleFilter === r.key ? C.primary : C.gray, fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}>
                 {counts[r.key] || 0}
@@ -513,7 +513,7 @@ export default function AdminUsers() {
       </div>
 
       {/* Table */}
-      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(27,23,70,0.07)', overflow: 'hidden' }}>
+      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', overflow: 'hidden' }}>
         {loading ? (
           <div style={{ padding: 60, textAlign: 'center', color: C.gray, fontFamily: 'inherit', fontSize: 13 }}>جارٍ التحميل...</div>
         ) : error ? (
@@ -568,11 +568,11 @@ export default function AdminUsers() {
                       <td style={{ padding: '12px 14px' }}>
                         {can('admin.users.toggle') ? (
                           <button onClick={() => handleToggle(u)}
-                            style={{ padding: '3px 10px', borderRadius: 20, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', border: 'none', cursor: 'pointer', background: u.is_active ? '#E8F8F2' : '#FDECE9', color: u.is_active ? C.green : C.red, transition: 'all 0.2s' }}>
+                            style={{ padding: '3px 10px', borderRadius: 20, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', border: 'none', cursor: 'pointer', background: u.is_active ? '#E8F8F2' : '#FCEBEB', color: u.is_active ? C.green : C.red, transition: 'all 0.2s' }}>
                             {u.is_active ? 'نشط' : 'معلق'}
                           </button>
                         ) : (
-                          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', background: u.is_active ? '#E8F8F2' : '#FDECE9', color: u.is_active ? C.green : C.red }}>
+                          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', background: u.is_active ? '#E8F8F2' : '#FCEBEB', color: u.is_active ? C.green : C.red }}>
                             {u.is_active ? 'نشط' : 'معلق'}
                           </span>
                         )}
@@ -592,14 +592,14 @@ export default function AdminUsers() {
                             const full    = granted === total;
                             return (
                               <button onClick={() => setPermissionsUser(u)}
-                                style={{ padding: '5px 12px', borderRadius: 8, border: `1px solid ${full ? '#A9E4CF' : '#FCD98B'}`, background: full ? '#E8F8F2' : '#FFF8EA', color: full ? C.green : '#7A4706', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                style={{ padding: '5px 12px', borderRadius: 8, border: `1px solid ${full ? '#A9E4CF' : '#FBC3A3'}`, background: full ? '#E8F8F2' : '#FEF3EC', color: full ? C.green : '#7F310E', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                                 <DfIcon name="lock" size={18} style={{ marginInlineEnd: 6 }} />{full ? 'كامل' : `${granted}/${total}`}
                               </button>
                             );
                           })()}
                           {can('admin.users.delete') && (
                             <button onClick={() => setDeleteUser(u)}
-                              style={{ padding: '5px 10px', borderRadius: 8, border: `1px solid #F5B8AE`, background: '#FDECE9', color: C.red, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
+                              style={{ padding: '5px 10px', borderRadius: 8, border: `1px solid #F1B2B2`, background: '#FCEBEB', color: C.red, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
                               <DfIcon name="trash" size={18} style={{ marginInlineEnd: 6 }} />
                             </button>
                           )}

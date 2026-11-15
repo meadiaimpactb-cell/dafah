@@ -4,12 +4,12 @@ import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
 
 const C = {
-  primary: '#5546D6', ink: '#1B1746',
-  orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F', amberSoft: '#FFF8EA',
+  primary: '#235D7F', ink: '#0E2A3D',
+  orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F', amberSoft: '#FEF3EC',
   green: '#0B7F5D', greenLight: '#E8F8F2',
-  red: '#D03F2A', redLight: '#FDECE9',
-  gray: '#67637A', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
-  white: '#FFFFFF', dark: '#1B1746',
+  red: '#C53A3A', redLight: '#FCEBEB',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
+  white: '#FFFFFF', dark: '#0E2A3D',
 };
 
 const fmt = (n) => Number(n).toLocaleString('en-US');
@@ -30,7 +30,7 @@ function Toast({ msg, type, onClose }) {
   useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t); }, []);
   const bg = type === 'success' ? C.green : type === 'error' ? C.red : C.primary;
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', bottom: 24, left: 24, background: bg, color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, zIndex: 9999, boxShadow: '0 4px 20px rgba(27,23,70,.2)', fontFamily: 'inherit' }}>
+    <div style={{ position: 'fixed', bottom: 24, left: 24, background: bg, color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, zIndex: 9999, boxShadow: '0 4px 20px rgba(14,42,61,.2)', fontFamily: 'inherit' }}>
       {msg}
     </div>,
     document.body
@@ -39,8 +39,8 @@ function Toast({ msg, type, onClose }) {
 
 function Modal({ title, onClose, children }) {
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(27,23,70,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9000, padding: 20 }}>
-      <div style={{ background: C.white, borderRadius: 16, width: '100%', maxWidth: 440, boxShadow: '0 20px 60px rgba(27,23,70,.25)', direction: 'rtl', fontFamily: 'inherit' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,42,61,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9000, padding: 20 }}>
+      <div style={{ background: C.white, borderRadius: 16, width: '100%', maxWidth: 440, boxShadow: '0 20px 60px rgba(14,42,61,.25)', direction: 'rtl', fontFamily: 'inherit' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 20px', borderBottom: `1px solid ${C.grayBorder}` }}>
           <span style={{ fontSize: 15, fontWeight: 700, color: C.ink, fontFamily: 'inherit' }}>{title}</span>
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: C.gray, fontFamily: 'inherit', lineHeight: 1 }}>×</button>
@@ -151,7 +151,7 @@ function EditSettingModal({ setting, onClose, onSaved }) {
       <Field label="الحالة">
         <div style={{ display: 'flex', gap: 10 }}>
           {[true, false].map(v => (
-            <label key={String(v)} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', padding: '7px 14px', borderRadius: 8, border: `1.5px solid ${isActive === v ? C.primary : C.grayBorder}`, background: isActive === v ? '#E7E5FD' : C.white }}>
+            <label key={String(v)} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', padding: '7px 14px', borderRadius: 8, border: `1.5px solid ${isActive === v ? C.primary : C.grayBorder}`, background: isActive === v ? '#D9E8F1' : C.white }}>
               <input type="radio" checked={isActive === v} onChange={() => setIsActive(v)} style={{ accentColor: C.primary }} />
               {v ? 'مفعّل' : 'معطّل'}
             </label>
@@ -227,7 +227,7 @@ function DiscountModal({ discount, onClose, onSaved }) {
         <Field label="الحالة">
           <div style={{ display: 'flex', gap: 10 }}>
             {[true, false].map(v => (
-              <label key={String(v)} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', padding: '7px 14px', borderRadius: 8, border: `1.5px solid ${form.is_active === v ? C.primary : C.grayBorder}`, background: form.is_active === v ? '#E7E5FD' : C.white }}>
+              <label key={String(v)} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', padding: '7px 14px', borderRadius: 8, border: `1.5px solid ${form.is_active === v ? C.primary : C.grayBorder}`, background: form.is_active === v ? '#D9E8F1' : C.white }}>
                 <input type="radio" checked={form.is_active === v} onChange={() => set('is_active', v)} style={{ accentColor: C.primary }} />
                 {v ? 'نشط' : 'معطّل'}
               </label>
@@ -336,7 +336,7 @@ export default function AdminServices() {
         {mainSettings.map(s => {
           const meta = SERVICE_META[s.key] || {};
           return (
-            <div key={s.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 18px', background: C.white, borderRadius: 12, marginBottom: 10, border: `1.5px solid ${s.is_active ? C.primary + '44' : C.grayBorder}`, boxShadow: '0 1px 4px rgba(27,23,70,.05)' }}>
+            <div key={s.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 18px', background: C.white, borderRadius: 12, marginBottom: 10, border: `1.5px solid ${s.is_active ? C.primary + '44' : C.grayBorder}`, boxShadow: '0 1px 4px rgba(14,42,61,.05)' }}>
               <div>
                 <div style={{ fontSize: 15, fontWeight: 700, color: C.ink, fontFamily: 'inherit' }}>{s.label}</div>
                 <div style={{ fontSize: 13, color: C.gray, marginTop: 3, fontFamily: 'inherit' }}>

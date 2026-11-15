@@ -1,7 +1,7 @@
 // جولة تعريفية قصيرة لكل دور — تظهر مرة واحدة تلقائيًا، ويمكن إعادتها من القائمة.
 import React, { useEffect, useState } from 'react';
 import { colors, font } from '../../theme/tokens';
-import { LogoMark } from '../brand/Logo';
+import { LogoMark, RosetteShape } from '../brand/Logo';
 
 const STEPS = {
   client: [
@@ -9,7 +9,7 @@ const STEPS = {
     { title: 'ثلاث خدمات مستقلة', text: 'التخطيط الاستراتيجي، والتخطيط التشغيلي، والسياسات واللوائح. كل خدمة مستقلة تمامًا: ابدأ بأيٍّ منها، ولا يشترط إنهاء واحدة قبل الأخرى.', dots: true },
     { title: 'كيف تسير كل خدمة؟', text: '١) اختر الخدمة  ٢) ادفع واختر مستشارك  ٣) أنجز الوحدات واحدة تلو الأخرى  ٤) يعتمدها المستشار، ثم تنزّل وثيقتك جاهزة بصيغة PDF.' },
     { title: 'لا تعرف معنى مصطلح؟', text: 'اضغط علامة «؟» بجانب أي عنوان لترى شرحًا مبسطًا ومثالًا. ومن زر «؟» أعلى الشاشة شغّل «وضع الشرح» ليعرّفك بوظيفة كل زر وأيقونة.', help: true },
-    { title: 'خطوتك التالية دائمًا أمامك', text: 'في لوحة التحكم بطاقة «خطوتك التالية» تخبرك بالضبط بما عليك فعله الآن. والأزرار الكهرمانية هي الإجراء الأهم في كل صفحة.', go: 'client-dash' },
+    { title: 'خطوتك التالية دائمًا أمامك', text: 'في لوحة التحكم بطاقة «خطوتك التالية» تخبرك بالضبط بما عليك فعله الآن. والأزرار البرتقالية هي الإجراء الأهم في كل صفحة.', go: 'client-dash' },
   ],
   consultant: [
     { title: 'مرحبًا بك مستشارًا في دفة', text: 'دورك مراجعة ما يرسله العملاء: تعتمد الوحدة، أو تطلب تعديلًا بملاحظات واضحة.' },
@@ -44,12 +44,10 @@ export default function OnboardingTour({ role, force, navigate }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 950, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-      <div onClick={done} style={{ position: 'absolute', inset: 0, background: 'rgba(18,15,51,0.55)', backdropFilter: 'blur(3px)' }} />
-      <div role="dialog" aria-label="جولة تعريفية" style={{ position: 'relative', width: 'min(480px, 100%)', background: '#fff', borderRadius: 24, overflow: 'hidden', boxShadow: '0 30px 80px rgba(18,15,51,0.35)', animation: 'modalIn 0.25s ease' }}>
+      <div onClick={done} style={{ position: 'absolute', inset: 0, background: 'rgba(10,31,46,0.55)', backdropFilter: 'blur(3px)' }} />
+      <div role="dialog" aria-label="جولة تعريفية" style={{ position: 'relative', width: 'min(480px, 100%)', background: '#fff', borderRadius: 24, overflow: 'hidden', boxShadow: '0 30px 80px rgba(10,31,46,0.35)', animation: 'modalIn 0.25s ease' }}>
         <div style={{ background: `linear-gradient(135deg, ${colors.ink}, ${colors.primaryDeep})`, padding: '26px 26px 22px', color: '#fff', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', left: 22, top: 18, display: 'flex', alignItems: 'flex-end', gap: 6 }}>
-            {[8, 11, 15].map((d, k) => <span key={k} style={{ width: d, height: d, borderRadius: '50%', background: k <= i % 3 ? colors.amber : 'rgba(255,255,255,0.25)', marginBottom: k * 6 }} />)}
-          </div>
+          <RosetteShape size={150} color="#FFFFFF" opacity={0.08} style={{ position: 'absolute', left: -30, top: -40, transform: `rotate(${i * 22.5}deg)`, transition: 'transform .6s ease' }} />
           <LogoMark size={44} tone="dark" />
           <div style={{ fontFamily: font.display, fontSize: 21, fontWeight: 700, marginTop: 14 }}>{s.title}</div>
         </div>

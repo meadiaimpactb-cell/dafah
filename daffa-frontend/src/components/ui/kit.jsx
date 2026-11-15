@@ -3,6 +3,7 @@ import React from 'react';
 import { colors, tones, font, shadow } from '../../theme/tokens';
 import { IcClock, IcUpload, IcSearch, IcCheckCircle, IcArrowPath, IcXMark } from '../../utils/icons';
 import { Help } from './Help';
+import { RosetteShape } from '../brand/Logo';
 
 // ── شارة الحالة ──────────────────────────────────────────────────────────────
 export const Badge = ({ text, color = 'gray', small, dot, children, style }) => {
@@ -27,10 +28,10 @@ export const ProgressBar = ({ percent = 0, height = 8, color, track }) => {
 };
 
 // ── الأزرار ──────────────────────────────────────────────────────────────────
-// primary = الكهرماني «خطوتك التالية» (بنص داكن)، brand = النيلي، secondary = إطار.
+// primary = البرتقالي «خطوتك التالية» (بنص كحلي)، brand = أزرق الدفّة، secondary = إطار.
 const BTN = {
-  primary:   { bg: colors.amber,   color: colors.ink,     border: '1.5px solid transparent', shadow: '0 2px 0 rgba(154,91,7,0.35)' },
-  brand:     { bg: colors.primary, color: '#fff',         border: '1.5px solid transparent', shadow: '0 2px 0 rgba(43,36,112,0.35)' },
+  primary:   { bg: colors.amber,   color: colors.ink,     border: '1.5px solid transparent', shadow: '0 2px 0 rgba(163,63,18,0.35)' },
+  brand:     { bg: colors.primary, color: '#fff',         border: '1.5px solid transparent', shadow: '0 2px 0 rgba(18,50,71,0.35)' },
   secondary: { bg: '#fff',         color: colors.primary, border: `1.5px solid ${colors.primary}` },
   outline:   { bg: '#fff',         color: colors.text,    border: `1.5px solid ${colors.borderStrong}` },
   ghost:     { bg: 'transparent',  color: colors.primary, border: '1.5px solid transparent' },
@@ -173,7 +174,7 @@ export const StatusBar = ({ status }) => {
 export const Modal = ({ open, onClose, title, children, wide }) => {
   if (!open) return null;
   return (
-    <div className="df-modal-scrim" onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(18,15,51,0.55)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, animation: 'pageIn 0.2s ease' }}>
+    <div className="df-modal-scrim" onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(10,31,46,0.55)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, animation: 'pageIn 0.2s ease' }}>
       <div className="df-modal" role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.stopPropagation()} style={{ background: '#fff', borderRadius: 20, width: wide ? 720 : 520, maxWidth: '100%', maxHeight: '88vh', overflowY: 'auto', boxShadow: shadow.lg, animation: 'modalIn 0.22s ease' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '16px 22px', borderBottom: `1px solid ${colors.grayBorder}`, position: 'sticky', top: 0, background: '#fff', zIndex: 1, borderRadius: '20px 20px 0 0' }}>
           <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink }}>{title}</h3>
@@ -275,7 +276,7 @@ export const EmptyState = ({ icon, title, text, action }) => (
 // ── مؤشّر التحميل (النقاط الثلاث الصاعدة) ─────────────────────────────────────
 export const Loading = ({ text = 'جارٍ التحميل…', pad = 60 }) => (
   <div style={{ padding: pad, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, color: colors.gray, fontSize: 13.5 }}>
-    <span className="df-dots" aria-hidden="true"><i /><i /><i /></span>
+    <RosetteShape size={34} color={colors.primary} hub={colors.amber} className="df-turn" />
     {text}
   </div>
 );

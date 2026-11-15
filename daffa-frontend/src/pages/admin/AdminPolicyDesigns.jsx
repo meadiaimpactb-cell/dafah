@@ -3,18 +3,18 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { adminApi } from '../../api/admin';
 
 const C = {
-  primary: '#5546D6', ink: '#1B1746',
-  orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F', amberSoft: '#FFF8EA',
+  primary: '#235D7F', ink: '#0E2A3D',
+  orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F', amberSoft: '#FEF3EC',
   green: '#0E9F74', greenLight: '#C9EFE1',
   blue: '#2E8FE6', blueLight: '#CFE5FA',
-  yellow: '#F5A524', yellowLight: '#FEEDC6',
-  red: '#E5533D', redLight: '#FAD4CE',
-  gray: '#67637A', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
+  yellow: '#EF6A2C', yellowLight: '#FDE2D2',
+  red: '#DC4A4A', redLight: '#F8D3D3',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
 };
 
 const STATUS_CFG = {
-  pending:            { label: 'بانتظار التصميم', bg: C.yellowLight, color: '#7A4706', dot: C.amberText   },
-  revision_requested: { label: 'طُلب تعديل',      bg: C.redLight,    color: '#8F2415', dot: C.red       },
+  pending:            { label: 'بانتظار التصميم', bg: C.yellowLight, color: '#7F310E', dot: C.amberText   },
+  revision_requested: { label: 'طُلب تعديل',      bg: C.redLight,    color: '#842525', dot: C.red       },
   uploaded:           { label: 'تم رفع التصميم', bg: C.blueLight,   color: '#164F8A', dot: C.blue      },
   approved:           { label: 'معتمد',           bg: C.greenLight,  color: '#086449', dot: C.green     },
 };
@@ -39,7 +39,7 @@ const exportDesignerBrief = (item) => {
     : '—';
 
   const row = (label, val) => val
-    ? `<tr><td style="color:#67637A;padding:6px 12px 6px 0;font-size:13px;white-space:nowrap;vertical-align:top">${label}</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#1B1746">${val}</td></tr>`
+    ? `<tr><td style="color:#5E6B78;padding:6px 12px 6px 0;font-size:13px;white-space:nowrap;vertical-align:top">${label}</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#0E2A3D">${val}</td></tr>`
     : '';
 
   const html = `<!DOCTYPE html>
@@ -50,33 +50,33 @@ const exportDesignerBrief = (item) => {
   <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;direction:rtl;background:#FBF9F5;color:#1B1746;padding:0}
+    body{font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;direction:rtl;background:#FBF9F5;color:#0E2A3D;padding:0}
     .page{max-width:800px;margin:0 auto;background:#fff;min-height:100vh;padding:40px}
     @media print{body{background:#fff}.page{padding:20px;max-width:100%}.no-print{display:none!important}@page{margin:15mm}}
-    .header{background:linear-gradient(135deg,#5546D6,#1B1746);color:#fff;padding:28px 32px;border-radius:12px;margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+    .header{background:linear-gradient(135deg,#235D7F,#0E2A3D);color:#fff;padding:28px 32px;border-radius:12px;margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
     .header-title{font-size:22px;font-weight:800;margin-bottom:4px}
     .header-sub{font-size:13px;opacity:0.8}
     .logo-box{background:rgba(255,255,255,0.15);border-radius:10px;padding:10px;text-align:center}
     .logo-box img{max-height:70px;max-width:160px;object-fit:contain;display:block}
     .logo-box .no-logo{font-size:11px;opacity:0.7;padding:8px 12px}
     .section{margin-bottom:24px;border:1.5px solid #E8E3DA;border-radius:10px;overflow:hidden}
-    .section-title{background:#F3EFE8;padding:10px 16px;font-size:13px;font-weight:700;color:#1B1746;border-bottom:1px solid #E8E3DA}
+    .section-title{background:#F3EFE8;padding:10px 16px;font-size:13px;font-weight:700;color:#0E2A3D;border-bottom:1px solid #E8E3DA}
     .section-body{padding:16px}
     table{width:100%;border-collapse:collapse}
     .colors{display:flex;gap:12px;flex-wrap:wrap;padding:4px 0}
     .color-item{display:flex;align-items:center;gap:8px;padding:6px 12px;background:#FBF9F5;border-radius:8px;border:1px solid #E8E3DA}
     .color-swatch{width:32px;height:32px;border-radius:6px;border:1px solid #E8E3DA;flex-shrink:0}
     .color-info{font-size:12px}
-    .color-label{color:#67637A;margin-bottom:2px}
-    .color-hex{font-family:monospace;font-weight:700;color:#1B1746}
+    .color-label{color:#5E6B78;margin-bottom:2px}
+    .color-hex{font-family:monospace;font-weight:700;color:#0E2A3D}
     .policies{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0}
-    .policy-tag{padding:4px 12px;border-radius:20px;background:#E7E5FD;color:#5546D6;font-size:12px;font-weight:600}
+    .policy-tag{padding:4px 12px;border-radius:20px;background:#D9E8F1;color:#235D7F;font-size:12px;font-weight:600}
     .checkbox{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;background:#C9EFE1;color:#086449;margin-left:8px}
-    .download-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#5546D6;color:#fff;border-radius:10px;text-decoration:none;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:13px;margin-top:8px}
-    .print-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:#F5A524;color:#1B1746;border:none;border-radius:10px;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-left:10px}
-    .footer{margin-top:32px;padding:14px 20px;background:#F3EFE8;border-radius:10px;font-size:11px;color:#67637A;text-align:center}
+    .download-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#235D7F;color:#fff;border-radius:10px;text-decoration:none;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:13px;margin-top:8px}
+    .print-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:#EF6A2C;color:#0E2A3D;border:none;border-radius:10px;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-left:10px}
+    .footer{margin-top:32px;padding:14px 20px;background:#F3EFE8;border-radius:10px;font-size:11px;color:#5E6B78;text-align:center}
     .scope-box{padding:12px 16px;border-radius:8px;background:#EAF4FD;border:1.5px solid #A9D2F5;font-size:13px;font-weight:700;color:#1A65AD;margin-bottom:0}
-    .notes-box{padding:12px 14px;background:#FFF8EA;border:1px solid #FCD98B;border-radius:8px;font-size:13px;color:#5F3705;line-height:1.7}
+    .notes-box{padding:12px 14px;background:#FEF3EC;border:1px solid #FBC3A3;border-radius:8px;font-size:13px;color:#5E240A;line-height:1.7}
   </style>
 </head>
 <body>
@@ -99,7 +99,7 @@ const exportDesignerBrief = (item) => {
     <div class="no-print" style="margin-bottom:20px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
       <button class="print-btn" onclick="window.print()"><DfIcon name="printer" size={18} style={{ marginInlineEnd: 6 }} />طباعة / حفظ PDF</button>
       ${item.design_logo_url ? `<a class="download-btn" href="${item.design_logo_url}" download target="_blank">⬇ تحميل الشعار</a>` : ''}
-      <span style="font-size:11px;color:#67637A">لحفظ كـ PDF: اضغط طباعة ← اختر "حفظ كـ PDF"</span>
+      <span style="font-size:11px;color:#5E6B78">لحفظ كـ PDF: اضغط طباعة ← اختر "حفظ كـ PDF"</span>
     </div>
 
     <!-- السياسات المطلوب تصميمها -->
@@ -123,7 +123,7 @@ const exportDesignerBrief = (item) => {
         ${item.design_logo_url ? `
         <div style="margin-bottom:16px;padding:12px;background:#FBF9F5;border-radius:8px;border:1px solid #E8E3DA;display:inline-block">
           <img src="${item.design_logo_url}" style="max-height:80px;max-width:200px;object-fit:contain;display:block"/>
-          <div style="font-size:10px;color:#67637A;margin-top:6px;text-align:center">شعار المنظمة</div>
+          <div style="font-size:10px;color:#5E6B78;margin-top:6px;text-align:center">شعار المنظمة</div>
         </div>` : ''}
         <table>
           ${row('الاسم بالعربية',  b.org_name    || '—')}
@@ -148,7 +148,7 @@ const exportDesignerBrief = (item) => {
         </table>
         <!-- الألوان -->
         <div style="margin-bottom:14px">
-          <div style="font-size:12px;color:#67637A;margin-bottom:8px">الهوية اللونية:</div>
+          <div style="font-size:12px;color:#5E6B78;margin-bottom:8px">الهوية اللونية:</div>
           <div class="colors">
             ${b.primary_color ? `
             <div class="color-item">
@@ -164,20 +164,20 @@ const exportDesignerBrief = (item) => {
         </div>
         <!-- عناصر الوثيقة -->
         <div style="margin-bottom:${b.notes?'14px':'0'}">
-          <div style="font-size:12px;color:#67637A;margin-bottom:6px">عناصر الوثيقة المطلوبة:</div>
-          ${b.include_cover ? '<span class="checkbox">✓ صفحة غلاف لكل سياسة</span>' : '<span style="padding:5px 12px;border-radius:8px;font-size:12px;background:#F3EFE8;color:#8F8BA3;margin-left:8px">✗ بدون صفحة غلاف</span>'}
-          ${b.include_toc   ? '<span class="checkbox">✓ فهرس المحتويات</span>'       : '<span style="padding:5px 12px;border-radius:8px;font-size:12px;background:#F3EFE8;color:#8F8BA3">✗ بدون فهرس</span>'}
+          <div style="font-size:12px;color:#5E6B78;margin-bottom:6px">عناصر الوثيقة المطلوبة:</div>
+          ${b.include_cover ? '<span class="checkbox">✓ صفحة غلاف لكل سياسة</span>' : '<span style="padding:5px 12px;border-radius:8px;font-size:12px;background:#F3EFE8;color:#8C97A3;margin-left:8px">✗ بدون صفحة غلاف</span>'}
+          ${b.include_toc   ? '<span class="checkbox">✓ فهرس المحتويات</span>'       : '<span style="padding:5px 12px;border-radius:8px;font-size:12px;background:#F3EFE8;color:#8C97A3">✗ بدون فهرس</span>'}
         </div>
-        ${b.notes ? `<div style="margin-top:14px"><div style="font-size:12px;color:#67637A;margin-bottom:6px">ملاحظات وتعليمات المصمم:</div><div class="notes-box">${b.notes}</div></div>` : ''}
+        ${b.notes ? `<div style="margin-top:14px"><div style="font-size:12px;color:#5E6B78;margin-bottom:6px">ملاحظات وتعليمات المصمم:</div><div class="notes-box">${b.notes}</div></div>` : ''}
       </div>
     </div>
 
     <!-- ملاحظات تعديل إن وجدت -->
     ${item.design_revision_notes ? `
     <div class="section">
-      <div class="section-title" style="background:#FAD4CE;color:#8F2415"><DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />ملاحظات التعديل من العميل</div>
+      <div class="section-title" style="background:#F8D3D3;color:#842525"><DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />ملاحظات التعديل من العميل</div>
       <div class="section-body">
-        <div style="font-size:13px;color:#8F2415;line-height:1.7">${item.design_revision_notes}</div>
+        <div style="font-size:13px;color:#842525;line-height:1.7">${item.design_revision_notes}</div>
       </div>
     </div>` : ''}
 
@@ -275,13 +275,13 @@ export default function AdminPolicyDesigns() {
   return (
     <div className="animate-in" style={{ direction: 'rtl' }}>
       {/* Header */}
-      <div style={{ background: '#fff', borderRadius: 14, padding: '18px 24px', marginBottom: 16, boxShadow: '0 1px 6px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+      <div style={{ background: '#fff', borderRadius: 14, padding: '18px 24px', marginBottom: 16, boxShadow: '0 1px 6px rgba(14,42,61,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <div>
           <h2 style={{ fontSize: 18, fontWeight: 700, color: C.ink, marginBottom: 2 }}>إدارة طلبات التصميم</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <p style={{ fontSize: 12, color: C.gray }}>رفع التصاميم الاحترافية للعملاء</p>
             {lastSync && (
-              <span style={{ fontSize: 10, color: refreshing ? C.primary : '#8F8BA3', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ fontSize: 10, color: refreshing ? C.primary : '#8C97A3', display: 'flex', alignItems: 'center', gap: 4 }}>
                 {refreshing
                   ? <><span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: C.primary, animation: 'pulse 1s infinite' }} /> يتحدث…</>
                   : <><DfIcon name="clock" size={18} style={{ marginInlineEnd: 6 }} />آخر تحديث: {fmtTime(lastSync)}</>
@@ -308,7 +308,7 @@ export default function AdminPolicyDesigns() {
           { key: 'approved',           label: 'معتمدة',           color: C.green   },
         ].map(s => (
           <div key={s.key} onClick={() => setFilter(filter === s.key ? 'all' : s.key)}
-            style={{ background: '#fff', borderRadius: 10, padding: '12px 14px', boxShadow: '0 1px 4px rgba(27,23,70,0.05)', cursor: 'pointer', border: `2px solid ${filter === s.key ? s.color : 'transparent'}`, transition: 'all 0.2s' }}>
+            style={{ background: '#fff', borderRadius: 10, padding: '12px 14px', boxShadow: '0 1px 4px rgba(14,42,61,0.05)', cursor: 'pointer', border: `2px solid ${filter === s.key ? s.color : 'transparent'}`, transition: 'all 0.2s' }}>
             <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{counts[s.key]}</div>
             <div style={{ fontSize: 11, color: C.gray, marginTop: 2 }}>{s.label}</div>
           </div>
@@ -335,7 +335,7 @@ export default function AdminPolicyDesigns() {
       {loading && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[1,2,3].map(i => (
-            <div key={i} style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 1px 4px rgba(27,23,70,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }}>
+            <div key={i} style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 1px 4px rgba(14,42,61,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }}>
               <div style={{ height: 16, width: '40%', background: C.grayLight, borderRadius: 6, marginBottom: 10 }} />
               <div style={{ height: 10, width: '70%', background: C.grayLight, borderRadius: 4 }} />
             </div>
@@ -346,7 +346,7 @@ export default function AdminPolicyDesigns() {
 
       {/* Empty */}
       {!loading && filtered.length === 0 && (
-        <div style={{ background: '#fff', borderRadius: 14, padding: '50px 24px', textAlign: 'center', boxShadow: '0 1px 6px rgba(27,23,70,0.06)' }}>
+        <div style={{ background: '#fff', borderRadius: 14, padding: '50px 24px', textAlign: 'center', boxShadow: '0 1px 6px rgba(14,42,61,0.06)' }}>
           <div style={{ fontSize: 40, marginBottom: 10 }}><DfIcon name="palette" size={40} /></div>
           <div style={{ fontSize: 15, fontWeight: 700, color: C.ink, marginBottom: 6 }}>لا توجد طلبات</div>
           <p style={{ fontSize: 12, color: C.gray }}>{filter === 'all' ? 'لم يطلب أي عميل خدمة التصميم بعد' : 'لا توجد طلبات بهذه الحالة حالياً'}</p>
@@ -363,7 +363,7 @@ export default function AdminPolicyDesigns() {
 
             return (
               <div key={item.id}
-                style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 6px rgba(27,23,70,0.06)', border: `2px solid ${needsAction ? C.amberLine + '40' : 'transparent'}`, overflow: 'hidden', transition: 'border 0.2s' }}>
+                style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 6px rgba(14,42,61,0.06)', border: `2px solid ${needsAction ? C.amberLine + '40' : 'transparent'}`, overflow: 'hidden', transition: 'border 0.2s' }}>
 
                 {/* Card header */}
                 <div style={{ padding: '16px 20px' }}>
@@ -371,7 +371,7 @@ export default function AdminPolicyDesigns() {
                     {/* Left: org info */}
                     <div style={{ display: 'flex', gap: 12, flex: 1, minWidth: 0 }}>
                       {/* Avatar */}
-                      <div style={{ width: 44, height: 44, borderRadius: 10, background: '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: C.primary, flexShrink: 0 }}>
+                      <div style={{ width: 44, height: 44, borderRadius: 10, background: '#D9E8F1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: C.primary, flexShrink: 0 }}>
                         {b?.org_name?.charAt(0) || item.org_name?.charAt(0) || '؟'}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -380,9 +380,9 @@ export default function AdminPolicyDesigns() {
                           {b?.org_name_en && <span style={{ fontSize: 11, color: C.gray, fontWeight: 400, marginRight: 6, direction: 'ltr', display: 'inline-block' }}>{b.org_name_en}</span>}
                         </div>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 6 }}>
-                          {b?.org_type && <span style={{ padding: '1px 8px', borderRadius: 10, fontSize: 10, background: '#E7E5FD', color: '#4537B4', fontWeight: 600 }}>{b.org_type}</span>}
+                          {b?.org_type && <span style={{ padding: '1px 8px', borderRadius: 10, fontSize: 10, background: '#D9E8F1', color: '#1C4D6A', fontWeight: 600 }}>{b.org_type}</span>}
                           {item.selected_policies?.map((p, i) => (
-                            <span key={i} style={{ padding: '1px 8px', borderRadius: 10, fontSize: 10, background: '#E7E5FD', color: C.primary, fontWeight: 600 }}>{p}</span>
+                            <span key={i} style={{ padding: '1px 8px', borderRadius: 10, fontSize: 10, background: '#D9E8F1', color: C.primary, fontWeight: 600 }}>{p}</span>
                           ))}
                         </div>
                         {/* Meta row */}
@@ -484,7 +484,7 @@ export default function AdminPolicyDesigns() {
                           {b.include_toc   && <span style={{ padding: '2px 8px', borderRadius: 8, fontSize: 10, background: C.greenLight, color: '#086449' }}>✓ فهرس محتويات</span>}
                         </div>
                         {b.notes && (
-                          <div style={{ marginTop: 8, padding: '8px 10px', background: C.yellowLight, borderRadius: 8, fontSize: 11, color: '#5F3705', lineHeight: 1.6, border: `1px solid ${C.amberLine}30` }}>
+                          <div style={{ marginTop: 8, padding: '8px 10px', background: C.yellowLight, borderRadius: 8, fontSize: 11, color: '#5E240A', lineHeight: 1.6, border: `1px solid ${C.amberLine}30` }}>
                             <strong>ملاحظات: </strong>{b.notes}
                           </div>
                         )}
@@ -502,7 +502,7 @@ export default function AdminPolicyDesigns() {
 
                 {/* Revision notes */}
                 {item.design_revision_notes && (
-                  <div style={{ margin: '0 20px 12px', padding: '10px 14px', background: C.redLight, borderRadius: 10, border: `1px solid ${C.red}30`, fontSize: 12, color: '#8F2415' }}>
+                  <div style={{ margin: '0 20px 12px', padding: '10px 14px', background: C.redLight, borderRadius: 10, border: `1px solid ${C.red}30`, fontSize: 12, color: '#842525' }}>
                     <strong><DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />ملاحظات التعديل من العميل: </strong>{item.design_revision_notes}
                   </div>
                 )}
@@ -542,7 +542,7 @@ export default function AdminPolicyDesigns() {
                       <button
                         onClick={() => { setSelected(item); setUploadErr(''); setTimeout(() => fileRef.current?.click(), 50); }}
                         disabled={uploading && selected?.id === item.id}
-                        style={{ padding: '7px 18px', background: C.amber, color: '#1B1746', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: uploading && selected?.id === item.id ? 'not-allowed' : 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, opacity: uploading && selected?.id === item.id ? 0.6 : 1 }}>
+                        style={{ padding: '7px 18px', background: C.amber, color: '#0E2A3D', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: uploading && selected?.id === item.id ? 'not-allowed' : 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, opacity: uploading && selected?.id === item.id ? 0.6 : 1 }}>
                         {uploading && selected?.id === item.id ? 'جارٍ الرفع…' : '⬆ رفع التصميم'}
                       </button>
                     </div>

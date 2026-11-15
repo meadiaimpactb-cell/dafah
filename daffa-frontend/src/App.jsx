@@ -28,7 +28,7 @@ import AdminSiteContent from "./pages/admin/AdminSiteContent";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminPolicyDesigns from "./pages/admin/AdminPolicyDesigns";
 import AdminOutputs from "./pages/admin/AdminOutputs";
-import BrandLogo, { LogoMark } from "./components/brand/Logo";
+import BrandLogo, { LogoMark, RosetteShape } from "./components/brand/Logo";
 import { colors as themeColors, systems } from "./theme/tokens";
 import { Badge, ProgressBar, Btn, Card, Input, MetricCard, Tab, StatusBar, Modal, BarChart, DonutChart, LineChart, GenericPage, EmptyState, Loading, SectionTitle } from "./components/ui/kit";
 import { Help, TipLayer } from "./components/ui/Help";
@@ -265,7 +265,7 @@ const AdminNotificationsPage = () => {
                     {/* بطاقة معلومات المستخدم المختار */}
                     {selectedUser && (
                       <div style={{ padding: "14px 16px", borderRadius: 10, border: `1.5px solid ${selectedUser.role === 'consultant' ? colors.amberLine : colors.primary}`, background: selectedUser.role === 'consultant' ? `${colors.amber}08` : `${colors.primary}08`, display: "flex", gap: 14, alignItems: "flex-start" }}>
-                        <div style={{ width: 44, height: 44, borderRadius: "50%", background: selectedUser.role === 'consultant' ? colors.amber : colors.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "#1B1746", fontWeight: 700, fontSize: 18, flexShrink: 0 }}>
+                        <div style={{ width: 44, height: 44, borderRadius: "50%", background: selectedUser.role === 'consultant' ? colors.amber : colors.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "#0E2A3D", fontWeight: 700, fontSize: 18, flexShrink: 0 }}>
                           {selectedUser.display_name?.[0] || "?"}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
@@ -522,9 +522,9 @@ const AdminActivityLogPage = () => {
                       green: { bg: '#C9EFE1', color: '#086449' },
                       primary:  { bg: '#C9EFE1', color: '#0B7F5D' },
                       blue:  { bg: '#CFE5FA', color: '#1A65AD' },
-                      orange:{ bg: '#FEEDC6', color: '#9A5B07' },
-                      red:   { bg: '#FAD4CE', color: '#D03F2A' },
-                      gray:  { bg: '#F3EFE8', color: '#67637A' },
+                      orange:{ bg: '#FDE2D2', color: '#A33F12' },
+                      red:   { bg: '#F8D3D3', color: '#C53A3A' },
+                      gray:  { bg: '#F3EFE8', color: '#5E6B78' },
                     };
                     const actionStyle = badgeColors[meta.color] || badgeColors.gray;
                     const roleStyle   = badgeColors[ROLE_COLORS[row.role] || 'gray'] || badgeColors.gray;
@@ -719,7 +719,7 @@ const AdminFaqsPage = () => {
                     <td style={{ padding: '12px', textAlign: 'center', color: colors.gray }}>{faq.sort_order}</td>
                     <td style={{ padding: '12px', textAlign: 'center' }}>
                       <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, fontWeight: 600,
-                        background: faq.is_active ? '#E8F8F2' : '#FDECE9',
+                        background: faq.is_active ? '#E8F8F2' : '#FCEBEB',
                         color: faq.is_active ? '#0B7F5D' : colors.red }}>
                         {faq.is_active ? 'مفعّل' : 'معطّل'}
                       </span>
@@ -1218,7 +1218,7 @@ const AdminReportsPage = () => {
           </Card>
           <Card>
             <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>معدل الإكمال حسب الخدمة</h4>
-            <BarChart height={160} data={data.completion_by_service || []} colorFn={i => [colors.primary, colors.amberText, '#9A5B07'][i] || colors.primary} />
+            <BarChart height={160} data={data.completion_by_service || []} colorFn={i => [colors.primary, colors.amberText, '#A33F12'][i] || colors.primary} />
           </Card>
         </div>
       )}
@@ -1296,11 +1296,11 @@ const AdminReportsPage = () => {
         <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginTop: 16 }}>
           <Card>
             <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>الطلب على الخدمات</h4>
-            <BarChart height={160} data={(data.service_dist || []).map(s => ({ label: s.label, value: s.value }))} colorFn={i => [colors.primary, colors.amberText, '#9A5B07'][i] || colors.primary} />
+            <BarChart height={160} data={(data.service_dist || []).map(s => ({ label: s.label, value: s.value }))} colorFn={i => [colors.primary, colors.amberText, '#A33F12'][i] || colors.primary} />
           </Card>
           <Card>
             <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>معدل الإكمال حسب الخدمة</h4>
-            <BarChart height={160} data={data.completion_by_service || []} colorFn={i => [colors.primary, colors.amberText, '#9A5B07'][i] || colors.primary} />
+            <BarChart height={160} data={data.completion_by_service || []} colorFn={i => [colors.primary, colors.amberText, '#A33F12'][i] || colors.primary} />
           </Card>
         </div>
       )}
@@ -1323,18 +1323,18 @@ const AdminDashboardPage = () => {
   const MONTH_LABELS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 
   const catColor = (cat) => {
-    const m = { auth:'#0E9F74', workflow:'#1F74C4', payment:'#9A5B07', review:'#5546D6', admin:'#E5533D', policy:'#0E9F74', consultant:'#9A5B07', general:'#67637A' };
-    return m[cat] || '#67637A';
+    const m = { auth:'#0E9F74', workflow:'#1F74C4', payment:'#A33F12', review:'#235D7F', admin:'#DC4A4A', policy:'#0E9F74', consultant:'#A33F12', general:'#5E6B78' };
+    return m[cat] || '#5E6B78';
   };
 
   const fmt = (n) => Number(n || 0).toLocaleString('en-US');
 
   if (loading) return (
-    <div style={{ padding: 60, textAlign: 'center', color: '#67637A', fontSize: 13 }}>جارٍ تحميل لوحة التحكم…</div>
+    <div style={{ padding: 60, textAlign: 'center', color: '#5E6B78', fontSize: 13 }}>جارٍ تحميل لوحة التحكم…</div>
   );
 
   if (!data) return (
-    <div style={{ padding: 60, textAlign: 'center', color: '#E5533D', fontSize: 13 }}>تعذّر تحميل البيانات. حاول مجدداً.</div>
+    <div style={{ padding: 60, textAlign: 'center', color: '#DC4A4A', fontSize: 13 }}>تعذّر تحميل البيانات. حاول مجدداً.</div>
   );
 
   const monthEntries = Object.entries(data.monthly_revenue);
@@ -1344,7 +1344,7 @@ const AdminDashboardPage = () => {
   const stPct  = Math.round(strategic   / distTotal * 100);
   const opPct  = Math.round(operational / distTotal * 100);
   const polPct = Math.round(policy      / distTotal * 100);
-  const conicBg = `conic-gradient(${colors.primary} 0% ${stPct}%, ${colors.amberText} ${stPct}% ${stPct + polPct}%, #9A5B07 ${stPct + polPct}% 100%)`;
+  const conicBg = `conic-gradient(${colors.primary} 0% ${stPct}%, ${colors.amberText} ${stPct}% ${stPct + polPct}%, #A33F12 ${stPct + polPct}% 100%)`;
 
   const roleLabel = { admin: 'أدمين', consultant: 'مستشار', client: 'عميل', system: 'نظام' };
 
@@ -1404,7 +1404,7 @@ const AdminDashboardPage = () => {
                 {[
                   { label: 'تخطيط استراتيجي', color: colors.primary,   pct: stPct,  cnt: strategic   },
                   { label: 'سياسات ولوائح',    color: colors.amberText, pct: polPct, cnt: policy      },
-                  { label: 'تخطيط تشغيلي',     color: '#9A5B07',    pct: opPct,  cnt: operational },
+                  { label: 'تخطيط تشغيلي',     color: '#A33F12',    pct: opPct,  cnt: operational },
                 ].map((l, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                     <div style={{ width: 12, height: 12, borderRadius: 3, background: l.color, flexShrink: 0 }} />
@@ -1888,7 +1888,7 @@ export default function DaffaPlatform() {
   const AboutPage = () => (
     <div style={{ width: "100%", minHeight: "100vh" }} className="geo-bg">
       <PublicNav />
-      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #2B2470)`, padding: "50px 40px", textAlign: "center" }}>
+      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px 40px", textAlign: "center" }}>
         <h1 style={{ color: "white", fontSize: 32, fontWeight: 800 }}>عن منصة دفة</h1>
         <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginTop: 10 }}>{sc('about_hero_subtitle','للتخطيط الاستراتيجي وصناعة السياسات')}</p>
       </div>
@@ -1912,7 +1912,7 @@ export default function DaffaPlatform() {
             {n:"3", t: sc('howworks3_title','مخرجات احترافية'),   d: sc('howworks3_desc','وثائق نهائية مصممة تلقائياً')},
           ].map((s,i) => (
             <Card key={i} accent style={{ textAlign: "center", padding: 24 }}>
-              <div style={{ width: 40, height: 40, borderRadius: "50%", background: colors.amber, color: "#1B1746", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", fontWeight: 800, fontSize: 18 }}>{s.n}</div>
+              <div style={{ width: 40, height: 40, borderRadius: "50%", background: colors.amber, color: "#0E2A3D", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", fontWeight: 800, fontSize: 18 }}>{s.n}</div>
               <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>{s.t}</h3>
               <p style={{ fontSize: 13, color: colors.gray, lineHeight: 1.7 }}>{s.d}</p>
             </Card>
@@ -1924,7 +1924,7 @@ export default function DaffaPlatform() {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
             <div style={{ padding: "10px 28px", background: colors.primaryDeep, color: "white", borderRadius: 10, fontWeight: 700, fontSize: 14 }}>مشرف النظام</div>
             <div style={{ width: 2, height: 20, background: colors.grayBorder }} />
-            <div style={{ padding: "10px 28px", background: colors.amber, color: "#1B1746", borderRadius: 10, fontWeight: 700, fontSize: 14 }}>المشرف الفني</div>
+            <div style={{ padding: "10px 28px", background: colors.amber, color: "#0E2A3D", borderRadius: 10, fontWeight: 700, fontSize: 14 }}>المشرف الفني</div>
             <div style={{ width: 2, height: 20, background: colors.grayBorder }} />
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
               {["إدارة التصميم", "المنسق الفني", "الدعم التقني", "الإدارة المالية"].map((d, i) => (
@@ -1970,7 +1970,7 @@ export default function DaffaPlatform() {
   const ServicesPage = () => (
     <div style={{ width: "100%", minHeight: "100vh" }} className="geo-bg">
       <PublicNav />
-      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #2B2470)`, padding: "50px 40px", textAlign: "center" }}>
+      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px 40px", textAlign: "center" }}>
         <h1 style={{ color: "white", fontSize: 32, fontWeight: 800 }}>خدمات منصة دفة</h1>
         <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginTop: 10 }}>{sc('services_hero_subtitle','ثلاثة أنظمة متكاملة لبناء منظمتك')}</p>
       </div>
@@ -2036,7 +2036,7 @@ export default function DaffaPlatform() {
           <p style={{ fontSize: 13, color: colors.gray, marginBottom: 20 }}>كل وحدة تخطيطية (في الأنظمة الثلاثة) تتكون من 6 مكونات + اعتماد المستشار</p>
           <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
             {["نبذة", "شرح مكتوب", "إرشادات", "فيديو", "خدمة الدردشة", "نماذج عمل", "اعتماد المستشار"].map((c, i) => (
-              <div key={i} style={{ padding: "10px 18px", borderRadius: 10, background: i === 6 ? colors.amber : colors.primaryDeep, color: "#1B1746", fontSize: 13, fontWeight: 600 }}>{c}</div>
+              <div key={i} style={{ padding: "10px 18px", borderRadius: 10, background: i === 6 ? colors.amber : colors.primaryDeep, color: "#0E2A3D", fontSize: 13, fontWeight: 600 }}>{c}</div>
             ))}
           </div>
         </Card>
@@ -2049,7 +2049,7 @@ export default function DaffaPlatform() {
   const PricingPage = () => (
     <div style={{ width: "100%", minHeight: "100vh" }} className="geo-bg">
       <PublicNav />
-      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #2B2470)`, padding: "50px 40px", textAlign: "center" }}>
+      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px 40px", textAlign: "center" }}>
         <h1 style={{ color: "white", fontSize: 32, fontWeight: 800 }}>الأسعار</h1>
         <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginTop: 10 }}>{sc('pricing_hero_subtitle','أسعار مناسبة لجميع المنظمات غير الربحية')}</p>
       </div>
@@ -2061,7 +2061,7 @@ export default function DaffaPlatform() {
             { title: "السياسات واللوائح",    price: `من ${sc('policies_min_price','1,000')}`, icon: <IcClipboard width={36} height={36}/>, features: ["7 سياسات متاحة", "استبيانات ذكية موجهة", "توليد تلقائي للسياسة", "فيديوهات تعليمية", "مراجعة مستشار", "تسعير مستقل لكل سياسة", "تحميل PDF / Word"], popular: false },
           ].map((p, i) => (
             <Card key={i} style={{ padding: 28, border: p.popular ? `2px solid ${colors.amberLine}` : `1px solid ${colors.grayBorder}`, position: "relative", overflow: "visible" }}>
-              {p.popular && <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: colors.amber, color: "#1B1746", padding: "4px 16px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>الأكثر طلباً</div>}
+              {p.popular && <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: colors.amber, color: "#0E2A3D", padding: "4px 16px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>الأكثر طلباً</div>}
               <div style={{ textAlign: "center", marginBottom: 20 }}>
                 <span style={{ color: colors.primary }}>{p.icon}</span>
                 <h3 style={{ fontSize: 18, fontWeight: 800, color: colors.ink, marginTop: 8 }}>{p.title}</h3>
@@ -2118,7 +2118,7 @@ export default function DaffaPlatform() {
   const ContactPage = () => (
     <div style={{ width: "100%", minHeight: "100vh" }} className="geo-bg">
       <PublicNav />
-      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #2B2470)`, padding: "50px 40px", textAlign: "center" }}>
+      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px 40px", textAlign: "center" }}>
         <h1 style={{ color: "white", fontSize: 32, fontWeight: 800 }}>تواصل معنا</h1>
         <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginTop: 10 }}>{sc('contact_hero_subtitle','نسعد بتواصلكم والإجابة على استفساراتكم')}</p>
       </div>
@@ -2266,7 +2266,7 @@ export default function DaffaPlatform() {
                     <input type="file" accept="image/*" onChange={handleRegLogo} style={{ display: "none" }} />
                   </label>
                   {regLogo && (
-                    <button onClick={() => { setRegLogo(null); setRegLogoPreview(null); }} style={{ padding: "7px 12px", background: "#FDECE9", color: "#D03F2A", border: "1px solid #F5B8AE", borderRadius: 8, fontSize: 12, cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
+                    <button onClick={() => { setRegLogo(null); setRegLogoPreview(null); }} style={{ padding: "7px 12px", background: "#FCEBEB", color: "#C53A3A", border: "1px solid #F1B2B2", borderRadius: 8, fontSize: 12, cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
                       حذف
                     </button>
                   )}
@@ -2325,18 +2325,16 @@ export default function DaffaPlatform() {
       <div className="animate-in" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         {/* ترحيب + خطوتك التالية */}
         <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 24, background: `linear-gradient(135deg, ${colors.ink} 0%, ${colors.primaryDeep} 100%)`, color: '#fff', padding: 'clamp(20px, 4vw, 32px)' }}>
-          <svg aria-hidden="true" viewBox="0 0 120 120" style={{ position: 'absolute', left: -30, bottom: -50, width: 260, opacity: 0.08 }}><path d="M60,32 C82,35 96,52 93,67 C91,79 83,85 70,85 L25,85" fill="none" stroke="#fff" strokeWidth="19" strokeLinecap="round"/></svg>
-          <div style={{ position: 'absolute', left: 28, top: 24, display: 'flex', alignItems: 'flex-end', gap: 7 }} aria-hidden="true">
-            {[9, 13, 18].map((d, k) => <span key={k} style={{ width: d, height: d, borderRadius: '50%', background: colors.amber, marginBottom: k * 9, animation: `dfRise .5s ${k * .12}s both` }} />)}
-          </div>
-          <div style={{ fontSize: 14, color: '#DDDAF7' }}>مرحبًا{firstName ? '،' : ''}</div>
+          <RosetteShape size={300} color="#FFFFFF" opacity={0.07} style={{ position: 'absolute', left: -70, bottom: -110, animation: 'dfTurn 60s linear infinite' }} />
+          <RosetteShape size={34} color="#FFFFFF" hub={colors.amber} opacity={0.9} style={{ position: 'absolute', left: 26, top: 22 }} />
+          <div style={{ fontSize: 14, color: '#D6E4EE' }}>مرحبًا{firstName ? '،' : ''}</div>
           <h2 style={{ color: '#fff', fontSize: 'clamp(20px, 3vw, 26px)', fontWeight: 700, margin: '2px 0 18px', maxWidth: '80%' }}>{firstName || 'بك في دفة'}</h2>
           {next ? (
             <div style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 18, padding: 18, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
               <div style={{ flex: '1 1 280px', minWidth: 0 }}>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: colors.ink, background: colors.amber, borderRadius: 999, padding: '3px 10px', marginBottom: 8 }}>خطوتك التالية</div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{next.title}</div>
-                <div style={{ fontSize: 14, lineHeight: 1.9, color: '#E7E5FD' }}>{next.text}</div>
+                <div style={{ fontSize: 14, lineHeight: 1.9, color: '#D9E8F1' }}>{next.text}</div>
               </div>
               <Btn large onClick={() => navigate(next.go)} iconEnd={<span style={{ fontSize: 18 }}>←</span>}>{next.cta}</Btn>
             </div>
@@ -2538,7 +2536,7 @@ export default function DaffaPlatform() {
         {workflowSteps.map((ws, i) => (
           <React.Fragment key={i}>
             <div onClick={() => i <= strategicStep && setStrategicStep(i)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: i <= strategicStep ? "pointer" : "default", minWidth: 80, position: "relative" }}>
-              <div style={{ width: 40, height: 40, borderRadius: i === strategicStep ? 12 : "50%", background: i < strategicStep ? colors.green : i === strategicStep ? colors.amber : colors.grayLight, color: i <= strategicStep ? "#1B1746" : colors.gray, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, transition: "all 0.3s", boxShadow: i === strategicStep ? `0 4px 12px ${colors.amberLine}40` : "none" }}>
+              <div style={{ width: 40, height: 40, borderRadius: i === strategicStep ? 12 : "50%", background: i < strategicStep ? colors.green : i === strategicStep ? colors.amber : colors.grayLight, color: i <= strategicStep ? "#0E2A3D" : colors.gray, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, transition: "all 0.3s", boxShadow: i === strategicStep ? `0 4px 12px ${colors.amberLine}40` : "none" }}>
                 {i < strategicStep ? <IcCheck width={16} height={16}/> : ws.icon}
               </div>
               <span style={{ fontSize: 10, fontWeight: i === strategicStep ? 700 : 500, color: i < strategicStep ? colors.green : i === strategicStep ? colors.amberText : colors.gray, textAlign: "center", maxWidth: 90, lineHeight: 1.3 }}>{ws.label}</span>
@@ -2620,7 +2618,7 @@ export default function DaffaPlatform() {
           <Card key={c.id} accent style={{ cursor: c.available ? "pointer" : "default", border: selectedConsultant === c.id ? `2px solid ${colors.amberLine}` : "2px solid transparent", opacity: c.available ? 1 : 0.5 }}
             onClick={() => c.available && setSelectedConsultant(c.id)}>
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-              <div style={{ width: 64, height: 64, borderRadius: "50%", background: `linear-gradient(135deg, ${colors.primary}, ${colors.amber})`, display: "flex", alignItems: "center", justifyContent: "center", color: "#1B1746", fontSize: 24, fontWeight: 700, flexShrink: 0 }}>{c.name[0]}</div>
+              <div style={{ width: 64, height: 64, borderRadius: "50%", background: `linear-gradient(135deg, ${colors.primary}, ${colors.amber})`, display: "flex", alignItems: "center", justifyContent: "center", color: "#0E2A3D", fontSize: 24, fontWeight: 700, flexShrink: 0 }}>{c.name[0]}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink }}>{c.name}</h3>
@@ -2746,7 +2744,7 @@ export default function DaffaPlatform() {
           const s = statusMap[u.status];
           return (
             <div key={u.id} onClick={() => setActiveUnit(u)} style={{ background: colors.primaryDeep, borderRadius: 12, padding: "20px 12px", textAlign: "center", borderBottom: `3px solid ${colors.amberLine}`, cursor: "pointer", transition: "transform 0.2s, box-shadow 0.2s" }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(27,23,70,0.15)"; }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(14,42,61,0.15)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
               <div style={{ color: "white", fontSize: 13, fontWeight: 600, marginBottom: 10, minHeight: 40 }}>{u.name}</div>
               <Badge text={s.badge} color={s.color} small />
@@ -2759,7 +2757,7 @@ export default function DaffaPlatform() {
           const s = statusMap[u.status];
           return (
             <div key={u.id} onClick={() => setActiveUnit(u)} style={{ background: colors.primaryDeep, borderRadius: 12, padding: "20px 12px", textAlign: "center", borderBottom: `3px solid ${colors.amberLine}`, cursor: "pointer", transition: "transform 0.2s, box-shadow 0.2s" }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(27,23,70,0.15)"; }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(14,42,61,0.15)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
               <div style={{ color: "white", fontSize: 13, fontWeight: 600, marginBottom: 10, minHeight: 40 }}>{u.name}</div>
               <Badge text={s.badge} color={s.color} small />
@@ -3031,7 +3029,7 @@ export default function DaffaPlatform() {
       <div>
         <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 16 }}>سلسلة نظرية التغيير</h4>
         <div style={{ display: "flex", gap: 8, alignItems: "stretch", overflowX: "auto", paddingBottom: 8 }}>
-          {[{ title: "المدخلات", color: "#6C5EE6", placeholder: "الموارد البشرية\nالموارد المالية\nالبنية التحتية" },
+          {[{ title: "المدخلات", color: "#33769C", placeholder: "الموارد البشرية\nالموارد المالية\nالبنية التحتية" },
             { title: "الأنشطة", color: colors.primary, placeholder: "برامج تدريب\nحملات توعية\nخدمات مباشرة" },
             { title: "المخرجات", color: colors.blue, placeholder: "عدد المستفيدين\nبرامج منفذة\nمواد منشورة" },
             { title: "النتائج", color: colors.amberText, placeholder: "تحسن المعرفة\nتغير السلوك\nزيادة الوعي" },
@@ -3073,7 +3071,7 @@ export default function DaffaPlatform() {
         <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 6 }}>
           {[{ t: "مصادر الدخل", p: "تبرعات، منح، رسوم..." }, { t: "هيكل التكاليف", p: "رواتب، إيجار، برامج..." }].map((s, i) => (
             <div key={i} style={{ border: `1.5px solid ${colors.grayBorder}`, borderRadius: 8, overflow: "hidden" }}>
-              <div style={{ padding: "6px 8px", background: colors.amber, color: "#1B1746", fontSize: 10, fontWeight: 600, textAlign: "center" }}>{s.t}</div>
+              <div style={{ padding: "6px 8px", background: colors.amber, color: "#0E2A3D", fontSize: 10, fontWeight: 600, textAlign: "center" }}>{s.t}</div>
               <textarea style={{ ...taStyle, border: "none", minHeight: 60, fontSize: 11 }} placeholder={s.p} />
             </div>
           ))}
@@ -3246,9 +3244,9 @@ export default function DaffaPlatform() {
           )}
           {tab === 3 && (
             <div style={{ textAlign: "center" }}>
-              <div style={{ width: "100%", maxWidth: 600, margin: "0 auto", aspectRatio: "16/9", background: `linear-gradient(135deg, ${colors.primaryDeep}, #2B2470)`, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}>
+              <div style={{ width: "100%", maxWidth: 600, margin: "0 auto", aspectRatio: "16/9", background: `linear-gradient(135deg, ${colors.primaryDeep}, #123247)`, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}>
                 <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>{Icons.play}</div>
-                <div style={{ position: "absolute", bottom: 12, left: 12, background: "rgba(27,23,70,0.6)", padding: "4px 10px", borderRadius: 6, color: "white", fontSize: 12 }}>{unit.videoDuration}</div>
+                <div style={{ position: "absolute", bottom: 12, left: 12, background: "rgba(14,42,61,0.6)", padding: "4px 10px", borderRadius: 6, color: "white", fontSize: 12 }}>{unit.videoDuration}</div>
               </div>
               <h4 style={{ fontSize: 15, fontWeight: 600, color: colors.ink, marginTop: 16 }}>شرح {unit.name}</h4>
               <p style={{ fontSize: 12, color: colors.gray }}>المدة: {unit.videoDuration} دقيقة</p>
@@ -3278,7 +3276,7 @@ export default function DaffaPlatform() {
               <div style={{ display: "flex", gap: 8 }}>
                 <button style={{ padding: 10, borderRadius: 10, border: `1px solid ${colors.grayBorder}`, background: "white", cursor: "pointer", display: "flex" }}>{Icons.clip}</button>
                 <input placeholder="اكتب رسالتك..." style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
-                <button style={{ padding: "10px 16px", borderRadius: 10, background: colors.amber, border: "none", cursor: "pointer", display: "flex", color: "#1B1746" }}>{Icons.send}</button>
+                <button style={{ padding: "10px 16px", borderRadius: 10, background: colors.amber, border: "none", cursor: "pointer", display: "flex", color: "#0E2A3D" }}>{Icons.send}</button>
               </div>
             </div>
           )}
@@ -3361,7 +3359,7 @@ export default function DaffaPlatform() {
         {opWorkflowSteps.map((ws, i) => (
           <React.Fragment key={i}>
             <div onClick={() => i <= opStep && setOpStep(i)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: i <= opStep ? "pointer" : "default", minWidth: 70 }}>
-              <div style={{ width: 36, height: 36, borderRadius: ws.id === 5 ? 0 : i === opStep ? 10 : "50%", transform: ws.id === 5 ? "rotate(45deg)" : "none", background: i < opStep ? colors.green : i === opStep ? colors.amber : colors.grayLight, color: i <= opStep ? "#1B1746" : colors.gray, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, transition: "all 0.3s", boxShadow: i === opStep ? `0 4px 12px ${colors.amberLine}40` : "none" }}>
+              <div style={{ width: 36, height: 36, borderRadius: ws.id === 5 ? 0 : i === opStep ? 10 : "50%", transform: ws.id === 5 ? "rotate(45deg)" : "none", background: i < opStep ? colors.green : i === opStep ? colors.amber : colors.grayLight, color: i <= opStep ? "#0E2A3D" : colors.gray, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, transition: "all 0.3s", boxShadow: i === opStep ? `0 4px 12px ${colors.amberLine}40` : "none" }}>
                 <span style={{ transform: ws.id === 5 ? "rotate(-45deg)" : "none" }}>{i < opStep ? <IcCheck width={14} height={14}/> : ws.icon}</span>
               </div>
               <span style={{ fontSize: 9, fontWeight: i === opStep ? 700 : 500, color: i < opStep ? colors.green : i === opStep ? colors.amberText : colors.gray, textAlign: "center", maxWidth: 80, lineHeight: 1.3 }}>{ws.label}</span>
@@ -3626,7 +3624,7 @@ export default function DaffaPlatform() {
           const s = statusMap[u.status];
           return (
             <div key={u.id} onClick={() => setActiveOpUnit(u)} style={{ background: colors.primaryDeep, borderRadius: 12, padding: "20px 12px", textAlign: "center", borderBottom: `3px solid ${colors.amberLine}`, cursor: "pointer", transition: "transform 0.2s, box-shadow 0.2s" }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(27,23,70,0.15)"; }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(14,42,61,0.15)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
               <div style={{ color: "white", fontSize: 13, fontWeight: 600, marginBottom: 10, minHeight: 40 }}>{u.name}</div>
               <Badge text={s.badge} color={s.color} small />
@@ -3660,8 +3658,8 @@ export default function DaffaPlatform() {
           {tab === 0 && <div><h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>نبذة عن {unit.name}</h3><p style={{ fontSize: 14, color: colors.gray, lineHeight: 2 }}>{unit.overview}</p><p style={{ fontSize: 14, color: colors.gray, lineHeight: 2, marginTop: 12 }}>{unit.overview2}</p></div>}
           {tab === 1 && <div><h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>شرح مكتوب: {unit.name}</h3>{unit.topics.map((tp, i) => <div key={i} style={{ marginBottom: 16 }}><h4 style={{ fontSize: 15, fontWeight: 600, color: colors.primary, marginBottom: 8 }}>{i + 1}. {tp.t}</h4><p style={{ fontSize: 13, color: colors.gray, lineHeight: 2 }}>{tp.d}</p></div>)}</div>}
           {tab === 2 && <div><h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>إرشادات: {unit.name}</h3>{unit.steps.map((s, i) => <div key={i} style={{ display: "flex", gap: 14, marginBottom: 16 }}><div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>{i + 1}</div><div><h4 style={{ fontSize: 14, fontWeight: 600, color: colors.ink }}>{s.title}</h4><p style={{ fontSize: 13, color: colors.gray }}>{s.desc}</p></div></div>)}<div style={{ padding: 14, background: colors.amberSoft, borderRadius: 10, borderRight: `3px solid ${colors.amberLine}` }}><span style={{ color: colors.amberText, display: "inline-flex", alignItems: "center", marginLeft: 4 }}><IcLightbulb width={14} height={14}/></span><span style={{ fontSize: 13, color: colors.gray }}>{unit.tip}</span></div></div>}
-          {tab === 3 && <div style={{ textAlign: "center" }}><div style={{ width: "100%", maxWidth: 600, margin: "0 auto", aspectRatio: "16/9", background: `linear-gradient(135deg, ${colors.primaryDeep}, #2B2470)`, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}><div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>{Icons.play}</div><div style={{ position: "absolute", bottom: 12, left: 12, background: "rgba(27,23,70,0.6)", padding: "4px 10px", borderRadius: 6, color: "white", fontSize: 12 }}>{unit.videoDuration}</div></div><h4 style={{ fontSize: 15, fontWeight: 600, color: colors.ink, marginTop: 16 }}>شرح {unit.name}</h4></div>}
-          {tab === 4 && <div><div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, padding: "10px 14px", background: colors.grayLight, borderRadius: 10 }}><div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14 }}>أ</div><div><div style={{ fontSize: 13, fontWeight: 600 }}>أحمد الشمري</div><div style={{ fontSize: 11, color: colors.green }}>● متصل</div></div></div><div style={{ height: 200, background: colors.grayLight, borderRadius: 12, padding: 16, display: "flex", alignItems: "center", justifyContent: "center", color: colors.gray }}>ابدأ المحادثة مع المستشار حول {unit.name}</div><div style={{ display: "flex", gap: 8, marginTop: 12 }}><button style={{ padding: 10, borderRadius: 10, border: `1px solid ${colors.grayBorder}`, background: "white", cursor: "pointer", display: "flex" }}>{Icons.clip}</button><input placeholder="اكتب رسالتك..." style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit", outline: "none" }} /><button style={{ padding: "10px 16px", borderRadius: 10, background: colors.amber, border: "none", cursor: "pointer", display: "flex", color: "#1B1746" }}>{Icons.send}</button></div></div>}
+          {tab === 3 && <div style={{ textAlign: "center" }}><div style={{ width: "100%", maxWidth: 600, margin: "0 auto", aspectRatio: "16/9", background: `linear-gradient(135deg, ${colors.primaryDeep}, #123247)`, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}><div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>{Icons.play}</div><div style={{ position: "absolute", bottom: 12, left: 12, background: "rgba(14,42,61,0.6)", padding: "4px 10px", borderRadius: 6, color: "white", fontSize: 12 }}>{unit.videoDuration}</div></div><h4 style={{ fontSize: 15, fontWeight: 600, color: colors.ink, marginTop: 16 }}>شرح {unit.name}</h4></div>}
+          {tab === 4 && <div><div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, padding: "10px 14px", background: colors.grayLight, borderRadius: 10 }}><div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14 }}>أ</div><div><div style={{ fontSize: 13, fontWeight: 600 }}>أحمد الشمري</div><div style={{ fontSize: 11, color: colors.green }}>● متصل</div></div></div><div style={{ height: 200, background: colors.grayLight, borderRadius: 12, padding: 16, display: "flex", alignItems: "center", justifyContent: "center", color: colors.gray }}>ابدأ المحادثة مع المستشار حول {unit.name}</div><div style={{ display: "flex", gap: 8, marginTop: 12 }}><button style={{ padding: 10, borderRadius: 10, border: `1px solid ${colors.grayBorder}`, background: "white", cursor: "pointer", display: "flex" }}>{Icons.clip}</button><input placeholder="اكتب رسالتك..." style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit", outline: "none" }} /><button style={{ padding: "10px 16px", borderRadius: 10, background: colors.amber, border: "none", cursor: "pointer", display: "flex", color: "#0E2A3D" }}>{Icons.send}</button></div></div>}
           {tab === 5 && <div><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}><h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink }}>نماذج العمل: {unit.name}</h3><span style={{ fontSize: 11, color: colors.green, display: "inline-flex", alignItems: "center", gap: 4 }}><IcSave width={12} height={12}/> تم الحفظ تلقائياً</span></div><OpTemplateRenderer unit={unit} /><div style={{ display: "flex", gap: 12, marginTop: 20 }}><Btn variant="secondary">حفظ كمسودة</Btn><Btn>إرسال للمراجعة</Btn></div></div>}
         </Card>
       </div>
@@ -3900,7 +3898,7 @@ export default function DaffaPlatform() {
       <div className="animate-in">
         {/* Toast */}
         {toast && (
-          <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 9999, background: toast.ok ? colors.primary : colors.red, color: "#fff", padding: "10px 24px", borderRadius: 10, fontSize: 13, fontWeight: 600, boxShadow: "0 4px 20px rgba(27,23,70,0.2)" }}>{toast.msg}</div>
+          <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 9999, background: toast.ok ? colors.primary : colors.red, color: "#fff", padding: "10px 24px", borderRadius: 10, fontSize: 13, fontWeight: 600, boxShadow: "0 4px 20px rgba(14,42,61,0.2)" }}>{toast.msg}</div>
         )}
 
         <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>بناء الاستبيانات</h2>
@@ -3943,7 +3941,7 @@ export default function DaffaPlatform() {
               <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink }}>{activeSection.name} ({questions.length} أسئلة)</h3>
-                  <button onClick={openAddQ} style={{ padding: "7px 16px", background: colors.amber, color: "#1B1746", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}><IcPlus width={13} height={13}/> إضافة سؤال</button>
+                  <button onClick={openAddQ} style={{ padding: "7px 16px", background: colors.amber, color: "#0E2A3D", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}><IcPlus width={13} height={13}/> إضافة سؤال</button>
                 </div>
 
                 {loadingQ ? (
@@ -3983,10 +3981,10 @@ export default function DaffaPlatform() {
 
         {/* Section Modal */}
         {secModal && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(27,23,70,0.45)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ background: "#fff", borderRadius: 14, padding: 28, width: 380, direction: "rtl", boxShadow: "0 20px 60px rgba(27,23,70,0.2)" }}>
+          <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(14,42,61,0.45)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ background: "#fff", borderRadius: 14, padding: 28, width: 380, direction: "rtl", boxShadow: "0 20px 60px rgba(14,42,61,0.2)" }}>
               <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>{secEdit ? "تعديل القسم" : "إضافة قسم جديد"}</h3>
-              <label style={{ fontSize: 12, fontWeight: 600, color: "#34314A", display: "block", marginBottom: 6 }}>اسم القسم</label>
+              <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>اسم القسم</label>
               <input value={secName} onChange={e => setSecName(e.target.value)} onKeyDown={e => e.key === "Enter" && saveSection()} placeholder="مثال: التوظيف" style={{ ...inputS, marginBottom: 20 }} autoFocus />
               <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
                 <button onClick={() => setSecModal(false)} style={{ padding: "9px 20px", background: "#F3EFE8", border: "none", borderRadius: 8, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>إلغاء</button>
@@ -3998,18 +3996,18 @@ export default function DaffaPlatform() {
 
         {/* Question Modal */}
         {qModal && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(27,23,70,0.45)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ background: "#fff", borderRadius: 14, padding: 28, width: 480, direction: "rtl", boxShadow: "0 20px 60px rgba(27,23,70,0.2)", maxHeight: "90vh", overflowY: "auto" }}>
+          <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(14,42,61,0.45)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ background: "#fff", borderRadius: 14, padding: 28, width: 480, direction: "rtl", boxShadow: "0 20px 60px rgba(14,42,61,0.2)", maxHeight: "90vh", overflowY: "auto" }}>
               <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 20 }}>{qEdit ? "تعديل السؤال" : "إضافة سؤال جديد"}</h3>
 
               <div style={{ marginBottom: 14 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "#34314A", display: "block", marginBottom: 6 }}>نص السؤال *</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>نص السؤال *</label>
                 <textarea value={qForm.question} onChange={e => setQForm(f => ({ ...f, question: e.target.value }))} rows={2} placeholder="اكتب السؤال هنا…" style={{ ...inputS, resize: "vertical" }} />
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 12, marginBottom: 14 }}>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: "#34314A", display: "block", marginBottom: 6 }}>نوع السؤال *</label>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>نوع السؤال *</label>
                   <select value={qForm.type} onChange={e => setQForm(f => ({ ...f, type: e.target.value }))} style={{ ...inputS }}>
                     {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                   </select>
@@ -4024,24 +4022,24 @@ export default function DaffaPlatform() {
 
               {["single","multiple"].includes(qForm.type) && (
                 <div style={{ marginBottom: 14 }}>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: "#34314A", display: "block", marginBottom: 6 }}>الخيارات (سطر لكل خيار) *</label>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>الخيارات (سطر لكل خيار) *</label>
                   <textarea value={qForm.optionsText} onChange={e => setQForm(f => ({ ...f, optionsText: e.target.value }))} rows={4} placeholder={"خيار 1\nخيار 2\nخيار 3"} style={{ ...inputS, resize: "vertical" }} />
                 </div>
               )}
 
               <div style={{ marginBottom: 14 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "#34314A", display: "block", marginBottom: 6 }}>تلميح (اختياري)</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>تلميح (اختياري)</label>
                 <input value={qForm.hint} onChange={e => setQForm(f => ({ ...f, hint: e.target.value }))} placeholder="نص مساعد يظهر للمستخدم" style={{ ...inputS }} />
               </div>
 
               <div style={{ marginBottom: 20 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "#34314A", display: "block", marginBottom: 6 }}>شرط العرض (اختياري)</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>شرط العرض (اختياري)</label>
                 <input value={qForm.display_condition} onChange={e => setQForm(f => ({ ...f, display_condition: e.target.value }))} placeholder="مثال: إذا كانت إجابة السؤال السابق نعم" style={{ ...inputS }} />
               </div>
 
               <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
                 <button onClick={() => setQModal(false)} style={{ padding: "9px 20px", background: "#F3EFE8", border: "none", borderRadius: 8, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>إلغاء</button>
-                <button onClick={saveQuestion} disabled={qSaving || !qForm.question.trim()} style={{ padding: "9px 20px", background: colors.amber, color: "#1B1746", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{qSaving ? "جارٍ الحفظ…" : "حفظ"}</button>
+                <button onClick={saveQuestion} disabled={qSaving || !qForm.question.trim()} style={{ padding: "9px 20px", background: colors.amber, color: "#0E2A3D", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{qSaving ? "جارٍ الحفظ…" : "حفظ"}</button>
               </div>
             </div>
           </div>
@@ -4350,10 +4348,10 @@ export default function DaffaPlatform() {
   const sessionToastEl = !sessionExpired ? null : (
     <div style={{
       position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)',
-      background: '#1B1746', color: '#fff', borderRadius: 14,
+      background: '#0E2A3D', color: '#fff', borderRadius: 14,
       padding: '14px 28px', fontSize: 14, fontWeight: 600,
       display: 'flex', alignItems: 'center', gap: 12,
-      boxShadow: '0 8px 32px rgba(27,23,70,0.3)',
+      boxShadow: '0 8px 32px rgba(14,42,61,0.3)',
       zIndex: 99999, direction: 'rtl', fontFamily: "inherit",
       animation: 'fadeInUp 0.35s ease',
       whiteSpace: 'nowrap',
@@ -4361,15 +4359,15 @@ export default function DaffaPlatform() {
       <span style={{ fontSize: 20 }}><DfIcon name="lock" size={20} /></span>
       <div>
         <div>انتهت جلستك — يرجى تسجيل الدخول مجدداً</div>
-        <div style={{ fontSize: 11, color: '#8F8BA3', marginTop: 2 }}>تم تسجيل خروجك تلقائياً لحماية حسابك</div>
+        <div style={{ fontSize: 11, color: '#8C97A3', marginTop: 2 }}>تم تسجيل خروجك تلقائياً لحماية حسابك</div>
       </div>
       <button
         onClick={() => { setSessionExpired(false); setAuthPage('login'); }}
-        style={{ marginRight: 8, padding: '6px 16px', background: colors.amber, color: '#1B1746', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
+        style={{ marginRight: 8, padding: '6px 16px', background: colors.amber, color: '#0E2A3D', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
         دخول
       </button>
       <button onClick={() => setSessionExpired(false)}
-        style={{ background: 'none', border: 'none', color: '#8F8BA3', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
+        style={{ background: 'none', border: 'none', color: '#8C97A3', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
     </div>
   );
 

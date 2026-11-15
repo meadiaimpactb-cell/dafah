@@ -4,13 +4,13 @@ import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
 
 const C = {
-  primary:       '#5546D6',
-  ink:   '#1B1746',
-  orange:     '#F5A524', amber: '#F5A524', amberText: '#9A5B07',
-  gray:       '#67637A',
+  primary:       '#235D7F',
+  ink:   '#0E2A3D',
+  orange:     '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12',
+  gray:       '#5E6B78',
   grayLight:  '#F3EFE8',
   grayBorder: '#E8E3DA',
-  red:        '#D03F2A',
+  red:        '#C53A3A',
   green:      '#0B7F5D',
 };
 
@@ -53,7 +53,7 @@ const inp = {
 };
 
 const statusColor = (s) => s === 'نشط' ? C.green : s === 'معلق' ? C.amberLine : C.primary;
-const statusBg    = (s) => s === 'نشط' ? '#C9EFE1' : s === 'معلق' ? '#FFF8EA' : '#EAF4FD';
+const statusBg    = (s) => s === 'نشط' ? '#C9EFE1' : s === 'معلق' ? '#FEF3EC' : '#EAF4FD';
 
 const Badge = ({ text }) => (
   <span style={{
@@ -75,7 +75,7 @@ const Overlay = ({ children, onClose, closeOnBackdrop = false }) =>
     <div
       onClick={closeOnBackdrop ? onClose : undefined}
       style={{
-        position: 'fixed', inset: 0, background: 'rgba(27,23,70,0.45)',
+        position: 'fixed', inset: 0, background: 'rgba(14,42,61,0.45)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         zIndex: 9999, padding: 20,
       }}
@@ -89,9 +89,9 @@ const Toast = ({ toast }) =>
   toast ? ReactDOM.createPortal(
     <div style={{
       position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)',
-      background: toast.type === 'success' ? '#0B7F5D' : '#D03F2A',
+      background: toast.type === 'success' ? '#0B7F5D' : '#C53A3A',
       color: '#fff', padding: '12px 28px', borderRadius: 12,
-      fontSize: 14, fontWeight: 700, zIndex: 99999, boxShadow: '0 4px 20px rgba(27,23,70,0.15)',
+      fontSize: 14, fontWeight: 700, zIndex: 99999, boxShadow: '0 4px 20px rgba(14,42,61,0.15)',
       fontFamily: "inherit",
     }}>{toast.text}</div>,
     document.body,
@@ -299,12 +299,12 @@ export default function AdminOrgs() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <h2 style={{ fontSize: 20, fontWeight: 800, color: C.ink }}>إدارة المنظمات</h2>
           {refreshing && (
-            <span style={{ fontSize: 11, color: '#8F8BA3', padding: '3px 10px', background: '#F3EFE8', borderRadius: 20 }}>
+            <span style={{ fontSize: 11, color: '#8C97A3', padding: '3px 10px', background: '#F3EFE8', borderRadius: 20 }}>
               ↻ تحديث...
             </span>
           )}
         </div>
-        <button onClick={openAdd} style={{ padding: '10px 22px', background: C.amber, color: '#1B1746', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
+        <button onClick={openAdd} style={{ padding: '10px 22px', background: C.amber, color: '#0E2A3D', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
           + إضافة منظمة
         </button>
       </div>
@@ -316,7 +316,7 @@ export default function AdminOrgs() {
           { label: 'نشطة',            value: orgs.filter(o => o.status !== 'معلق').length, icon: <DfIcon name="check" size={20} />, color: C.green },
           { label: 'معلقة',           value: orgs.filter(o => o.status === 'معلق').length, icon: <DfIcon name="pause" size={20} />, color: C.red },
         ].map(s => (
-          <div key={s.label} style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 6px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div key={s.label} style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 6px rgba(14,42,61,0.06)', display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{ fontSize: 26 }}>{s.icon}</div>
             <div>
               <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
@@ -327,7 +327,7 @@ export default function AdminOrgs() {
       </div>
 
       {/* ── Search & Filters ── */}
-      <div style={{ background: '#fff', borderRadius: 12, padding: '14px 18px', marginBottom: 16, boxShadow: '0 1px 6px rgba(27,23,70,0.06)' }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: '14px 18px', marginBottom: 16, boxShadow: '0 1px 6px rgba(14,42,61,0.06)' }}>
         <div style={{ display: 'flex', gap: 12 }}>
           <div style={{ flex: 1, position: 'relative' }}>
             <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: C.gray, pointerEvents: 'none' }}><DfIcon name="search" size={18} /></span>
@@ -351,7 +351,7 @@ export default function AdminOrgs() {
       </div>
 
       {/* ── Table ── */}
-      <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 6px rgba(27,23,70,0.06)', overflow: 'hidden' }}>
+      <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 6px rgba(14,42,61,0.06)', overflow: 'hidden' }}>
         {filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 60, color: C.gray }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}><DfIcon name="building" size={48} /></div>
@@ -393,11 +393,11 @@ export default function AdminOrgs() {
                   <td style={{ padding: '11px 10px' }}>
                     <div style={{ display: 'flex', gap: 5 }} onClick={e => e.stopPropagation()}>
                       <button onClick={() => openView(o)} style={btnStyle('#EAF4FD', C.primary, '#A9D2F5')}>عرض</button>
-                      <button onClick={e => openEdit(o, e)} style={btnStyle('#FFF8EA', C.amberText, '#FCD98B')}>تعديل</button>
-                      <button onClick={e => handleToggle(o, e)} style={btnStyle(o.is_active ? '#FDECE9' : '#E8F8F2', o.is_active ? C.red : C.green, o.is_active ? '#F5B8AE' : '#7FD3B5')}>
+                      <button onClick={e => openEdit(o, e)} style={btnStyle('#FEF3EC', C.amberText, '#FBC3A3')}>تعديل</button>
+                      <button onClick={e => handleToggle(o, e)} style={btnStyle(o.is_active ? '#FCEBEB' : '#E8F8F2', o.is_active ? C.red : C.green, o.is_active ? '#F1B2B2' : '#7FD3B5')}>
                         {o.is_active ? 'تعليق' : 'تفعيل'}
                       </button>
-                      <button onClick={e => openDelete(o, e)} style={btnStyle('#FDECE9', C.red, '#F5B8AE')}><DfIcon name="trash" size={18} /></button>
+                      <button onClick={e => openDelete(o, e)} style={btnStyle('#FCEBEB', C.red, '#F1B2B2')}><DfIcon name="trash" size={18} /></button>
                     </div>
                   </td>
                 </tr>
@@ -505,7 +505,7 @@ export default function AdminOrgs() {
                     {(logoFile || (modal === 'edit' && selected?.logo_url)) && (
                       <button
                         onClick={() => { resetLogo(); if (modal === 'edit') setSelected(p => ({ ...p, logo_url: null })); }}
-                        style={{ padding: '7px 12px', background: '#FDECE9', color: C.red, border: `1px solid #F5B8AE`, borderRadius: 8, fontSize: 12, cursor: 'pointer', fontFamily: "inherit", flexShrink: 0 }}
+                        style={{ padding: '7px 12px', background: '#FCEBEB', color: C.red, border: `1px solid #F1B2B2`, borderRadius: 8, fontSize: 12, cursor: 'pointer', fontFamily: "inherit", flexShrink: 0 }}
                       >
                         ✕ حذف
                       </button>
@@ -546,7 +546,7 @@ export default function AdminOrgs() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                style={{ flex: 1, padding: '11px 0', background: saving ? '#8F8BA3' : C.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: "inherit" }}
+                style={{ flex: 1, padding: '11px 0', background: saving ? '#8C97A3' : C.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: "inherit" }}
               >
                 {saving ? 'جاري الحفظ...' : modal === 'add' ? 'إضافة المنظمة' : 'حفظ التعديلات'}
               </button>
@@ -572,7 +572,7 @@ export default function AdminOrgs() {
               <button
                 onClick={handleDelete}
                 disabled={saving}
-                style={{ flex: 1, padding: '11px 0', background: saving ? '#8F8BA3' : C.red, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: "inherit" }}
+                style={{ flex: 1, padding: '11px 0', background: saving ? '#8C97A3' : C.red, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: "inherit" }}
               >
                 {saving ? 'جاري الحذف...' : 'نعم، احذف'}
               </button>
@@ -594,5 +594,5 @@ const btnStyle = (bg, color, border) => ({
 });
 
 const closeBtn = {
-  background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#8F8BA3',
+  background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#8C97A3',
 };

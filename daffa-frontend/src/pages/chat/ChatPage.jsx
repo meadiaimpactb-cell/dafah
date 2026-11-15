@@ -3,9 +3,9 @@ import { chatApi } from '../../api/chat';
 import { IcSearch, IcChat, IcCheck, IcDoubleCheck, IcLock } from '../../utils/icons';
 
 const C = {
-  primary: '#5546D6', ink: '#1B1746', primarySoft: '#E7E5FD',
-  orange: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F', green: '#0B7F5D',
-  gray: '#67637A', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
+  primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
+  orange: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F', green: '#0B7F5D',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
   white: '#FFFFFF', bg: '#FBF9F5',
 };
 
@@ -92,7 +92,7 @@ const ConversationList = ({ conversations, selectedId, onSelect, loading, role, 
                     {c.last_message || 'لا توجد رسائل بعد'}
                   </span>
                   {c.unread > 0 && (
-                    <span style={{ width: 20, height: 20, borderRadius: '50%', background: C.amber, color: '#1B1746', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 6 }}>
+                    <span style={{ width: 20, height: 20, borderRadius: '50%', background: C.amber, color: '#0E2A3D', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 6 }}>
                       {c.unread}
                     </span>
                   )}
@@ -209,9 +209,9 @@ const ChatWindow = ({ conversation, currentUserId, onMessageSent, canSend = true
                   padding: '10px 14px',
                   borderRadius: m.is_mine ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
                   background: m.is_mine ? C.white : C.primary,
-                  color: m.is_mine ? '#1B1746' : 'white',
+                  color: m.is_mine ? '#0E2A3D' : 'white',
                   fontSize: 13, lineHeight: 1.7,
-                  boxShadow: m.is_mine ? '0 1px 3px rgba(27,23,70,0.06)' : 'none',
+                  boxShadow: m.is_mine ? '0 1px 3px rgba(14,42,61,0.06)' : 'none',
                 }}>
                   {m.body}
                 </div>
@@ -253,7 +253,7 @@ const ChatWindow = ({ conversation, currentUserId, onMessageSent, canSend = true
             style={{
               width: 42, height: 42, borderRadius: 12, border: 'none',
               background: body.trim() ? C.amber : C.grayLight,
-              color: body.trim() ? '#1B1746' : C.gray,
+              color: body.trim() ? '#0E2A3D' : C.gray,
               cursor: body.trim() ? 'pointer' : 'default',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'all 0.2s', flexShrink: 0,
@@ -326,7 +326,7 @@ export default function ChatPage({ role, userId, canSend = true, autoStart = fal
   };
 
   if (error) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300, color: '#D03F2A', flexDirection: 'column', gap: 12 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300, color: '#C53A3A', flexDirection: 'column', gap: 12 }}>
       <div>{error}</div>
       <button onClick={() => loadConversations(false)} style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: C.primary, color: 'white', cursor: 'pointer', fontFamily: "inherit" }}>إعادة المحاولة</button>
     </div>

@@ -6,9 +6,9 @@ import OtpVerification from '../auth/OtpVerification';
 import { IcCheck, IcLightbulb, IcShield, IcBriefcase, IcBuilding, IcUser, IcLock, IcDocument, IcSave } from '../../utils/icons';
 
 const C = {
-  primary: '#5546D6', ink: '#1B1746', primarySoft: '#E7E5FD',
-  orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F', green: '#0B7F5D', red: '#D03F2A',
-  gray: '#67637A', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
+  primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
+  orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F', green: '#0B7F5D', red: '#C53A3A',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
 };
 
 // ── Toast ──────────────────────────────────────────────────────────────────────
@@ -17,9 +17,9 @@ const Toast = ({ toast }) =>
     <div style={{
       position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)',
       zIndex: 9999999, padding: '12px 24px', borderRadius: 12,
-      background: toast.type === 'success' ? '#086449' : '#8F2415',
+      background: toast.type === 'success' ? '#086449' : '#842525',
       color: 'white', fontSize: 14, fontWeight: 600,
-      fontFamily: "inherit", boxShadow: '0 4px 20px rgba(27,23,70,0.3)',
+      fontFamily: "inherit", boxShadow: '0 4px 20px rgba(14,42,61,0.3)',
       whiteSpace: 'nowrap', animation: 'fadeInUp 0.3s ease-out both',
     }}>
       {toast.msg}
@@ -35,7 +35,7 @@ const Field = ({ label, name, value, onChange, type = 'text', placeholder, disab
       <textarea
         name={name} value={value || ''} onChange={onChange}
         placeholder={placeholder} rows={3}
-        style={{ padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "inherit", resize: 'vertical', outline: 'none', transition: 'border 0.2s', background: disabled ? C.grayLight : 'white', color: disabled ? C.gray : '#1B1746' }}
+        style={{ padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "inherit", resize: 'vertical', outline: 'none', transition: 'border 0.2s', background: disabled ? C.grayLight : 'white', color: disabled ? C.gray : '#0E2A3D' }}
         onFocus={e => !disabled && (e.target.style.borderColor = C.primary)}
         onBlur={e => (e.target.style.borderColor = C.grayBorder)}
         disabled={disabled}
@@ -44,7 +44,7 @@ const Field = ({ label, name, value, onChange, type = 'text', placeholder, disab
       <input
         type={type} name={name} value={value || ''} onChange={onChange}
         placeholder={placeholder || label}
-        style={{ padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none', transition: 'border 0.2s', background: disabled ? C.grayLight : 'white', color: disabled ? C.gray : '#1B1746' }}
+        style={{ padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none', transition: 'border 0.2s', background: disabled ? C.grayLight : 'white', color: disabled ? C.gray : '#0E2A3D' }}
         onFocus={e => !disabled && (e.target.style.borderColor = C.primary)}
         onBlur={e => (e.target.style.borderColor = C.grayBorder)}
         disabled={disabled}
@@ -90,7 +90,7 @@ const AvatarCircle = ({ name, email, logoUrl, size = 72, onClick, uploading }) =
         {/* dark overlay on hover */}
         <div style={{
           position: 'absolute', inset: 0, borderRadius: '50%',
-          background: 'rgba(27,23,70,0.45)',
+          background: 'rgba(14,42,61,0.45)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           opacity: showOverlay ? 1 : 0,
           transition: 'opacity 0.2s',
@@ -262,7 +262,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
       />
 
       {/* Profile Header Card */}
-      <div style={{ background: 'white', borderRadius: 16, padding: 24, marginBottom: 20, boxShadow: '0 1px 4px rgba(27,23,70,0.07)', display: 'flex', alignItems: 'center', gap: 20 }}>
+      <div style={{ background: 'white', borderRadius: 16, padding: 24, marginBottom: 20, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', display: 'flex', alignItems: 'center', gap: 20 }}>
         <AvatarCircle
           name={displayName}
           email={authUser?.email}
@@ -275,7 +275,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
           <div style={{ fontSize: 20, fontWeight: 800, color: C.ink }}>{displayName || '—'}</div>
           <div style={{ fontSize: 13, color: C.gray, marginTop: 2 }}>{authUser?.email}</div>
           <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
-            <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', background: role === 'admin' ? '#FEEDC6' : role === 'consultant' ? C.primarySoft : C.grayLight, color: role === 'admin' ? '#9A5B07' : role === 'consultant' ? C.primary : C.gray }}>
+            <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', background: role === 'admin' ? '#FDE2D2' : role === 'consultant' ? C.primarySoft : C.grayLight, color: role === 'admin' ? '#A33F12' : role === 'consultant' ? C.primary : C.gray }}>
               {role === 'admin' ? 'مدير النظام' : role === 'consultant' ? 'مستشار' : 'عميل'}
             </span>
             {role === 'client' && authUser?.org_type && (
@@ -296,7 +296,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
             color: tab === id ? C.primary : C.gray,
             fontWeight: tab === id ? 700 : 500, fontSize: 13,
             fontFamily: "inherit", cursor: 'pointer',
-            boxShadow: tab === id ? '0 1px 4px rgba(27,23,70,0.08)' : 'none',
+            boxShadow: tab === id ? '0 1px 4px rgba(14,42,61,0.08)' : 'none',
             transition: 'all 0.2s',
           }}>
             {label}
@@ -306,11 +306,11 @@ export default function ProfilePage({ authUser, onUpdate }) {
 
       {/* ── Profile Tab ── */}
       {tab === 'profile' && (
-        <div style={{ background: 'white', borderRadius: 16, padding: 28, boxShadow: '0 1px 4px rgba(27,23,70,0.07)' }}>
+        <div style={{ background: 'white', borderRadius: 16, padding: 28, boxShadow: '0 1px 4px rgba(14,42,61,0.07)' }}>
 
           {/* تنبيه إكمال البيانات (حساب جديد عبر Google بلا رقم جوال) */}
           {role === 'client' && !authUser?.phone && (
-            <div role="status" style={{ background: '#FFF8EA', border: '1px solid #FCD98B', borderRadius: 12, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#7A4706', lineHeight: 1.8 }}>
+            <div role="status" style={{ background: '#FEF3EC', border: '1px solid #FBC3A3', borderRadius: 12, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#7F310E', lineHeight: 1.8 }}>
               <strong>أكمل بيانات منظمتك:</strong> راجع اسم المنظمة ونوعها وأضف رقم الجوال، ثم اضغط «حفظ التغييرات».
             </div>
           )}
@@ -416,7 +416,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
 
           {/* Error messages */}
           {Object.keys(errors).length > 0 && (
-            <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FDECE9', border: '1px solid #F5B8AE', marginBottom: 16 }}>
+            <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FCEBEB', border: '1px solid #F1B2B2', marginBottom: 16 }}>
               {Object.values(errors).flat().map((e, i) => (
                 <div key={i} style={{ fontSize: 12, color: C.red }}>• {e}</div>
               ))}
@@ -445,7 +445,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
 
       {/* ── Security Tab ── */}
       {tab === 'security' && (
-        <div style={{ background: 'white', borderRadius: 16, padding: 28, boxShadow: '0 1px 4px rgba(27,23,70,0.07)' }}>
+        <div style={{ background: 'white', borderRadius: 16, padding: 28, boxShadow: '0 1px 4px rgba(14,42,61,0.07)' }}>
           <SectionTitle>تغيير كلمة المرور</SectionTitle>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 440, marginBottom: 24 }}>
@@ -489,9 +489,9 @@ export default function ProfilePage({ authUser, onUpdate }) {
                     const hasNum = /\d/.test(pwForm.new_password);
                     const hasSpecial = /[!@#$%^&*]/.test(pwForm.new_password);
                     const score = (len >= 8 ? 1 : 0) + (len >= 12 ? 1 : 0) + (hasUpper || hasNum ? 1 : 0) + (hasSpecial ? 1 : 0);
-                    const colors = ['#D03F2A', '#9A5B07', '#9A5B07', '#0B7F5D'];
+                    const colors = ['#C53A3A', '#A33F12', '#A33F12', '#0B7F5D'];
                     return (
-                      <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= score ? colors[score - 1] || '#D03F2A' : C.grayBorder, transition: 'background 0.3s' }} />
+                      <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= score ? colors[score - 1] || '#C53A3A' : C.grayBorder, transition: 'background 0.3s' }} />
                     );
                   })}
                 </div>
@@ -504,7 +504,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
               style={{
                 marginTop: 8, padding: '11px 24px', borderRadius: 12, border: 'none',
                 background: (!pwForm.current_password || !pwForm.new_password) ? C.grayLight : C.amber,
-                color: (!pwForm.current_password || !pwForm.new_password) ? C.gray : '#1B1746',
+                color: (!pwForm.current_password || !pwForm.new_password) ? C.gray : '#0E2A3D',
                 fontWeight: 700, fontSize: 14, fontFamily: "inherit",
                 cursor: (pwSaving || !pwForm.current_password || !pwForm.new_password) ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s',

@@ -2,11 +2,11 @@ import React, { useState, useEffect, useCallback } from "react";
 import api from "../../api/axios";
 
 const colors = {
-  primary: "#5546D6", ink: "#1B1746", primaryDeep: "#2B2470",
-  orange: "#F5A524", amberText: '#9A5B07', amberSoft: "#FFF8EA",
+  primary: "#235D7F", ink: "#0E2A3D", primaryDeep: "#123247",
+  orange: "#EF6A2C", amberText: '#A33F12', amberSoft: "#FEF3EC",
   bg: "#FBF9F5", white: "#FFFFFF",
-  gray: "#67637A", grayLight: "#F3EFE8", grayBorder: "#E8E3DA",
-  green: "#0E9F74", red: "#E5533D",
+  gray: "#5E6B78", grayLight: "#F3EFE8", grayBorder: "#E8E3DA",
+  green: "#0E9F74", red: "#DC4A4A",
 };
 
 const GROUP_LABELS = {
@@ -134,7 +134,7 @@ export default function AdminSiteContent() {
             padding: "10px 28px", borderRadius: 10, fontSize: 13, fontWeight: 700,
             fontFamily: "inherit", cursor: isDirty(activeTab) ? "pointer" : "default",
             border: "none", background: isDirty(activeTab) ? colors.amber : colors.grayBorder,
-            color: isDirty(activeTab) ? "#1B1746" : colors.gray,
+            color: isDirty(activeTab) ? "#0E2A3D" : colors.gray,
             transition: "all 0.2s",
           }}
         >

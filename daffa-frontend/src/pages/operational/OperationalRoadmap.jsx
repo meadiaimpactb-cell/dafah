@@ -11,19 +11,19 @@ import { IcClock, IcUpload, IcCheckCircle, IcArrowPath, IcSearch, IcWarning, IcL
 
 // ─── Colors ─────────────────────────────────────────────────────
 const colors = {
-  primary: "#5546D6", ink: "#1B1746", primaryDeep: "#2B2470",
-  orange: "#F5A524", amberLine: '#E0920F', amberSoft: "#FFF8EA",
-  gray: "#67637A", grayLight: "#F3EFE8", grayBorder: "#E8E3DA",
+  primary: "#235D7F", ink: "#0E2A3D", primaryDeep: "#123247",
+  orange: "#EF6A2C", amberLine: '#E05A1F', amberSoft: "#FEF3EC",
+  gray: "#5E6B78", grayLight: "#F3EFE8", grayBorder: "#E8E3DA",
   green: "#0E9F74", greenLight: "#C9EFE1",
   blue: "#2E8FE6", blueLight: "#CFE5FA",
-  yellow: "#F5A524", yellowLight: "#FEEDC6",
+  yellow: "#EF6A2C", yellowLight: "#FDE2D2",
 };
 
 // ─── Plans list constants ────────────────────────────────────────
 const OP_STATUS_CFG = {
-  pending:   { label: 'جارٍ الإعداد',   color: '#67637A', bg: '#F3EFE8' },
-  active:    { label: 'جارٍ التنفيذ',   color: '#5546D6', bg: '#E7E5FD' },
-  review:    { label: 'قيد المراجعة',   color: '#5546D6', bg: '#E7E5FD' },
+  pending:   { label: 'جارٍ الإعداد',   color: '#5E6B78', bg: '#F3EFE8' },
+  active:    { label: 'جارٍ التنفيذ',   color: '#235D7F', bg: '#D9E8F1' },
+  review:    { label: 'قيد المراجعة',   color: '#235D7F', bg: '#D9E8F1' },
   completed: { label: 'مكتملة',          color: '#0B7F5D', bg: '#C9EFE1' },
 };
 
@@ -32,7 +32,7 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
   if (loading) return (
     <div style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
-      <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
         {[...Array(3)].map((_, i) => (
           <div key={i} style={{ height: 96, borderRadius: 10, background: '#F3EFE8', marginBottom: 12 }} />
         ))}
@@ -44,10 +44,10 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
 
   return (
     <div className="animate-in">
-      <div style={{ background: '#fff', borderRadius: 12, padding: '20px 28px', marginBottom: 20, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: '20px 28px', marginBottom: 20, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div>
           <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 4 }}>خططك التشغيلية</h2>
-          <p style={{ fontSize: 13, color: '#67637A' }}>
+          <p style={{ fontSize: 13, color: '#5E6B78' }}>
             {plans.length === 0 ? 'لم تبدأ أي خطة بعد' : `لديك ${plans.length} ${plans.length === 1 ? 'خطة' : 'خطط'} تشغيلية`}
           </p>
         </div>
@@ -55,12 +55,12 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
           <button
             onClick={onCreateNew}
             disabled={hasActive}
-            style={{ padding: '11px 24px', background: hasActive ? '#E8E3DA' : colors.amber, color: hasActive ? '#8F8BA3' : '#1B1746', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: hasActive ? 'not-allowed' : 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 8 }}
+            style={{ padding: '11px 24px', background: hasActive ? '#E8E3DA' : colors.amber, color: hasActive ? '#8C97A3' : '#0E2A3D', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: hasActive ? 'not-allowed' : 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 8 }}
           >
             <span style={{ fontSize: 20, lineHeight: 1 }}>+</span> إنشاء خطة جديدة
           </button>
           {hasActive && (
-            <div style={{ marginTop: 6, fontSize: 11, color: '#67637A', maxWidth: 220 }}>
+            <div style={{ marginTop: 6, fontSize: 11, color: '#5E6B78', maxWidth: 220 }}>
               أكمل الخطة الحالية أولاً لفتح هذا الخيار
             </div>
           )}
@@ -68,15 +68,15 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
       </div>
 
       {plans.length === 0 && (
-        <div style={{ background: '#fff', borderRadius: 12, padding: '60px 24px', boxShadow: '0 1px 8px rgba(27,23,70,0.06)', textAlign: 'center' }}>
-          <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}><DfIcon name="gear" size={32} /></div>
+        <div style={{ background: '#fff', borderRadius: 12, padding: '60px 24px', boxShadow: '0 1px 8px rgba(14,42,61,0.06)', textAlign: 'center' }}>
+          <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#D9E8F1', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}><DfIcon name="gear" size={32} /></div>
           <div style={{ fontSize: 18, fontWeight: 700, color: colors.ink, marginBottom: 10 }}>ابدأ خطتك التشغيلية الأولى</div>
-          <p style={{ fontSize: 13, color: '#67637A', maxWidth: 420, margin: '0 auto 28px', lineHeight: 1.7 }}>
+          <p style={{ fontSize: 13, color: '#5E6B78', maxWidth: 420, margin: '0 auto 28px', lineHeight: 1.7 }}>
             بناء خطة تشغيلية متكاملة من خلال 5 وحدات تخطيطية بمرافقة المستشار الاستراتيجي
           </p>
           <button
             onClick={onCreateNew}
-            style={{ padding: '13px 36px', background: colors.amber, color: '#1B1746', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+            style={{ padding: '13px 36px', background: colors.amber, color: '#0E2A3D', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
           >
             ابدأ الآن ←
           </button>
@@ -96,12 +96,12 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
             return (
               <div
                 key={plan.id}
-                style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', boxShadow: '0 1px 8px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', gap: 20, cursor: 'pointer', transition: 'box-shadow 0.2s', border: '1.5px solid transparent' }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(85,70,214,0.12)'}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 8px rgba(27,23,70,0.06)'}
+                style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', boxShadow: '0 1px 8px rgba(14,42,61,0.06)', display: 'flex', alignItems: 'center', gap: 20, cursor: 'pointer', transition: 'box-shadow 0.2s', border: '1.5px solid transparent' }}
+                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(35,93,127,0.12)'}
+                onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 8px rgba(14,42,61,0.06)'}
                 onClick={() => onSelect(plan.id)}
               >
-                <div style={{ width: 48, height: 48, borderRadius: '50%', background: isDone ? '#C9EFE1' : '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: 48, height: 48, borderRadius: '50%', background: isDone ? '#C9EFE1' : '#D9E8F1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <span style={{ fontSize: 18, fontWeight: 800, color: isDone ? '#0B7F5D' : colors.primary }}>#{planNum}</span>
                 </div>
                 <div style={{ flex: 1 }}>
@@ -109,18 +109,18 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
                     <span style={{ fontSize: 15, fontWeight: 700, color: colors.ink }}>الخطة التشغيلية #{planNum}</span>
                     <span style={{ padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: cfg.bg, color: cfg.color }}>{cfg.label}</span>
                   </div>
-                  <div style={{ fontSize: 12, color: '#67637A', marginBottom: 8 }}>
+                  <div style={{ fontSize: 12, color: '#5E6B78', marginBottom: 8 }}>
                     {plan.consultant ? `المستشار: ${plan.consultant.name}` : 'لم يُختر مستشار بعد'}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ flex: 1, height: 6, background: '#E8E3DA', borderRadius: 4, overflow: 'hidden' }}>
                       <div style={{ width: `${pct}%`, height: '100%', background: isDone ? '#0B7F5D' : colors.primary, borderRadius: 4, transition: 'width 0.4s' }} />
                     </div>
-                    <span style={{ fontSize: 12, color: '#67637A', whiteSpace: 'nowrap' }}>{approved}/{total} وحدة معتمدة</span>
+                    <span style={{ fontSize: 12, color: '#5E6B78', whiteSpace: 'nowrap' }}>{approved}/{total} وحدة معتمدة</span>
                   </div>
                 </div>
                 <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                  <div style={{ fontSize: 11, color: '#8F8BA3', marginBottom: 10 }}>
+                  <div style={{ fontSize: 11, color: '#8C97A3', marginBottom: 10 }}>
                     {new Date(plan.created_at).toLocaleDateString('ar-SA')}
                   </div>
                   <button
@@ -147,7 +147,7 @@ const Badge = ({ text, color = "gray", small }) => {
     blue:   { bg: colors.blueLight,   text: colors.blue   },
     yellow: { bg: colors.yellowLight, text: colors.amberText },
     gray:   { bg: colors.grayLight,   text: colors.gray   },
-    primary:   { bg: "#E7E5FD",          text: colors.primary   },
+    primary:   { bg: "#D9E8F1",          text: colors.primary   },
   };
   const c = map[color] || map.gray;
   return (
@@ -159,7 +159,7 @@ const Badge = ({ text, color = "gray", small }) => {
 
 const Btn = ({ children, variant = "primary", onClick, disabled, small }) => {
   const styles = {
-    primary:   { bg: colors.amber, color: "#1B1746",       border: "none" },
+    primary:   { bg: colors.amber, color: "#0E2A3D",       border: "none" },
     secondary: { bg: "transparent", color: colors.primary,   border: `2px solid ${colors.primary}` },
     ghost:     { bg: "transparent", color: colors.primary,   border: "none" },
   };
@@ -172,7 +172,7 @@ const Btn = ({ children, variant = "primary", onClick, disabled, small }) => {
 };
 
 const Card = ({ children, accent, onClick, style }) => (
-  <div onClick={onClick} style={{ background: "white", borderRadius: 14, padding: 20, boxShadow: "0 1px 4px rgba(27,23,70,0.06)", borderBottom: accent ? `3px solid ${colors.amberLine}` : "none", cursor: onClick ? "pointer" : "default", transition: "all 0.2s", ...style }}>
+  <div onClick={onClick} style={{ background: "white", borderRadius: 14, padding: 20, boxShadow: "0 1px 4px rgba(14,42,61,0.06)", borderBottom: accent ? `3px solid ${colors.amberLine}` : "none", cursor: onClick ? "pointer" : "default", transition: "all 0.2s", ...style }}>
     {children}
   </div>
 );
@@ -335,7 +335,7 @@ const BankTransferInfo = () => (
         </div>
       ))}
     </div>
-    <div style={{ marginTop: 12, padding: "8px 10px", background: "#FEEDC6", borderRadius: 8, fontSize: 11, color: "#7A4706", display: "flex", alignItems: "center", gap: 6 }}>
+    <div style={{ marginTop: 12, padding: "8px 10px", background: "#FDE2D2", borderRadius: 8, fontSize: 11, color: "#7F310E", display: "flex", alignItems: "center", gap: 6 }}>
       <IcWarning width={14} height={14}/> بعد التحويل، أرسل إيصال الدفع عبر البريد الإلكتروني لتفعيل الخدمة
     </div>
   </div>
@@ -418,7 +418,7 @@ const EmbeddedChat = ({ consultantName }) => {
     </div>
   );
   if (error) return (
-    <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D03F2A', fontSize: 13 }}>{error}</div>
+    <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C53A3A', fontSize: 13 }}>{error}</div>
   );
 
   return (
@@ -433,7 +433,7 @@ const EmbeddedChat = ({ consultantName }) => {
         )}
         {messages.map(m => (
           <div key={m.id} style={{ display: 'flex', justifyContent: m.is_mine ? 'flex-start' : 'flex-end' }}>
-            <div style={{ maxWidth: '75%', padding: '10px 14px', borderRadius: m.is_mine ? '12px 12px 12px 4px' : '12px 12px 4px 12px', background: m.is_mine ? colors.primary : 'white', color: m.is_mine ? 'white' : colors.ink, fontSize: 13, lineHeight: 1.6, boxShadow: '0 1px 3px rgba(27,23,70,0.08)' }}>
+            <div style={{ maxWidth: '75%', padding: '10px 14px', borderRadius: m.is_mine ? '12px 12px 12px 4px' : '12px 12px 4px 12px', background: m.is_mine ? colors.primary : 'white', color: m.is_mine ? 'white' : colors.ink, fontSize: 13, lineHeight: 1.6, boxShadow: '0 1px 3px rgba(14,42,61,0.08)' }}>
               <div style={{ direction: 'rtl' }}>{m.body}</div>
               <div style={{ fontSize: 10, opacity: 0.65, marginTop: 3, textAlign: m.is_mine ? 'left' : 'right' }}>{m.time}</div>
             </div>
@@ -452,7 +452,7 @@ const EmbeddedChat = ({ consultantName }) => {
           style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none', direction: 'rtl' }}
         />
         <button onClick={handleSend} disabled={!body.trim() || sending}
-          style={{ padding: '10px 16px', borderRadius: 10, background: body.trim() && !sending ? colors.amber : colors.grayLight, border: 'none', cursor: body.trim() && !sending ? 'pointer' : 'not-allowed', color: '#1B1746', display: 'flex', alignItems: 'center', transition: 'background 0.2s' }}>
+          style={{ padding: '10px 16px', borderRadius: 10, background: body.trim() && !sending ? colors.amber : colors.grayLight, border: 'none', cursor: body.trim() && !sending ? 'pointer' : 'not-allowed', color: '#0E2A3D', display: 'flex', alignItems: 'center', transition: 'background 0.2s' }}>
           {Icons.send}
         </button>
       </div>
@@ -611,7 +611,7 @@ const OpWorkflowStepper = ({ opStep, setOpStep, workflow }) => {
                   borderRadius: ws.id === 5 ? 0 : current ? 10 : "50%",
                   transform: ws.id === 5 ? "rotate(45deg)" : "none",
                   background: done ? (current ? colors.amber : colors.green) : colors.grayLight,
-                  color: (done || current) ? "#1B1746" : colors.gray,
+                  color: (done || current) ? "#0E2A3D" : colors.gray,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 14, fontWeight: 700, transition: "all 0.3s",
                   boxShadow: current ? `0 4px 12px ${colors.amberLine}40` : done ? `0 2px 8px ${colors.green}30` : "none",
@@ -636,7 +636,7 @@ const OpWorkflowStepper = ({ opStep, setOpStep, workflow }) => {
 
       {/* مؤشر وضع المراجعة */}
       {reviewing && (
-        <div style={{ marginTop: 4, padding: '6px 14px', background: '#FFF8EA', borderRadius: 8, border: `1px solid ${colors.amberLine}30`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ marginTop: 4, padding: '6px 14px', background: '#FEF3EC', borderRadius: 8, border: `1px solid ${colors.amberLine}30`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 12, color: colors.amberText, fontWeight: 600 }}>
             <DfIcon name="search" size={18} style={{ marginInlineEnd: 6 }} />وضع المراجعة — تستعرض: {opWorkflowSteps[opStep]?.label}
           </span>
@@ -702,7 +702,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Badge text={it.checked ? "معتمد" : "غير محدد"} color={it.checked ? "green" : "gray"} small />
-              {!readOnly && <button onClick={() => removeItem(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D03F2A', fontSize: 13, padding: '2px 6px', borderRadius: 4 }}>✕</button>}
+              {!readOnly && <button onClick={() => removeItem(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#C53A3A', fontSize: 13, padding: '2px 6px', borderRadius: 4 }}>✕</button>}
             </div>
           </Card>
         ))}
@@ -976,7 +976,7 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
       <div style={{ margin: "12px 0 16px" }}><Tab tabs={tabs} active={tab} onChange={setTab} /></div>
 
       {msg && (
-        <div style={{ position: "fixed", bottom: 24, right: 24, padding: "12px 20px", borderRadius: 10, background: msg.type==="success"?"#C9EFE1":"#FAD4CE", color: msg.type==="success"?"#0B7F5D":"#D03F2A", fontWeight: 600, fontSize: 13, boxShadow: "0 4px 16px rgba(27,23,70,0.12)", zIndex: 9999 }}>
+        <div style={{ position: "fixed", bottom: 24, right: 24, padding: "12px 20px", borderRadius: 10, background: msg.type==="success"?"#C9EFE1":"#F8D3D3", color: msg.type==="success"?"#0B7F5D":"#C53A3A", fontWeight: 600, fontSize: 13, boxShadow: "0 4px 16px rgba(14,42,61,0.12)", zIndex: 9999 }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>{msg.type==="success" ? <IcCheck width={14} height={14}/> : <IcXMark width={14} height={14}/>}{msg.text}</span>
         </div>
       )}
@@ -1032,9 +1032,9 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
                 />
               </div>
             ) : (
-              <div style={{ width: "100%", maxWidth: 600, margin: "0 auto", aspectRatio: "16/9", background: `linear-gradient(135deg, ${colors.primaryDeep}, #2B2470)`, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}>
+              <div style={{ width: "100%", maxWidth: 600, margin: "0 auto", aspectRatio: "16/9", background: `linear-gradient(135deg, ${colors.primaryDeep}, #123247)`, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}>
                 <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>{Icons.play}</div>
-                <div style={{ position: "absolute", bottom: 12, left: 12, background: "rgba(27,23,70,0.6)", padding: "4px 10px", borderRadius: 6, color: "white", fontSize: 12 }}>{unit.video_duration || unit.videoDuration}</div>
+                <div style={{ position: "absolute", bottom: 12, left: 12, background: "rgba(14,42,61,0.6)", padding: "4px 10px", borderRadius: 6, color: "white", fontSize: 12 }}>{unit.video_duration || unit.videoDuration}</div>
               </div>
             )}
             <h4 style={{ fontSize: 15, fontWeight: 600, color: colors.ink, marginTop: 16 }}>شرح {unit.name}</h4>
@@ -1165,7 +1165,7 @@ const OpStepInfo = ({ strategicCompleted, units, catalog, pricing, consultant, o
           </div>
         ))}
         {consultant && (
-          <div style={{ marginTop: 12, padding: "10px 14px", background: "#E7E5FD", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ marginTop: 12, padding: "10px 14px", background: "#D9E8F1", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ width: 32, height: 32, borderRadius: "50%", background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>م</div>
             <div>
               <div style={{ fontSize: 11, color: colors.gray }}>المستشار المشرف</div>
@@ -1245,11 +1245,11 @@ const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant, onWork
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 4 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: colors.gray }}>
             <span>الخدمة</span>
-            <span style={{ color: '#34314A', fontWeight: 600 }}>التخطيط التشغيلي (5 وحدات)</span>
+            <span style={{ color: '#334452', fontWeight: 600 }}>التخطيط التشغيلي (5 وحدات)</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: colors.gray }}>
             <span>المستشار</span>
-            <span style={{ color: '#34314A', fontWeight: 600 }}>{consultant?.name || '—'}</span>
+            <span style={{ color: '#334452', fontWeight: 600 }}>{consultant?.name || '—'}</span>
           </div>
         </div>
       }
@@ -1274,7 +1274,7 @@ const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant, onWork
       )}
 
       {payError && (
-        <div style={{ padding: "12px 16px", background: "#FAD4CE", borderRadius: 10, color: "#D03F2A", fontSize: 13, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 6 }}>
+        <div style={{ padding: "12px 16px", background: "#F8D3D3", borderRadius: 10, color: "#C53A3A", fontSize: 13, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 6 }}>
           <IcXMark width={14} height={14}/> {payError}
         </div>
       )}
@@ -1381,10 +1381,10 @@ const OpStepWork = ({ units, setOpStep, setActiveUnit, readOnly }) => {
 
   const statusSummary = [
     { label: 'معتمدة',         count: approvedCount,                                                              color: colors.green  },
-    { label: 'قيد المراجعة',   count: (units||[]).filter(u=>u.submission_status==='reviewing').length,            color: '#5546D6'     },
+    { label: 'قيد المراجعة',   count: (units||[]).filter(u=>u.submission_status==='reviewing').length,            color: '#235D7F'     },
     { label: 'مُرسلة',         count: (units||[]).filter(u=>u.submission_status==='submitted').length,            color: colors.blue   },
     { label: 'تحتاج تعديل',    count: (units||[]).filter(u=>u.submission_status==='revision').length,            color: colors.amberText },
-    { label: 'قيد العمل',      count: (units||[]).filter(u=>u.submission_status==='in_progress').length,         color: '#9A5B07'     },
+    { label: 'قيد العمل',      count: (units||[]).filter(u=>u.submission_status==='in_progress').length,         color: '#A33F12'     },
     { label: 'لم تبدأ',        count: (units||[]).filter(u=>!u.submission_status||u.submission_status==='not_started').length, color: colors.gray },
   ].filter(s => s.count > 0);
 
@@ -1420,8 +1420,8 @@ const OpStepWork = ({ units, setOpStep, setActiveUnit, readOnly }) => {
           return (
             <div key={u.id || u.unit_number}
               onClick={() => accessible && setActiveUnit(u)}
-              style={{ background: accessible ? colors.primaryDeep : '#8F8BA3', borderRadius: 12, padding: "20px 12px", textAlign: "center", borderBottom: `3px solid ${accessible ? (status==='approved'?colors.green:colors.amberLine) : '#67637A'}`, cursor: accessible ? "pointer" : "not-allowed", position: "relative", transition: "transform 0.2s, box-shadow 0.2s", opacity: accessible ? 1 : 0.65 }}
-              onMouseEnter={e => { if (accessible) { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(27,23,70,0.15)"; } }}
+              style={{ background: accessible ? colors.primaryDeep : '#8C97A3', borderRadius: 12, padding: "20px 12px", textAlign: "center", borderBottom: `3px solid ${accessible ? (status==='approved'?colors.green:colors.amberLine) : '#5E6B78'}`, cursor: accessible ? "pointer" : "not-allowed", position: "relative", transition: "transform 0.2s, box-shadow 0.2s", opacity: accessible ? 1 : 0.65 }}
+              onMouseEnter={e => { if (accessible) { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(14,42,61,0.15)"; } }}
               onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
               {!accessible && !readOnly && <div style={{ position: "absolute", top: 8, left: 8, color: "white" }}><IcLock width={16} height={16}/></div>}
               <div style={{ color: "white", fontSize: 13, fontWeight: 600, marginBottom: 10, minHeight: 40, lineHeight: 1.4 }}>{u.name}</div>
@@ -1432,7 +1432,7 @@ const OpStepWork = ({ units, setOpStep, setActiveUnit, readOnly }) => {
       </div>
 
       {/* شريط التقدم */}
-      <div style={{ background: "white", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(27,23,70,0.06)" }}>
+      <div style={{ background: "white", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(14,42,61,0.06)" }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: colors.gray, marginBottom: 6 }}>
             <span>تقدم الإرسال</span>
@@ -1493,7 +1493,7 @@ const OpStepReview = ({ units, setOpStep, refreshData }) => {
       <p style={{ fontSize: 13, color: colors.gray, marginBottom: 20 }}>يقوم المستشار بمراجعة مخرجاتك واعتمادها أو طلب تعديل. سيتم إشعارك عند اكتمال الاعتماد.</p>
 
       {anyRevision && (
-        <Card style={{ marginBottom: 16, padding: "14px 18px", background: "#FFF8EA", borderRight: `4px solid ${colors.amberLine}` }}>
+        <Card style={{ marginBottom: 16, padding: "14px 18px", background: "#FEF3EC", borderRight: `4px solid ${colors.amberLine}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ color: colors.amberText }}><IcArrowPath width={22} height={22}/></span>
             <div>
@@ -1544,7 +1544,7 @@ const OpStepReview = ({ units, setOpStep, refreshData }) => {
           <button
             onClick={handleProceed}
             disabled={proceeding}
-            style={{ padding: '11px 26px', background: proceeding ? '#8F8BA3' : colors.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: proceeding ? 'not-allowed' : 'pointer', fontFamily: "inherit", whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(85,70,214,0.3)' }}
+            style={{ padding: '11px 26px', background: proceeding ? '#8C97A3' : colors.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: proceeding ? 'not-allowed' : 'pointer', fontFamily: "inherit", whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(35,93,127,0.3)' }}
           >
             {proceeding ? '...' : 'الاعتماد النهائي ←'}
           </button>
@@ -1711,7 +1711,7 @@ const OpStepArbitration = ({ setOpStep, setWorkflow, workflowId }) => {
         ))}
       </Card>
 
-      <Card style={{ marginBottom: 20, padding: "14px 18px", background: "#F3F2FE", border: `1px solid #D0CCFA` }}>
+      <Card style={{ marginBottom: 20, padding: "14px 18px", background: "#EEF5F9", border: `1px solid #B5D2E3` }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: colors.gray, marginBottom: 4 }}>
           <span>تحكيم الخطة التشغيلية</span><span>2,500 ريال</span>
         </div>
@@ -1791,7 +1791,7 @@ const OpStepDone = ({ workflow, setWorkflow, navigate, onComplete, units, workfl
         <p style={{ fontSize: 13, color: colors.gray, textAlign: "center", marginBottom: 20 }}>أكمل الدفع لبدء إجراءات التحكيم الرسمية</p>
 
         {payError && (
-          <div style={{ padding: "12px 16px", background: "#FAD4CE", borderRadius: 10, color: "#D03F2A", fontSize: 13, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ padding: "12px 16px", background: "#F8D3D3", borderRadius: 10, color: "#C53A3A", fontSize: 13, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 6 }}>
             <IcXMark width={14} height={14}/> {payError}
           </div>
         )}
@@ -1809,7 +1809,7 @@ const OpStepDone = ({ workflow, setWorkflow, navigate, onComplete, units, workfl
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 16, fontWeight: 800, color: colors.ink, padding: "12px 0" }}>
               <span>الإجمالي</span><span>2,875 ريال</span>
             </div>
-            <div style={{ padding: "10px 14px", background: "#F3F2FE", borderRadius: 8, fontSize: 12, color: colors.primary, marginTop: 4 }}>
+            <div style={{ padding: "10px 14px", background: "#EEF5F9", borderRadius: 8, fontSize: 12, color: colors.primary, marginTop: 4 }}>
               الجهة: شركة الاستشارات الاستراتيجية
             </div>
           </Card>
@@ -1893,7 +1893,7 @@ const OpStepDone = ({ workflow, setWorkflow, navigate, onComplete, units, workfl
       )}
 
       {!canNavigate && (
-        <div style={{ padding: "10px 16px", background: colors.yellowLight, borderRadius: 10, fontSize: 12, color: "#7A4706", fontWeight: 600, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ padding: "10px 16px", background: colors.yellowLight, borderRadius: 10, fontSize: 12, color: "#7F310E", fontWeight: 600, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
           <IcWarning width={14} height={14}/> {!workflowCompleted
             ? "يجب إتمام الدفع وإجراءات التحكيم أولاً لتفعيل هذا الزر."
             : `لا تزال ${pendingUnits.length} وحدة بانتظار الاعتماد من المستشار.`}

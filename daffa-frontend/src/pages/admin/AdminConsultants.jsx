@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
 import { usePermissions } from '../../utils/permissions';
 
-const colors = { primary: '#5546D6', ink: '#1B1746', orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F' };
+const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
 
 const SPECIALTIES = [
   'تخطيط استراتيجي',
@@ -213,16 +213,16 @@ export default function AdminConsultants() {
   if (!can('admin.consultants.view')) return (
     <div style={{ textAlign: 'center', padding: 80, background: '#fff', borderRadius: 12 }}>
       <div style={{ fontSize: 48, marginBottom: 12 }}><DfIcon name="lock" size={48} /></div>
-      <div style={{ fontSize: 16, fontWeight: 700, color: '#D03F2A', marginBottom: 8 }}>غير مصرح بالوصول</div>
-      <div style={{ fontSize: 13, color: '#67637A' }}>ليس لديك صلاحية لعرض إدارة المستشارين</div>
+      <div style={{ fontSize: 16, fontWeight: 700, color: '#C53A3A', marginBottom: 8 }}>غير مصرح بالوصول</div>
+      <div style={{ fontSize: 13, color: '#5E6B78' }}>ليس لديك صلاحية لعرض إدارة المستشارين</div>
     </div>
   );
 
   if (loadError) return (
     <div style={{ textAlign: 'center', padding: 80, background: '#fff', borderRadius: 12 }}>
       <div style={{ fontSize: 36, marginBottom: 12 }}><DfIcon name="warning" size={36} /></div>
-      <div style={{ fontSize: 15, fontWeight: 700, color: '#D03F2A', marginBottom: 8 }}>فشل تحميل البيانات</div>
-      <div style={{ fontSize: 13, color: '#67637A', marginBottom: 20 }}>{loadError}</div>
+      <div style={{ fontSize: 15, fontWeight: 700, color: '#C53A3A', marginBottom: 8 }}>فشل تحميل البيانات</div>
+      <div style={{ fontSize: 13, color: '#5E6B78', marginBottom: 20 }}>{loadError}</div>
       <button onClick={load} style={{ padding: '10px 28px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
         إعادة المحاولة
       </button>
@@ -236,7 +236,7 @@ export default function AdminConsultants() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <h2 style={{ fontSize: 20, fontWeight: 800, color: colors.ink }}>إدارة المستشارين</h2>
           {refreshing && (
-            <span style={{ fontSize: 11, color: '#8F8BA3', padding: '3px 10px', background: '#F3EFE8', borderRadius: 20 }}>
+            <span style={{ fontSize: 11, color: '#8C97A3', padding: '3px 10px', background: '#F3EFE8', borderRadius: 20 }}>
               ↻ تحديث...
             </span>
           )}
@@ -244,7 +244,7 @@ export default function AdminConsultants() {
         {can('admin.consultants.add') && (
           <button
             onClick={openAdd}
-            style={{ padding: '10px 22px', background: colors.amber, color: '#1B1746', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}
+            style={{ padding: '10px 22px', background: colors.amber, color: '#0E2A3D', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}
           >
             + إضافة مستشار
           </button>
@@ -255,12 +255,12 @@ export default function AdminConsultants() {
       <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-3)', gap: 14, marginBottom: 20 }}>
         <StatCard label="إجمالي المستشارين" value={consultants.length}         color={colors.primary}    icon={<DfIcon name="users" size={20} />} />
         <StatCard label="متاحون الآن"        value={consultants.filter(c => c.available).length}  color="#0B7F5D" icon={<DfIcon name="check" size={20} />} />
-        <StatCard label="غير متاحين"         value={consultants.filter(c => !c.available).length} color="#D03F2A" icon={<DfIcon name="pause" size={20} />} />
+        <StatCard label="غير متاحين"         value={consultants.filter(c => !c.available).length} color="#C53A3A" icon={<DfIcon name="pause" size={20} />} />
       </div>
 
       {/* قائمة المستشارين */}
       {consultants.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 60, color: '#8F8BA3', background: '#fff', borderRadius: 12 }}>
+        <div style={{ textAlign: 'center', padding: 60, color: '#8C97A3', background: '#fff', borderRadius: 12 }}>
           <div style={{ fontSize: 48, marginBottom: 12 }}><DfIcon name="user" size={48} /></div>
           <div style={{ fontSize: 15, fontWeight: 600 }}>لا يوجد مستشارون بعد</div>
           <div style={{ fontSize: 13, marginTop: 6 }}>اضغط "إضافة مستشار" للبدء</div>
@@ -273,12 +273,12 @@ export default function AdminConsultants() {
               onClick={() => openView(c)}
               style={{
                 background: '#fff', borderRadius: 14, padding: 20,
-                boxShadow: '0 1px 8px rgba(27,23,70,0.07)',
-                border: `1.5px solid ${c.available ? '#E8E3DA' : '#F5B8AE'}`,
+                boxShadow: '0 1px 8px rgba(14,42,61,0.07)',
+                border: `1.5px solid ${c.available ? '#E8E3DA' : '#F1B2B2'}`,
                 cursor: 'pointer', transition: 'all 0.2s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(27,23,70,0.10)'; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 1px 8px rgba(27,23,70,0.07)'; }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(14,42,61,0.10)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 1px 8px rgba(14,42,61,0.07)'; }}
             >
               <div style={{ textAlign: 'center' }}>
                 {/* أفاتار */}
@@ -295,32 +295,32 @@ export default function AdminConsultants() {
                     <span><DfIcon name="key" size={18} /></span><span>{c.user.email}</span>
                   </div>
                 ) : (
-                  <div style={{ marginTop: 5, fontSize: 10, color: '#8F8BA3' }}>بدون حساب دخول</div>
+                  <div style={{ marginTop: 5, fontSize: 10, color: '#8C97A3' }}>بدون حساب دخول</div>
                 )}
 
                 {/* تقييم */}
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 3, marginTop: 10 }}>
                   {[1,2,3,4,5].map(s => (
-                    <span key={s} style={{ fontSize: 12, color: s <= Math.round(c.rating) ? '#9A5B07' : '#E8E3DA' }}>★</span>
+                    <span key={s} style={{ fontSize: 12, color: s <= Math.round(c.rating) ? '#A33F12' : '#E8E3DA' }}>★</span>
                   ))}
-                  <span style={{ fontSize: 12, color: '#67637A', marginRight: 4 }}>{c.rating}</span>
+                  <span style={{ fontSize: 12, color: '#5E6B78', marginRight: 4 }}>{c.rating}</span>
                 </div>
 
                 {/* إحصائيات */}
                 <div style={{ display: 'flex', justifyContent: 'space-around', margin: '12px 0', paddingTop: 12, borderTop: '1px solid #F3EFE8' }}>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: 15, fontWeight: 700, color: colors.ink }}>{c.experience_years}</div>
-                    <div style={{ fontSize: 10, color: '#8F8BA3' }}>سنة خبرة</div>
+                    <div style={{ fontSize: 10, color: '#8C97A3' }}>سنة خبرة</div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: 15, fontWeight: 700, color: colors.ink }}>{c.completed_projects}</div>
-                    <div style={{ fontSize: 10, color: '#8F8BA3' }}>مشروع</div>
+                    <div style={{ fontSize: 10, color: '#8C97A3' }}>مشروع</div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{
                       fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
-                      background: c.available ? '#C9EFE1' : '#FAD4CE',
-                      color: c.available ? '#0B7F5D' : '#D03F2A',
+                      background: c.available ? '#C9EFE1' : '#F8D3D3',
+                      color: c.available ? '#0B7F5D' : '#C53A3A',
                     }}>
                       {c.available ? 'متاح' : 'غير متاح'}
                     </div>
@@ -338,7 +338,7 @@ export default function AdminConsultants() {
                   {can('admin.consultants.toggle') && (
                     <button
                       onClick={e => openToggleConfirm(c, e)}
-                      style={{ flex: 1, padding: '7px 0', background: c.available ? '#FDECE9' : '#E8F8F2', color: c.available ? '#D03F2A' : '#0B7F5D', border: `1px solid ${c.available ? '#F5B8AE' : '#7FD3B5'}`, borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}
+                      style={{ flex: 1, padding: '7px 0', background: c.available ? '#FCEBEB' : '#E8F8F2', color: c.available ? '#C53A3A' : '#0B7F5D', border: `1px solid ${c.available ? '#F1B2B2' : '#7FD3B5'}`, borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}
                     >
                       {c.available ? 'إيقاف' : '▶ تفعيل'}
                     </button>
@@ -346,7 +346,7 @@ export default function AdminConsultants() {
                   {can('admin.consultants.edit') && (
                     <button
                       onClick={e => openEdit(c, e)}
-                      style={{ flex: 1, padding: '7px 0', background: '#FFF8EA', color: colors.amberText, border: `1px solid #FCD98B`, borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}
+                      style={{ flex: 1, padding: '7px 0', background: '#FEF3EC', color: colors.amberText, border: `1px solid #FBC3A3`, borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}
                     >
                       <DfIcon name="pencil" size={18} style={{ marginInlineEnd: 6 }} />تعديل
                     </button>
@@ -354,7 +354,7 @@ export default function AdminConsultants() {
                   {can('admin.consultants.delete') && (
                     <button
                       onClick={e => openDelete(c, e)}
-                      style={{ padding: '7px 12px', background: '#FDECE9', color: '#D03F2A', border: `1px solid #F5B8AE`, borderRadius: 8, fontSize: 11, cursor: 'pointer', fontFamily: "inherit" }}
+                      style={{ padding: '7px 12px', background: '#FCEBEB', color: '#C53A3A', border: `1px solid #F1B2B2`, borderRadius: 8, fontSize: 11, cursor: 'pointer', fontFamily: "inherit" }}
                     >
                       <DfIcon name="trash" size={18} style={{ marginInlineEnd: 6 }} />
                     </button>
@@ -374,14 +374,14 @@ export default function AdminConsultants() {
               <h3 style={{ fontSize: 18, fontWeight: 700, color: colors.ink }}>
                 {modal === 'add' ? 'إضافة مستشار جديد' : 'تعديل بيانات المستشار'}
               </h3>
-              <button onClick={() => setModal(null)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#8F8BA3' }}>✕</button>
+              <button onClick={() => setModal(null)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#8C97A3' }}>✕</button>
             </div>
 
             {/* ── صورة المستشار ── */}
             <div style={{ marginBottom: 20, padding: '16px', background: '#F3EFE8', borderRadius: 12 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>
                 الصورة الشخصية
-                <span style={{ fontSize: 11, fontWeight: 400, color: '#67637A', marginRight: 6 }}>(اختياري)</span>
+                <span style={{ fontSize: 11, fontWeight: 400, color: '#5E6B78', marginRight: 6 }}>(اختياري)</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 <div style={{ flexShrink: 0, width: 56, height: 56, borderRadius: '50%', overflow: 'hidden', border: '2px solid #E8E3DA', background: `linear-gradient(135deg, ${colors.primary}, ${colors.ink})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -399,7 +399,7 @@ export default function AdminConsultants() {
                       <DfIcon name="check" size={18} style={{ marginInlineEnd: 6 }} />{avatarFile.name}
                     </div>
                   ) : (
-                    <div style={{ fontSize: 11, color: '#67637A', marginBottom: 8 }}>PNG / JPG / WebP — بحد أقصى 2 ميغابايت</div>
+                    <div style={{ fontSize: 11, color: '#5E6B78', marginBottom: 8 }}>PNG / JPG / WebP — بحد أقصى 2 ميغابايت</div>
                   )}
                   <div style={{ display: 'flex', gap: 8 }}>
                     <label style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 14px', background: '#fff', border: '1.5px solid #E8E3DA', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', color: colors.ink, fontFamily: "inherit", flexShrink: 0 }}>
@@ -409,7 +409,7 @@ export default function AdminConsultants() {
                     {(avatarFile || (modal === 'edit' && selected?.avatar_url)) && (
                       <button
                         onClick={() => { resetAvatar(); if (modal === 'edit') setSelected(p => ({ ...p, avatar_url: null })); }}
-                        style={{ padding: '7px 12px', background: '#FDECE9', color: '#D03F2A', border: '1px solid #F5B8AE', borderRadius: 8, fontSize: 12, cursor: 'pointer', fontFamily: "inherit", flexShrink: 0 }}
+                        style={{ padding: '7px 12px', background: '#FCEBEB', color: '#C53A3A', border: '1px solid #F1B2B2', borderRadius: 8, fontSize: 12, cursor: 'pointer', fontFamily: "inherit", flexShrink: 0 }}
                       >
                         ✕ حذف
                       </button>
@@ -447,7 +447,7 @@ export default function AdminConsultants() {
               <FormField label="الحالة" style={{ gridColumn: '1/-1' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
                   <input type="checkbox" checked={form.available} onChange={e => setF('available', e.target.checked)} style={{ width: 16, height: 16, accentColor: colors.primary }} />
-                  <span style={{ fontSize: 13, fontWeight: 600, color: form.available ? '#0B7F5D' : '#D03F2A' }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: form.available ? '#0B7F5D' : '#C53A3A' }}>
                     {form.available ? 'متاح للعملاء' : 'غير متاح حالياً'}
                   </span>
                 </label>
@@ -459,7 +459,7 @@ export default function AdminConsultants() {
                   <div style={{ fontSize: 13, fontWeight: 700, color: colors.ink, marginBottom: 4 }}>
                     <DfIcon name="key" size={18} style={{ marginInlineEnd: 6 }} />حساب دخول للمستشار
                   </div>
-                  <div style={{ fontSize: 11, color: '#8F8BA3', marginBottom: 12 }}>
+                  <div style={{ fontSize: 11, color: '#8C97A3', marginBottom: 12 }}>
                     {modal === 'add'
                       ? 'اختياري — يتيح للمستشار الدخول على بوابته الخاصة'
                       : 'هذا المستشار ليس لديه حساب دخول بعد — أنشئ له واحداً الآن'}
@@ -490,11 +490,11 @@ export default function AdminConsultants() {
             </div>
 
             <div style={{ display: 'flex', gap: 10, marginTop: 22, justifyContent: 'flex-end' }}>
-              <button onClick={() => setModal(null)} style={{ padding: '10px 24px', background: '#F3EFE8', color: '#34314A', border: '1.5px solid #E8E3DA', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}>إلغاء</button>
+              <button onClick={() => setModal(null)} style={{ padding: '10px 24px', background: '#F3EFE8', color: '#334452', border: '1.5px solid #E8E3DA', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}>إلغاء</button>
               <button
                 onClick={handleSave}
                 disabled={saving || !form.name.trim() || !form.specialty.trim()}
-                style={{ padding: '10px 28px', background: (!form.name.trim() || !form.specialty.trim()) ? '#D9D3C7' : colors.amber, color: '#1B1746', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}
+                style={{ padding: '10px 28px', background: (!form.name.trim() || !form.specialty.trim()) ? '#D9D3C7' : colors.amber, color: '#0E2A3D', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}
               >
                 {saving ? 'جاري الحفظ...' : (modal === 'add' ? 'إضافة المستشار' : 'حفظ التعديلات')}
               </button>
@@ -516,22 +516,22 @@ export default function AdminConsultants() {
               <h3 style={{ fontSize: 18, fontWeight: 800, color: colors.ink }}>{selected.name}</h3>
               <div style={{ display: 'inline-block', marginTop: 6, padding: '4px 14px', background: '#EAF4FD', color: colors.primary, fontSize: 12, borderRadius: 20, fontWeight: 600 }}>{selected.specialty}</div>
               <div style={{ display: 'flex', justifyContent: 'center', gap: 3, marginTop: 10 }}>
-                {[1,2,3,4,5].map(s => <span key={s} style={{ fontSize: 16, color: s <= Math.round(selected.rating) ? '#9A5B07' : '#E8E3DA' }}>★</span>)}
-                <span style={{ fontSize: 13, color: '#67637A', marginRight: 4 }}>{selected.rating}</span>
+                {[1,2,3,4,5].map(s => <span key={s} style={{ fontSize: 16, color: s <= Math.round(selected.rating) ? '#A33F12' : '#E8E3DA' }}>★</span>)}
+                <span style={{ fontSize: 13, color: '#5E6B78', marginRight: 4 }}>{selected.rating}</span>
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-3)', gap: 12, marginBottom: 16 }}>
               <InfoBox label="سنوات الخبرة"     value={selected.experience_years} />
               <InfoBox label="المشاريع المنجزة" value={selected.completed_projects} />
-              <InfoBox label="الحالة"           value={selected.available ? 'متاح' : 'غير متاح'} valueColor={selected.available ? '#0B7F5D' : '#D03F2A'} />
+              <InfoBox label="الحالة"           value={selected.available ? 'متاح' : 'غير متاح'} valueColor={selected.available ? '#0B7F5D' : '#C53A3A'} />
             </div>
             {selected.bio && (
-              <div style={{ background: '#FBF9F5', borderRadius: 10, padding: '12px 16px', fontSize: 13, color: '#4A4660', lineHeight: 1.8, marginBottom: 16 }}>
+              <div style={{ background: '#FBF9F5', borderRadius: 10, padding: '12px 16px', fontSize: 13, color: '#465564', lineHeight: 1.8, marginBottom: 16 }}>
                 {selected.bio}
               </div>
             )}
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              <button onClick={() => setModal(null)} style={{ padding: '9px 22px', background: '#F3EFE8', border: '1.5px solid #E8E3DA', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit", color: '#34314A' }}>إغلاق</button>
+              <button onClick={() => setModal(null)} style={{ padding: '9px 22px', background: '#F3EFE8', border: '1.5px solid #E8E3DA', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit", color: '#334452' }}>إغلاق</button>
               <button onClick={e => openEdit(selected, e)} style={{ padding: '9px 22px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}><DfIcon name="pencil" size={14} style={{ marginInlineEnd: 6 }} />تعديل</button>
             </div>
           </div>
@@ -543,7 +543,7 @@ export default function AdminConsultants() {
           <div style={{ background: '#fff', borderRadius: 16, padding: 32, width: '100%', maxWidth: 420, textAlign: 'center' }}>
             <div style={{
               width: 70, height: 70, borderRadius: '50%', margin: '0 auto 18px',
-              background: selected.available ? '#FDECE9' : '#E8F8F2',
+              background: selected.available ? '#FCEBEB' : '#E8F8F2',
               display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32,
             }}>
               {selected.available ? <DfIcon name="pause" size={20} /> : '▶'}
@@ -553,13 +553,13 @@ export default function AdminConsultants() {
               {selected.available ? 'إيقاف المستشار' : 'تفعيل المستشار'}
             </h3>
 
-            <p style={{ fontSize: 14, color: '#67637A', marginBottom: 4 }}>
+            <p style={{ fontSize: 14, color: '#5E6B78', marginBottom: 4 }}>
               هل تريد {selected.available ? 'إيقاف' : 'تفعيل'}
             </p>
             <p style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>
               {selected.name}؟
             </p>
-            <p style={{ fontSize: 12, color: '#8F8BA3', marginBottom: 26 }}>
+            <p style={{ fontSize: 12, color: '#8C97A3', marginBottom: 26 }}>
               {selected.available
                 ? 'لن يظهر للعملاء في قائمة المستشارين المتاحين'
                 : 'سيظهر للعملاء ويمكنهم اختياره'}
@@ -568,7 +568,7 @@ export default function AdminConsultants() {
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
               <button
                 onClick={() => setModal(null)}
-                style={{ padding: '10px 28px', background: '#F3EFE8', border: '1.5px solid #E8E3DA', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit", color: '#34314A' }}
+                style={{ padding: '10px 28px', background: '#F3EFE8', border: '1.5px solid #E8E3DA', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit", color: '#334452' }}
               >
                 إلغاء
               </button>
@@ -578,7 +578,7 @@ export default function AdminConsultants() {
                 style={{
                   padding: '10px 28px', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700,
                   cursor: 'pointer', fontFamily: "inherit", color: '#fff',
-                  background: selected.available ? '#D03F2A' : '#0B7F5D',
+                  background: selected.available ? '#C53A3A' : '#0B7F5D',
                 }}
               >
                 {saving ? 'جاري...' : (selected.available ? 'نعم، إيقاف' : '▶ نعم، تفعيل')}
@@ -591,14 +591,14 @@ export default function AdminConsultants() {
       {modal === 'delete' && selected && (
         <Overlay onClose={() => setModal(null)} closeOnBackdrop>
           <div style={{ background: '#fff', borderRadius: 16, padding: 32, width: '100%', maxWidth: 420, textAlign: 'center' }}>
-            <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FDECE9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 28 }}><DfIcon name="warning" size={28} /></div>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FCEBEB', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 28 }}><DfIcon name="warning" size={28} /></div>
             <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>حذف المستشار</h3>
-            <p style={{ fontSize: 13, color: '#67637A', marginBottom: 4 }}>هل أنت متأكد من حذف</p>
-            <p style={{ fontSize: 15, fontWeight: 700, color: '#D03F2A', marginBottom: 20 }}>{selected.name}؟</p>
-            <p style={{ fontSize: 12, color: '#8F8BA3', marginBottom: 24 }}>لا يمكن التراجع عن هذا الإجراء</p>
+            <p style={{ fontSize: 13, color: '#5E6B78', marginBottom: 4 }}>هل أنت متأكد من حذف</p>
+            <p style={{ fontSize: 15, fontWeight: 700, color: '#C53A3A', marginBottom: 20 }}>{selected.name}؟</p>
+            <p style={{ fontSize: 12, color: '#8C97A3', marginBottom: 24 }}>لا يمكن التراجع عن هذا الإجراء</p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-              <button onClick={() => setModal(null)} style={{ padding: '10px 28px', background: '#F3EFE8', border: '1.5px solid #E8E3DA', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit", color: '#34314A' }}>إلغاء</button>
-              <button onClick={handleDelete} disabled={saving} style={{ padding: '10px 28px', background: '#D03F2A', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
+              <button onClick={() => setModal(null)} style={{ padding: '10px 28px', background: '#F3EFE8', border: '1.5px solid #E8E3DA', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit", color: '#334452' }}>إلغاء</button>
+              <button onClick={handleDelete} disabled={saving} style={{ padding: '10px 28px', background: '#C53A3A', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
                 {saving ? 'جاري الحذف...' : 'نعم، احذف'}
               </button>
             </div>
@@ -618,10 +618,10 @@ const Toast = ({ toast }) => {
   return ReactDOM.createPortal(
     <div style={{
       position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)',
-      background: toast.type === 'success' ? '#0B7F5D' : '#D03F2A',
+      background: toast.type === 'success' ? '#0B7F5D' : '#C53A3A',
       color: '#fff', borderRadius: 12, padding: '14px 32px',
       fontSize: 15, fontWeight: 700,
-      boxShadow: '0 8px 30px rgba(27,23,70,0.25)',
+      boxShadow: '0 8px 30px rgba(14,42,61,0.25)',
       zIndex: 999999, whiteSpace: 'nowrap',
       display: 'flex', alignItems: 'center', gap: 10,
       animation: 'fadeInUp 0.3s ease',
@@ -640,7 +640,7 @@ const Overlay = ({ children, onClose, closeOnBackdrop = false }) =>
       onClick={closeOnBackdrop ? e => { if (e.target === e.currentTarget) onClose(); } : undefined}
       style={{
         position: 'fixed', inset: 0,
-        background: 'rgba(27,23,70,0.55)',
+        background: 'rgba(14,42,61,0.55)',
         backdropFilter: 'blur(2px)',
         zIndex: 99999,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -654,7 +654,7 @@ const Overlay = ({ children, onClose, closeOnBackdrop = false }) =>
 
 const FormField = ({ label, children, style }) => (
   <div style={style}>
-    <label style={{ fontSize: 12, fontWeight: 600, color: '#34314A', display: 'block', marginBottom: 5 }}>{label}</label>
+    <label style={{ fontSize: 12, fontWeight: 600, color: '#334452', display: 'block', marginBottom: 5 }}>{label}</label>
     {children}
   </div>
 );
@@ -662,16 +662,16 @@ const FormField = ({ label, children, style }) => (
 const InfoBox = ({ label, value, valueColor }) => (
   <div style={{ background: '#FBF9F5', borderRadius: 8, padding: '10px 14px', textAlign: 'center' }}>
     <div style={{ fontSize: 16, fontWeight: 700, color: valueColor || colors.ink }}>{value}</div>
-    <div style={{ fontSize: 11, color: '#8F8BA3', marginTop: 2 }}>{label}</div>
+    <div style={{ fontSize: 11, color: '#8C97A3', marginTop: 2 }}>{label}</div>
   </div>
 );
 
 const StatCard = ({ label, value, color, icon }) => (
-  <div style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 8px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', gap: 14 }}>
+  <div style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 8px rgba(14,42,61,0.06)', display: 'flex', alignItems: 'center', gap: 14 }}>
     <div style={{ width: 44, height: 44, borderRadius: 12, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{icon}</div>
     <div>
       <div style={{ fontSize: 22, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 12, color: '#67637A', marginTop: 2 }}>{label}</div>
+      <div style={{ fontSize: 12, color: '#5E6B78', marginTop: 2 }}>{label}</div>
     </div>
   </div>
 );

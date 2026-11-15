@@ -15,10 +15,10 @@ import TemplateRenderer, { GUIDE_SPEC, guideFields, resolveTip } from '../strate
  */
 
 const C = {
-  primary: '#5546D6', ink: '#1B1746', primarySoft: '#E7E5FD',
-  green: '#0B7F5D', greenLight: '#E8F8F2', orange: '#F5A524', amber: '#F5A524', amberLine: '#E0920F', amberSoft: '#FFF8EA',
-  gray: '#67637A', grayLight: '#F3EFE8', grayBorder: '#E8E3DA', red: '#D03F2A', redLight: '#FDECE9',
-  white: '#FFFFFF', dark: '#1B1746', amberBg: '#FFF8EA', amberBorder: '#FCD98B', amberText: '#7A4706',
+  primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
+  green: '#0B7F5D', greenLight: '#E8F8F2', orange: '#EF6A2C', amber: '#EF6A2C', amberLine: '#E05A1F', amberSoft: '#FEF3EC',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA', red: '#C53A3A', redLight: '#FCEBEB',
+  white: '#FFFFFF', dark: '#0E2A3D', amberBg: '#FEF3EC', amberBorder: '#FBC3A3', amberText: '#7F310E',
 };
 
 const TABS = [
@@ -78,7 +78,7 @@ function Field({ label, hint, value, onChange, multiline, rows = 3, placeholder,
 function SmallBtn({ children, onClick, tone = 'primary', title, disabled }) {
   const tones = {
     primary:  { background: C.primarySoft, color: C.ink, border: `1px solid ${C.primary}40` },
-    red:   { background: C.redLight, color: C.red, border: '1px solid #F5B8AE' },
+    red:   { background: C.redLight, color: C.red, border: '1px solid #F1B2B2' },
     gray:  { background: C.grayLight, color: C.gray, border: `1px solid ${C.grayBorder}` },
     solid: { background: C.primary, color: '#fff', border: `1px solid ${C.primary}` },
   };
@@ -322,7 +322,7 @@ function ExampleEditor({ value, onChange }) {
   const ex = value || emptyExample();
   const [preview, setPreview] = useState(false);
   return (
-    <div style={{ background: '#FFF8EA', border: '1px dashed #FCD98B', borderRadius: 10, padding: '10px 12px 4px' }}>
+    <div style={{ background: '#FEF3EC', border: '1px dashed #FBC3A3', borderRadius: 10, padding: '10px 12px 4px' }}>
       <Field label="عنوان المثال" value={ex.title} onChange={v => onChange({ ...ex, title: v })} />
       <ObjList label="محتوى المثال" items={ex.blocks} onChange={v => onChange({ ...ex, blocks: v })} newItem={() => newBlock('paragraph')} addLabel="+ كتلة"
         hint="يتكوّن المثال من كتل متتالية: فقرة، أو قائمة، أو عناوين وقيم، أو جدول، أو هيكل تنظيمي."
@@ -392,7 +392,7 @@ function PdfManager({ unit, kind, onUpdated, notify }) {
   };
 
   return (
-    <div style={{ background: C.amberSoft, border: '1px solid #FCD98B', borderRadius: 10, padding: '11px 13px', marginBottom: 14 }}>
+    <div style={{ background: C.amberSoft, border: '1px solid #FBC3A3', borderRadius: 10, padding: '11px 13px', marginBottom: 14 }}>
       <div style={{ fontSize: 12.5, fontWeight: 800, color: C.amberText, marginBottom: 6 }}>ملف PDF — {PDF_KIND_LABEL[kind]}</div>
       <div style={{ fontSize: 12, color: C.dark, marginBottom: 8, lineHeight: 1.7, wordBreak: 'break-word' }}>
         الملف الحالي: <strong>{fileName}</strong>
@@ -739,8 +739,8 @@ export default function StrategicContentEditor({ unit: initialUnit, initialTab =
 
   return ReactDOM.createPortal(
     <div role="dialog" aria-modal="true" aria-label={`تعديل محتوى ${draft.name}`}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(27,23,70,.5)', zIndex: 9000, display: 'flex', alignItems: 'stretch', justifyContent: 'center', padding: width > 700 ? 16 : 0 }}>
-      <div style={{ background: '#FBF9F5', borderRadius: width > 700 ? 14 : 0, width: '100%', maxWidth: 1500, display: 'flex', flexDirection: 'column', direction: 'rtl', fontFamily: "inherit", overflow: 'hidden', boxShadow: '0 24px 60px rgba(27,23,70,.25)' }}>
+      style={{ position: 'fixed', inset: 0, background: 'rgba(14,42,61,.5)', zIndex: 9000, display: 'flex', alignItems: 'stretch', justifyContent: 'center', padding: width > 700 ? 16 : 0 }}>
+      <div style={{ background: '#FBF9F5', borderRadius: width > 700 ? 14 : 0, width: '100%', maxWidth: 1500, display: 'flex', flexDirection: 'column', direction: 'rtl', fontFamily: "inherit", overflow: 'hidden', boxShadow: '0 24px 60px rgba(14,42,61,.25)' }}>
         {/* الرأس */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '12px 18px', background: '#fff', borderBottom: `1px solid ${C.grayBorder}`, flexWrap: 'wrap' }}>
           <div style={{ minWidth: 0 }}>

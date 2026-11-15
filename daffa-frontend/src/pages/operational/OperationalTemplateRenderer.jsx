@@ -2,7 +2,7 @@ import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import { operationalApi } from '../../api/operational';
 
-const colors = { primary: '#5546D6', ink: '#1B1746', orange: '#F5A524' };
+const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C' };
 const inp = { width: '100%', padding: '8px 10px', border: '1.5px solid #E8E3DA', borderRadius: 6, fontSize: 12, fontFamily: "inherit", boxSizing: 'border-box', direction: 'rtl', textAlign: 'right' };
 
 // ══ Unit 1: المبادرات الاستراتيجية (استيراد) ══════════════════════════════
@@ -33,7 +33,7 @@ function TemplateOpImport({ formData, setFormData }) {
         <DfIcon name="inbox" size={18} style={{ marginInlineEnd: 6 }} />تم استيراد المبادرات الاستراتيجية المعتمدة تلقائياً من خطتك الاستراتيجية
       </div>
       {initiatives.length === 0 ? (
-        <div style={{ background: '#FFF8EA', border: '1px solid #FCD98B', borderRadius: 8, padding: 16, fontSize: 13, color: '#7A4706', textAlign: 'center' }}>
+        <div style={{ background: '#FEF3EC', border: '1px solid #FBC3A3', borderRadius: 8, padding: 16, fontSize: 13, color: '#7F310E', textAlign: 'center' }}>
           <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />لا توجد مبادرات في الخطة الاستراتيجية. تأكد من إكمال الوحدة الخامسة في التخطيط الاستراتيجي.
         </div>
       ) : (
@@ -42,14 +42,14 @@ function TemplateOpImport({ formData, setFormData }) {
             {initiatives.map((init, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: '#FBF9F5', borderRadius: 8, border: '1px solid #E8E3DA' }}>
                 <div style={{ width: 28, height: 28, borderRadius: '50%', background: colors.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
-                <span style={{ fontSize: 13, color: '#34314A', flex: 1 }}>{init}</span>
+                <span style={{ fontSize: 13, color: '#334452', flex: 1 }}>{init}</span>
                 <span style={{ fontSize: 11, padding: '2px 8px', background: '#C9EFE1', color: '#0B7F5D', borderRadius: 20, fontWeight: 600 }}>معتمدة</span>
               </div>
             ))}
           </div>
           <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: formData.confirmed ? '#E8F8F2' : '#FBF9F5', border: `1.5px solid ${formData.confirmed ? '#7FD3B5' : '#E8E3DA'}`, borderRadius: 8, cursor: 'pointer' }}>
             <input type="checkbox" checked={!!formData.confirmed} onChange={e => setFormData(prev => ({ ...prev, confirmed: e.target.checked }))} style={{ width: 16, height: 16, accentColor: colors.primary }} />
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#34314A' }}>أؤكد استيراد هذه المبادرات والمضي قدماً في التخطيط التشغيلي</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: '#334452' }}>أؤكد استيراد هذه المبادرات والمضي قدماً في التخطيط التشغيلي</span>
           </label>
         </>
       )}
@@ -96,13 +96,13 @@ function TemplateOpActivities({ formData, setFormData }) {
                 <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA' }}><input value={row.activity || ''} onChange={e => updateRow(i, 'activity', e.target.value)} style={inp} placeholder="اسم النشاط" /></td>
                 <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA' }}><input value={row.description || ''} onChange={e => updateRow(i, 'description', e.target.value)} style={inp} placeholder="وصف النشاط" /></td>
                 <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA' }}><input value={row.expected_output || ''} onChange={e => updateRow(i, 'expected_output', e.target.value)} style={inp} placeholder="المخرج المتوقع" /></td>
-                <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA', textAlign: 'center' }}><button onClick={() => removeRow(i)} style={{ background: '#FAD4CE', color: '#D03F2A', border: 'none', borderRadius: 6, padding: '4px 8px', cursor: 'pointer', fontSize: 12 }}>حذف</button></td>
+                <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA', textAlign: 'center' }}><button onClick={() => removeRow(i)} style={{ background: '#F8D3D3', color: '#C53A3A', border: 'none', borderRadius: 6, padding: '4px 8px', cursor: 'pointer', fontSize: 12 }}>حذف</button></td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      {rows.length === 0 && <div style={{ textAlign: 'center', padding: 20, color: '#8F8BA3', fontSize: 13 }}>لا توجد أنشطة بعد. أضف نشاطاً لكل مبادرة استراتيجية.</div>}
+      {rows.length === 0 && <div style={{ textAlign: 'center', padding: 20, color: '#8C97A3', fontSize: 13 }}>لا توجد أنشطة بعد. أضف نشاطاً لكل مبادرة استراتيجية.</div>}
       <button onClick={addRow} style={{ marginTop: 12, padding: '9px 20px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}>+ إضافة نشاط</button>
     </div>
   );
@@ -173,14 +173,14 @@ function TemplateOpGantt({ formData, setFormData }) {
                   );
                 })}
                 <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA', textAlign: 'center' }}>
-                  <button onClick={() => removeRow(i)} style={{ background: '#FAD4CE', color: '#D03F2A', border: 'none', borderRadius: 6, padding: '4px 8px', cursor: 'pointer', fontSize: 11 }}>حذف</button>
+                  <button onClick={() => removeRow(i)} style={{ background: '#F8D3D3', color: '#C53A3A', border: 'none', borderRadius: 6, padding: '4px 8px', cursor: 'pointer', fontSize: 11 }}>حذف</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      {timeline.length === 0 && <div style={{ textAlign: 'center', padding: 20, color: '#8F8BA3', fontSize: 13 }}>أضف الأنشطة وحدد شهور تنفيذها.</div>}
+      {timeline.length === 0 && <div style={{ textAlign: 'center', padding: 20, color: '#8C97A3', fontSize: 13 }}>أضف الأنشطة وحدد شهور تنفيذها.</div>}
       <button onClick={addRow} style={{ marginTop: 12, padding: '9px 20px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}>+ إضافة نشاط</button>
     </div>
   );
@@ -225,13 +225,13 @@ function TemplateOpResponsible({ formData, setFormData }) {
                 <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA' }}><input value={row.responsible || ''} onChange={e => updateRow(i, 'responsible', e.target.value)} style={inp} placeholder="اسم المسؤول" /></td>
                 <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA' }}><input value={row.department || ''} onChange={e => updateRow(i, 'department', e.target.value)} style={inp} placeholder="القسم أو الإدارة" /></td>
                 <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA' }}><input value={row.notes || ''} onChange={e => updateRow(i, 'notes', e.target.value)} style={inp} placeholder="ملاحظات إضافية" /></td>
-                <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA', textAlign: 'center' }}><button onClick={() => removeRow(i)} style={{ background: '#FAD4CE', color: '#D03F2A', border: 'none', borderRadius: 6, padding: '4px 8px', cursor: 'pointer', fontSize: 12 }}>حذف</button></td>
+                <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA', textAlign: 'center' }}><button onClick={() => removeRow(i)} style={{ background: '#F8D3D3', color: '#C53A3A', border: 'none', borderRadius: 6, padding: '4px 8px', cursor: 'pointer', fontSize: 12 }}>حذف</button></td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      {responsibilities.length === 0 && <div style={{ textAlign: 'center', padding: 20, color: '#8F8BA3', fontSize: 13 }}>أضف الأنشطة وعيّن المسؤولين عنها.</div>}
+      {responsibilities.length === 0 && <div style={{ textAlign: 'center', padding: 20, color: '#8C97A3', fontSize: 13 }}>أضف الأنشطة وعيّن المسؤولين عنها.</div>}
       <button onClick={addRow} style={{ marginTop: 12, padding: '9px 20px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}>+ إضافة نشاط</button>
     </div>
   );
@@ -283,13 +283,13 @@ function TemplateOpBudget({ formData, setFormData }) {
                 </td>
                 <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA' }}><input type="number" value={row.cost || ''} onChange={e => updateRow(i, 'cost', e.target.value)} style={{ ...inp, textAlign: 'left', direction: 'ltr' }} placeholder="0" min="0" /></td>
                 <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA' }}><input value={row.notes || ''} onChange={e => updateRow(i, 'notes', e.target.value)} style={inp} placeholder="ملاحظات" /></td>
-                <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA', textAlign: 'center' }}><button onClick={() => removeRow(i)} style={{ background: '#FAD4CE', color: '#D03F2A', border: 'none', borderRadius: 6, padding: '4px 8px', cursor: 'pointer', fontSize: 12 }}>حذف</button></td>
+                <td style={{ padding: '6px 8px', border: '1px solid #E8E3DA', textAlign: 'center' }}><button onClick={() => removeRow(i)} style={{ background: '#F8D3D3', color: '#C53A3A', border: 'none', borderRadius: 6, padding: '4px 8px', cursor: 'pointer', fontSize: 12 }}>حذف</button></td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      {costs.length === 0 && <div style={{ textAlign: 'center', padding: 20, color: '#8F8BA3', fontSize: 13 }}>أضف بنود التكلفة لكل نشاط.</div>}
+      {costs.length === 0 && <div style={{ textAlign: 'center', padding: 20, color: '#8C97A3', fontSize: 13 }}>أضف بنود التكلفة لكل نشاط.</div>}
       <button onClick={addRow} style={{ marginTop: 12, padding: '9px 20px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}>+ إضافة بند</button>
 
       {costs.length > 0 && (
@@ -310,5 +310,5 @@ export default function OperationalTemplateRenderer({ unit, formData, setFormDat
   if (type === 'op_gantt')       return <TemplateOpGantt       formData={formData} setFormData={setFormData} />;
   if (type === 'op_responsible') return <TemplateOpResponsible formData={formData} setFormData={setFormData} />;
   if (type === 'op_budget')      return <TemplateOpBudget      formData={formData} setFormData={setFormData} />;
-  return <div style={{ color: '#8F8BA3', textAlign: 'center', padding: 40 }}>نوع النموذج غير معروف: {type}</div>;
+  return <div style={{ color: '#8C97A3', textAlign: 'center', padding: 40 }}>نوع النموذج غير معروف: {type}</div>;
 }

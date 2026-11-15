@@ -6,8 +6,8 @@ import React, { useEffect, useRef, useState } from 'react';
  * تُستخدم في صفحات دفع التخطيط الاستراتيجي والتشغيلي والسياسات.
  */
 
-const PRIMARY = '#5546D6';
-const INK = '#1B1746';
+const PRIMARY = '#235D7F';
+const INK = '#0E2A3D';
 
 const LOGOS = {
   visa:          { src: '/payments/visa.png',          alt: 'Visa',            ratio: 247 / 80 },
@@ -38,7 +38,7 @@ export const PAYMENT_METHODS = [
 ];
 
 const Check = () => (
-  <span aria-hidden="true" style={{ position: 'absolute', top: 8, insetInlineStart: 8, width: 20, height: 20, borderRadius: '50%', background: PRIMARY, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(85,70,214,0.35)' }}>
+  <span aria-hidden="true" style={{ position: 'absolute', top: 8, insetInlineStart: 8, width: 20, height: 20, borderRadius: '50%', background: PRIMARY, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(35,93,127,0.35)' }}>
     <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
   </span>
 );
@@ -67,8 +67,8 @@ export function PaymentMethodPicker({ value, onChange, columns = 2 }) {
             style={{
               position: 'relative', minHeight: 92, padding: '16px 10px 12px', borderRadius: 14, cursor: 'pointer',
               border: on ? `2px solid ${PRIMARY}` : '1.5px solid #E8E3DA',
-              background: on ? '#F3F2FE' : '#fff',
-              boxShadow: on ? `0 0 0 4px ${PRIMARY}1F, 0 6px 16px rgba(27,23,70,0.10)` : '0 1px 2px rgba(27,23,70,0.04)',
+              background: on ? '#EEF5F9' : '#fff',
+              boxShadow: on ? `0 0 0 4px ${PRIMARY}1F, 0 6px 16px rgba(14,42,61,0.10)` : '0 1px 2px rgba(14,42,61,0.04)',
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 9,
               fontFamily: "inherit", transition: 'border-color .15s, box-shadow .15s, background .15s', touchAction: 'manipulation',
             }}>
@@ -76,7 +76,7 @@ export function PaymentMethodPicker({ value, onChange, columns = 2 }) {
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, height: 26, direction: 'ltr' }}>
               {m.logos.map(([name, h]) => <PayLogo key={name} name={name} height={h} />)}
             </span>
-            <span style={{ fontSize: 12.5, fontWeight: on ? 800 : 600, color: on ? INK : '#34314A', lineHeight: 1.3 }}>{m.label}</span>
+            <span style={{ fontSize: 12.5, fontWeight: on ? 800 : 600, color: on ? INK : '#334452', lineHeight: 1.3 }}>{m.label}</span>
           </button>
         );
       })}
@@ -90,7 +90,7 @@ export const CardNetworkLogo = ({ brand, height = 18 }) => {
   if (brand === 'mc') return <PayLogo name="mastercard" height={height + 2} />;
   if (brand === 'mada') return <PayLogo name="mada" height={height + 2} />;
   return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#8F8BA3" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#8C97A3" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="2" y="5" width="20" height="14" rx="2.5" /><line x1="2" y1="10" x2="22" y2="10" />
     </svg>
   );

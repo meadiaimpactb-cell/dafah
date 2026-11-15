@@ -9,7 +9,7 @@
 body {
     font-family: 'plexarabic', 'dejavusans', sans-serif;
     direction: rtl;
-    color: #1B1746;
+    color: #0E2A3D;
     font-size: 12px;
     line-height: 1.7;
 }
@@ -21,7 +21,7 @@ body {
 
 /* ══ غلاف ══ */
 .cover {
-    background-color: #1B1746;
+    background-color: #0E2A3D;
     color: #ffffff;
     padding: 26px 28px 28px;
     border-radius: 0 0 10px 10px;
@@ -37,14 +37,14 @@ body {
 
 .cover-sub-text {
     font-size: 12px;
-    color: #D0CCFA;
+    color: #B5D2E3;
     text-align: center;
     margin-bottom: 14px;
 }
 
 .cover-org-type-text {
     font-size: 11px;
-    color: #D0CCFA;
+    color: #B5D2E3;
     text-align: center;
     margin-bottom: 6px;
 }
@@ -52,13 +52,13 @@ body {
 .cover-line-div {
     width: 50px;
     height: 3px;
-    background-color: #F5A524;
+    background-color: #EF6A2C;
     margin: 0 auto 18px;
 }
 
 .cover-badge-span {
-    background-color: #F5A524;
-    color: #1B1746;
+    background-color: #EF6A2C;
+    color: #0E2A3D;
     padding: 3px 12px;
     border-radius: 20px;
     font-size: 10px;
@@ -66,28 +66,28 @@ body {
 }
 
 .cover-card-div {
-    border: 1px solid #4537B4;
+    border: 1px solid #1C4D6A;
     border-radius: 6px;
     padding: 9px 14px;
     text-align: center;
-    background-color: #2B2470;
+    background-color: #123247;
 }
 
-.cover-card-lbl { font-size: 9px; color: #B0A9F6; margin-bottom: 3px; }
+.cover-card-lbl { font-size: 9px; color: #86B5D0; margin-bottom: 3px; }
 .cover-card-val { font-size: 11px; font-weight: bold; color: #ffffff; }
 
 .cover-footer-div {
     text-align: center;
     margin-top: 26px;
     padding-top: 12px;
-    border-top: 1px solid #4537B4;
+    border-top: 1px solid #1C4D6A;
     font-size: 10px;
-    color: #8D82EF;
+    color: #5592B6;
 }
 
 /* ══ فهرس ══ */
 .toc-header-div {
-    background-color: #5546D6;
+    background-color: #235D7F;
     color: #ffffff;
     padding: 10px 16px;
     border-radius: 6px;
@@ -105,7 +105,7 @@ body {
 }
 
 .toc-num-span {
-    background-color: #5546D6;
+    background-color: #235D7F;
     color: #ffffff;
     border-radius: 50%;
     display: inline-block;
@@ -122,13 +122,13 @@ body {
 .toc-name-span {
     font-size: 11px;
     font-weight: bold;
-    color: #34314A;
+    color: #334452;
     vertical-align: middle;
 }
 
 /* ══ وحدات ══ */
 .unit-num-span {
-    background-color: #5546D6;
+    background-color: #235D7F;
     color: #ffffff;
     border-radius: 50%;
     display: inline-block;
@@ -144,7 +144,7 @@ body {
 .unit-title-span {
     font-size: 14px;
     font-weight: bold;
-    color: #1B1746;
+    color: #0E2A3D;
     vertical-align: middle;
     padding-right: 10px;
 }
@@ -154,20 +154,20 @@ body {
     margin-bottom: 8px;
     background-color: #FBF9F5;
     padding: 8px 10px 8px 8px;
-    border-right: 3px solid #5546D6;
+    border-right: 3px solid #235D7F;
     page-break-inside: avoid;
 }
 
 .field-label {
     font-size: 9px;
     font-weight: bold;
-    color: #5546D6;
+    color: #235D7F;
     margin-bottom: 4px;
 }
 
 .field-value {
     font-size: 11px;
-    color: #34314A;
+    color: #334452;
     line-height: 1.65;
 }
 
@@ -185,19 +185,19 @@ body {
 }
 
 .data-table th {
-    background-color: #5546D6;
+    background-color: #235D7F;
     color: #ffffff;
     padding: 5px 8px;
     font-weight: bold;
     text-align: right;
-    border-left: 1px solid #382D90;
+    border-left: 1px solid #173F57;
 }
 
 .data-table td {
     padding: 5px 8px;
     border-bottom: 1px solid #E8E3DA;
     border-left: 1px solid #E8E3DA;
-    color: #34314A;
+    color: #334452;
     text-align: right;
 }
 
@@ -207,17 +207,17 @@ body {
 .nested-table { width: 100%; }
 .nested-key {
     font-weight: bold;
-    color: #67637A;
+    color: #5E6B78;
     font-size: 10px;
     padding-left: 10px;
     width: 130px;
     vertical-align: top;
 }
-.nested-val { font-size: 10px; color: #34314A; }
+.nested-val { font-size: 10px; color: #334452; }
 
 /* ══ ختام ══ */
 .closing {
-    background-color: #1B1746;
+    background-color: #0E2A3D;
     color: #ffffff;
     padding: 44px 36px;
     text-align: center;
@@ -226,21 +226,21 @@ body {
 }
 
 .closing-title { font-size: 17px; font-weight: bold; color: #ffffff; margin-bottom: 10px; }
-.closing-text  { font-size: 12px; color: #D0CCFA; margin-bottom: 24px; line-height: 1.8; }
+.closing-text  { font-size: 12px; color: #B5D2E3; margin-bottom: 24px; line-height: 1.8; }
 
 .stamp-box {
-    border: 1px solid #4537B4;
+    border: 1px solid #1C4D6A;
     border-radius: 8px;
     padding: 12px 28px;
     display: inline-block;
-    background-color: #2B2470;
+    background-color: #123247;
 }
 
-.stamp-lbl  { font-size: 9px; color: #B0A9F6; margin-bottom: 3px; }
+.stamp-lbl  { font-size: 9px; color: #86B5D0; margin-bottom: 3px; }
 .stamp-val  { font-size: 13px; font-weight: bold; color: #ffffff; margin-bottom: 8px; }
-.stamp-date { font-size: 11px; color: #D0CCFA; }
+.stamp-date { font-size: 11px; color: #B5D2E3; }
 
-.empty-val  { color: #8F8BA3; font-style: italic; }
+.empty-val  { color: #8C97A3; font-style: italic; }
 .page-break { page-break-before: always; }
 .spacer     { height: 12px; }
 </style>
@@ -249,7 +249,7 @@ body {
 
 {{-- ════ غلاف ════ --}}
 <div class="cover">
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid #4537B4;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid #1C4D6A;">
         <tr>
             <td style="vertical-align:middle;">
                 <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('logo.png'))) }}" alt="منصة دفة" style="height:44px; max-width:140px; background:#ffffff; border-radius:6px; padding:3px;" />
@@ -326,7 +326,7 @@ body {
 @foreach($submissions as $submission)
 <div class="page-break"></div>
 
-<table width="100%" cellpadding="0" cellspacing="0" style="border-bottom:2px solid #5546D6; margin-bottom:12px; padding-bottom:8px;">
+<table width="100%" cellpadding="0" cellspacing="0" style="border-bottom:2px solid #235D7F; margin-bottom:12px; padding-bottom:8px;">
     <tr>
         <td width="36" style="vertical-align:middle;">
             <span class="unit-num-span">{{ $submission->unit_number }}</span>

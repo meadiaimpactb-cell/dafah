@@ -3,7 +3,7 @@
 //   لوحي   → شريط أيقونات مع تلميحات، وزر يفتح القائمة كاملة فوق المحتوى
 //   جوال   → شريط علوي مختصر + شريط تبويبات سفلي + قائمة منزلقة
 import React, { useEffect, useState } from 'react';
-import Logo, { LogoMark } from '../brand/Logo';
+import Logo, { LogoMark, RosetteShape } from '../brand/Logo';
 import { colors, font } from '../../theme/tokens';
 import { NAV_HELP } from '../../theme/glossary';
 import { setHelpMode } from '../ui/Help';
@@ -39,7 +39,7 @@ function NavList({ menu, currentView, onNavigate, compact, badges }) {
         return (
           <React.Fragment key={item.id}>
             {showGroup && (
-              <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(221,218,247,0.55)', padding: '14px 12px 6px', letterSpacing: 0 }}>{item.group}</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(214,228,238,0.55)', padding: '14px 12px 6px', letterSpacing: 0 }}>{item.group}</div>
             )}
             <button
               onClick={() => onNavigate(item.id)}
@@ -53,12 +53,12 @@ function NavList({ menu, currentView, onNavigate, compact, badges }) {
                 justifyContent: compact ? 'center' : 'flex-start',
                 borderRadius: 12, border: 'none', position: 'relative',
                 background: active ? 'rgba(255,255,255,0.12)' : 'transparent',
-                color: active ? '#fff' : 'rgba(231,229,253,0.78)',
+                color: active ? '#fff' : 'rgba(217,232,241,0.78)',
                 cursor: 'pointer', fontSize: 14, fontWeight: active ? 700 : 500, fontFamily: 'inherit', textAlign: 'right',
                 transition: 'background 0.15s, color 0.15s',
               }}
               onMouseEnter={(e) => { if (!active) { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#fff'; } }}
-              onMouseLeave={(e) => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(231,229,253,0.78)'; } }}
+              onMouseLeave={(e) => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(217,232,241,0.78)'; } }}
             >
               {active && <span style={{ position: 'absolute', right: -8, top: 10, bottom: 10, width: 4, borderRadius: 4, background: colors.amber }} />}
               <span style={{ display: 'flex', flexShrink: 0, color: active ? colors.amber : 'inherit', position: 'relative' }}>
@@ -88,7 +88,7 @@ function UserCard({ authUser, role, compact, onLogout, onProfile }) {
       {!compact && (
         <div style={{ color: '#fff', overflow: 'hidden', flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13.5, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
-          <div style={{ fontSize: 11.5, color: 'rgba(221,218,247,0.7)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{role === 'client' ? (authUser?.org_type || 'عميل') : ROLE_LABEL[role]}</div>
+          <div style={{ fontSize: 11.5, color: 'rgba(214,228,238,0.7)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{role === 'client' ? (authUser?.org_type || 'عميل') : ROLE_LABEL[role]}</div>
         </div>
       )}
       <button onClick={onLogout} data-tip="تسجيل الخروج" aria-label="تسجيل الخروج" style={{ width: 36, height: 36, borderRadius: 10, border: '1px solid rgba(255,255,255,0.14)', background: 'rgba(255,255,255,0.06)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -100,16 +100,14 @@ function UserCard({ authUser, role, compact, onLogout, onProfile }) {
 
 function SidebarPanel({ compact, onToggle, showToggle, children, footer, onLogoClick, width }) {
   return (
-    <aside className="df-sidebar" style={{ width, height: '100%', background: `linear-gradient(180deg, ${colors.ink} 0%, #16123A 100%)`, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
-      <svg aria-hidden="true" width="220" height="220" viewBox="0 0 120 120" style={{ position: 'absolute', left: -70, bottom: 60, opacity: 0.05, pointerEvents: 'none' }}>
-        <path d="M60,32 C82,35 96,52 93,67 C91,79 83,85 70,85 L25,85" fill="none" stroke="#fff" strokeWidth="19" strokeLinecap="round" />
-      </svg>
+    <aside className="df-sidebar" style={{ width, height: '100%', background: `linear-gradient(180deg, ${colors.ink} 0%, #0B2233 100%)`, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
+      <RosetteShape size={260} color="#FFFFFF" opacity={0.045} style={{ position: 'absolute', left: -90, bottom: 40, pointerEvents: 'none' }} />
       <div style={{ height: 72, padding: compact ? '0' : '0 18px', display: 'flex', alignItems: 'center', justifyContent: compact ? 'center' : 'space-between', gap: 8, flexShrink: 0 }}>
         <span onClick={onLogoClick} style={{ cursor: 'pointer', display: 'flex' }} data-tip="الصفحة الرئيسية للوحة التحكم">
           {compact ? <LogoMark size={40} tone="dark" /> : <Logo variant="horizontal" tone="dark" size={38} />}
         </span>
         {showToggle && !compact && (
-          <button onClick={onToggle} data-tip="طيّ القائمة لمساحة أوسع" aria-label="طيّ القائمة" style={{ width: 34, height: 34, borderRadius: 10, border: 'none', background: 'rgba(255,255,255,0.06)', color: 'rgba(231,229,253,0.8)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{I.collapse}</button>
+          <button onClick={onToggle} data-tip="طيّ القائمة لمساحة أوسع" aria-label="طيّ القائمة" style={{ width: 34, height: 34, borderRadius: 10, border: 'none', background: 'rgba(255,255,255,0.06)', color: 'rgba(217,232,241,0.8)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{I.collapse}</button>
         )}
       </div>
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: compact ? '4px 10px 12px' : '4px 14px 12px' }}>{children}</div>
@@ -184,7 +182,7 @@ export default function AppShell({
       {/* قائمة منزلقة (جوال/لوحي) */}
       {drawer && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 400 }}>
-          <div onClick={() => setDrawer(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(18,15,51,0.5)', animation: 'pageIn 0.2s ease' }} />
+          <div onClick={() => setDrawer(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(10,31,46,0.5)', animation: 'pageIn 0.2s ease' }} />
           <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, animation: 'dfDrawerIn 0.24s cubic-bezier(0.2,0.8,0.2,1)', boxShadow: '0 0 60px rgba(0,0,0,0.3)' }}>
             {fullPanel(() => setDrawer(false))}
           </div>
@@ -230,7 +228,7 @@ export default function AppShell({
 
       {/* شريط التبويبات السفلي (جوال) */}
       {vp.isPhone && (
-        <nav className="df-tabbar" aria-label="تنقّل سريع" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 300, height: 'calc(var(--tabbar-h) + env(safe-area-inset-bottom))', paddingBottom: 'env(safe-area-inset-bottom)', background: '#fff', borderTop: `1px solid ${colors.grayBorder}`, display: 'flex', boxShadow: '0 -6px 20px rgba(27,23,70,0.06)' }}>
+        <nav className="df-tabbar" aria-label="تنقّل سريع" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 300, height: 'calc(var(--tabbar-h) + env(safe-area-inset-bottom))', paddingBottom: 'env(safe-area-inset-bottom)', background: '#fff', borderTop: `1px solid ${colors.grayBorder}`, display: 'flex', boxShadow: '0 -6px 20px rgba(14,42,61,0.06)' }}>
           {bottomTabs.map((t) => {
             const active = currentView === t.id;
             return (
@@ -252,6 +250,6 @@ export default function AppShell({
 }
 
 const iconBtn = { width: 40, height: 40, borderRadius: 12, border: 'none', background: 'transparent', color: colors.gray, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 };
-const sideLink = { display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '8px 6px', border: 'none', background: 'transparent', color: 'rgba(231,229,253,0.85)', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', textAlign: 'right', borderRadius: 8 };
+const sideLink = { display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '8px 6px', border: 'none', background: 'transparent', color: 'rgba(217,232,241,0.85)', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', textAlign: 'right', borderRadius: 8 };
 const qDot = { width: 18, height: 18, borderRadius: '50%', background: colors.amber, color: colors.ink, fontSize: 11, fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' };
 const tabBtn = (active) => ({ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, border: 'none', background: 'none', color: active ? colors.primary : colors.gray, cursor: 'pointer', fontFamily: 'inherit', minWidth: 0 });

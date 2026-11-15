@@ -29,13 +29,13 @@ export default function GlossaryDrawer({ open, onClose, initial }) {
   if (!open) return null;
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 900 }}>
-      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(18,15,51,0.45)', animation: 'pageIn 0.2s' }} />
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(10,31,46,0.45)', animation: 'pageIn 0.2s' }} />
       <aside role="dialog" aria-label="قاموس المصطلحات" style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: 'min(460px, 100vw)', background: colors.bg, boxShadow: '0 0 60px rgba(0,0,0,0.25)', display: 'flex', flexDirection: 'column', animation: 'pageIn 0.2s' }}>
         <div style={{ padding: '20px 22px 14px', background: colors.ink, color: '#fff' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
             <div>
               <div style={{ fontFamily: font.display, fontSize: 19, fontWeight: 700 }}>قاموس دفة</div>
-              <div style={{ fontSize: 13, color: '#DDDAF7', marginTop: 2 }}>كل مصطلح بلغة بسيطة ومثال من الواقع</div>
+              <div style={{ fontSize: 13, color: '#D6E4EE', marginTop: 2 }}>كل مصطلح بلغة بسيطة ومثال من الواقع</div>
             </div>
             <button onClick={onClose} aria-label="إغلاق" style={{ width: 38, height: 38, borderRadius: 12, border: 'none', background: 'rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer', fontSize: 18 }}>✕</button>
           </div>
@@ -52,7 +52,7 @@ export default function GlossaryDrawer({ open, onClose, initial }) {
                   <div key={k} id={`gl-${k}`} style={{ background: '#fff', borderRadius: 14, padding: '14px 16px', marginBottom: 8, border: `1.5px solid ${focus === k ? colors.amber : colors.grayBorder}` }}>
                     <div style={{ fontFamily: font.display, fontWeight: 700, color: colors.ink, fontSize: 15, marginBottom: 4 }}>{v.term}</div>
                     <div style={{ fontSize: 14, lineHeight: 1.9, color: colors.text }}>{v.simple}</div>
-                    {v.example && <div style={{ marginTop: 8, padding: '8px 12px', borderRadius: 10, background: colors.amberSoft, fontSize: 13, lineHeight: 1.8, color: '#7A4706' }}><b>مثال: </b>{v.example}</div>}
+                    {v.example && <div style={{ marginTop: 8, padding: '8px 12px', borderRadius: 10, background: colors.amberSoft, fontSize: 13, lineHeight: 1.8, color: '#7F310E' }}><b>مثال: </b>{v.example}</div>}
                   </div>
                 ))}
               </section>

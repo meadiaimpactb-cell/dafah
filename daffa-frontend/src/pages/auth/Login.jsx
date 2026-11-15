@@ -128,7 +128,7 @@ function ForgotForm({ onBack }) {
         <p style={S.forgotText}>
           إذا كان البريد الإلكتروني مسجلاً، ستصلك رسالة تحتوي على رابط إعادة التعيين خلال دقائق.
         </p>
-        <button type="button" onClick={onBack} style={{ ...S.btn, background: '#5546D6' }}>
+        <button type="button" onClick={onBack} style={{ ...S.btn, background: '#235D7F' }}>
           العودة لتسجيل الدخول
         </button>
       </div>
@@ -176,7 +176,7 @@ export default function Login({ onLogin, onGoRegister }) {
     <div style={S.overlay}>
       <div style={S.card}>
         <div style={S.logo}>
-          <Logo variant="stacked" size={64} descriptor />
+          <Logo variant="stacked" size={92} descriptor />
         </div>
 
         {view === 'login' && (
@@ -208,7 +208,7 @@ export default function Login({ onLogin, onGoRegister }) {
 const S = {
   overlay: {
     minHeight: '100vh',
-    background: 'radial-gradient(rgba(85,70,214,0.08) 1.2px, transparent 1.3px) 0 0 / 22px 22px, #FBF9F5',
+    background: 'radial-gradient(rgba(35,93,127,0.08) 1.2px, transparent 1.3px) 0 0 / 22px 22px, #FBF9F5',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -224,7 +224,7 @@ const S = {
     width: '100%',
     maxWidth: 460,
     boxSizing: 'border-box',
-    boxShadow: '0 4px 32px rgba(27,23,70,0.08)',
+    boxShadow: '0 4px 32px rgba(14,42,61,0.08)',
   },
   logo: {
     display: 'flex',
@@ -232,18 +232,18 @@ const S = {
     alignItems: 'center',
     marginBottom: 24,
   },
-  logoText: { fontSize: 22, fontWeight: 700, color: '#5546D6', marginTop: 6 },
-  title: { textAlign: 'center', fontSize: 22, fontWeight: 700, color: '#1B1746', marginBottom: 28 },
+  logoText: { fontSize: 22, fontWeight: 700, color: '#235D7F', marginTop: 6 },
+  title: { textAlign: 'center', fontSize: 22, fontWeight: 700, color: '#0E2A3D', marginBottom: 28 },
   form: { display: 'flex', flexDirection: 'column', gap: 0 },
   field: { marginBottom: 16 },
-  label: { display: 'block', fontSize: 14, fontWeight: 600, color: '#34314A', marginBottom: 6, textAlign: 'right' },
+  label: { display: 'block', fontSize: 14, fontWeight: 600, color: '#334452', marginBottom: 6, textAlign: 'right' },
   input: {
     width: '100%',
     padding: '10px 14px',
     border: '1.5px solid #E8E3DA',
     borderRadius: 8,
     fontSize: 14,
-    color: '#1B1746',
+    color: '#0E2A3D',
     background: '#FBF9F5',
     textAlign: 'right',
     direction: 'rtl',
@@ -255,8 +255,8 @@ const S = {
   btn: {
     width: '100%',
     padding: '13px',
-    background: '#F5A524',
-    color: '#1B1746',
+    background: '#EF6A2C',
+    color: '#0E2A3D',
     border: 'none',
     borderRadius: 10,
     fontSize: 16,
@@ -266,21 +266,21 @@ const S = {
     fontFamily: "inherit",
   },
   error: {
-    background: '#FDECE9',
-    color: '#D03F2A',
-    border: '1px solid #F5B8AE',
+    background: '#FCEBEB',
+    color: '#C53A3A',
+    border: '1px solid #F1B2B2',
     borderRadius: 8,
     padding: '10px 14px',
     fontSize: 13,
     marginBottom: 12,
     textAlign: 'right',
   },
-  footer: { textAlign: 'center', fontSize: 14, color: '#67637A', marginTop: 16 },
-  link: { color: '#5546D6', cursor: 'pointer', fontWeight: 600 },
+  footer: { textAlign: 'center', fontSize: 14, color: '#5E6B78', marginTop: 16 },
+  link: { color: '#235D7F', cursor: 'pointer', fontWeight: 600 },
   backBtn: {
     background: 'none',
     border: 'none',
-    color: '#5546D6',
+    color: '#235D7F',
     cursor: 'pointer',
     fontSize: 14,
     fontWeight: 600,
@@ -307,7 +307,7 @@ const S = {
   },
   dividerText: {
     fontSize: 12,
-    color: '#8F8BA3',
+    color: '#8C97A3',
   },
   mailIcon: {
     width: 72,
@@ -323,7 +323,7 @@ const S = {
   forgotText: {
     textAlign: 'center',
     fontSize: 14,
-    color: '#67637A',
+    color: '#5E6B78',
     lineHeight: 1.8,
     marginBottom: 24,
   },

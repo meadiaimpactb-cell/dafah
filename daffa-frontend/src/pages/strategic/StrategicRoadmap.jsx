@@ -17,12 +17,12 @@ const STEPS = [
   { id: 5, label: 'الاعتماد' },
 ];
 
-const C = { primary: '#5546D6', ink: '#1B1746', orange: '#F5A524', amberLine: '#E0920F' };
+const C = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amberLine: '#E05A1F' };
 
 const STATUS_CFG = {
-  pending:   { label: 'جارٍ الإعداد',   color: '#67637A', bg: '#F3EFE8' },
-  active:    { label: 'جارٍ التنفيذ',   color: '#5546D6', bg: '#E7E5FD' },
-  review:    { label: 'قيد المراجعة',   color: '#5546D6', bg: '#E7E5FD' },
+  pending:   { label: 'جارٍ الإعداد',   color: '#5E6B78', bg: '#F3EFE8' },
+  active:    { label: 'جارٍ التنفيذ',   color: '#235D7F', bg: '#D9E8F1' },
+  review:    { label: 'قيد المراجعة',   color: '#235D7F', bg: '#D9E8F1' },
   completed: { label: 'مكتملة',          color: '#0B7F5D', bg: '#C9EFE1' },
 };
 
@@ -31,7 +31,7 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
   if (loading) return (
     <div style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
-      <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
         {[...Array(3)].map((_, i) => (
           <div key={i} style={{ height: 96, borderRadius: 10, background: '#F3EFE8', marginBottom: 12 }} />
         ))}
@@ -42,10 +42,10 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
   return (
     <div className="animate-in">
       {/* Header */}
-      <div style={{ background: '#fff', borderRadius: 12, padding: '20px 28px', marginBottom: 20, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: '20px 28px', marginBottom: 20, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 4 }}>خططك الاستراتيجية</h2>
-          <p style={{ fontSize: 13, color: '#67637A' }}>
+          <p style={{ fontSize: 13, color: '#5E6B78' }}>
             {plans.length === 0 ? 'لم تبدأ أي خطة بعد' : `لديك ${plans.length} ${plans.length === 1 ? 'خطة' : 'خطط'} استراتيجية`}
           </p>
         </div>
@@ -55,7 +55,7 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
           style={{
             padding: '11px 24px',
             background: canCreate ? C.amber : '#D9D3C7',
-            color: canCreate ? '#1B1746' : '#8F8BA3',
+            color: canCreate ? '#0E2A3D' : '#8C97A3',
             border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700,
             cursor: canCreate ? 'pointer' : 'not-allowed',
             fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 8,
@@ -68,11 +68,11 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
 
       {/* Warning banner when creation is locked */}
       {!canCreate && plans.length > 0 && (
-        <div style={{ marginBottom: 20, padding: '14px 20px', background: '#FFF8EA', border: '1.5px solid #F9C152', borderRadius: 12, display: 'flex', alignItems: 'flex-start', gap: 12, direction: 'rtl' }}>
+        <div style={{ marginBottom: 20, padding: '14px 20px', background: '#FEF3EC', border: '1.5px solid #F79D6C', borderRadius: 12, display: 'flex', alignItems: 'flex-start', gap: 12, direction: 'rtl' }}>
           <span style={{ fontSize: 22, lineHeight: 1, flexShrink: 0 }}><DfIcon name="warning" size={22} /></span>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#7A4706', marginBottom: 4 }}>لا يمكن إنشاء خطة جديدة حالياً</div>
-            <div style={{ fontSize: 13, color: '#5F3705', lineHeight: 1.6 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#7F310E', marginBottom: 4 }}>لا يمكن إنشاء خطة جديدة حالياً</div>
+            <div style={{ fontSize: 13, color: '#5E240A', lineHeight: 1.6 }}>
               يجب إكمال تسليم جميع الوحدات الـ11 في الخطة الحالية قبل البدء في خطة جديدة. استمر في العمل على خطتك الحالية وأرسل جميع الوحدات للمستشار.
             </div>
           </div>
@@ -81,15 +81,15 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
 
       {/* Empty state */}
       {plans.length === 0 && (
-        <div style={{ background: '#fff', borderRadius: 12, padding: '60px 24px', boxShadow: '0 1px 8px rgba(27,23,70,0.06)', textAlign: 'center' }}>
-          <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}><DfIcon name="clipboard" size={32} /></div>
+        <div style={{ background: '#fff', borderRadius: 12, padding: '60px 24px', boxShadow: '0 1px 8px rgba(14,42,61,0.06)', textAlign: 'center' }}>
+          <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#D9E8F1', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}><DfIcon name="clipboard" size={32} /></div>
           <div style={{ fontSize: 18, fontWeight: 700, color: C.ink, marginBottom: 10 }}>ابدأ خطتك الاستراتيجية الأولى</div>
-          <p style={{ fontSize: 13, color: '#67637A', maxWidth: 420, margin: '0 auto 28px', lineHeight: 1.7 }}>
+          <p style={{ fontSize: 13, color: '#5E6B78', maxWidth: 420, margin: '0 auto 28px', lineHeight: 1.7 }}>
             بناء خطة استراتيجية متكاملة للمنظمة من خلال 11 وحدة تخطيطية بمرافقة مستشار متخصص
           </p>
           <button
             onClick={onCreateNew}
-            style={{ padding: '13px 36px', background: C.amber, color: '#1B1746', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+            style={{ padding: '13px 36px', background: C.amber, color: '#0E2A3D', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
           >
             ابدأ الآن ←
           </button>
@@ -111,13 +111,13 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
             return (
               <div
                 key={plan.id}
-                style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', boxShadow: '0 1px 8px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', gap: 20, cursor: 'pointer', transition: 'box-shadow 0.2s', border: '1.5px solid transparent' }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(85,70,214,0.12)'}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 8px rgba(27,23,70,0.06)'}
+                style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', boxShadow: '0 1px 8px rgba(14,42,61,0.06)', display: 'flex', alignItems: 'center', gap: 20, cursor: 'pointer', transition: 'box-shadow 0.2s', border: '1.5px solid transparent' }}
+                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(35,93,127,0.12)'}
+                onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 8px rgba(14,42,61,0.06)'}
                 onClick={() => onSelect(plan.id)}
               >
                 {/* Plan number badge */}
-                <div style={{ width: 48, height: 48, borderRadius: '50%', background: isDone ? '#C9EFE1' : '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: 48, height: 48, borderRadius: '50%', background: isDone ? '#C9EFE1' : '#D9E8F1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <span style={{ fontSize: 18, fontWeight: 800, color: isDone ? '#0B7F5D' : C.primary }}>#{planNum}</span>
                 </div>
 
@@ -127,7 +127,7 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
                     <span style={{ fontSize: 15, fontWeight: 700, color: C.ink }}>الخطة الاستراتيجية #{planNum}</span>
                     <span style={{ padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: cfg.bg, color: cfg.color }}>{cfg.label}</span>
                   </div>
-                  <div style={{ fontSize: 12, color: '#67637A', marginBottom: 8 }}>
+                  <div style={{ fontSize: 12, color: '#5E6B78', marginBottom: 8 }}>
                     {plan.consultant ? `المستشار: ${plan.consultant.name}` : 'لم يُختر مستشار بعد'}
                     {stepLabel && plan.status !== 'completed' && <span style={{ marginRight: 12 }}>· المرحلة: {stepLabel}</span>}
                   </div>
@@ -136,13 +136,13 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
                     <div style={{ flex: 1, height: 6, background: '#E8E3DA', borderRadius: 4, overflow: 'hidden' }}>
                       <div style={{ width: `${pct}%`, height: '100%', background: isDone ? '#0B7F5D' : C.primary, borderRadius: 4, transition: 'width 0.4s' }} />
                     </div>
-                    <span style={{ fontSize: 12, color: '#67637A', whiteSpace: 'nowrap' }}>{approved}/{total} وحدة معتمدة</span>
+                    <span style={{ fontSize: 12, color: '#5E6B78', whiteSpace: 'nowrap' }}>{approved}/{total} وحدة معتمدة</span>
                   </div>
                 </div>
 
                 {/* Date + Action */}
                 <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                  <div style={{ fontSize: 11, color: '#8F8BA3', marginBottom: 10 }}>
+                  <div style={{ fontSize: 11, color: '#8C97A3', marginBottom: 10 }}>
                     {new Date(plan.created_at).toLocaleDateString('ar-SA')}
                   </div>
                   <button
@@ -174,12 +174,12 @@ function ServiceSummary({ workflow, pricing, onContinue }) {
 
   return (
     <div className="animate-in" style={{ maxWidth: 600, margin: '0 auto' }}>
-      <div style={{ background: '#fff', borderRadius: 12, padding: 28, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', marginBottom: 16 }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: 28, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-          <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}><DfIcon name="clipboard" size={20} /></div>
+          <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#D9E8F1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}><DfIcon name="clipboard" size={20} /></div>
           <div>
             <div style={{ fontSize: 16, fontWeight: 700, color: C.ink }}>الخدمات المختارة</div>
-            <div style={{ fontSize: 12, color: '#67637A' }}>ملخص ما تم اختياره في بداية الخطة</div>
+            <div style={{ fontSize: 12, color: '#5E6B78' }}>ملخص ما تم اختياره في بداية الخطة</div>
           </div>
         </div>
 
@@ -187,9 +187,9 @@ function ServiceSummary({ workflow, pricing, onContinue }) {
           <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: item.included ? '#E8F8F2' : '#FBF9F5', borderRadius: 8, marginBottom: 8, border: `1px solid ${item.included ? '#A9E4CF' : '#E8E3DA'}` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ fontSize: 16 }}>{item.included ? <DfIcon name="check" size={20} /> : '⬜'}</span>
-              <span style={{ fontSize: 13, color: item.included ? '#086449' : '#8F8BA3', fontWeight: item.included ? 600 : 400 }}>{item.label}</span>
+              <span style={{ fontSize: 13, color: item.included ? '#086449' : '#8C97A3', fontWeight: item.included ? 600 : 400 }}>{item.label}</span>
             </div>
-            <span style={{ fontSize: 13, fontWeight: 700, color: item.included ? '#0B7F5D' : '#8F8BA3' }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: item.included ? '#0B7F5D' : '#8C97A3' }}>
               {item.price.toLocaleString('en-US')} ريال
             </span>
           </div>
@@ -218,7 +218,7 @@ function WorkflowStepper({ step, workflow, onStepClick }) {
   const realStep = workflow?.current_step ?? step;
 
   return (
-    <div style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', marginBottom: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+    <div style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', marginBottom: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
       <div style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', gap: 0 }}>
         {STEPS.map((s, i) => {
           const isCompleted = workflow?.status === 'completed';
@@ -237,13 +237,13 @@ function WorkflowStepper({ step, workflow, onStepClick }) {
                   style={{
                     width: 36, height: 36, borderRadius: '50%',
                     background: done ? C.primary : current ? C.amber : '#E8E3DA',
-                    color: done || current ? '#1B1746' : '#8F8BA3',
+                    color: done || current ? '#0E2A3D' : '#8C97A3',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 14, fontWeight: 700, transition: 'all 0.2s',
                     cursor: clickable ? 'pointer' : 'default',
                     outline: step === s.id && done ? `3px solid ${C.amberLine}` : 'none',
                     outlineOffset: 2,
-                    boxShadow: clickable ? '0 2px 6px rgba(85,70,214,0.18)' : 'none',
+                    boxShadow: clickable ? '0 2px 6px rgba(35,93,127,0.18)' : 'none',
                   }}
                   onMouseEnter={e => { if (clickable) e.currentTarget.style.background = C.ink; }}
                   onMouseLeave={e => { if (clickable) e.currentTarget.style.background = C.primary; }}
@@ -254,12 +254,12 @@ function WorkflowStepper({ step, workflow, onStepClick }) {
                   onClick={() => clickable && onStepClick(s.id)}
                   style={{
                     fontSize: 11,
-                    color: current ? C.amberText : done ? C.primary : '#8F8BA3',
+                    color: current ? C.amberText : done ? C.primary : '#8C97A3',
                     marginTop: 6, textAlign: 'center',
                     fontWeight: current || (done && step === s.id) ? 700 : 400,
                     cursor: clickable ? 'pointer' : 'default',
                     textDecoration: clickable ? 'underline dotted' : 'none',
-                    textDecorationColor: 'rgba(85,70,214,0.4)',
+                    textDecorationColor: 'rgba(35,93,127,0.4)',
                   }}
                 >
                   {s.label}
@@ -274,7 +274,7 @@ function WorkflowStepper({ step, workflow, onStepClick }) {
       </div>
       {/* مؤشر وضع المراجعة */}
       {workflow && step < realStep && (
-        <div style={{ marginTop: 12, padding: '6px 14px', background: '#FFF8EA', borderRadius: 8, border: `1px solid ${C.amberLine}30`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ marginTop: 12, padding: '6px 14px', background: '#FEF3EC', borderRadius: 8, border: `1px solid ${C.amberLine}30`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 12, color: C.amberText, fontWeight: 600 }}>
             <DfIcon name="search" size={18} style={{ marginInlineEnd: 6 }} />وضع المراجعة — تستعرض: {STEPS[step]?.label}
           </span>
@@ -410,7 +410,7 @@ export default function StrategicRoadmap({ activeUnit, setActiveUnit, navigate, 
   if (loading) return (
     <div style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
-      <div style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', marginBottom: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', display: 'flex', gap: 8 }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', marginBottom: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', display: 'flex', gap: 8 }}>
         {[...Array(6)].map((_, i) => (
           <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#E8E3DA' }} />
@@ -418,7 +418,7 @@ export default function StrategicRoadmap({ activeUnit, setActiveUnit, navigate, 
           </div>
         ))}
       </div>
-      <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
         <div style={{ width: '40%', height: 20, borderRadius: 4, background: '#E8E3DA', marginBottom: 16 }} />
         {[...Array(4)].map((_, i) => <div key={i} style={{ height: 56, borderRadius: 8, background: '#F3EFE8', marginBottom: 10 }} />)}
       </div>

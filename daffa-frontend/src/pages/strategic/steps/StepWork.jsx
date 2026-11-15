@@ -2,14 +2,14 @@ import DfIcon from '../../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import { strategicApi } from '../../../api/strategic';
 
-const colors = { primary: '#5546D6', ink: '#1B1746', orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F' };
+const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
 
 const STATUS_MAP = {
-  not_started: { label: 'لم يبدأ',    bg: '#F3EFE8', color: '#67637A' },
-  in_progress: { label: 'قيد العمل',  bg: '#FEEDC6', color: '#9A5B07' },
+  not_started: { label: 'لم يبدأ',    bg: '#F3EFE8', color: '#5E6B78' },
+  in_progress: { label: 'قيد العمل',  bg: '#FDE2D2', color: '#A33F12' },
   submitted:   { label: 'مُرسل',      bg: '#CFE5FA', color: '#1F74C4' },
-  reviewing:   { label: 'قيد المراجعة', bg: '#E7E5FD', color: '#5546D6' },
-  revision:    { label: 'يحتاج تعديل', bg: '#FAD4CE', color: '#D03F2A' },
+  reviewing:   { label: 'قيد المراجعة', bg: '#D9E8F1', color: '#235D7F' },
+  revision:    { label: 'يحتاج تعديل', bg: '#F8D3D3', color: '#C53A3A' },
   approved:    { label: 'معتمد',      bg: '#C9EFE1', color: '#0B7F5D' },
 };
 
@@ -41,7 +41,7 @@ export default function StepWork({ workflow, setActiveUnit, workflowId, refreshW
   return (
     <div className="animate-in">
       {/* شريط التقدم */}
-      <div style={{ background: '#fff', borderRadius: 12, padding: 20, marginBottom: 20, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: 20, marginBottom: 20, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <span style={{ fontSize: 14, fontWeight: 700, color: colors.ink }}>التقدم الكلي</span>
           <span style={{ fontSize: 14, fontWeight: 700, color: colors.amberText }}>{approved}/{total} {total === 1 ? 'وحدة' : 'وحدات'} معتمدة</span>
@@ -49,7 +49,7 @@ export default function StepWork({ workflow, setActiveUnit, workflowId, refreshW
         <div style={{ background: '#E8E3DA', borderRadius: 20, height: 10 }}>
           <div style={{ background: `linear-gradient(90deg, ${colors.primary}, ${colors.amber})`, height: '100%', borderRadius: 20, width: `${percent}%`, transition: 'width 0.5s' }} />
         </div>
-        <div style={{ fontSize: 12, color: '#8F8BA3', marginTop: 4, textAlign: 'left' }}>{percent}%</div>
+        <div style={{ fontSize: 12, color: '#8C97A3', marginTop: 4, textAlign: 'left' }}>{percent}%</div>
       </div>
 
       {/* شبكة الوحدات */}
@@ -66,21 +66,21 @@ export default function StepWork({ workflow, setActiveUnit, workflowId, refreshW
               onClick={() => !locked && setActiveUnit(unit)}
               style={{
                 background: '#fff', borderRadius: 12, padding: 18,
-                boxShadow: '0 1px 8px rgba(27,23,70,0.06)',
+                boxShadow: '0 1px 8px rgba(14,42,61,0.06)',
                 cursor: locked ? 'not-allowed' : 'pointer',
                 opacity: locked ? 0.5 : 1,
-                border: `1.5px solid ${unit.submission_status === 'approved' ? '#7FD3B5' : unit.submission_status === 'revision' ? '#EE9A8C' : '#F3EFE8'}`,
+                border: `1.5px solid ${unit.submission_status === 'approved' ? '#7FD3B5' : unit.submission_status === 'revision' ? '#E88E8E' : '#F3EFE8'}`,
                 transition: 'all 0.2s',
               }}
               onMouseEnter={e => { if (!locked) e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = ''; }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: locked ? '#8F8BA3' : colors.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{i + 1}</div>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: locked ? '#8C97A3' : colors.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{i + 1}</div>
                 <span style={{ fontSize: 10, padding: '3px 8px', borderRadius: 20, fontWeight: 600, background: st.bg, color: st.color }}>{locked ? 'مقفل' : st.label}</span>
               </div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: locked ? '#8F8BA3' : colors.ink }}>{unit.name}</div>
-              <div style={{ fontSize: 11, color: '#8F8BA3', marginTop: 4 }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />{unit.video_duration}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: locked ? '#8C97A3' : colors.ink }}>{unit.name}</div>
+              <div style={{ fontSize: 11, color: '#8C97A3', marginTop: 4 }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />{unit.video_duration}</div>
             </div>
           );
         })}
@@ -98,7 +98,7 @@ export default function StepWork({ workflow, setActiveUnit, workflowId, refreshW
           <button
             onClick={handleProceed}
             disabled={proceeding}
-            style={{ padding: '10px 22px', background: proceeding ? '#8F8BA3' : colors.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: proceeding ? 'not-allowed' : 'pointer', fontFamily: "inherit", whiteSpace: 'nowrap' }}
+            style={{ padding: '10px 22px', background: proceeding ? '#8C97A3' : colors.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: proceeding ? 'not-allowed' : 'pointer', fontFamily: "inherit", whiteSpace: 'nowrap' }}
           >
             {proceeding ? '...' : 'متابعة المراجعة ←'}
           </button>

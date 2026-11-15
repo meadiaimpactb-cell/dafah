@@ -9,7 +9,7 @@
 body {
     font-family: 'plexarabic', 'dejavusans', sans-serif;
     direction: rtl;
-    color: #1B1746;
+    color: #0E2A3D;
     font-size: 12px;
     line-height: 1.7;
 }
@@ -20,7 +20,7 @@ body {
 }
 
 .header {
-    background-color: #1B1746;
+    background-color: #0E2A3D;
     color: #ffffff;
     padding: 22px 24px 18px;
     border-radius: 0 0 10px 10px;
@@ -46,8 +46,8 @@ body {
 }
 
 .invoice-badge {
-    background: #F5A524;
-    color: #1B1746;
+    background: #EF6A2C;
+    color: #0E2A3D;
     font-size: 16px;
     font-weight: bold;
     padding: 6px 18px;
@@ -63,7 +63,7 @@ body {
     display: flex;
     justify-content: space-between;
     font-size: 11px;
-    color: #D0CCFA;
+    color: #B5D2E3;
 }
 
 .section {
@@ -73,8 +73,8 @@ body {
 .section-title {
     font-size: 13px;
     font-weight: bold;
-    color: #1B1746;
-    border-right: 3px solid #E0920F;
+    color: #0E2A3D;
+    border-right: 3px solid #E05A1F;
     padding-right: 8px;
     margin-bottom: 10px;
 }
@@ -96,8 +96,8 @@ body {
 
 .info-row:last-child { border-bottom: none; }
 
-.info-label { color: #67637A; font-weight: 600; }
-.info-value { color: #1B1746; }
+.info-label { color: #5E6B78; font-weight: 600; }
+.info-value { color: #0E2A3D; }
 
 .items-table {
     width: 100%;
@@ -106,7 +106,7 @@ body {
 }
 
 .items-table th {
-    background: #1B1746;
+    background: #0E2A3D;
     color: white;
     padding: 9px 10px;
     text-align: right;
@@ -144,14 +144,14 @@ body {
     border-bottom: none;
     font-size: 14px;
     font-weight: bold;
-    color: #1B1746;
+    color: #0E2A3D;
     padding-top: 8px;
     margin-top: 4px;
-    border-top: 2px solid #1B1746;
+    border-top: 2px solid #0E2A3D;
 }
 
-.totals-label { color: #67637A; }
-.totals-value { color: #1B1746; font-weight: 600; }
+.totals-label { color: #5E6B78; }
+.totals-value { color: #0E2A3D; font-weight: 600; }
 
 .clearfix::after { content: ""; display: table; clear: both; }
 
@@ -175,12 +175,12 @@ body {
 }
 
 .vat-note {
-    background: #FFF8EA;
-    border: 1px solid #FCD98B;
+    background: #FEF3EC;
+    border: 1px solid #FBC3A3;
     border-radius: 6px;
     padding: 8px 12px;
     font-size: 10.5px;
-    color: #7A4706;
+    color: #7F310E;
     margin-top: 12px;
 }
 </style>

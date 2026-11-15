@@ -8,23 +8,23 @@ import { DEMO_DATA } from './demoData';
 import { validateTemplate } from './templateValidation';
 import { OverviewContent, ExplanationContent, GuidelinesContent, templateLabel } from './UnitContent';
 
-const colors = { primary: '#5546D6', ink: '#1B1746', orange: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F' };
+const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
 
 const ConfirmModal = ({ open, title, message, onConfirm, onCancel }) => {
   if (!open) return null;
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(27,23,70,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ background: '#fff', borderRadius: 16, padding: '32px 28px', maxWidth: 420, width: '90%', textAlign: 'center', boxShadow: '0 20px 60px rgba(27,23,70,0.25)', direction: 'rtl' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 64, height: 64, borderRadius: '50%', background: '#E7E5FD', margin: '0 auto 16px' }}>
-          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#5546D6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(14,42,61,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ background: '#fff', borderRadius: 16, padding: '32px 28px', maxWidth: 420, width: '90%', textAlign: 'center', boxShadow: '0 20px 60px rgba(14,42,61,0.25)', direction: 'rtl' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 64, height: 64, borderRadius: '50%', background: '#D9E8F1', margin: '0 auto 16px' }}>
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#235D7F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1 1 .03 2.798-1.442 2.798H4.24c-1.47 0-2.441-1.798-1.442-2.798L4.8 15.3" />
           </svg>
         </div>
-        <div style={{ fontSize: 16, fontWeight: 700, color: '#1B1746', marginBottom: 10 }}>{title}</div>
-        <p style={{ fontSize: 13, color: '#67637A', marginBottom: 28, lineHeight: 1.8 }}>{message}</p>
+        <div style={{ fontSize: 16, fontWeight: 700, color: '#0E2A3D', marginBottom: 10 }}>{title}</div>
+        <p style={{ fontSize: 13, color: '#5E6B78', marginBottom: 28, lineHeight: 1.8 }}>{message}</p>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-          <button onClick={onConfirm} style={{ padding: '10px 30px', background: '#5546D6', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>تأكيد</button>
-          <button onClick={onCancel}  style={{ padding: '10px 30px', background: '#F3EFE8', color: '#34314A', border: '1.5px solid #E8E3DA', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>إلغاء</button>
+          <button onClick={onConfirm} style={{ padding: '10px 30px', background: '#235D7F', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>تأكيد</button>
+          <button onClick={onCancel}  style={{ padding: '10px 30px', background: '#F3EFE8', color: '#334452', border: '1.5px solid #E8E3DA', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>إلغاء</button>
         </div>
       </div>
     </div>,
@@ -42,11 +42,11 @@ const TABS = [
 ];
 
 const STATUS_MAP = {
-  not_started: { label: 'لم يبدأ',      color: '#67637A' },
-  in_progress: { label: 'قيد العمل',    color: '#9A5B07' },
+  not_started: { label: 'لم يبدأ',      color: '#5E6B78' },
+  in_progress: { label: 'قيد العمل',    color: '#A33F12' },
   submitted:   { label: 'مُرسل',        color: '#1F74C4' },
-  reviewing:   { label: 'قيد المراجعة', color: '#5546D6' },
-  revision:    { label: 'يحتاج تعديل',  color: '#D03F2A' },
+  reviewing:   { label: 'قيد المراجعة', color: '#235D7F' },
+  revision:    { label: 'يحتاج تعديل',  color: '#C53A3A' },
   approved:    { label: 'معتمد',        color: '#0B7F5D' },
 };
 
@@ -135,10 +135,10 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
   return (
     <div className="animate-in">
       {/* رأس الصفحة */}
-      <div style={{ background: '#fff', borderRadius: 12, padding: '14px 20px', marginBottom: 14, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: '14px 20px', marginBottom: 14, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', display: 'flex', alignItems: 'center', gap: 12 }}>
         <button
           onClick={onBack}
-          style={{ padding: '7px 14px', background: '#F3EFE8', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontFamily: "inherit", color: '#34314A', whiteSpace: 'nowrap' }}
+          style={{ padding: '7px 14px', background: '#F3EFE8', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontFamily: "inherit", color: '#334452', whiteSpace: 'nowrap' }}
         >
           ← رجوع
         </button>
@@ -148,9 +148,9 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
               {unitSummary.unit_number}
             </div>
             <h2 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, margin: 0, display: 'flex', alignItems: 'center' }}>{unit.name}<Help term={unit.template_type} /></h2>
-            <span style={{ fontSize: 11, color: '#8F8BA3' }}>الوحدة {unitSummary.unit_number} من {allUnits.length || '?'}</span>
+            <span style={{ fontSize: 11, color: '#8C97A3' }}>الوحدة {unitSummary.unit_number} من {allUnits.length || '?'}</span>
           </div>
-          <div style={{ fontSize: 11, color: '#8F8BA3', marginTop: 3, marginRight: 40 }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />{unit.video_duration}</div>
+          <div style={{ fontSize: 11, color: '#8C97A3', marginTop: 3, marginRight: 40 }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />{unit.video_duration}</div>
         </div>
         <span style={{ fontSize: 11, padding: '4px 12px', borderRadius: 20, fontWeight: 600, color: st.color, background: st.color + '18', whiteSpace: 'nowrap' }}>{st.label}</span>
       </div>
@@ -161,7 +161,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
         {prevUnit ? (
           <button
             onClick={() => goToUnit(prevUnit)}
-            style={{ padding: '7px 16px', background: '#F3EFE8', border: '1.5px solid #E8E3DA', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontFamily: "inherit", color: '#34314A' }}
+            style={{ padding: '7px 16px', background: '#F3EFE8', border: '1.5px solid #E8E3DA', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontFamily: "inherit", color: '#334452' }}
           >
             → {prevUnit.name}
           </button>
@@ -176,23 +176,23 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
             التالي: {nextUnit.name} ←
           </button>
         ) : nextUnit && !currentSubmitted ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 14px', background: '#F3EFE8', borderRadius: 8, fontSize: 12, color: '#8F8BA3' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 14px', background: '#F3EFE8', borderRadius: 8, fontSize: 12, color: '#8C97A3' }}>
             <DfIcon name="lock" size={18} style={{ marginInlineEnd: 6 }} />{nextUnit.name} — أرسل الوحدة الحالية أولاً
           </div>
         ) : (
-          <div style={{ fontSize: 12, color: '#8F8BA3', padding: '7px 0' }}>آخر وحدة</div>
+          <div style={{ fontSize: 12, color: '#8C97A3', padding: '7px 0' }}>آخر وحدة</div>
         )}
       </div>
 
       {/* ملاحظة المستشار — تظهر فقط عند status=revision */}
       {submission.status === 'revision' && submission.consultant_notes && (
-        <div style={{ background: '#FDECE9', border: '1px solid #F5B8AE', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#D03F2A' }}>
+        <div style={{ background: '#FCEBEB', border: '1px solid #F1B2B2', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#C53A3A' }}>
           <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />ملاحظة المستشار: {submission.consultant_notes}
         </div>
       )}
 
       {/* التبويبات */}
-      <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', overflow: 'hidden' }}>
+      <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', overflow: 'hidden' }}>
         <div style={{ display: 'flex', borderBottom: '2px solid #F3EFE8', overflowX: 'auto' }}>
           {TABS.map(t => (
             <button
@@ -201,7 +201,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
               style={{
                 padding: '12px 18px', border: 'none', background: 'transparent',
                 cursor: 'pointer', fontSize: 13, fontWeight: tab === t.id ? 700 : 400,
-                color: tab === t.id ? colors.primary : '#67637A',
+                color: tab === t.id ? colors.primary : '#5E6B78',
                 borderBottom: `2px solid ${tab === t.id ? colors.primary : 'transparent'}`,
                 marginBottom: -2, whiteSpace: 'nowrap', fontFamily: "inherit",
                 transition: 'all 0.2s',
@@ -234,10 +234,10 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
       {msg && ReactDOM.createPortal(
         <div style={{
           position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)',
-          background: msg.type === 'success' ? '#0B7F5D' : '#D03F2A',
+          background: msg.type === 'success' ? '#0B7F5D' : '#C53A3A',
           color: '#fff', borderRadius: 12, padding: '14px 32px',
           fontSize: 15, fontWeight: 700,
-          boxShadow: '0 8px 30px rgba(27,23,70,0.25)',
+          boxShadow: '0 8px 30px rgba(14,42,61,0.25)',
           zIndex: 999999, whiteSpace: 'nowrap',
           display: 'flex', alignItems: 'center', gap: 10,
           animation: 'fadeInUp 0.3s ease',
@@ -253,11 +253,11 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
         <div style={{ marginTop: 20 }}>
           {/* رسالة الحقول المطلوبة */}
           {!isLocked && !validation.valid && (
-            <div style={{ background: '#FFF8EA', border: '1.5px solid #FCD98B', borderRadius: 10, padding: '12px 16px', marginBottom: 14, direction: 'rtl' }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#9A5B07', marginBottom: 6 }}>
+            <div style={{ background: '#FEF3EC', border: '1.5px solid #FBC3A3', borderRadius: 10, padding: '12px 16px', marginBottom: 14, direction: 'rtl' }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#A33F12', marginBottom: 6 }}>
                 <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />يجب تعبئة الحقول التالية قبل الحفظ:
               </div>
-              <ul style={{ margin: 0, padding: '0 20px', fontSize: 12, color: '#7A4706', lineHeight: 2 }}>
+              <ul style={{ margin: 0, padding: '0 20px', fontSize: 12, color: '#7F310E', lineHeight: 2 }}>
                 {validation.errors.map((err, i) => (
                   <li key={i}>{err}</li>
                 ))}
@@ -293,7 +293,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
                   style={{
                     padding: '11px 28px',
                     background: validation.valid ? '#F3EFE8' : '#E8E3DA',
-                    color: validation.valid ? '#34314A' : '#8F8BA3',
+                    color: validation.valid ? '#334452' : '#8C97A3',
                     border: '1.5px solid #E8E3DA',
                     borderRadius: 10, fontSize: 14, fontWeight: 600,
                     cursor: validation.valid && !saving ? 'pointer' : 'not-allowed',
@@ -311,7 +311,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
                   style={{
                     padding: '11px 28px',
                     background: validation.valid ? colors.amber : '#E8E3DA',
-                    color: validation.valid ? '#1B1746' : '#8F8BA3',
+                    color: validation.valid ? '#0E2A3D' : '#8C97A3',
                     border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700,
                     cursor: validation.valid && !submitting ? 'pointer' : 'not-allowed',
                     fontFamily: "inherit",
@@ -364,9 +364,9 @@ function TabOverview({ unit }) {
   return (
     <div>
       <div style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 10 }}>عن هذه الوحدة</div>
-      <p style={{ fontSize: 14, color: '#34314A', lineHeight: 1.9, marginBottom: 14 }}>{unit.overview || '—'}</p>
+      <p style={{ fontSize: 14, color: '#334452', lineHeight: 1.9, marginBottom: 14 }}>{unit.overview || '—'}</p>
       {unit.overview2 && (
-        <p style={{ fontSize: 13, color: '#4A4660', lineHeight: 1.8, padding: '10px 14px', background: '#EAF4FD', borderRadius: 8, borderRight: `3px solid ${colors.primary}`, marginBottom: 16 }}>
+        <p style={{ fontSize: 13, color: '#465564', lineHeight: 1.8, padding: '10px 14px', background: '#EAF4FD', borderRadius: 8, borderRight: `3px solid ${colors.primary}`, marginBottom: 16 }}>
           {unit.overview2}
         </p>
       )}
@@ -390,7 +390,7 @@ function TabDescription({ unit }) {
 
       {/* نص الشرح المكتوب من الأدمين */}
       {hasText && (
-        <p style={{ fontSize: 14, color: '#34314A', lineHeight: 1.9, marginBottom: hasTopics ? 20 : 0, whiteSpace: 'pre-line' }}>
+        <p style={{ fontSize: 14, color: '#334452', lineHeight: 1.9, marginBottom: hasTopics ? 20 : 0, whiteSpace: 'pre-line' }}>
           {unit.written_description}
         </p>
       )}
@@ -401,7 +401,7 @@ function TabDescription({ unit }) {
           {topics.map((topic, i) => (
             <div key={i} style={{ background: '#FBF9F5', borderRadius: 10, padding: '14px 18px', borderRight: `3px solid ${colors.primary}` }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>{topic.t}</div>
-              <div style={{ fontSize: 13, color: '#4A4660', lineHeight: 1.8 }}>{topic.d}</div>
+              <div style={{ fontSize: 13, color: '#465564', lineHeight: 1.8 }}>{topic.d}</div>
             </div>
           ))}
         </div>
@@ -409,7 +409,7 @@ function TabDescription({ unit }) {
 
       {/* حالة فارغة */}
       {!hasText && !hasTopics && (
-        <p style={{ color: '#8F8BA3', fontSize: 13 }}>لا يوجد شرح مكتوب لهذه الوحدة بعد</p>
+        <p style={{ color: '#8C97A3', fontSize: 13 }}>لا يوجد شرح مكتوب لهذه الوحدة بعد</p>
       )}
     </div>
   );
@@ -427,16 +427,16 @@ function TabGuide({ unit }) {
           <div style={{ width: 28, height: 28, borderRadius: '50%', background: colors.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
           <div>
             <div style={{ fontSize: 13, fontWeight: 700, color: colors.ink, marginBottom: 3 }}>{step.t}</div>
-            <div style={{ fontSize: 13, color: '#67637A', lineHeight: 1.7 }}>{step.d}</div>
+            <div style={{ fontSize: 13, color: '#5E6B78', lineHeight: 1.7 }}>{step.d}</div>
           </div>
         </div>
       ))}
       {unit.tip && (
-        <div style={{ background: '#FFF8EA', border: '1px solid #FCD98B', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 10, marginTop: 8 }}>
+        <div style={{ background: '#FEF3EC', border: '1px solid #FBC3A3', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 10, marginTop: 8 }}>
           <span style={{ fontSize: 18 }}><DfIcon name="bulb" size={18} /></span>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#7A4706', marginBottom: 2 }}>نصيحة</div>
-            <div style={{ fontSize: 13, color: '#5F3705', lineHeight: 1.7 }}>{unit.tip}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#7F310E', marginBottom: 2 }}>نصيحة</div>
+            <div style={{ fontSize: 13, color: '#5E240A', lineHeight: 1.7 }}>{unit.tip}</div>
           </div>
         </div>
       )}
@@ -467,7 +467,7 @@ function TabVideo({ unit }) {
           <iframe src={embedUrl} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }} allowFullScreen title={unit.name} />
         </div>
       ) : (
-        <div style={{ background: '#F3EFE8', borderRadius: 12, padding: 60, color: '#8F8BA3', textAlign: 'center' }}>
+        <div style={{ background: '#F3EFE8', borderRadius: 12, padding: 60, color: '#8C97A3', textAlign: 'center' }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}><DfIcon name="film" size={40} /></div>
           <div style={{ fontSize: 14 }}>الفيديو التعليمي قيد الإعداد</div>
         </div>
@@ -482,7 +482,7 @@ function TabChat({ onNavigate }) {
     <div style={{ textAlign: 'center', padding: '40px 20px' }}>
       <div style={{ fontSize: 40, marginBottom: 14 }}><DfIcon name="chat" size={40} /></div>
       <div style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>خدمة الدردشة مع المستشار</div>
-      <p style={{ fontSize: 13, color: '#67637A', maxWidth: 400, margin: '0 auto 24px' }}>تواصل مع المستشار للحصول على توجيه وإجابة أسئلتك</p>
+      <p style={{ fontSize: 13, color: '#5E6B78', maxWidth: 400, margin: '0 auto 24px' }}>تواصل مع المستشار للحصول على توجيه وإجابة أسئلتك</p>
       <button style={{ padding: '11px 32px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}
         onClick={() => onNavigate && onNavigate('client-chat')}>بدء المحادثة</button>
     </div>
@@ -491,7 +491,7 @@ function TabChat({ onNavigate }) {
 
 const InfoBox = ({ label, value }) => (
   <div style={{ background: '#FBF9F5', borderRadius: 8, padding: '12px 16px' }}>
-    <div style={{ fontSize: 11, color: '#8F8BA3', marginBottom: 4 }}>{label}</div>
-    <div style={{ fontSize: 14, fontWeight: 600, color: '#34314A' }}>{value}</div>
+    <div style={{ fontSize: 11, color: '#8C97A3', marginBottom: 4 }}>{label}</div>
+    <div style={{ fontSize: 14, fontWeight: 600, color: '#334452' }}>{value}</div>
   </div>
 );

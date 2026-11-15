@@ -1,6 +1,6 @@
 // الشريط العلوي والتذييل للصفحات العامة (متجاوبان).
 import React, { useEffect, useState } from 'react';
-import Logo from '../../components/brand/Logo';
+import Logo, { RosetteShape } from '../../components/brand/Logo';
 import { colors } from '../../theme/tokens';
 import useViewport from '../../hooks/useViewport';
 
@@ -77,14 +77,14 @@ export function PublicNav({ current, navigate, onLogin, onRegister }) {
 
 export function PublicFooter({ sc, navigate }) {
   const go = (v) => { navigate(v); window.scrollTo({ top: 0 }); };
-  const col = { fontSize: 14, color: '#C9C5F9', padding: '5px 0', cursor: 'pointer', background: 'none', border: 'none', fontFamily: 'inherit', textAlign: 'right', display: 'block' };
+  const col = { fontSize: 14, color: '#BFD6E5', padding: '5px 0', cursor: 'pointer', background: 'none', border: 'none', fontFamily: 'inherit', textAlign: 'right', display: 'block' };
   return (
     <footer style={{ background: colors.ink, color: '#fff', position: 'relative', overflow: 'hidden' }}>
-      <svg aria-hidden="true" viewBox="0 0 120 120" style={{ position: 'absolute', left: -60, top: -40, width: 340, opacity: 0.05 }}><path d="M60,32 C82,35 96,52 93,67 C91,79 83,85 70,85 L25,85" fill="none" stroke="#fff" strokeWidth="19" strokeLinecap="round" /></svg>
+      <RosetteShape size={380} color="#FFFFFF" opacity={0.05} style={{ position: 'absolute', left: -110, top: -90 }} />
       <div style={{ maxWidth: 1180, margin: '0 auto', padding: '56px clamp(16px, 4vw, 40px) 36px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32, position: 'relative' }}>
         <div style={{ gridColumn: 'span 1' }}>
           <Logo variant="horizontal" tone="dark" size={44} />
-          <p style={{ fontSize: 14, color: '#DDDAF7', marginTop: 16, lineHeight: 1.9, maxWidth: 300 }}>{sc('footer_desc', 'منصة دفة للتخطيط الاستراتيجي وصناعة السياسات')}</p>
+          <p style={{ fontSize: 14, color: '#D6E4EE', marginTop: 16, lineHeight: 1.9, maxWidth: 300 }}>{sc('footer_desc', 'منصة دفة للتخطيط الاستراتيجي وصناعة السياسات')}</p>
         </div>
         <div>
           <h4 style={{ color: '#fff', fontSize: 15, marginBottom: 12 }}>روابط سريعة</h4>
@@ -96,14 +96,14 @@ export function PublicFooter({ sc, navigate }) {
         </div>
         <div>
           <h4 style={{ color: '#fff', fontSize: 15, marginBottom: 12 }}>تواصل معنا</h4>
-          <div style={{ fontSize: 14, color: '#C9C5F9', lineHeight: 2.1 }}>
+          <div style={{ fontSize: 14, color: '#BFD6E5', lineHeight: 2.1 }}>
             <div dir="ltr" style={{ textAlign: 'right' }}>{sc('contact_email', 'info@daffa.sa')}</div>
             <div dir="ltr" style={{ textAlign: 'right' }}>{sc('contact_phone', '+966 55 XXX XXXX')}</div>
             <div>{sc('contact_address', 'الرياض، المملكة العربية السعودية')}</div>
           </div>
         </div>
       </div>
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '16px', textAlign: 'center', fontSize: 13, color: 'rgba(221,218,247,0.6)', position: 'relative' }}>
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '16px', textAlign: 'center', fontSize: 13, color: 'rgba(214,228,238,0.6)', position: 'relative' }}>
         {sc('footer_copyright', 'جميع الحقوق محفوظة © 2026 منصة دفة')}
       </div>
     </footer>

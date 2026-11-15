@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { strategicApi } from '../../../api/strategic';
 
-const colors = { primary: '#5546D6', ink: '#1B1746', orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F' };
+const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
 
 const UNIT_FALLBACK = [
   'تحليل البيئة الداخلية','تحليل البيئة الخارجية','دراسة الاحتياجات المجتمعية',
@@ -47,12 +47,12 @@ export default function StepServiceSelect({ setWorkflow, setStep, catalog, prici
   return (
     <div className="animate-in">
       {/* Header */}
-      <div style={{ background: '#fff', borderRadius: 12, padding: 28, marginBottom: 20, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', textAlign: 'center' }}>
-        <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px', fontSize: 28 }}>
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#5546D6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <div style={{ background: '#fff', borderRadius: 12, padding: 28, marginBottom: 20, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', textAlign: 'center' }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#D9E8F1', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px', fontSize: 28 }}>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#235D7F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
         <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>نظام التخطيط الاستراتيجي</h2>
-        <p style={{ fontSize: 14, color: '#67637A', maxWidth: 520, margin: '0 auto', lineHeight: 1.7 }}>
+        <p style={{ fontSize: 14, color: '#5E6B78', maxWidth: 520, margin: '0 auto', lineHeight: 1.7 }}>
           بناء الخطة الاستراتيجية الكاملة للمنظمة من خلال {units.length} وحدة تخطيطية متسلسلة
           مع مراجعة واعتماد من مستشار متخصص
         </p>
@@ -60,7 +60,7 @@ export default function StepServiceSelect({ setWorkflow, setStep, catalog, prici
 
       <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 20 }}>
         {/* الوحدات */}
-        <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+        <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
           <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>
             الوحدات التخطيطية الـ {units.length}
           </h3>
@@ -68,7 +68,7 @@ export default function StepServiceSelect({ setWorkflow, setStep, catalog, prici
             {units.map((u, i) => (
               <div key={u.unit_number || i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: '#FBF9F5', borderRadius: 8 }}>
                 <div style={{ width: 24, height: 24, borderRadius: '50%', background: colors.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{u.unit_number || i + 1}</div>
-                <span style={{ fontSize: 13, color: '#34314A' }}>{u.name}</span>
+                <span style={{ fontSize: 13, color: '#334452' }}>{u.name}</span>
               </div>
             ))}
           </div>
@@ -76,23 +76,23 @@ export default function StepServiceSelect({ setWorkflow, setStep, catalog, prici
 
         {/* ما يشمله + الأسعار */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+          <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
             <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>ما يشمله النظام</h3>
             {[`${units.length} وحدة تخطيطية متسلسلة`,'فيديوهات تعليمية لكل وحدة','شرح مكتوب وإرشادات مفصلة','نماذج عمل جاهزة للتعبئة','خدمة دردشة مع المستشار','مراجعة واعتماد من مستشار متخصص','وثيقة استراتيجية نهائية'].map((f, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                 <span style={{ color: colors.primary, fontWeight: 700 }}>✓</span>
-                <span style={{ fontSize: 13, color: '#34314A' }}>{f}</span>
+                <span style={{ fontSize: 13, color: '#334452' }}>{f}</span>
               </div>
             ))}
           </div>
 
           {/* الإضافات */}
-          <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+          <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
             <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>خدمات إضافية (اختياري)</h3>
 
             {/* السعر الأساسي */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#FBF9F5', borderRadius: 8, marginBottom: 12 }}>
-              <span style={{ fontSize: 13, color: '#34314A' }}>السعر الأساسي</span>
+              <span style={{ fontSize: 13, color: '#334452' }}>السعر الأساسي</span>
               <span style={{ fontSize: 13, fontWeight: 700, color: colors.ink }}>{basePrice.toLocaleString('en-US')} ريال</span>
             </div>
 
@@ -103,7 +103,7 @@ export default function StepServiceSelect({ setWorkflow, setStep, catalog, prici
               <label key={a.key} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, cursor: 'pointer', padding: '10px 12px', border: `1.5px solid ${addons[a.key] ? colors.primary : '#E8E3DA'}`, borderRadius: 8, transition: 'border-color 0.2s' }}>
                 <input type="checkbox" checked={addons[a.key]} onChange={e => setAddons({ ...addons, [a.key]: e.target.checked })} style={{ width: 16, height: 16, accentColor: colors.primary }} />
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#34314A' }}>{a.label}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#334452' }}>{a.label}</div>
                 </div>
                 <span style={{ fontSize: 13, fontWeight: 700, color: colors.amberText }}>{a.price.toLocaleString('en-US')} ريال</span>
               </label>
@@ -111,10 +111,10 @@ export default function StepServiceSelect({ setWorkflow, setStep, catalog, prici
 
             {/* ملخص السعر */}
             <div style={{ background: '#FBF9F5', borderRadius: 8, padding: 14, marginTop: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#67637A', marginBottom: 6 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#5E6B78', marginBottom: 6 }}>
                 <span>المجموع الجزئي</span><span>{subtotal.toLocaleString('en-US')} ريال</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#67637A', marginBottom: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#5E6B78', marginBottom: 8 }}>
                 <span>ضريبة القيمة المضافة ({pricing?.tax_rate ?? 15}%)</span><span>{tax.toLocaleString('en-US')} ريال</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 15, fontWeight: 700, color: colors.ink, borderTop: '1px solid #E8E3DA', paddingTop: 8 }}>
@@ -125,10 +125,10 @@ export default function StepServiceSelect({ setWorkflow, setStep, catalog, prici
         </div>
       </div>
 
-      {error && <div style={{ background: '#FDECE9', color: '#D03F2A', border: '1px solid #F5B8AE', borderRadius: 8, padding: '10px 14px', marginTop: 16, textAlign: 'center', fontSize: 13 }}>{error}</div>}
+      {error && <div style={{ background: '#FCEBEB', color: '#C53A3A', border: '1px solid #F1B2B2', borderRadius: 8, padding: '10px 14px', marginTop: 16, textAlign: 'center', fontSize: 13 }}>{error}</div>}
 
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
-        <button onClick={handleStart} disabled={loading} style={{ padding: '14px 48px', background: colors.amber, color: '#1B1746', border: 'none', borderRadius: 10, fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+        <button onClick={handleStart} disabled={loading} style={{ padding: '14px 48px', background: colors.amber, color: '#0E2A3D', border: 'none', borderRadius: 10, fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
           {loading ? 'جاري البدء...' : 'التالي: اختيار المستشار ←'}
         </button>
       </div>

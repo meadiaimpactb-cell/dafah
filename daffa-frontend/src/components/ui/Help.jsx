@@ -245,7 +245,7 @@ export function TipLayer() {
       )}
       {helpMode && (
         <div className="df-helpbar" role="status">
-          <span className="df-help" style={{ margin: 0, background: '#F5A524', borderColor: '#F5A524', color: '#1B1746' }} aria-hidden="true">؟</span>
+          <span className="df-help" style={{ margin: 0, background: '#EF6A2C', borderColor: '#EF6A2C', color: '#0E2A3D' }} aria-hidden="true">؟</span>
           <span>وضع الشرح مفعّل — اضغط أي عنصر عليه علامة <b>؟</b> لتعرف وظيفته</span>
           <button type="button" onClick={() => setHelpMode(false)}>إنهاء</button>
         </div>

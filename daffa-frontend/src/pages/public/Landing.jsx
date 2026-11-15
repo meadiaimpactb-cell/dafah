@@ -1,16 +1,14 @@
 // الصفحة الرئيسية — كل النصوص قابلة للتعديل من «محتوى الموقع» في لوحة الأدمن (sc).
 import React from 'react';
 import { colors, systems, font } from '../../theme/tokens';
+import { RosetteShape } from '../../components/brand/Logo';
 import { IcTarget, IcCog, IcClipboard, IcCheckCircle, IcLightbulb, IcChat, IcDocument } from '../../utils/icons';
 
-const DAL = 'M60,32 C82,35 96,52 93,67 C91,79 83,85 70,85 L25,85';
 const wrap = { maxWidth: 1180, margin: '0 auto', padding: '0 clamp(16px, 4vw, 40px)' };
 
 const Eyebrow = ({ children, dark }) => (
   <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 700, color: dark ? colors.amber : colors.primary, marginBottom: 10 }}>
-    <span style={{ display: 'inline-flex', alignItems: 'flex-end', gap: 3 }}>
-      {[5, 7, 9].map((d, i) => <span key={i} style={{ width: d, height: d, borderRadius: '50%', background: colors.amber, marginBottom: i * 3 }} />)}
-    </span>
+    <RosetteShape size={16} color={colors.amber} />
     {children}
   </div>
 );
@@ -23,7 +21,7 @@ function HeroPreview() {
   ];
   return (
     <div aria-hidden="true" style={{ position: 'relative', width: '100%', maxWidth: 440, marginInline: 'auto' }}>
-      <div style={{ background: '#fff', borderRadius: 22, padding: 20, boxShadow: '0 30px 70px rgba(10,8,40,0.45)', transform: 'rotate(-2deg)' }}>
+      <div style={{ background: '#fff', borderRadius: 22, padding: 20, boxShadow: '0 30px 70px rgba(6,20,30,0.45)', transform: 'rotate(-2deg)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
           <div style={{ fontFamily: font.display, fontWeight: 700, color: colors.ink, fontSize: 15 }}>رحلة جمعيتك</div>
           <span style={{ fontSize: 11.5, fontWeight: 700, background: colors.amber, color: colors.ink, borderRadius: 999, padding: '2px 10px' }}>خطوتك التالية</span>
@@ -41,7 +39,7 @@ function HeroPreview() {
           );
         })}
       </div>
-      <div style={{ position: 'absolute', bottom: -18, left: -10, background: '#fff', borderRadius: 16, padding: '10px 14px', boxShadow: '0 16px 40px rgba(10,8,40,0.35)', display: 'flex', alignItems: 'center', gap: 10, transform: 'rotate(2deg)' }}>
+      <div style={{ position: 'absolute', bottom: -18, left: -10, background: '#fff', borderRadius: 16, padding: '10px 14px', boxShadow: '0 16px 40px rgba(6,20,30,0.35)', display: 'flex', alignItems: 'center', gap: 10, transform: 'rotate(2deg)' }}>
         <span style={{ width: 34, height: 34, borderRadius: 10, background: colors.greenLight, color: colors.greenText, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IcCheckCircle width={20} height={20} /></span>
         <div>
           <div style={{ fontSize: 12.5, fontWeight: 700, color: colors.ink }}>اعتمد المستشار وحدتك</div>
@@ -83,17 +81,17 @@ export default function Landing({ sc, navigate, onRegister, PublicNav, PublicFoo
 
       {/* البطل */}
       <section style={{ position: 'relative', overflow: 'hidden', background: `radial-gradient(1200px 500px at 85% -10%, ${colors.primaryDeep} 0%, transparent 60%), ${colors.ink}`, color: '#fff' }}>
-        <svg aria-hidden="true" viewBox="0 0 120 120" style={{ position: 'absolute', right: '-6%', bottom: '-35%', width: 'min(70vw, 720px)', opacity: 0.06 }}><path d={DAL} fill="none" stroke="#fff" strokeWidth="19" strokeLinecap="round" /></svg>
+        <RosetteShape size={760} color="#FFFFFF" opacity={0.06} style={{ position: 'absolute', right: '-12%', bottom: '-38%', animation: 'dfTurn 90s linear infinite' }} />
         <div style={{ ...wrap, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))', gap: 'clamp(32px, 5vw, 64px)', alignItems: 'center', padding: 'clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px) clamp(64px, 9vw, 110px)', position: 'relative' }}>
           <div>
             <Eyebrow dark>للجمعيات والمؤسسات غير الربحية</Eyebrow>
             <h1 style={{ color: '#fff', fontSize: 'clamp(28px, 3.6vw, 44px)', fontWeight: 800, lineHeight: 1.35 }}>{sc('hero_title', 'نظام البناء الاستراتيجي والتشغيلي للمنظمات غير الربحية')}</h1>
-            <p style={{ fontSize: 'clamp(16px, 1.6vw, 19px)', color: '#DDDAF7', marginTop: 18, lineHeight: 1.9, maxWidth: 560 }}>{sc('hero_subtitle', 'فكرة النظام وآلية العمل')}</p>
+            <p style={{ fontSize: 'clamp(16px, 1.6vw, 19px)', color: '#D6E4EE', marginTop: 18, lineHeight: 1.9, maxWidth: 560 }}>{sc('hero_subtitle', 'فكرة النظام وآلية العمل')}</p>
             <div style={{ display: 'flex', gap: 12, marginTop: 30, flexWrap: 'wrap' }}>
-              <button onClick={onRegister} style={{ height: 54, padding: '0 30px', borderRadius: 14, border: 'none', background: colors.amber, color: colors.ink, fontSize: 16.5, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 3px 0 rgba(154,91,7,0.5)' }}>ابدأ مجانًا الآن ←</button>
+              <button onClick={onRegister} style={{ height: 54, padding: '0 30px', borderRadius: 14, border: 'none', background: colors.amber, color: colors.ink, fontSize: 16.5, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 3px 0 rgba(163,63,18,0.5)' }}>ابدأ مجانًا الآن ←</button>
               <button onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })} style={{ height: 54, padding: '0 26px', borderRadius: 14, border: '1.5px solid rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: 16, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>كيف تعمل دفة؟</button>
             </div>
-            <div style={{ display: 'flex', gap: 20, marginTop: 28, flexWrap: 'wrap', fontSize: 14, color: '#C9C5F9' }}>
+            <div style={{ display: 'flex', gap: 20, marginTop: 28, flexWrap: 'wrap', fontSize: 14, color: '#BFD6E5' }}>
               {['بدون خبرة سابقة', 'مستشار متخصص', 'وثائق جاهزة PDF'].map((t) => (
                 <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><IcCheckCircle width={18} height={18} style={{ color: colors.amber }} />{t}</span>
               ))}
@@ -107,7 +105,7 @@ export default function Landing({ sc, navigate, onRegister, PublicNav, PublicFoo
       <section style={{ ...wrap, marginTop: -44, position: 'relative', zIndex: 2 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: 16 }}>
           {easy.map((e) => (
-            <div key={e.t} style={{ background: '#fff', borderRadius: 20, padding: 22, border: `1px solid ${colors.grayBorder}`, boxShadow: '0 12px 30px rgba(27,23,70,0.07)' }}>
+            <div key={e.t} style={{ background: '#fff', borderRadius: 20, padding: 22, border: `1px solid ${colors.grayBorder}`, boxShadow: '0 12px 30px rgba(14,42,61,0.07)' }}>
               <div style={{ width: 46, height: 46, borderRadius: 14, background: colors.primaryTint, color: colors.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>{e.icon}</div>
               <h3 style={{ fontSize: 17, marginBottom: 6 }}>{e.t}</h3>
               <p style={{ fontSize: 14.5, color: colors.gray, lineHeight: 1.9 }}>{e.d}</p>
@@ -180,7 +178,7 @@ export default function Landing({ sc, navigate, onRegister, PublicNav, PublicFoo
 
       {/* دعوة */}
       <section style={{ background: colors.amber, position: 'relative', overflow: 'hidden' }}>
-        <svg aria-hidden="true" viewBox="0 0 120 120" style={{ position: 'absolute', left: '4%', top: '-30%', width: 300, opacity: 0.12 }}><path d={DAL} fill="none" stroke={colors.ink} strokeWidth="19" strokeLinecap="round" /></svg>
+        <RosetteShape size={300} color={colors.ink} opacity={0.1} style={{ position: 'absolute', left: '3%', top: '-40%' }} />
         <div style={{ ...wrap, padding: 'clamp(40px, 6vw, 64px) clamp(16px, 4vw, 40px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap', position: 'relative' }}>
           <h2 style={{ fontSize: 'clamp(22px, 3vw, 32px)', fontWeight: 800, color: colors.ink, maxWidth: 680 }}>{sc('cta_title', 'ابدأ رحلة التخطيط الاستراتيجي لمنظمتك الآن')}</h2>
           <button onClick={onRegister} style={{ height: 56, padding: '0 34px', borderRadius: 16, border: 'none', background: colors.ink, color: '#fff', fontWeight: 700, fontSize: 17, fontFamily: 'inherit', cursor: 'pointer' }}>سجّل مجانًا</button>

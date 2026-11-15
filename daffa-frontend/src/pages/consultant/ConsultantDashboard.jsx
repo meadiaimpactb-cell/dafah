@@ -6,10 +6,10 @@ import FormDataViewer from './FormDataViewer';
 import { IcCheckCircle, IcArrowPath, IcClipboard, IcUsers, IcWarning, IcXMark, IcSparkles } from '../../utils/icons';
 
 const colors = {
-  primary: '#5546D6', ink: '#1B1746', primaryDeep: '#5546D6',
-  orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F', green: '#0B7F5D', red: '#D03F2A',
-  gray: '#67637A', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
-  yellow: '#9A5B07',
+  primary: '#235D7F', ink: '#0E2A3D', primaryDeep: '#235D7F',
+  orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F', green: '#0B7F5D', red: '#C53A3A',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
+  yellow: '#A33F12',
 };
 
 const CACHE_KEY = 'consultant_dashboard_cache';
@@ -17,9 +17,9 @@ const CACHE_KEY = 'consultant_dashboard_cache';
 const StatusBadge = ({ status }) => {
   const map = {
     submitted:  { label: 'مُرسَل',   bg: '#EAF4FD', color: '#1A65AD' },
-    reviewing:  { label: 'قيد المراجعة', bg: '#FFF8EA', color: colors.amberText },
+    reviewing:  { label: 'قيد المراجعة', bg: '#FEF3EC', color: colors.amberText },
     approved:   { label: 'معتمد',    bg: '#E8F8F2', color: colors.green },
-    revision:   { label: 'يحتاج تعديل', bg: '#FFF8EA', color: colors.amberText },
+    revision:   { label: 'يحتاج تعديل', bg: '#FEF3EC', color: colors.amberText },
     not_started:{ label: 'لم يبدأ',  bg: colors.grayLight, color: colors.gray },
   };
   const s = map[status] || { label: status, bg: colors.grayLight, color: colors.gray };
@@ -31,7 +31,7 @@ const StatusBadge = ({ status }) => {
 };
 
 const MetricCard = ({ title, value, icon, color }) => (
-  <div style={{ background: 'white', borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(27,23,70,0.07)', display: 'flex', alignItems: 'center', gap: 14 }}>
+  <div style={{ background: 'white', borderRadius: 12, padding: 20, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', display: 'flex', alignItems: 'center', gap: 14 }}>
     <div style={{ width: 44, height: 44, borderRadius: 12, background: color ? `${color}18` : `${colors.primary}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: color || colors.primary }}>
       {icon}
     </div>
@@ -46,15 +46,15 @@ const MetricCard = ({ title, value, icon, color }) => (
 const ConfirmModal = ({ type, unitName, orgName, onConfirm, onCancel }) => {
   const isApprove = type === 'approve';
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(27,23,70,0.55)', backdropFilter: 'blur(4px)' }}>
-      <div style={{ background: 'white', borderRadius: 20, padding: 32, width: 420, boxShadow: '0 24px 64px rgba(27,23,70,0.25)', textAlign: 'center', animation: 'modalIn 0.22s ease-out both' }}>
-        <div style={{ width: 64, height: 64, borderRadius: '50%', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: isApprove ? '#E8F8F2' : '#FFF8EA', border: `2px solid ${isApprove ? '#A9E4CF' : '#FCD98B'}` }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(14,42,61,0.55)', backdropFilter: 'blur(4px)' }}>
+      <div style={{ background: 'white', borderRadius: 20, padding: 32, width: 420, boxShadow: '0 24px 64px rgba(14,42,61,0.25)', textAlign: 'center', animation: 'modalIn 0.22s ease-out both' }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: isApprove ? '#E8F8F2' : '#FEF3EC', border: `2px solid ${isApprove ? '#A9E4CF' : '#FBC3A3'}` }}>
           {isApprove ? (
             <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#0B7F5D" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="20 6 9 17 4 12"/>
             </svg>
           ) : (
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#9A5B07" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#A33F12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
             </svg>
@@ -71,7 +71,7 @@ const ConfirmModal = ({ type, unitName, orgName, onConfirm, onCancel }) => {
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={onCancel} style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: '1.5px solid #E8E3DA', background: 'white', color: colors.gray, fontSize: 14, fontWeight: 600, fontFamily: "inherit", cursor: 'pointer' }}>إلغاء</button>
-          <button onClick={onConfirm} style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: isApprove ? colors.green : colors.amber, color: '#1B1746', fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: 'pointer', boxShadow: `0 4px 14px ${isApprove ? '#0E9F7440' : '#F5A52466'}` }}>
+          <button onClick={onConfirm} style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: isApprove ? colors.green : colors.amber, color: '#0E2A3D', fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: 'pointer', boxShadow: `0 4px 14px ${isApprove ? '#0E9F7440' : '#EF6A2C66'}` }}>
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
               {isApprove ? (
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -152,8 +152,8 @@ const ReviewDetailModal = ({ submissionId, initialData, serviceType = 'strategic
   };
 
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(27,23,70,0.45)', zIndex: 99999, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '24px 16px' }}>
-      <div style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 860, boxShadow: '0 20px 60px rgba(27,23,70,0.2)' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,42,61,0.45)', zIndex: 99999, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '24px 16px' }}>
+      <div style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 860, boxShadow: '0 20px 60px rgba(14,42,61,0.2)' }}>
         {/* Header */}
         <div style={{ padding: '18px 24px', borderBottom: `1px solid ${colors.grayBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
@@ -162,13 +162,13 @@ const ReviewDetailModal = ({ submissionId, initialData, serviceType = 'strategic
             </div>
             <div style={{ fontSize: 12, color: colors.gray, marginTop: 2 }}>
               {sub?.org_name}
-              {isOp && <span style={{ marginRight: 8, padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: '#FFF8EA', color: colors.amberText }}>تشغيلي</span>}
+              {isOp && <span style={{ marginRight: 8, padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: '#FEF3EC', color: colors.amberText }}>تشغيلي</span>}
               {isPol && <span style={{ marginRight: 8, padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: '#E8F8F2', color: colors.green }}>سياسة</span>}
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {sub && <StatusBadge status={sub.status} />}
-            {sub?.is_late && <span style={{ padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: '#FDECE9', color: colors.red, display: 'inline-flex', alignItems: 'center', gap: 4 }}><IcWarning width={12} height={12}/> متأخر {sub.days_pending} يوم</span>}
+            {sub?.is_late && <span style={{ padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: '#FCEBEB', color: colors.red, display: 'inline-flex', alignItems: 'center', gap: 4 }}><IcWarning width={12} height={12}/> متأخر {sub.days_pending} يوم</span>}
             <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: 'none', background: colors.grayLight, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: colors.gray }}><IcXMark width={16} height={16}/></button>
           </div>
         </div>
@@ -251,7 +251,7 @@ const ReviewDetailModal = ({ submissionId, initialData, serviceType = 'strategic
       )}
 
       {toast && ReactDOM.createPortal(
-        <div style={{ position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)', zIndex: 9999999, background: toast.type === 'success' ? '#086449' : '#8F2415', color: 'white', padding: '12px 24px', borderRadius: 12, fontSize: 14, fontWeight: 600, fontFamily: "inherit", boxShadow: '0 4px 20px rgba(27,23,70,0.3)', whiteSpace: 'nowrap' }}>
+        <div style={{ position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)', zIndex: 9999999, background: toast.type === 'success' ? '#086449' : '#842525', color: 'white', padding: '12px 24px', borderRadius: 12, fontSize: 14, fontWeight: 600, fontFamily: "inherit", boxShadow: '0 4px 20px rgba(14,42,61,0.3)', whiteSpace: 'nowrap' }}>
           {toast.text}
         </div>, document.body
       )}
@@ -320,7 +320,7 @@ export default function ConsultantDashboard() {
       </div>
 
       {/* Pending Reviews List */}
-      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(27,23,70,0.07)', overflow: 'hidden' }}>
+      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', overflow: 'hidden' }}>
         <div style={{ padding: '16px 20px', borderBottom: `1px solid ${colors.grayBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, margin: 0 }}>المراجعات المعلقة</h3>
           {pending.length > 0 && <span style={{ fontSize: 12, color: colors.gray }}>آخر {pending.length} مراجعات</span>}
@@ -336,7 +336,7 @@ export default function ConsultantDashboard() {
             const svcType   = s.service_type || 'strategic';
             const openModal = () => { setReviewId(s.id); setReviewData(s); setReviewSvcType(svcType); };
             const svcBadge  = svcType === 'operational'
-              ? { label: 'تشغيلي', bg: '#FFF8EA', color: colors.amberText }
+              ? { label: 'تشغيلي', bg: '#FEF3EC', color: colors.amberText }
               : svcType === 'policy'
               ? { label: 'سياسة',  bg: '#E8F8F2', color: colors.green }
               : null;
@@ -362,7 +362,7 @@ export default function ConsultantDashboard() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <StatusBadge status={s.status} />
-                  {s.is_late && <span style={{ padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: '#FDECE9', color: colors.red, display: 'inline-flex', alignItems: 'center', gap: 4 }}><IcWarning width={12} height={12}/> متأخر</span>}
+                  {s.is_late && <span style={{ padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: '#FCEBEB', color: colors.red, display: 'inline-flex', alignItems: 'center', gap: 4 }}><IcWarning width={12} height={12}/> متأخر</span>}
                   <span style={{ fontSize: 11, color: colors.gray }}>{s.submitted_at}</span>
                   <button onClick={e => { e.stopPropagation(); openModal(); }}
                     style={{ padding: '5px 14px', borderRadius: 8, border: 'none', background: colors.primary, color: 'white', fontWeight: 600, fontSize: 12, fontFamily: "inherit", cursor: 'pointer' }}>

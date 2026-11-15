@@ -1,6 +1,6 @@
 import React from 'react';
 
-const colors = { primary: '#5546D6', ink: '#1B1746', orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F' };
+const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
 const norm = s => (s || '').replace(/\s+/g, ' ').trim();
 
 /**
@@ -66,7 +66,7 @@ export function buildOrgTree(positions) {
   return { roots, issues };
 }
 
-const ORG_LEVEL_COLORS = [colors.ink, colors.primary, '#5546D6', '#6C5EE6', '#8D82EF'];
+const ORG_LEVEL_COLORS = [colors.ink, colors.primary, '#235D7F', '#33769C', '#5592B6'];
 
 export function OrgNode({ node, depth = 0 }) {
   const bg = ORG_LEVEL_COLORS[Math.min(depth, ORG_LEVEL_COLORS.length - 1)];

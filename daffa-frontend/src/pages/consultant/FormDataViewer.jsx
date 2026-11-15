@@ -2,9 +2,9 @@ import DfIcon from '../../components/ui/DfIcon';
 import React from 'react';
 
 const colors = {
-  primary: '#5546D6', ink: '#1B1746', primarySoft: '#E7E5FD',
-  orange: '#F5A524', green: '#0B7F5D',
-  gray: '#67637A', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
+  primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
+  orange: '#EF6A2C', green: '#0B7F5D',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
 };
 
 // ── ترجمة المفاتيح ─────────────────────────────────────────────────────────────
@@ -85,7 +85,7 @@ const safeStr = (v) => {
 
 // ── عارض قيمة نصية ────────────────────────────────────────────────────────────
 const TextValue = ({ value }) => (
-  <div style={{ fontSize: 13, color: '#34314A', padding: '8px 12px', background: colors.grayLight, borderRadius: 6, lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+  <div style={{ fontSize: 13, color: '#334452', padding: '8px 12px', background: colors.grayLight, borderRadius: 6, lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
     {String(value ?? '')}
   </div>
 );
@@ -94,7 +94,7 @@ const TextValue = ({ value }) => (
 const ListValue = ({ items }) => (
   <ul style={{ margin: 0, paddingRight: 20 }}>
     {items.map((item, i) => (
-      <li key={i} style={{ fontSize: 13, color: '#34314A', lineHeight: 1.9, padding: '2px 0' }}>{item}</li>
+      <li key={i} style={{ fontSize: 13, color: '#334452', lineHeight: 1.9, padding: '2px 0' }}>{item}</li>
     ))}
   </ul>
 );
@@ -114,7 +114,7 @@ const TableView = ({ headers, rows }) => (
         {rows.map((row, i) => (
           <tr key={i} style={{ borderBottom: `1px solid ${colors.grayBorder}`, background: i % 2 === 0 ? 'white' : '#FBF9F5' }}>
             {row.map((cell, j) => (
-              <td key={j} style={{ padding: '8px 12px', color: '#34314A', verticalAlign: 'top', lineHeight: 1.7 }}>{cell || '—'}</td>
+              <td key={j} style={{ padding: '8px 12px', color: '#334452', verticalAlign: 'top', lineHeight: 1.7 }}>{cell || '—'}</td>
             ))}
           </tr>
         ))}
@@ -179,11 +179,11 @@ const ObjectListViewer = ({ items, type }) => {
               ].map(([lbl, val]) => val ? (
                 <div key={lbl} style={{ fontSize: 12 }}>
                   <span style={{ color: colors.gray }}>{lbl}: </span>
-                  <span style={{ color: '#34314A', fontWeight: 600 }}>{val}</span>
+                  <span style={{ color: '#334452', fontWeight: 600 }}>{val}</span>
                 </div>
               ) : null)}
               {ini.description && (
-                <div style={{ gridColumn: '1/-1', fontSize: 12, color: '#34314A', lineHeight: 1.7 }}>
+                <div style={{ gridColumn: '1/-1', fontSize: 12, color: '#334452', lineHeight: 1.7 }}>
                   <span style={{ color: colors.gray }}>الوصف: </span>{ini.description}
                 </div>
               )}
@@ -202,7 +202,7 @@ const ObjectListViewer = ({ items, type }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {items.map((item, i) => (
-        <div key={i} style={{ padding: '8px 12px', background: colors.grayLight, borderRadius: 8, fontSize: 13, color: '#34314A' }}>
+        <div key={i} style={{ padding: '8px 12px', background: colors.grayLight, borderRadius: 8, fontSize: 13, color: '#334452' }}>
           {typeof item === 'object' ? Object.entries(item).map(([k, v]) => (
             <div key={k} style={{ whiteSpace: 'pre-wrap', lineHeight: 1.7 }}>
               <strong>{label(k)}: </strong>{safeStr(v)}
@@ -225,7 +225,7 @@ const TocViewer = ({ data }) => {
           <div style={{ padding: '8px 14px', background: colors.primarySoft, fontSize: 13, fontWeight: 700, color: colors.ink }}>
             {icons[k]} {LABELS[k] || k}
           </div>
-          <div style={{ padding: '10px 14px', fontSize: 13, color: '#34314A', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{data[k]}</div>
+          <div style={{ padding: '10px 14px', fontSize: 13, color: '#334452', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{data[k]}</div>
         </div>
       ) : null)}
     </div>
@@ -246,7 +246,7 @@ const BmcViewer = ({ data }) => {
           <div style={{ padding: '7px 12px', background: colors.primarySoft, fontSize: 12, fontWeight: 700, color: colors.ink }}>
             {icon} {LABELS[k]}
           </div>
-          <div style={{ padding: '8px 12px', fontSize: 12, color: '#34314A', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{data[k]}</div>
+          <div style={{ padding: '8px 12px', fontSize: 12, color: '#334452', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{data[k]}</div>
         </div>
       ) : null)}
     </div>
@@ -348,10 +348,10 @@ export default function FormDataViewer({ data }) {
         return (
           <Section key={key} title={sectionLabel}>
             <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 10 }}>
-              {[['so','#E8F8F2','#0B7F5D'], ['wo','#FFF8EA','#9A5B07'], ['st','#EAF4FD','#1A65AD'], ['wt','#FDECE9','#D03F2A']].map(([k, bg, clr]) => value[k] ? (
+              {[['so','#E8F8F2','#0B7F5D'], ['wo','#FEF3EC','#A33F12'], ['st','#EAF4FD','#1A65AD'], ['wt','#FCEBEB','#C53A3A']].map(([k, bg, clr]) => value[k] ? (
                 <div key={k} style={{ padding: 12, background: bg, borderRadius: 10, border: `1px solid ${clr}30` }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: clr, marginBottom: 6 }}>{LABELS[k]}</div>
-                  <div style={{ fontSize: 12, color: '#34314A', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{value[k]}</div>
+                  <div style={{ fontSize: 12, color: '#334452', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{value[k]}</div>
                 </div>
               ) : null)}
             </div>
@@ -366,7 +366,7 @@ export default function FormDataViewer({ data }) {
               {['vision', 'mission'].map(k => value[k] ? (
                 <div key={k} style={{ padding: 12, background: colors.primarySoft, borderRadius: 10, border: `1px solid ${colors.primary}30` }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: colors.ink, marginBottom: 4 }}>{LABELS[k]}</div>
-                  <div style={{ fontSize: 13, color: '#34314A', lineHeight: 1.8 }}>{value[k]}</div>
+                  <div style={{ fontSize: 13, color: '#334452', lineHeight: 1.8 }}>{value[k]}</div>
                 </div>
               ) : null)}
             </div>
@@ -378,10 +378,10 @@ export default function FormDataViewer({ data }) {
         return (
           <Section key={key} title={sectionLabel}>
             <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 10 }}>
-              {[['strengths','#E8F8F2','#0B7F5D',<DfIcon name="muscle" size={20} />], ['weaknesses','#FDECE9','#D03F2A',<DfIcon name="warning" size={20} />], ['opportunities','#EAF4FD','#1A65AD',<DfIcon name="rocket" size={20} />], ['threats','#FFF8EA','#9A5B07',<DfIcon name="shield" size={20} />]].map(([k, bg, clr, ico]) => value[k] ? (
+              {[['strengths','#E8F8F2','#0B7F5D',<DfIcon name="muscle" size={20} />], ['weaknesses','#FCEBEB','#C53A3A',<DfIcon name="warning" size={20} />], ['opportunities','#EAF4FD','#1A65AD',<DfIcon name="rocket" size={20} />], ['threats','#FEF3EC','#A33F12',<DfIcon name="shield" size={20} />]].map(([k, bg, clr, ico]) => value[k] ? (
                 <div key={k} style={{ padding: 12, background: bg, borderRadius: 10, border: `1px solid ${clr}30` }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: clr, marginBottom: 6 }}>{ico} {LABELS[k]}</div>
-                  <div style={{ fontSize: 12, color: '#34314A', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{value[k]}</div>
+                  <div style={{ fontSize: 12, color: '#334452', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{value[k]}</div>
                 </div>
               ) : null)}
             </div>

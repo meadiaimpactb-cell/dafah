@@ -2,10 +2,10 @@ import React, { useState, useEffect, useCallback } from "react";
 import api from "../../api/axios";
 
 const colors = {
-  primary: "#5546D6", ink: "#1B1746",
-  orange: "#F5A524", amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F',
+  primary: "#235D7F", ink: "#0E2A3D",
+  orange: "#EF6A2C", amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F',
   white: "#FFFFFF",
-  gray: "#67637A", grayLight: "#F3EFE8", grayBorder: "#E8E3DA",
+  gray: "#5E6B78", grayLight: "#F3EFE8", grayBorder: "#E8E3DA",
   green: "#0E9F74",
 };
 
@@ -91,7 +91,7 @@ export default function AdminSettings() {
               background: active === i ? "white" : "transparent",
               color: active === i ? colors.primary : colors.gray,
               border: "none", cursor: "pointer", transition: "all 0.2s",
-              boxShadow: active === i ? "0 1px 3px rgba(27,23,70,0.08)" : "none",
+              boxShadow: active === i ? "0 1px 3px rgba(14,42,61,0.08)" : "none",
               whiteSpace: "nowrap",
             }}
           >
@@ -101,7 +101,7 @@ export default function AdminSettings() {
       </div>
 
       {/* Card */}
-      <div style={{ background: "white", borderRadius: 14, padding: 20, boxShadow: "0 1px 4px rgba(27,23,70,0.06)" }}>
+      <div style={{ background: "white", borderRadius: 14, padding: 20, boxShadow: "0 1px 4px rgba(14,42,61,0.06)" }}>
         {hasFields ? (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 16 }}>
@@ -134,7 +134,7 @@ export default function AdminSettings() {
                     fontFamily: "inherit", cursor: saving ? "default" : "pointer",
                     border: "none",
                     background: saved ? colors.green : colors.amber,
-                    color: "#1B1746", transition: "background 0.3s",
+                    color: "#0E2A3D", transition: "background 0.3s",
                   }}
                 >
                   {saving ? "جارٍ الحفظ…" : saved ? "✓ تم الحفظ" : "حفظ الإعدادات"}

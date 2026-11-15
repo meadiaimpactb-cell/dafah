@@ -56,7 +56,7 @@ function OutputDrawer({ row, onClose }) {
   const sys = systems[row.system];
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 800 }}>
-      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(18,15,51,0.5)', animation: 'pageIn .2s' }} />
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(10,31,46,0.5)', animation: 'pageIn .2s' }} />
       <aside role="dialog" aria-label="تفاصيل المخرج" style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: 'min(860px, 100vw)', background: colors.bg, display: 'flex', flexDirection: 'column', boxShadow: '0 0 60px rgba(0,0,0,0.3)', animation: 'pageIn .2s' }}>
         <header style={{ background: '#fff', borderBottom: `1px solid ${colors.grayBorder}`, padding: '16px 20px', display: 'flex', alignItems: 'flex-start', gap: 12, borderTop: `4px solid ${sys.color}` }}>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -115,7 +115,7 @@ function OutputDrawer({ row, onClose }) {
                       {isOpen && (
                         <div style={{ padding: '4px 16px 16px', borderTop: `1px solid ${colors.grayBorder}` }}>
                           {it.consultant_notes && (
-                            <div style={{ margin: '12px 0', padding: '12px 14px', borderRadius: 12, background: it.status === 'revision' ? colors.amberSoft : colors.greenLight, border: `1px solid ${it.status === 'revision' ? '#FEEDC6' : '#C9EFE1'}` }}>
+                            <div style={{ margin: '12px 0', padding: '12px 14px', borderRadius: 12, background: it.status === 'revision' ? colors.amberSoft : colors.greenLight, border: `1px solid ${it.status === 'revision' ? '#FDE2D2' : '#C9EFE1'}` }}>
                               <div style={{ fontSize: 12.5, fontWeight: 700, color: it.status === 'revision' ? colors.amberText : colors.greenText, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}><IcChat width={15} height={15} /> ملاحظة المستشار{it.reviewed_at ? ` · ${it.reviewed_at.slice(0, 10)}` : ''}</div>
                               <div style={{ fontSize: 14, lineHeight: 1.9, color: colors.text, whiteSpace: 'pre-wrap' }}>{it.consultant_notes}</div>
                             </div>
@@ -147,13 +147,13 @@ function ConsultantDrawer({ c, onClose }) {
   useEffect(() => { adminApi.getConsultantReviews(c.id).then((r) => setD(r.data)).catch(() => setD({ data: [], ratings: [] })); }, [c]);
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 800 }}>
-      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(18,15,51,0.5)' }} />
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(10,31,46,0.5)' }} />
       <aside role="dialog" aria-label="قرارات المستشار" style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: 'min(640px, 100vw)', background: colors.bg, display: 'flex', flexDirection: 'column', boxShadow: '0 0 60px rgba(0,0,0,0.3)' }}>
         <header style={{ background: colors.ink, color: '#fff', padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 46, height: 46, borderRadius: 14, background: colors.amber, color: colors.ink, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: font.display, fontWeight: 700, fontSize: 20 }}>{(c.name || 'م')[0]}</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: font.display, fontSize: 18, fontWeight: 700 }}>{c.name}</div>
-            <div style={{ fontSize: 13, color: '#DDDAF7' }}>{c.specialty || 'مستشار'} · قرارات المراجعة وملاحظاته</div>
+            <div style={{ fontSize: 13, color: '#D6E4EE' }}>{c.specialty || 'مستشار'} · قرارات المراجعة وملاحظاته</div>
           </div>
           <button onClick={onClose} aria-label="إغلاق" style={{ width: 38, height: 38, borderRadius: 12, border: 'none', background: 'rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer' }}><IcXMark width={18} height={18} /></button>
         </header>

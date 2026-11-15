@@ -4,11 +4,11 @@ import { strategicApi } from '../../../api/strategic';
 import { PayLogo, PaymentMethodPicker, ApplePayButton, SecurePaymentBadge } from '../../shared/PaymentBrand';
 
 const C = {
-  primary: '#5546D6', ink: '#1B1746', primarySoft: '#E7E5FD',
-  orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F', amberSoft: '#FFF8EA',
-  gray: '#67637A', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
+  primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
+  orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F', amberSoft: '#FEF3EC',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
   green: '#0B7F5D', greenLight: '#C9EFE1',
-  red: '#D03F2A', redLight: '#FAD4CE',
+  red: '#C53A3A', redLight: '#F8D3D3',
 };
 
 // ── شعارات الشبكات الرسمية (public/payments) — بنفس الأسماء المستخدمة في الصفحات ──
@@ -99,7 +99,7 @@ export const CardPreview = ({ cardNum, name, expiry, brand }) => {
         <div style={{ fontSize: 11, opacity: 0.8, letterSpacing: 1 }}>بطاقة الدفع</div>
         <div>
           {brand && (
-            <div style={{ background: '#fff', borderRadius: 6, padding: '4px 8px', display: 'flex', alignItems: 'center', boxShadow: '0 1px 4px rgba(27,23,70,0.15)' }}>
+            <div style={{ background: '#fff', borderRadius: 6, padding: '4px 8px', display: 'flex', alignItems: 'center', boxShadow: '0 1px 4px rgba(14,42,61,0.15)' }}>
               {brand === 'visa' ? <IcVisa /> : brand === 'mc' ? <IcMastercard /> : <IcMada height={18} />}
             </div>
           )}
@@ -193,7 +193,7 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
     <div className="animate-in" style={{ maxWidth: 820, margin: '0 auto', direction: 'rtl' }}>
 
       {/* Header */}
-      <div style={{ background: '#fff', borderRadius: 14, padding: '20px 28px', marginBottom: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: '#fff', borderRadius: 14, padding: '20px 28px', marginBottom: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <h2 style={{ fontSize: 18, fontWeight: 800, color: C.ink, marginBottom: 3 }}>إتمام الدفع</h2>
           <p style={{ fontSize: 13, color: C.gray }}>أتمّ الدفع لبدء رحلة التخطيط الاستراتيجي</p>
@@ -208,7 +208,7 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
         {/* ── طريقة الدفع ─────────────────────────────── */}
         <div>
           {/* أزرار طرق الدفع */}
-          <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', marginBottom: 16 }}>
+          <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', marginBottom: 16 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginBottom: 14 }}>اختر طريقة الدفع</div>
             <PaymentMethodPicker
               value={method}
@@ -219,7 +219,7 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
 
           {/* ── بطاقة ائتمان / مدى ── */}
           {(method === 'card' || method === 'mada') && (
-            <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+            <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
               <CardPreview cardNum={cardNum} name={holder} expiry={expiry} brand={method === 'mada' ? 'mada' : brand} />
 
               {/* Test card hint */}
@@ -296,7 +296,7 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
 
           {/* ── Apple Pay ── */}
           {method === 'apple_pay' && (
-            <div style={{ background: '#fff', borderRadius: 14, padding: 32, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', textAlign: 'center' }}>
+            <div style={{ background: '#fff', borderRadius: 14, padding: 32, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', textAlign: 'center' }}>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}><PayLogo name="apple_pay" height={44} /></div>
               <p style={{ fontSize: 13, color: C.gray, maxWidth: 300, margin: '0 auto 22px', lineHeight: 1.8 }}>
                 ادفع بأمان باستخدام Apple Pay من جهازك — لا تحتاج إلى إدخال بيانات البطاقة
@@ -307,7 +307,7 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
 
           {/* ── تحويل بنكي ── */}
           {method === 'bank_transfer' && (
-            <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+            <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginBottom: 16 }}>بيانات التحويل البنكي</div>
 
               {[
@@ -319,13 +319,13 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
                 <div key={r.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: C.grayLight, borderRadius: 10, marginBottom: 8 }}>
                   <div>
                     <div style={{ fontSize: 11, color: C.gray, marginBottom: 2 }}>{r.label}</div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1B1746', fontFamily: r.label.includes('IBAN') || r.label.includes('SWIFT') ? "'Courier New',monospace" : "inherit", letterSpacing: r.label.includes('IBAN') || r.label.includes('SWIFT') ? 1 : 0 }}>{r.value}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#0E2A3D', fontFamily: r.label.includes('IBAN') || r.label.includes('SWIFT') ? "'Courier New',monospace" : "inherit", letterSpacing: r.label.includes('IBAN') || r.label.includes('SWIFT') ? 1 : 0 }}>{r.value}</div>
                   </div>
                   <CopyBtn text={r.value.replace(/\s/g,'')} />
                 </div>
               ))}
 
-              <div style={{ marginTop: 14, padding: '12px 16px', background: '#FFF8EA', borderRadius: 10, border: '1px solid #FCD98B', fontSize: 12, color: '#7A4706', lineHeight: 1.7 }}>
+              <div style={{ marginTop: 14, padding: '12px 16px', background: '#FEF3EC', borderRadius: 10, border: '1px solid #FBC3A3', fontSize: 12, color: '#7F310E', lineHeight: 1.7 }}>
                 <strong>تعليمات التحويل:</strong> بعد إتمام التحويل، أرسل إيصال الدفع عبر المحادثة مع المستشار. سيتم تفعيل الخدمة خلال يوم عمل واحد من تأكيد الاستلام.
               </div>
             </div>
@@ -336,7 +336,7 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
 
         {/* ── ملخص الطلب ────────────────────────────── */}
         <div>
-          <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', marginBottom: 16 }}>
+          <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', marginBottom: 16 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginBottom: 16, paddingBottom: 12, borderBottom: `1px solid ${C.grayBorder}` }}>ملخص الطلب</div>
 
             <Row label="الخدمة"     value="التخطيط الاستراتيجي" />
@@ -356,7 +356,7 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
           </div>
 
           {/* كود الخصم */}
-          <div style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', marginBottom: 16 }}>
+          <div style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', marginBottom: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 10 }}>كود الخصم</div>
             <div style={{ display: 'flex', gap: 8 }}>
               <input
@@ -371,7 +371,7 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
 
           {/* زر الدفع */}
           {error && (
-            <div style={{ background: C.redLight, color: C.red, border: `1px solid #F5B8AE`, borderRadius: 10, padding: '10px 14px', marginBottom: 12, textAlign: 'center', fontSize: 13 }}>
+            <div style={{ background: C.redLight, color: C.red, border: `1px solid #F1B2B2`, borderRadius: 10, padding: '10px 14px', marginBottom: 12, textAlign: 'center', fontSize: 13 }}>
               {error}
             </div>
           )}
@@ -381,8 +381,8 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
             disabled={loading}
             style={{
               width: '100%', padding: '16px 0',
-              background: loading ? '#8F8BA3' : `linear-gradient(135deg,${C.amber},#F5A524)`,
-              color: '#1B1746', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800,
+              background: loading ? '#8C97A3' : `linear-gradient(135deg,${C.amber},#EF6A2C)`,
+              color: '#0E2A3D', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800,
               cursor: loading ? 'not-allowed' : 'pointer', fontFamily: "inherit",
               boxShadow: loading ? 'none' : `0 6px 20px ${C.amberLine}50`,
               transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -418,14 +418,14 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
 const Row = ({ label, value }) => (
   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: C.gray, marginBottom: 8, alignItems: 'center' }}>
     <span>{label}</span>
-    <span style={{ color: '#34314A', fontWeight: 600 }}>{value}</span>
+    <span style={{ color: '#334452', fontWeight: 600 }}>{value}</span>
   </div>
 );
 
 const RRow = ({ label, value, vc }) => (
   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: C.gray, alignItems: 'center' }}>
     <span>{label}</span>
-    <span style={{ color: vc || '#34314A', fontWeight: 600 }}>{value}</span>
+    <span style={{ color: vc || '#334452', fontWeight: 600 }}>{value}</span>
   </div>
 );
 
@@ -445,7 +445,7 @@ export const PaymentReceipt = ({ workflow, serviceLabel, extraRows }) => {
 
   return (
     <div className="animate-in" style={{ maxWidth: 560, margin: '0 auto', direction: 'rtl' }}>
-      <div style={{ background: '#fff', borderRadius: 14, padding: 28, marginBottom: 16, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', textAlign: 'center' }}>
+      <div style={{ background: '#fff', borderRadius: 14, padding: 28, marginBottom: 16, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', textAlign: 'center' }}>
         <div style={{ width: 68, height: 68, borderRadius: '50%', background: C.greenLight, margin: '0 auto 14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke={C.green} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="20 6 9 17 4 12" />
@@ -460,7 +460,7 @@ export const PaymentReceipt = ({ workflow, serviceLabel, extraRows }) => {
         )}
       </div>
 
-      <div style={{ background: '#fff', borderRadius: 14, padding: 20, marginBottom: 16, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+      <div style={{ background: '#fff', borderRadius: 14, padding: 20, marginBottom: 16, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 12 }}>طريقة الدفع المستخدمة</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: `${C.primary}08`, borderRadius: 10, border: `1.5px solid ${C.primary}25` }}>
           <span style={{ color: C.primary, display: 'flex', alignItems: 'center' }}>{m.icon}</span>
@@ -469,7 +469,7 @@ export const PaymentReceipt = ({ workflow, serviceLabel, extraRows }) => {
         </div>
       </div>
 
-      <div style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+      <div style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 12 }}>ملخص الطلب</div>
         {extraRows}
         <div style={{ borderTop: `1px dashed ${C.grayBorder}`, paddingTop: 12, marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -486,7 +486,7 @@ export const PaymentReceipt = ({ workflow, serviceLabel, extraRows }) => {
   );
 };
 
-const labelS = { fontSize: 12, fontWeight: 600, color: '#34314A', display: 'block', marginBottom: 6 };
+const labelS = { fontSize: 12, fontWeight: 600, color: '#334452', display: 'block', marginBottom: 6 };
 
 const inputS = {
   width: '100%', padding: '11px 14px',

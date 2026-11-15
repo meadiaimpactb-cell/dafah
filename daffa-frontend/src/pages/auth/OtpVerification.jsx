@@ -115,7 +115,7 @@ export default function OtpVerification({
         </button>
 
         <button type="button" disabled={resending || wait > 0} onClick={resend}
-          style={{ ...styles.linkBtn, color: wait > 0 ? '#8F8BA3' : '#5546D6', cursor: wait > 0 ? 'default' : 'pointer' }}>
+          style={{ ...styles.linkBtn, color: wait > 0 ? '#8C97A3' : '#235D7F', cursor: wait > 0 ? 'default' : 'pointer' }}>
           {resending ? 'جارٍ الإرسال...' : wait > 0 ? `إرسال رمز جديد بعد ${fmtWait(wait)}` : 'إرسال رمز جديد'}
         </button>
 
@@ -129,26 +129,26 @@ export default function OtpVerification({
 }
 
 const styles = {
-  title: { textAlign: 'center', fontSize: 22, fontWeight: 700, color: '#1B1746', marginBottom: 10 },
-  titleCompact: { fontSize: 15, fontWeight: 700, color: '#1B1746', margin: '0 0 6px' },
-  subtitle: { textAlign: 'center', fontSize: 14, color: '#67637A', lineHeight: 1.8, marginBottom: 24 },
-  email: { unicodeBidi: 'isolate', overflowWrap: 'anywhere', color: '#1B1746' },
+  title: { textAlign: 'center', fontSize: 22, fontWeight: 700, color: '#0E2A3D', marginBottom: 10 },
+  titleCompact: { fontSize: 15, fontWeight: 700, color: '#0E2A3D', margin: '0 0 6px' },
+  subtitle: { textAlign: 'center', fontSize: 14, color: '#5E6B78', lineHeight: 1.8, marginBottom: 24 },
+  email: { unicodeBidi: 'isolate', overflowWrap: 'anywhere', color: '#0E2A3D' },
   form: { display: 'flex', flexDirection: 'column', gap: 12 },
   otpInput: {
     width: '100%', padding: '14px 16px', border: '1.5px solid #E8E3DA', borderRadius: 10,
-    fontSize: 28, fontWeight: 700, color: '#5546D6', background: '#FBF9F5', textAlign: 'center',
+    fontSize: 28, fontWeight: 700, color: '#235D7F', background: '#FBF9F5', textAlign: 'center',
     direction: 'ltr', letterSpacing: 10, boxSizing: 'border-box', outline: 'none', fontFamily: "inherit",
   },
   btn: {
-    width: '100%', padding: '13px', background: '#F5A524', color: '#1B1746', border: 'none', borderRadius: 10,
+    width: '100%', padding: '13px', background: '#EF6A2C', color: '#0E2A3D', border: 'none', borderRadius: 10,
     fontSize: 16, fontWeight: 700, fontFamily: "inherit",
   },
   linkBtn: { background: 'none', border: 'none', fontSize: 14, fontWeight: 700, fontFamily: "inherit", padding: 8, minHeight: 44 },
   backBtn: {
-    background: 'none', border: 'none', color: '#5546D6', cursor: 'pointer', fontSize: 14, fontWeight: 600,
+    background: 'none', border: 'none', color: '#235D7F', cursor: 'pointer', fontSize: 14, fontWeight: 600,
     fontFamily: "inherit", padding: '0 0 16px 0', display: 'block',
   },
   notice: { background: '#EAF4FD', color: '#0B7F5D', border: '1px solid #A9D2F5', borderRadius: 8, padding: '10px 14px', fontSize: 13, textAlign: 'right', lineHeight: 1.7 },
-  error: { background: '#FDECE9', color: '#D03F2A', border: '1px solid #F5B8AE', borderRadius: 8, padding: '10px 14px', fontSize: 13, textAlign: 'right', lineHeight: 1.7 },
-  hint: { fontSize: 12, color: '#8F8BA3', textAlign: 'center', lineHeight: 1.8, margin: '2px 0 0' },
+  error: { background: '#FCEBEB', color: '#C53A3A', border: '1px solid #F1B2B2', borderRadius: 8, padding: '10px 14px', fontSize: 13, textAlign: 'right', lineHeight: 1.7 },
+  hint: { fontSize: 12, color: '#8C97A3', textAlign: 'center', lineHeight: 1.8, margin: '2px 0 0' },
 };

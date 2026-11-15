@@ -9,17 +9,17 @@ import { usePermissions } from '../../utils/permissions';
 import { IcCheckCircle, IcArrowPath, IcWarning, IcXMark, IcSparkles, IcClipboard, IcCog, IcScroll, IcPalette, IcLock, IcUpload, IcEye, IcDocument } from '../../utils/icons';
 
 const colors = {
-  primary: '#5546D6', ink: '#1B1746',
-  orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F', green: '#0B7F5D', red: '#D03F2A',
-  gray: '#67637A', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
+  primary: '#235D7F', ink: '#0E2A3D',
+  orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F', green: '#0B7F5D', red: '#C53A3A',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
 };
 
 const StatusBadge = ({ status }) => {
   const map = {
     submitted:  { label: 'مُرسَل',                  bg: '#EAF4FD', color: '#1A65AD' },
-    reviewing:  { label: 'قيد المراجعة',            bg: '#FFF8EA', color: colors.amberText },
+    reviewing:  { label: 'قيد المراجعة',            bg: '#FEF3EC', color: colors.amberText },
     approved:   { label: 'معتمد',                   bg: '#E8F8F2', color: colors.green },
-    revision:   { label: 'بانتظار تعديل العميل',    bg: '#FEEDC6', color: '#7A4706' },
+    revision:   { label: 'بانتظار تعديل العميل',    bg: '#FDE2D2', color: '#7F310E' },
     not_started:{ label: 'لم يبدأ',                 bg: colors.grayLight, color: colors.gray },
   };
   const s = map[status] || { label: status, bg: colors.grayLight, color: colors.gray };
@@ -43,7 +43,7 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {/* Summary bar */}
-        <div style={{ padding: '8px 14px', background: '#E7E5FD', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ padding: '8px 14px', background: '#D9E8F1', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: 12, fontWeight: 700, color: colors.ink }}>
             {questionnaireSections.length} أقسام — {answeredCount} إجابة
           </span>
@@ -59,9 +59,9 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
           return (
             <div key={section.id} style={{ border: `1.5px solid ${colors.grayBorder}`, borderRadius: 10, overflow: 'hidden' }}>
               {/* Section header */}
-              <div style={{ padding: '10px 14px', background: '#E7E5FD', borderBottom: `1px solid ${colors.grayBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ padding: '10px 14px', background: '#D9E8F1', borderBottom: `1px solid ${colors.grayBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 13, fontWeight: 700, color: colors.ink }}>{section.name}</span>
-                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: answered.length === questions.length ? '#C9EFE1' : '#FEEDC6', color: answered.length === questions.length ? colors.green : '#7A4706', fontWeight: 600 }}>
+                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: answered.length === questions.length ? '#C9EFE1' : '#FDE2D2', color: answered.length === questions.length ? colors.green : '#7F310E', fontWeight: 600 }}>
                   {answered.length}/{questions.length} مكتمل
                 </span>
               </div>
@@ -77,7 +77,7 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
                       {/* Question label */}
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 6 }}>
                         <span style={{ fontSize: 11, fontWeight: 700, color: colors.primary, marginTop: 1 }}>س{qi + 1}</span>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: '#34314A', flex: 1, lineHeight: 1.6 }}>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: '#334452', flex: 1, lineHeight: 1.6 }}>
                           {q.question}
                           {q.required && <span style={{ color: colors.red, marginRight: 3 }}>*</span>}
                         </div>
@@ -85,17 +85,17 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
 
                       {/* Answer */}
                       {isEmpty ? (
-                        <div style={{ fontSize: 12, color: colors.gray, fontStyle: 'italic', padding: '6px 10px', background: '#FFF8EA', borderRadius: 6, borderRight: `3px solid #F9C152` }}>
+                        <div style={{ fontSize: 12, color: colors.gray, fontStyle: 'italic', padding: '6px 10px', background: '#FEF3EC', borderRadius: 6, borderRight: `3px solid #F79D6C` }}>
                           لم يتم الإجابة
                         </div>
                       ) : Array.isArray(answer) ? (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                           {answer.map((item, i) => (
-                            <span key={i} style={{ fontSize: 12, background: '#E7E5FD', color: colors.primary, borderRadius: 20, padding: '3px 12px', fontWeight: 600 }}>{item}</span>
+                            <span key={i} style={{ fontSize: 12, background: '#D9E8F1', color: colors.primary, borderRadius: 20, padding: '3px 12px', fontWeight: 600 }}>{item}</span>
                           ))}
                         </div>
                       ) : (
-                        <div style={{ fontSize: 13, color: '#1B1746', padding: '8px 12px', background: colors.grayLight, borderRadius: 6, lineHeight: 1.8, whiteSpace: 'pre-wrap', borderRight: `3px solid ${colors.primary}` }}>
+                        <div style={{ fontSize: 13, color: '#0E2A3D', padding: '8px 12px', background: colors.grayLight, borderRadius: 6, lineHeight: 1.8, whiteSpace: 'pre-wrap', borderRight: `3px solid ${colors.primary}` }}>
                           {String(answer)}
                         </div>
                       )}
@@ -121,7 +121,7 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
       {Object.entries(formData).map(([key, value]) => (
         <div key={key} style={{ padding: '8px 12px', background: colors.grayLight, borderRadius: 6 }}>
           <div style={{ fontSize: 11, color: colors.primary, fontWeight: 600, marginBottom: 4 }}>{key}</div>
-          <div style={{ fontSize: 13, color: '#34314A' }}>
+          <div style={{ fontSize: 13, color: '#334452' }}>
             {Array.isArray(value) ? value.join('، ') : String(value ?? '—')}
           </div>
         </div>
@@ -134,16 +134,16 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
 const ConfirmModal = ({ type, unitName, orgName, onConfirm, onCancel }) => {
   const isApprove = type === 'approve';
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(27,23,70,0.5)', backdropFilter: 'blur(4px)' }}>
-      <div style={{ background: 'white', borderRadius: 20, padding: 32, width: 420, boxShadow: '0 24px 64px rgba(27,23,70,0.25)', textAlign: 'center', animation: 'modalIn 0.22s ease-out both' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(14,42,61,0.5)', backdropFilter: 'blur(4px)' }}>
+      <div style={{ background: 'white', borderRadius: 20, padding: 32, width: 420, boxShadow: '0 24px 64px rgba(14,42,61,0.25)', textAlign: 'center', animation: 'modalIn 0.22s ease-out both' }}>
         {/* Icon */}
-        <div style={{ width: 64, height: 64, borderRadius: '50%', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: isApprove ? '#E8F8F2' : '#FFF8EA', border: `2px solid ${isApprove ? '#A9E4CF' : '#FCD98B'}` }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: isApprove ? '#E8F8F2' : '#FEF3EC', border: `2px solid ${isApprove ? '#A9E4CF' : '#FBC3A3'}` }}>
           {isApprove ? (
             <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#0B7F5D" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="20 6 9 17 4 12"/>
             </svg>
           ) : (
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#9A5B07" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#A33F12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
             </svg>
@@ -170,7 +170,7 @@ const ConfirmModal = ({ type, unitName, orgName, onConfirm, onCancel }) => {
             إلغاء
           </button>
           <button onClick={onConfirm}
-            style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: isApprove ? colors.green : colors.amber, color: '#1B1746', fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: 'pointer', boxShadow: `0 4px 14px ${isApprove ? '#0E9F7440' : '#F5A52466'}` }}>
+            style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: isApprove ? colors.green : colors.amber, color: '#0E2A3D', fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: 'pointer', boxShadow: `0 4px 14px ${isApprove ? '#0E9F7440' : '#EF6A2C66'}` }}>
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
               {isApprove ? (
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -265,7 +265,7 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
   };
 
   return (
-    <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(27,23,70,0.07)', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <div style={{ padding: '14px 20px', borderBottom: `1px solid ${colors.grayBorder}`, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0 }}>
         <div>
@@ -274,13 +274,13 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
           </div>
           <div style={{ fontSize: 12, color: colors.gray, marginTop: 2 }}>
             {sub?.org_name}
-            {isOp && <span style={{ marginRight: 8, padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: '#FFF8EA', color: '#9A5B07' }}>تشغيلي</span>}
+            {isOp && <span style={{ marginRight: 8, padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: '#FEF3EC', color: '#A33F12' }}>تشغيلي</span>}
             {isPol && <span style={{ marginRight: 8, padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: '#E8F8F2', color: '#0B7F5D' }}>سياسة</span>}
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           {sub && <StatusBadge status={sub.status} />}
-          {sub?.is_late && <span style={{ padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: '#FDECE9', color: colors.red, display: 'inline-flex', alignItems: 'center', gap: 4 }}><IcWarning width={12} height={12}/> متأخر</span>}
+          {sub?.is_late && <span style={{ padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: '#FCEBEB', color: colors.red, display: 'inline-flex', alignItems: 'center', gap: 4 }}><IcWarning width={12} height={12}/> متأخر</span>}
           <button onClick={onClose} style={{ width: 28, height: 28, borderRadius: 6, border: 'none', background: colors.grayLight, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: colors.gray }}><IcXMark width={14} height={14}/></button>
         </div>
       </div>
@@ -309,12 +309,12 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
                   {sub.consultant_notes && (
                     <div style={{ marginBottom: 12 }}>
                       <div style={{ fontSize: 12, fontWeight: 600, color: colors.ink, marginBottom: 6 }}>الملاحظات المرسلة للعميل</div>
-                      <div style={{ padding: '10px 14px', background: '#FFF8EA', borderRadius: 8, border: `1px solid #FCD98B`, fontSize: 13, color: '#5F3705', lineHeight: 1.8 }}>
+                      <div style={{ padding: '10px 14px', background: '#FEF3EC', borderRadius: 8, border: `1px solid #FBC3A3`, fontSize: 13, color: '#5E240A', lineHeight: 1.8 }}>
                         {sub.consultant_notes}
                       </div>
                     </div>
                   )}
-                  <div style={{ padding: '14px 16px', borderRadius: 10, background: '#FEEDC6', border: '1px solid #FCD98B', color: '#7A4706', fontSize: 13, fontWeight: 600, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <div style={{ padding: '14px 16px', borderRadius: 10, background: '#FDE2D2', border: '1px solid #FBC3A3', color: '#7F310E', fontSize: 13, fontWeight: 600, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                     <IcArrowPath width={16} height={16}/>
                     بانتظار تعديل العميل وإعادة الإرسال
                   </div>
@@ -391,7 +391,7 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
       )}
 
       {toast && ReactDOM.createPortal(
-        <div style={{ position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)', zIndex: 9999999, background: toast.type === 'success' ? '#086449' : '#8F2415', color: 'white', padding: '12px 24px', borderRadius: 12, fontSize: 14, fontWeight: 600, fontFamily: "inherit", boxShadow: '0 4px 20px rgba(27,23,70,0.3)', whiteSpace: 'nowrap' }}>
+        <div style={{ position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)', zIndex: 9999999, background: toast.type === 'success' ? '#086449' : '#842525', color: 'white', padding: '12px 24px', borderRadius: 12, fontSize: 14, fontWeight: 600, fontFamily: "inherit", boxShadow: '0 4px 20px rgba(14,42,61,0.3)', whiteSpace: 'nowrap' }}>
           {toast.text}
         </div>, document.body
       )}
@@ -409,7 +409,7 @@ function DesignRequestsPanel() {
 
   const statusLabels = {
     pending:            { label: 'في انتظار التصميم', bg: '#EAF4FD', color: '#1A65AD' },
-    revision_requested: { label: 'طُلب تعديل',         bg: '#FFF8EA', color: colors.amberText },
+    revision_requested: { label: 'طُلب تعديل',         bg: '#FEF3EC', color: colors.amberText },
     uploaded:           { label: 'تم الرفع',            bg: '#E8F8F2', color: colors.green },
   };
 
@@ -453,7 +453,7 @@ function DesignRequestsPanel() {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 1fr' : '1fr', gap: 16, flex: 1, minHeight: 0 }}>
       {/* List */}
-      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(27,23,70,0.07)', overflow: 'hidden' }}>
+      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', overflow: 'hidden' }}>
         {items.map((w, i) => {
           const st = statusLabels[w.design_status] || statusLabels.pending;
           return (
@@ -477,7 +477,7 @@ function DesignRequestsPanel() {
 
       {/* Upload Panel */}
       {selected && (
-        <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(27,23,70,0.07)', padding: 24, overflowY: 'auto' }}>
+        <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', padding: 24, overflowY: 'auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
             <div>
               <div style={{ fontSize: 16, fontWeight: 700, color: colors.ink }}>{selected.org_name}</div>
@@ -487,9 +487,9 @@ function DesignRequestsPanel() {
           </div>
 
           {selected.design_revision_notes && (
-            <div style={{ padding: '10px 14px', background: '#FFF8EA', borderRadius: 8, border: `1px solid ${colors.amberLine}30`, marginBottom: 16 }}>
+            <div style={{ padding: '10px 14px', background: '#FEF3EC', borderRadius: 8, border: `1px solid ${colors.amberLine}30`, marginBottom: 16 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: colors.amberText, marginBottom: 4 }}>ملاحظات التعديل من العميل:</div>
-              <div style={{ fontSize: 12, color: '#34314A' }}>{selected.design_revision_notes}</div>
+              <div style={{ fontSize: 12, color: '#334452' }}>{selected.design_revision_notes}</div>
             </div>
           )}
 
@@ -675,7 +675,7 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
 
       {/* Client filter banner */}
       {clientFilter && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, padding: '8px 14px', background: '#E7E5FD', borderRadius: 10, border: '1.5px solid #5546D630' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, padding: '8px 14px', background: '#D9E8F1', borderRadius: 10, border: '1.5px solid #235D7F30' }}>
           <span style={{ fontSize: 13, fontWeight: 700, color: colors.ink }}>
             <DfIcon name="clipboard" size={18} style={{ marginInlineEnd: 6 }} />عرض: {clientFilter.orgName}
           </span>
@@ -704,7 +704,7 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
 
       {!isDesign && <div style={{ display: 'grid', gridTemplateColumns: selectedId ? '1fr 1fr' : '1fr', gap: 16, flex: 1, minHeight: 0 }}>
         {/* List */}
-        <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(27,23,70,0.07)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           {filtered.length === 0 ? (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: colors.gray, padding: 40 }}>
               <div style={{ marginBottom: 8, color: colors.gray }}>{isPending ? <IcSparkles width={32} height={32}/> : <IcClipboard width={32} height={32}/>}</div>

@@ -1,18 +1,19 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // هوية دفة — رموز التصميم (Design Tokens)
 // المصدر الوحيد للألوان والخطوط والمقاسات في الواجهة.
-// القاعدة: النيلي للهيكل والتنقل، والكهرماني «خطوتك التالية» دائمًا مع نص داكن.
+// الألوان مشتقة من الشعار الأصلي: أزرق الدفّة للهيكل والتنقل، والبرتقالي لـ«خطوتك التالية» دائمًا مع نص كحلي.
+// (أسماء المفاتيح الدلالية مثل amber/primary بقيت كما هي للتوافق مع الكود القائم.)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const palette = {
-  ink:     { 700: '#322C6E', 800: '#262159', 900: '#1B1746', 950: '#120F33' },
-  indigo:  { 50: '#F3F2FE', 100: '#E7E5FD', 200: '#D0CCFA', 300: '#B0A9F6', 400: '#8D82EF', 500: '#6C5EE6', 600: '#5546D6', 700: '#4537B4', 800: '#382D90', 900: '#2B2470' },
-  amber:   { 50: '#FFF8EA', 100: '#FEEDC6', 200: '#FCD98B', 300: '#F9C152', 400: '#F5A524', 500: '#E0920F', 600: '#B9740A', 700: '#9A5B07', 800: '#7A4706' },
+  navy:     { 700: '#1C4D6A', 800: '#15354B', 900: '#0E2A3D', 950: '#0A1F2E' },
+  blue:  { 50: '#EEF5F9', 100: '#D9E8F1', 200: '#B5D2E3', 300: '#86B5D0', 400: '#5592B6', 500: '#33769C', 600: '#235D7F', 700: '#1C4D6A', 800: '#173F57', 900: '#123247' },
+  orange:   { 50: '#FEF3EC', 100: '#FDE2D2', 200: '#FBC3A3', 300: '#F79D6C', 400: '#EF6A2C', 500: '#E05A1F', 600: '#C24C17', 700: '#A33F12', 800: '#7F310E' },
   emerald: { 50: '#E8F8F2', 100: '#C9EFE1', 200: '#A9E4CF', 300: '#7FD3B5', 400: '#2DBE92', 500: '#0E9F74', 600: '#0B7F5D', 700: '#086449', 800: '#064B37' },
-  coral:   { 50: '#FDECE9', 100: '#FAD4CE', 200: '#F5B8AE', 300: '#EE9A8C', 500: '#E5533D', 600: '#D03F2A', 700: '#B5301D', 800: '#8F2415' },
+  red:   { 50: '#FCEBEB', 100: '#F8D3D3', 200: '#F1B2B2', 300: '#E88E8E', 500: '#DC4A4A', 600: '#C53A3A', 700: '#A52F2F', 800: '#842525' },
   sky:     { 50: '#EAF4FD', 100: '#CFE5FA', 200: '#A9D2F5', 300: '#7DBBF0', 500: '#2E8FE6', 600: '#1F74C4', 700: '#1A65AD', 800: '#164F8A' },
   sand:    { 0: '#FFFFFF', 50: '#FBF9F5', 100: '#F3EFE8', 200: '#E8E3DA', 300: '#D9D3C7' },
-  slate:   { 400: '#B5B1C4', 500: '#8F8BA3', 600: '#67637A', 700: '#4A4660', 800: '#34314A' },
+  slate:   { 400: '#B4BDC6', 500: '#8C97A3', 600: '#5E6B78', 700: '#465564', 800: '#334452' },
 };
 
 const p = palette;
@@ -20,22 +21,23 @@ const p = palette;
 // الأسماء الدلالية المستخدمة في المكوّنات
 export const colors = {
   // العلامة
-  primary:     p.indigo[600],
-  primaryHover: p.indigo[700],
-  primaryDeep: p.indigo[900],
-  primarySoft: p.indigo[100],
-  primaryTint: p.indigo[50],
-  ink:         p.ink[900],
-  inkSoft:     p.ink[800],
+  primary:     p.blue[600],
+  primaryHover: p.blue[700],
+  primaryDeep: p.blue[900],
+  primarySoft: p.blue[100],
+  primaryTint: p.blue[50],
+  ink:         p.navy[900],   // الكحلي
+  navy:        p.navy[900],
+  inkSoft:     p.navy[800],
 
-  // الكهرماني: خلفية الإجراء الرئيس (بنص داكن دائمًا) + نص/خط آمن التباين
-  amber:       p.amber[400],
-  amberHover:  p.amber[300],
-  amberText:   p.amber[700],
-  amberLine:   p.amber[500],
-  amberSoft:   p.amber[50],
-  orange:      p.amber[400],   // اسم قديم — يُبقى للتوافق
-  orangeLight: p.amber[50],
+  // البرتقالي (لون وصف الشعار): خلفية الإجراء الرئيس (بنص داكن دائمًا) + نص/خط آمن التباين
+  amber:       p.orange[400],   // البرتقالي (اسم المفتاح قديم للتوافق)
+  amberHover:  p.orange[300],
+  amberText:   p.orange[700],
+  amberLine:   p.orange[500],
+  amberSoft:   p.orange[50],
+  orange:      p.orange[400],   // اسم قديم — يُبقى للتوافق
+  orangeLight: p.orange[50],
 
   // الأسطح والنصوص
   bg:          p.sand[50],
@@ -57,12 +59,12 @@ export const colors = {
   blue:        p.sky[600],
   blueText:    p.sky[700],
   blueLight:   p.sky[50],
-  yellow:      p.amber[400],
-  yellowText:  p.amber[700],
-  yellowLight: p.amber[50],
-  red:         p.coral[600],
-  redText:     p.coral[700],
-  redLight:    p.coral[50],
+  yellow:      p.orange[400],
+  yellowText:  p.orange[700],
+  yellowLight: p.orange[50],
+  red:         p.red[600],
+  redText:     p.red[700],
+  redLight:    p.red[50],
 };
 
 // الأنظمة الثلاثة مستقلة تمامًا، ولكلٍّ منها لون يميّزه في كل الواجهات
@@ -70,7 +72,7 @@ export const systems = {
   strategic: {
     key: 'strategic', view: 'strategic-roadmap',
     label: 'التخطيط الاستراتيجي', short: 'الاستراتيجي',
-    color: p.indigo[600], strong: p.indigo[700], soft: p.indigo[50], tint: p.indigo[100], text: p.indigo[700],
+    color: p.blue[600], strong: p.blue[700], soft: p.blue[50], tint: p.blue[100], text: p.blue[700],
   },
   operational: {
     key: 'operational', view: 'operational-roadmap',
@@ -80,7 +82,7 @@ export const systems = {
   policies: {
     key: 'policies', view: 'policies-select',
     label: 'السياسات واللوائح', short: 'السياسات',
-    color: p.amber[400], strong: p.amber[600], soft: p.amber[50], tint: p.amber[100], text: p.amber[700],
+    color: p.orange[400], strong: p.orange[600], soft: p.orange[50], tint: p.orange[100], text: p.orange[700],
   },
 };
 
@@ -92,11 +94,11 @@ export const font = {
 export const radius = { sm: 8, md: 12, lg: 16, xl: 22, pill: 999 };
 
 export const shadow = {
-  xs: '0 1px 2px rgba(27,23,70,0.06)',
-  sm: '0 2px 8px rgba(27,23,70,0.06)',
-  md: '0 8px 24px rgba(27,23,70,0.08)',
-  lg: '0 18px 48px rgba(27,23,70,0.14)',
-  focus: '0 0 0 3px rgba(85,70,214,0.28)',
+  xs: '0 1px 2px rgba(14,42,61,0.06)',
+  sm: '0 2px 8px rgba(14,42,61,0.06)',
+  md: '0 8px 24px rgba(14,42,61,0.08)',
+  lg: '0 18px 48px rgba(14,42,61,0.14)',
+  focus: '0 0 0 3px rgba(35,93,127,0.28)',
 };
 
 // نقاط الانكسار — مطابقة لما في index.css
@@ -104,14 +106,14 @@ export const breakpoints = { phone: 640, tablet: 1024 };
 
 // ألوان الحالات الموحّدة لكل الشارات
 export const tones = {
-  primary: { bg: p.indigo[100],  text: p.indigo[700],  dot: p.indigo[600] },
-  teal:    { bg: p.indigo[100],  text: p.indigo[700],  dot: p.indigo[600] }, // اسم قديم
+  primary: { bg: p.blue[100],  text: p.blue[700],  dot: p.blue[600] },
+  teal:    { bg: p.blue[100],  text: p.blue[700],  dot: p.blue[600] }, // اسم قديم
   green:   { bg: p.emerald[100], text: p.emerald[700], dot: p.emerald[500] },
-  orange:  { bg: p.amber[100],   text: p.amber[800],   dot: p.amber[400] },
-  yellow:  { bg: p.amber[100],   text: p.amber[800],   dot: p.amber[400] },
-  amber:   { bg: p.amber[100],   text: p.amber[800],   dot: p.amber[400] },
+  orange:  { bg: p.orange[100],   text: p.orange[800],   dot: p.orange[400] },
+  yellow:  { bg: p.orange[100],   text: p.orange[800],   dot: p.orange[400] },
+  amber:   { bg: p.orange[100],   text: p.orange[800],   dot: p.orange[400] },
   blue:    { bg: p.sky[100],     text: p.sky[800],     dot: p.sky[600] },
-  red:     { bg: p.coral[100],   text: p.coral[800],   dot: p.coral[600] },
+  red:     { bg: p.red[100],   text: p.red[800],   dot: p.red[600] },
   gray:    { bg: p.sand[100],    text: p.slate[700],   dot: p.slate[500] },
 };
 

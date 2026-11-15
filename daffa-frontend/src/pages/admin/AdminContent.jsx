@@ -5,12 +5,12 @@ import { adminApi } from '../../api/admin';
 import StrategicContentEditor from './StrategicContentEditor';
 
 const C = {
-  primary: '#5546D6', ink: '#1B1746', primarySoft: '#E7E5FD',
+  primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
   green: '#0B7F5D', greenLight: '#E8F8F2',
-  orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F', amberSoft: '#FFF8EA',
-  gray: '#67637A', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
-  red: '#D03F2A',
-  white: '#FFFFFF', dark: '#1B1746',
+  orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F', amberSoft: '#FEF3EC',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
+  red: '#C53A3A',
+  white: '#FFFFFF', dark: '#0E2A3D',
 };
 
 const TABS = [
@@ -42,7 +42,7 @@ function Toast({ msg, type, onClose }) {
   useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t); }, []);
   const bg = type === 'success' ? C.green : C.red;
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', bottom: 24, left: 24, background: bg, color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, zIndex: 9999, fontFamily: 'inherit', boxShadow: '0 4px 20px rgba(27,23,70,.2)' }}>
+    <div style={{ position: 'fixed', bottom: 24, left: 24, background: bg, color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, zIndex: 9999, fontFamily: 'inherit', boxShadow: '0 4px 20px rgba(14,42,61,.2)' }}>
       {msg}
     </div>,
     document.body
@@ -51,8 +51,8 @@ function Toast({ msg, type, onClose }) {
 
 function Modal({ title, subtitle, onClose, children, wide }) {
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(27,23,70,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9000, padding: 20 }}>
-      <div style={{ background: C.white, borderRadius: 16, width: '100%', maxWidth: wide ? 680 : 560, maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 60px rgba(27,23,70,.25)', direction: 'rtl', fontFamily: 'inherit' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,42,61,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9000, padding: 20 }}>
+      <div style={{ background: C.white, borderRadius: 16, width: '100%', maxWidth: wide ? 680 : 560, maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 60px rgba(14,42,61,.25)', direction: 'rtl', fontFamily: 'inherit' }}>
         <div style={{ padding: '18px 22px', borderBottom: `1px solid ${C.grayBorder}`, flexShrink: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
@@ -195,7 +195,7 @@ function ListEditor({ label, value, onChange, placeholder = 'العنوان', pl
                 style={{ width: '100%', padding: '7px 10px', borderRadius: 6, border: `1px solid ${C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', fontWeight: 600 }} />
             </div>
             <textarea value={item.d} onChange={e => update(i, 'd', e.target.value)} placeholder={placeholderD} rows={2}
-              style={{ width: '100%', padding: '7px 10px', borderRadius: 6, border: `1px solid ${C.grayBorder}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box', lineHeight: 1.6, color: '#4A4660' }} />
+              style={{ width: '100%', padding: '7px 10px', borderRadius: 6, border: `1px solid ${C.grayBorder}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box', lineHeight: 1.6, color: '#465564' }} />
           </div>
         ))}
       </div>
@@ -496,7 +496,7 @@ export default function AdminContent() {
       <div style={{ display: 'flex', gap: 4, background: C.grayLight, borderRadius: 12, padding: 4, marginBottom: 16, width: 'fit-content' }}>
         {TABS.map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key)}
-            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: activeTab === t.key ? 700 : 400, background: activeTab === t.key ? C.white : 'transparent', color: activeTab === t.key ? C.primary : C.gray, boxShadow: activeTab === t.key ? '0 1px 4px rgba(27,23,70,.1)' : 'none', transition: 'all .18s', whiteSpace: 'nowrap' }}>
+            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: activeTab === t.key ? 700 : 400, background: activeTab === t.key ? C.white : 'transparent', color: activeTab === t.key ? C.primary : C.gray, boxShadow: activeTab === t.key ? '0 1px 4px rgba(14,42,61,.1)' : 'none', transition: 'all .18s', whiteSpace: 'nowrap' }}>
             {t.label}
             <span style={{ marginRight: 6, padding: '1px 7px', borderRadius: 12, background: activeTab === t.key ? C.primarySoft : 'transparent', color: activeTab === t.key ? C.primary : C.gray, fontSize: 11, fontWeight: 700, fontFamily: 'inherit' }}>
               {data[t.key]?.length || t.count}

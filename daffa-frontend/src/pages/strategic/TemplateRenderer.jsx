@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useId } from 'react';
 import { formGuide, GuideBlocks, GuideExamples, LabelWithTip, InfoTip } from './UnitContent';
 import { buildOrgTree, OrgNode } from './OrgChart';
 
-const colors = { primary: '#5546D6', ink: '#1B1746', orange: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F' };
+const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
 
 export default function TemplateRenderer({ unit, formData, setFormData, disabled, context }) {
   const set = (key, value) => setFormData(prev => ({ ...prev, [key]: value }));
@@ -83,7 +83,7 @@ const SelectInput = ({ value, onChange, options, disabled }) => (
 
 /** عنوان خانة إدخال مرتبط بها (الضغط عليه ينقل المؤشر إلى الخانة) */
 const FieldLabel = ({ htmlFor, children }) => (
-  <label htmlFor={htmlFor} style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#34314A', marginBottom: 6 }}>{children}</label>
+  <label htmlFor={htmlFor} style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#334452', marginBottom: 6 }}>{children}</label>
 );
 
 const thStyle = {
@@ -153,10 +153,10 @@ function SwotTemplate({ formData, set, setFormData, disabled, unit, guide }) {
 
   const summaryTip = resolveTip(guide, 'summary', SWOT_SUMMARY_TITLE);
   const autoBox = (points, empty) => (
-    <div style={{ minHeight: 88, padding: '8px 12px', fontSize: 12, lineHeight: 1.9, color: '#34314A', background: '#FBF9F5' }}>
+    <div style={{ minHeight: 88, padding: '8px 12px', fontSize: 12, lineHeight: 1.9, color: '#334452', background: '#FBF9F5' }}>
       {points.length > 0
         ? <ul style={{ margin: 0, paddingRight: 16 }}>{points.map((p, i) => <li key={i}>{p}</li>)}</ul>
-        : <span style={{ color: '#8F8BA3' }}>{empty}</span>}
+        : <span style={{ color: '#8C97A3' }}>{empty}</span>}
     </div>
   );
 
@@ -192,20 +192,20 @@ function SwotTemplate({ formData, set, setFormData, disabled, unit, guide }) {
           {SWOT_SUMMARY_TITLE}
           {summaryTip && <InfoTip text={summaryTip.text} example={summaryTip.example} title={summaryTip.example?.title} label={SWOT_SUMMARY_TITLE} />}
         </div>
-        <div style={{ fontSize: 11.5, color: '#67637A', marginTop: 2 }}>مكيّف للتركيز على البيئة الداخلية للمنظمة</div>
+        <div style={{ fontSize: 11.5, color: '#5E6B78', marginTop: 2 }}>مكيّف للتركيز على البيئة الداخلية للمنظمة</div>
       </div>
       <GuideBlocks guide={guide} anchor="summary" />
       <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 8 }}>
         {[
           { key: 'strengths',    label: 'نقاط القوة',       code: 'S', color: '#0B7F5D', bg: '#E8F8F2', auto: strengths },
-          { key: 'weaknesses',   label: 'نقاط الضعف',       code: 'W', color: '#D03F2A', bg: '#FDECE9', auto: weaknesses },
+          { key: 'weaknesses',   label: 'نقاط الضعف',       code: 'W', color: '#C53A3A', bg: '#FCEBEB', auto: weaknesses },
           { key: 'opportunities',label: 'فرص التحسين',      code: 'O', color: '#1F74C4', bg: '#EAF4FD' },
-          { key: 'threats',      label: 'المخاطر الداخلية', code: 'T', color: '#9A5B07', bg: '#FFF8EA' },
+          { key: 'threats',      label: 'المخاطر الداخلية', code: 'T', color: '#A33F12', bg: '#FEF3EC' },
         ].map(q => (
           <div key={q.key} style={{ border: `2px solid ${q.color}25`, borderRadius: 10, overflow: 'hidden' }}>
             <div style={{ padding: '7px 12px', background: q.bg, fontSize: 13, fontWeight: 600, color: q.color, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span><Lbl guide={guide} anchor="summary" label={q.label} suffix={` (${q.code})`} /> ({q.code})</span>
-              {q.auto && <span style={{ fontSize: 10.5, fontWeight: 500, color: '#67637A' }}>تظهر تلقائيًا من الجدول</span>}
+              {q.auto && <span style={{ fontSize: 10.5, fontWeight: 500, color: '#5E6B78' }}>تظهر تلقائيًا من الجدول</span>}
             </div>
             {q.auto
               ? autoBox(q.auto, `تظهر هنا ${q.label} المسجّلة في الجدول أعلاه`)
@@ -348,7 +348,7 @@ function NeedsTemplate({ formData, setFormData, set, disabled, unit, guide }) {
               <tr key={i}>
                 <td style={{ ...tdStyle, minWidth: 150, background: '#FBF9F5' }}>
                   <TextInput value={it.name} onChange={v => update(i, 'name', v)} placeholder="اسم الاحتياج..." disabled={disabled} />
-                  {dup(it.name) && <div style={{ fontSize: 10.5, color: '#D03F2A', marginTop: 2 }}>اسم الاحتياج مكرر، يُرجى تمييزه.</div>}
+                  {dup(it.name) && <div style={{ fontSize: 10.5, color: '#C53A3A', marginTop: 2 }}>اسم الاحتياج مكرر، يُرجى تمييزه.</div>}
                 </td>
                 <td style={tdStyle}><TextInput value={it.desc}   onChange={v => update(i, 'desc',   v)} placeholder="وصف الاحتياج..." disabled={disabled} /></td>
                 <td style={{ ...tdStyle, minWidth: 90 }}><SelectInput value={it.priority} onChange={v => update(i, 'priority', v)} options={['عالية', 'متوسطة', 'منخفضة']} disabled={disabled} /></td>
@@ -357,7 +357,7 @@ function NeedsTemplate({ formData, setFormData, set, disabled, unit, guide }) {
                   <td style={{ ...tdStyle, textAlign: 'center' }}>
                     {items.length > 1 && (
                       <button type="button" onClick={() => removeRow(i)} title="حذف الصف"
-                        style={{ background: 'none', border: '1px solid #F5B8AE', borderRadius: 6, color: '#D03F2A', cursor: 'pointer', fontSize: 11, padding: '3px 8px', fontFamily: "inherit", whiteSpace: 'nowrap' }}>
+                        style={{ background: 'none', border: '1px solid #F1B2B2', borderRadius: 6, color: '#C53A3A', cursor: 'pointer', fontSize: 11, padding: '3px 8px', fontFamily: "inherit", whiteSpace: 'nowrap' }}>
                         حذف الصف
                       </button>
                     )}
@@ -386,8 +386,8 @@ function TowsTemplate({ formData, set, disabled, guide }) {
   const cells = [
     { key: 'so', title: 'SO — استراتيجيات القوة والفرص',       sub: 'كيف نستخدم نقاط القوة لاستثمار الفرص؟',       color: '#0B7F5D', bg: '#E8F8F2' },
     { key: 'wo', title: 'WO — استراتيجيات الضعف والفرص',       sub: 'كيف نعالج نقاط الضعف لاستثمار الفرص؟',        color: '#1F74C4', bg: '#EAF4FD' },
-    { key: 'st', title: 'ST — استراتيجيات القوة والتهديدات',    sub: 'كيف نستخدم نقاط القوة لمواجهة التهديدات؟',    color: '#9A5B07', bg: '#FFF8EA' },
-    { key: 'wt', title: 'WT — استراتيجيات الضعف والتهديدات',   sub: 'كيف نتجنب التهديدات في ظل نقاط الضعف؟',       color: '#D03F2A', bg: '#FDECE9' },
+    { key: 'st', title: 'ST — استراتيجيات القوة والتهديدات',    sub: 'كيف نستخدم نقاط القوة لمواجهة التهديدات؟',    color: '#A33F12', bg: '#FEF3EC' },
+    { key: 'wt', title: 'WT — استراتيجيات الضعف والتهديدات',   sub: 'كيف نتجنب التهديدات في ظل نقاط الضعف؟',       color: '#C53A3A', bg: '#FCEBEB' },
   ];
 
   return (
@@ -404,7 +404,7 @@ function TowsTemplate({ formData, set, disabled, guide }) {
                 {c.title}
                 {tip && <InfoTip text={tip.text} example={tip.example} title={tip.example?.title} label={c.key.toUpperCase()} />}
               </div>
-              <div style={{ fontSize: 11, color: '#8F8BA3', marginTop: 2 }}>{c.sub}</div>
+              <div style={{ fontSize: 11, color: '#8C97A3', marginTop: 2 }}>{c.sub}</div>
             </div>
             <TaInput value={tows[c.key]} onChange={v => update(c.key, v)} placeholder="اكتب الاستراتيجيات هنا..." rows={5} disabled={disabled} />
           </div>
@@ -451,7 +451,7 @@ function InitiativesTemplate({ formData, set, disabled, guide }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: colors.primary }}>مبادرة {i + 1}</div>
             {!disabled && init.length > 1 && (
-              <button onClick={() => removeRow(i)} style={{ background: 'none', border: 'none', color: '#D03F2A', cursor: 'pointer', fontSize: 18, lineHeight: 1 }}>✕</button>
+              <button onClick={() => removeRow(i)} style={{ background: 'none', border: 'none', color: '#C53A3A', cursor: 'pointer', fontSize: 18, lineHeight: 1 }}>✕</button>
             )}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 10 }}>
@@ -519,18 +519,18 @@ function DirectionsTemplate({ formData, set, disabled, guide }) {
       <GuideBlocks guide={guide} anchor="values" />
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
         {values.map((val, i) => (
-          <span key={i} style={{ padding: '5px 14px', borderRadius: 20, background: '#FFF8EA', color: colors.amberText, fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, border: '1px solid #FCD98B' }}>
+          <span key={i} style={{ padding: '5px 14px', borderRadius: 20, background: '#FEF3EC', color: colors.amberText, fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, border: '1px solid #FBC3A3' }}>
             {val}
-            {!disabled && <button onClick={() => removeValue(i)} style={{ background: 'none', border: 'none', color: '#D03F2A', cursor: 'pointer', fontSize: 14, lineHeight: 1, padding: 0 }}>✕</button>}
+            {!disabled && <button onClick={() => removeValue(i)} style={{ background: 'none', border: 'none', color: '#C53A3A', cursor: 'pointer', fontSize: 14, lineHeight: 1, padding: 0 }}>✕</button>}
           </span>
         ))}
         {!disabled && (
-          <button onClick={addValue} style={{ padding: '5px 14px', borderRadius: 20, background: '#F3EFE8', color: '#67637A', fontSize: 13, border: 'none', cursor: 'pointer', fontFamily: "inherit" }}>
+          <button onClick={addValue} style={{ padding: '5px 14px', borderRadius: 20, background: '#F3EFE8', color: '#5E6B78', fontSize: 13, border: 'none', cursor: 'pointer', fontFamily: "inherit" }}>
             + إضافة قيمة
           </button>
         )}
       </div>
-      {values.length === 0 && <div style={{ fontSize: 12, color: '#8F8BA3', marginBottom: 8 }}>مثال: الشفافية، الإتقان، العمل الجماعي، الابتكار</div>}
+      {values.length === 0 && <div style={{ fontSize: 12, color: '#8C97A3', marginBottom: 8 }}>مثال: الشفافية، الإتقان، العمل الجماعي، الابتكار</div>}
 
       <SectionTitleTip guide={guide} anchor="goals" label="الأهداف الاستراتيجية" />
       <GuideBlocks guide={guide} anchor="goals" />
@@ -541,7 +541,7 @@ function DirectionsTemplate({ formData, set, disabled, guide }) {
             <TextInput value={g} onChange={v => updateGoal(i, v)} placeholder="اكتب الهدف الاستراتيجي..." disabled={disabled} />
           </div>
           {!disabled && goals.length > 1 && (
-            <button onClick={() => removeGoal(i)} style={{ background: 'none', border: 'none', color: '#D03F2A', cursor: 'pointer', fontSize: 18, flexShrink: 0 }}>✕</button>
+            <button onClick={() => removeGoal(i)} style={{ background: 'none', border: 'none', color: '#C53A3A', cursor: 'pointer', fontSize: 18, flexShrink: 0 }}>✕</button>
           )}
         </div>
       ))}
@@ -560,7 +560,7 @@ function TocTemplate({ formData, set, disabled, guide }) {
   const update = (k, v) => set('toc', { ...t, [k]: v });
 
   const stages = [
-    { key: 'inputs',     title: 'المدخلات',  color: '#6C5EE6', placeholder: 'الموارد البشرية\nالموارد المالية\nالبنية التحتية' },
+    { key: 'inputs',     title: 'المدخلات',  color: '#33769C', placeholder: 'الموارد البشرية\nالموارد المالية\nالبنية التحتية' },
     { key: 'activities', title: 'الأنشطة',   color: colors.primary,  placeholder: 'برامج تدريب\nحملات توعية\nخدمات مباشرة' },
     { key: 'outputs',    title: 'المخرجات',  color: '#1F74C4', placeholder: 'عدد المستفيدين\nبرامج منفذة\nمواد منشورة' },
     { key: 'outcomes',   title: 'النتائج',   color: colors.amberText, placeholder: 'تحسن المعرفة\nتغير السلوك\nزيادة الوعي' },
@@ -597,7 +597,7 @@ function TocTemplate({ formData, set, disabled, guide }) {
 function BmcCell({ block, accent, value, onChange, disabled, guide }) {
   return (
     <div style={{ border: '1.5px solid #E8E3DA', borderRadius: 8, overflow: 'hidden' }}>
-      <div style={{ padding: '5px 8px', background: accent ? colors.amber : colors.primary, color: '#1B1746', fontSize: 11, fontWeight: 600, textAlign: 'center' }}>
+      <div style={{ padding: '5px 8px', background: accent ? colors.amber : colors.primary, color: '#0E2A3D', fontSize: 11, fontWeight: 600, textAlign: 'center' }}>
         {guide ? <Lbl guide={guide} anchor="top" label={block.t} /> : block.t}
       </div>
       <TaInput value={value} onChange={onChange} placeholder={block.p} rows={3} disabled={disabled} />
@@ -696,7 +696,7 @@ function KpisTemplate({ formData, set, disabled, unit, guide }) {
                 <td style={tdStyle}><TextInput value={row.owner}       onChange={v => updateRow(i, 'owner',       v)} placeholder="المسؤول"             disabled={disabled} /></td>
                 {!disabled && (
                   <td style={tdStyle}>
-                    {kpis.length > 1 && <button onClick={() => removeRow(i)} style={{ background: 'none', border: 'none', color: '#D03F2A', cursor: 'pointer', fontSize: 16 }}>✕</button>}
+                    {kpis.length > 1 && <button onClick={() => removeRow(i)} style={{ background: 'none', border: 'none', color: '#C53A3A', cursor: 'pointer', fontSize: 16 }}>✕</button>}
                   </td>
                 )}
               </tr>
@@ -732,10 +732,10 @@ function OrgchartTemplate({ formData, set, disabled, guide }) {
             {roots.map(r => <OrgNode key={r.key} node={r} />)}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', fontSize: 12, color: '#8F8BA3' }}>أضف الوظائف في الجدول لتظهر الخريطة التنظيمية.</div>
+          <div style={{ textAlign: 'center', fontSize: 12, color: '#8C97A3' }}>أضف الوظائف في الجدول لتظهر الخريطة التنظيمية.</div>
         )}
         {issueCount > 0 && (
-          <div style={{ marginTop: 12, fontSize: 11.5, color: '#7A4706', textAlign: 'center' }}>
+          <div style={{ marginTop: 12, fontSize: 11.5, color: '#7F310E', textAlign: 'center' }}>
             <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />{issueCount === 1 ? 'وظيفة واحدة لم تُرسم' : `${issueCount} وظائف لم تُرسم`} لعدم وضوح التبعية — راجع التنبيه عند الصف في الجدول.
           </div>
         )}
@@ -759,11 +759,11 @@ function OrgchartTemplate({ formData, set, disabled, guide }) {
                 <td style={tdStyle}><TextInput value={p.dept}      onChange={v => updatePos(i, 'dept',      v)} placeholder="اسم القسم"       disabled={disabled} /></td>
                 <td style={tdStyle}>
                   <TextInput value={p.reports_to} onChange={v => updatePos(i, 'reports_to', v)} placeholder="يتبع لـ..." disabled={disabled} />
-                  {issues[i] && <div style={{ fontSize: 10.5, color: '#7A4706', marginTop: 3, lineHeight: 1.6 }}><DfIcon name="warning" size={14} style={{ marginInlineEnd: 6 }} />{issues[i]}</div>}
+                  {issues[i] && <div style={{ fontSize: 10.5, color: '#7F310E', marginTop: 3, lineHeight: 1.6 }}><DfIcon name="warning" size={14} style={{ marginInlineEnd: 6 }} />{issues[i]}</div>}
                 </td>
                 {!disabled && (
                   <td style={tdStyle}>
-                    {positions.length > 1 && <button onClick={() => removePos(i)} style={{ background: 'none', border: 'none', color: '#D03F2A', cursor: 'pointer', fontSize: 16 }}>✕</button>}
+                    {positions.length > 1 && <button onClick={() => removePos(i)} style={{ background: 'none', border: 'none', color: '#C53A3A', cursor: 'pointer', fontSize: 16 }}>✕</button>}
                   </td>
                 )}
               </tr>
@@ -838,7 +838,7 @@ function DocumentTemplate({ formData, set, disabled, guide, context }) {
         <div key={s.key} style={{ marginBottom: 16 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>
             <Lbl guide={guide} anchor="top" label={s.label} />
-            {s.key === 'closing_notes' && <span style={{ fontSize: 11, fontWeight: 400, color: '#8F8BA3' }}> (اختياري)</span>}
+            {s.key === 'closing_notes' && <span style={{ fontSize: 11, fontWeight: 400, color: '#8C97A3' }}> (اختياري)</span>}
           </div>
           <TaInput value={doc[s.key]} onChange={v => update(s.key, v)} placeholder={s.placeholder} rows={4} disabled={disabled} />
         </div>
@@ -860,14 +860,14 @@ function GenericTemplate({ formData, set, disabled }) {
 /* ─── Helper components ─── */
 const FieldBox = ({ label, children, style }) => (
   <div style={style}>
-    <div style={{ fontSize: 12, fontWeight: 600, color: '#34314A', marginBottom: 4 }}>{label}</div>
+    <div style={{ fontSize: 12, fontWeight: 600, color: '#334452', marginBottom: 4 }}>{label}</div>
     {children}
   </div>
 );
 
 const FieldBoxTip = ({ guide, anchor, label, children, style }) => (
   <div style={style}>
-    <div style={{ fontSize: 12, fontWeight: 600, color: '#34314A', marginBottom: 4 }}><Lbl guide={guide} anchor={anchor} label={label} /></div>
+    <div style={{ fontSize: 12, fontWeight: 600, color: '#334452', marginBottom: 4 }}><Lbl guide={guide} anchor={anchor} label={label} /></div>
     {children}
   </div>
 );

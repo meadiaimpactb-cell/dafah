@@ -1,7 +1,7 @@
 {{-- رأس رسائل منصة دفة: الشعار (نسخة بيضاء على خلفية الهوية) ويفتح موقع المنصة عند الضغط عليه.
      الصورة برابط مطلق على موقع المنصة لأن برامج البريد لا تعرض الصور المضمّنة بصيغة data: --}}
 @php($site = rtrim(config('app.url'), '/'))
-<div class="header" style="background:#1B1746;padding:22px 24px 18px;border-bottom:4px solid #F5A524;text-align:center;">
+<div class="header" style="background:#0E2A3D;padding:22px 24px 18px;border-bottom:4px solid #EF6A2C;text-align:center;">
   <a href="{{ $site }}/" target="_blank" rel="noopener" title="الانتقال إلى منصة دفة" style="display:inline-block;text-decoration:none;border:0;">
     <img src="{{ $site }}/logo-white.png" width="140" height="140"
          alt="منصة دفة — للتخطيط الاستراتيجي وصناعة السياسات"
