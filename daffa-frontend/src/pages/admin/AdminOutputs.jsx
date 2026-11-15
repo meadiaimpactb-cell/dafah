@@ -138,11 +138,17 @@ function OutputDrawer({ row, onClose }) {
 // ── قرارات مستشار ─────────────────────────────────────────────────────────
 function ConsultantDrawer({ c, onClose }) {
   const [d, setD] = useState(null);
+  useEffect(() => {
+    const k = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', k);
+    document.body.style.overflow = 'hidden';
+    return () => { document.removeEventListener('keydown', k); document.body.style.overflow = ''; };
+  }, [onClose]);
   useEffect(() => { adminApi.getConsultantReviews(c.id).then((r) => setD(r.data)).catch(() => setD({ data: [], ratings: [] })); }, [c]);
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 800 }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(18,15,51,0.5)' }} />
-      <aside style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: 'min(640px, 100vw)', background: colors.bg, display: 'flex', flexDirection: 'column', boxShadow: '0 0 60px rgba(0,0,0,0.3)' }}>
+      <aside role="dialog" aria-label="قرارات المستشار" style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: 'min(640px, 100vw)', background: colors.bg, display: 'flex', flexDirection: 'column', boxShadow: '0 0 60px rgba(0,0,0,0.3)' }}>
         <header style={{ background: colors.ink, color: '#fff', padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 46, height: 46, borderRadius: 14, background: colors.amber, color: colors.ink, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: font.display, fontWeight: 700, fontSize: 20 }}>{(c.name || 'م')[0]}</div>
           <div style={{ flex: 1 }}>
