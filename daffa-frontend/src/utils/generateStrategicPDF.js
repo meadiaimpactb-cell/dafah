@@ -147,13 +147,13 @@ const PDF_CSS = `
   * { margin:0; padding:0; box-sizing:border-box; }
   .pdf-root {
     font-family:'Cairo','Segoe UI',Tahoma,Arial,sans-serif;
-    direction:rtl; color:#1f2937; background:#fff;
+    direction:rtl; color:#1B1746; background:#fff;
     font-size:12px; line-height:1.6; width:794px;
   }
 
   /* ══ غلاف ══ */
   .cover {
-    background: linear-gradient(155deg,#0f3d49 0%,#14505E 45%,#1A6B7C 100%);
+    background: linear-gradient(155deg,#1B1746 0%,#1B1746 45%,#5546D6 100%);
     color:#fff; padding:28px 36px 24px;
     border-radius:0 0 12px 12px;
     position:relative; overflow:hidden;
@@ -170,7 +170,7 @@ const PDF_CSS = `
   }
   .cover-logo { height:32px; object-fit:contain; }
   .cover-badge {
-    background:#E8620A; color:#fff;
+    background:#F5A524; color:#fff;
     padding:4px 14px; border-radius:20px;
     font-size:10px; font-weight:700;
   }
@@ -178,7 +178,7 @@ const PDF_CSS = `
   .cover-org-type { font-size:11px; opacity:0.6; margin-bottom:6px; }
   .cover-title { font-size:24px; font-weight:800; margin-bottom:6px; line-height:1.25; }
   .cover-sub { font-size:12px; opacity:0.7; margin-bottom:16px; }
-  .cover-line { width:40px; height:2px; background:#E8620A; margin:0 auto 16px; border-radius:2px; }
+  .cover-line { width:40px; height:2px; background:#F5A524; margin:0 auto 16px; border-radius:2px; }
   .cover-cards { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
   .cover-card {
     background:rgba(255,255,255,0.1);
@@ -199,7 +199,7 @@ const PDF_CSS = `
   /* ══ فهرس ══ */
   .toc-section { padding:20px 0 20px; }
   .toc-header {
-    background:#1A6B7C; color:#fff;
+    background:#5546D6; color:#fff;
     padding:10px 16px; border-radius:8px;
     font-size:14px; font-weight:800; margin-bottom:12px;
   }
@@ -207,63 +207,63 @@ const PDF_CSS = `
   .toc-item {
     display:flex; align-items:center; gap:8px;
     padding:7px 10px; border-radius:6px;
-    background:#f9fafb; border:1px solid #e5e7eb;
+    background:#FBF9F5; border:1px solid #E8E3DA;
   }
   .toc-num {
-    width:22px; height:22px; background:#1A6B7C; color:#fff;
+    width:22px; height:22px; background:#5546D6; color:#fff;
     border-radius:50%; display:inline-flex; align-items:center;
     justify-content:center; font-size:10px; font-weight:700; flex-shrink:0;
   }
-  .toc-name { font-size:11px; font-weight:600; color:#374151; }
+  .toc-name { font-size:11px; font-weight:600; color:#34314A; }
 
   /* ══ وحدات ══ */
   .unit-section { padding:0 0 16px; }
   .unit-header {
     display:flex; align-items:center; gap:10px;
     margin-bottom:12px; padding-bottom:8px;
-    border-bottom:2.5px solid #1A6B7C;
+    border-bottom:2.5px solid #5546D6;
   }
   .unit-num {
-    width:30px; height:30px; background:#1A6B7C; color:#fff;
+    width:30px; height:30px; background:#5546D6; color:#fff;
     border-radius:50%; display:inline-flex; align-items:center;
     justify-content:center; font-size:13px; font-weight:800; flex-shrink:0;
   }
-  .unit-header h2 { font-size:15px; font-weight:800; color:#14505E; }
+  .unit-header h2 { font-size:15px; font-weight:800; color:#1B1746; }
 
   .field-block {
     margin-bottom:8px; border-radius:6px;
-    border-right:3px solid #1A6B7C;
-    background:#f9fafb; padding:8px 10px;
+    border-right:3px solid #5546D6;
+    background:#FBF9F5; padding:8px 10px;
   }
   .field-label {
-    font-size:9.5px; font-weight:700; color:#1A6B7C;
+    font-size:9.5px; font-weight:700; color:#5546D6;
     text-transform:uppercase; letter-spacing:0.3px; margin-bottom:4px;
   }
-  .field-value { font-size:11.5px; color:#374151; line-height:1.65; }
+  .field-value { font-size:11.5px; color:#34314A; line-height:1.65; }
   .field-value ul { padding-right:16px; margin:0; }
   .field-value li { margin-bottom:2px; }
-  .empty { color:#9ca3af; font-style:italic; }
+  .empty { color:#8F8BA3; font-style:italic; }
 
   .data-table { width:100%; border-collapse:collapse; font-size:10.5px; margin-top:2px; }
   .data-table th {
-    background:#1A6B7C; color:#fff;
+    background:#5546D6; color:#fff;
     padding:5px 8px; font-weight:700; text-align:right; font-size:10px;
   }
-  .data-table td { padding:5px 8px; border-bottom:1px solid #e5e7eb; color:#374151; }
-  .data-table tr:nth-child(even) td { background:#f3f4f6; }
+  .data-table td { padding:5px 8px; border-bottom:1px solid #E8E3DA; color:#34314A; }
+  .data-table tr:nth-child(even) td { background:#F3EFE8; }
   .data-table tr:last-child td { border-bottom:none; }
 
   .nested-row {
     display:flex; gap:8px; padding:3px 0;
-    border-bottom:1px dashed #f3f4f6;
+    border-bottom:1px dashed #F3EFE8;
   }
   .nested-row:last-child { border-bottom:none; }
-  .nested-key { font-weight:700; color:#6b7280; min-width:100px; font-size:11px; flex-shrink:0; }
-  .nested-val { font-size:11px; color:#374151; }
+  .nested-key { font-weight:700; color:#67637A; min-width:100px; font-size:11px; flex-shrink:0; }
+  .nested-val { font-size:11px; color:#34314A; }
 
   /* ══ ختام ══ */
   .closing {
-    background:linear-gradient(155deg,#0f3d49 0%,#14505E 45%,#1A6B7C 100%);
+    background:linear-gradient(155deg,#1B1746 0%,#1B1746 45%,#5546D6 100%);
     color:#fff; padding:40px 36px;
     display:flex; flex-direction:column;
     align-items:center; justify-content:center;

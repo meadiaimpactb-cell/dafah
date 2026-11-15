@@ -1,6 +1,6 @@
 import React from 'react';
 
-const colors = { teal: '#1A6B7C', tealDark: '#14505E', orange: '#E8620A' };
+const colors = { primary: '#5546D6', ink: '#1B1746', orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F' };
 const norm = s => (s || '').replace(/\s+/g, ' ').trim();
 
 /**
@@ -66,7 +66,7 @@ export function buildOrgTree(positions) {
   return { roots, issues };
 }
 
-const ORG_LEVEL_COLORS = [colors.tealDark, colors.teal, '#2b8798', '#4ea3b2', '#6fb6c2'];
+const ORG_LEVEL_COLORS = [colors.ink, colors.primary, '#5546D6', '#6C5EE6', '#8D82EF'];
 
 export function OrgNode({ node, depth = 0 }) {
   const bg = ORG_LEVEL_COLORS[Math.min(depth, ORG_LEVEL_COLORS.length - 1)];
@@ -74,18 +74,18 @@ export function OrgNode({ node, depth = 0 }) {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 6px' }}>
       <div style={{
         padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, textAlign: 'center', minWidth: 110, maxWidth: 190,
-        background: node.top ? '#fff' : bg, color: node.top ? colors.tealDark : '#fff',
-        border: node.top ? `2px solid ${colors.orange}` : 'none', lineHeight: 1.5,
+        background: node.top ? '#fff' : bg, color: node.top ? colors.ink : '#fff',
+        border: node.top ? `2px solid ${colors.amberLine}` : 'none', lineHeight: 1.5,
       }}>
         {node.title}
       </div>
       {node.children.length > 0 && (
         <>
-          <div style={{ width: 2, height: 14, background: '#cbd5e1' }} />
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', borderTop: node.children.length > 1 ? '2px solid #cbd5e1' : 'none', paddingTop: node.children.length > 1 ? 0 : 0 }}>
+          <div style={{ width: 2, height: 14, background: '#D9D3C7' }} />
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', borderTop: node.children.length > 1 ? '2px solid #D9D3C7' : 'none', paddingTop: node.children.length > 1 ? 0 : 0 }}>
             {node.children.map(c => (
               <div key={c.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {node.children.length > 1 && <div style={{ width: 2, height: 12, background: '#cbd5e1' }} />}
+                {node.children.length > 1 && <div style={{ width: 2, height: 12, background: '#D9D3C7' }} />}
                 <OrgNode node={c} depth={depth + 1} />
               </div>
             ))}
@@ -101,7 +101,7 @@ export function OrgNode({ node, depth = 0 }) {
 export function OrgChartView({ positions }) {
   const { roots } = buildOrgTree(positions);
   return (
-    <div style={{ background: '#f8fafb', borderRadius: 10, padding: '16px 8px', overflowX: 'auto' }}>
+    <div style={{ background: '#FBF9F5', borderRadius: 10, padding: '16px 8px', overflowX: 'auto' }}>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', gap: 18, minWidth: 'fit-content', margin: '0 auto' }}>
         {roots.map(r => <OrgNode key={r.key} node={r} />)}
       </div>

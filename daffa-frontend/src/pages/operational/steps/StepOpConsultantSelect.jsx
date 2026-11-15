@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { operationalApi } from '../../../api/operational';
 
-const colors = { teal: '#1A6B7C', tealDark: '#14505E', orange: '#E8620A' };
+const colors = { primary: '#5546D6', ink: '#1B1746', orange: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F' };
 
 export default function StepOpConsultantSelect({ setWorkflow, setStep }) {
   const [consultants, setConsultants] = useState([]);
@@ -31,16 +31,16 @@ export default function StepOpConsultantSelect({ setWorkflow, setStep }) {
     }
   };
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 60, color: colors.teal }}>جاري تحميل المستشارين...</div>;
+  if (loading) return <div style={{ textAlign: 'center', padding: 60, color: colors.primary }}>جاري تحميل المستشارين...</div>;
 
   return (
     <div className="animate-in">
-      <div style={{ background: '#fff', borderRadius: 12, padding: 24, marginBottom: 20, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: colors.tealDark, marginBottom: 6 }}>اختيار المستشار</h2>
-        <p style={{ fontSize: 13, color: '#6b7280' }}>اختر المستشار المناسب لمرافقتك في رحلة التخطيط التشغيلي</p>
+      <div style={{ background: '#fff', borderRadius: 12, padding: 24, marginBottom: 20, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>اختيار المستشار</h2>
+        <p style={{ fontSize: 13, color: '#67637A' }}>اختر المستشار المناسب لمرافقتك في رحلة التخطيط التشغيلي</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginBottom: 24 }}>
         {consultants.map(c => {
           const isSelected = selected === c.id;
           return (
@@ -49,41 +49,41 @@ export default function StepOpConsultantSelect({ setWorkflow, setStep }) {
               onClick={() => c.available && setSelected(c.id)}
               style={{
                 background: '#fff', borderRadius: 12, padding: 20,
-                border: `2px solid ${isSelected ? colors.teal : '#e5e7eb'}`,
-                boxShadow: isSelected ? `0 0 0 3px ${colors.teal}22` : '0 1px 8px rgba(0,0,0,0.06)',
+                border: `2px solid ${isSelected ? colors.primary : '#E8E3DA'}`,
+                boxShadow: isSelected ? `0 0 0 3px ${colors.primary}22` : '0 1px 8px rgba(27,23,70,0.06)',
                 cursor: c.available ? 'pointer' : 'not-allowed',
                 opacity: c.available ? 1 : 0.55,
                 transition: 'all 0.2s', position: 'relative',
               }}
             >
               {!c.available && (
-                <div style={{ position: 'absolute', top: 12, left: 12, background: '#fee2e2', color: '#dc2626', fontSize: 11, padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>غير متاح</div>
+                <div style={{ position: 'absolute', top: 12, left: 12, background: '#FAD4CE', color: '#D03F2A', fontSize: 11, padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>غير متاح</div>
               )}
               {isSelected && (
-                <div style={{ position: 'absolute', top: 12, left: 12, background: colors.teal, color: '#fff', fontSize: 11, padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>✓ محدد</div>
+                <div style={{ position: 'absolute', top: 12, left: 12, background: colors.primary, color: '#fff', fontSize: 11, padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>✓ محدد</div>
               )}
               <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                <div style={{ width: 48, height: 48, borderRadius: '50%', background: `linear-gradient(135deg, ${colors.teal}, ${colors.tealDark})`, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 700, flexShrink: 0 }}>
+                <div style={{ width: 48, height: 48, borderRadius: '50%', background: `linear-gradient(135deg, ${colors.primary}, ${colors.ink})`, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 700, flexShrink: 0 }}>
                   {c.avatar_initial || c.name[0]}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 2 }}>{c.name}</div>
-                  <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>{c.specialty}</div>
-                  <div style={{ fontSize: 12, color: '#374151', lineHeight: 1.5 }}>{c.bio}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 2 }}>{c.name}</div>
+                  <div style={{ fontSize: 12, color: '#67637A', marginBottom: 8 }}>{c.specialty}</div>
+                  <div style={{ fontSize: 12, color: '#34314A', lineHeight: 1.5 }}>{c.bio}</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 16, marginTop: 14, paddingTop: 12, borderTop: '1px solid #f3f4f6' }}>
+              <div style={{ display: 'flex', gap: 16, marginTop: 14, paddingTop: 12, borderTop: '1px solid #F3EFE8' }}>
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: colors.orange }}>{'⭐'.repeat(Math.round(c.rating))}</div>
-                  <div style={{ fontSize: 11, color: '#9ca3af' }}>{c.rating}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: colors.amberText }}>{'⭐'.repeat(Math.round(c.rating))}</div>
+                  <div style={{ fontSize: 11, color: '#8F8BA3' }}>{c.rating}</div>
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark }}>{c.experience_years}</div>
-                  <div style={{ fontSize: 11, color: '#9ca3af' }}>سنة خبرة</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: colors.ink }}>{c.experience_years}</div>
+                  <div style={{ fontSize: 11, color: '#8F8BA3' }}>سنة خبرة</div>
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark }}>{c.completed_projects}</div>
-                  <div style={{ fontSize: 11, color: '#9ca3af' }}>مشروع</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: colors.ink }}>{c.completed_projects}</div>
+                  <div style={{ fontSize: 11, color: '#8F8BA3' }}>مشروع</div>
                 </div>
               </div>
             </div>
@@ -91,13 +91,13 @@ export default function StepOpConsultantSelect({ setWorkflow, setStep }) {
         })}
       </div>
 
-      {error && <div style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', marginBottom: 16, textAlign: 'center', fontSize: 13 }}>{error}</div>}
+      {error && <div style={{ background: '#FDECE9', color: '#D03F2A', border: '1px solid #F5B8AE', borderRadius: 8, padding: '10px 14px', marginBottom: 16, textAlign: 'center', fontSize: 13 }}>{error}</div>}
 
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <button
           onClick={handleConfirm}
           disabled={!selected || submitting}
-          style={{ padding: '13px 44px', background: selected ? colors.orange : '#d1d5db', color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: selected ? 'pointer' : 'not-allowed', fontFamily: "'Cairo', sans-serif", transition: 'background 0.2s' }}
+          style={{ padding: '13px 44px', background: selected ? colors.amber : '#D9D3C7', color: '#1B1746', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: selected ? 'pointer' : 'not-allowed', fontFamily: "inherit", transition: 'background 0.2s' }}
         >
           {submitting ? 'جاري الحفظ...' : 'التالي: الدفع ←'}
         </button>

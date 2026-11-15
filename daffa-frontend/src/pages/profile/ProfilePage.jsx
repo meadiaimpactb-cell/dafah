@@ -5,9 +5,9 @@ import OtpVerification from '../auth/OtpVerification';
 import { IcCheck, IcLightbulb, IcShield, IcBriefcase, IcBuilding, IcUser, IcLock, IcDocument, IcSave } from '../../utils/icons';
 
 const C = {
-  teal: '#1A6B7C', tealDark: '#14505E', tealLight: '#E8F4F6',
-  orange: '#E8620A', green: '#16a34a', red: '#dc2626',
-  gray: '#6B7280', grayLight: '#F3F4F6', grayBorder: '#E5E7EB',
+  primary: '#5546D6', ink: '#1B1746', primarySoft: '#E7E5FD',
+  orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F', green: '#0B7F5D', red: '#D03F2A',
+  gray: '#67637A', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
 };
 
 // ── Toast ──────────────────────────────────────────────────────────────────────
@@ -16,9 +16,9 @@ const Toast = ({ toast }) =>
     <div style={{
       position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)',
       zIndex: 9999999, padding: '12px 24px', borderRadius: 12,
-      background: toast.type === 'success' ? '#065f46' : '#7f1d1d',
+      background: toast.type === 'success' ? '#086449' : '#8F2415',
       color: 'white', fontSize: 14, fontWeight: 600,
-      fontFamily: "'Cairo', sans-serif", boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+      fontFamily: "inherit", boxShadow: '0 4px 20px rgba(27,23,70,0.3)',
       whiteSpace: 'nowrap', animation: 'fadeInUp 0.3s ease-out both',
     }}>
       {toast.msg}
@@ -29,13 +29,13 @@ const Toast = ({ toast }) =>
 // ── Field input ────────────────────────────────────────────────────────────────
 const Field = ({ label, name, value, onChange, type = 'text', placeholder, disabled, textarea }) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-    <label style={{ fontSize: 12, fontWeight: 600, color: C.tealDark }}>{label}</label>
+    <label style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>{label}</label>
     {textarea ? (
       <textarea
         name={name} value={value || ''} onChange={onChange}
         placeholder={placeholder} rows={3}
-        style={{ padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "'Cairo', sans-serif", resize: 'vertical', outline: 'none', transition: 'border 0.2s', background: disabled ? C.grayLight : 'white', color: disabled ? C.gray : '#1F2937' }}
-        onFocus={e => !disabled && (e.target.style.borderColor = C.teal)}
+        style={{ padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "inherit", resize: 'vertical', outline: 'none', transition: 'border 0.2s', background: disabled ? C.grayLight : 'white', color: disabled ? C.gray : '#1B1746' }}
+        onFocus={e => !disabled && (e.target.style.borderColor = C.primary)}
         onBlur={e => (e.target.style.borderColor = C.grayBorder)}
         disabled={disabled}
       />
@@ -43,8 +43,8 @@ const Field = ({ label, name, value, onChange, type = 'text', placeholder, disab
       <input
         type={type} name={name} value={value || ''} onChange={onChange}
         placeholder={placeholder || label}
-        style={{ padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', transition: 'border 0.2s', background: disabled ? C.grayLight : 'white', color: disabled ? C.gray : '#1F2937' }}
-        onFocus={e => !disabled && (e.target.style.borderColor = C.teal)}
+        style={{ padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none', transition: 'border 0.2s', background: disabled ? C.grayLight : 'white', color: disabled ? C.gray : '#1B1746' }}
+        onFocus={e => !disabled && (e.target.style.borderColor = C.primary)}
         onBlur={e => (e.target.style.borderColor = C.grayBorder)}
         disabled={disabled}
       />
@@ -68,10 +68,10 @@ const AvatarCircle = ({ name, email, logoUrl, size = 72, onClick, uploading }) =
         title={onClick ? 'انقر لتغيير الصورة' : undefined}
         style={{
           width: size, height: size, borderRadius: '50%',
-          background: `linear-gradient(135deg, ${C.teal}, ${C.tealDark})`,
+          background: `linear-gradient(135deg, ${C.primary}, ${C.ink})`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: 'white', fontWeight: 800, fontSize: size * 0.38,
-          boxShadow: `0 4px 16px ${C.teal}40`,
+          boxShadow: `0 4px 16px ${C.primary}40`,
           cursor: onClick ? 'pointer' : 'default',
           position: 'relative', overflow: 'hidden',
           transition: 'transform 0.15s',
@@ -89,7 +89,7 @@ const AvatarCircle = ({ name, email, logoUrl, size = 72, onClick, uploading }) =
         {/* dark overlay on hover */}
         <div style={{
           position: 'absolute', inset: 0, borderRadius: '50%',
-          background: 'rgba(0,0,0,0.45)',
+          background: 'rgba(27,23,70,0.45)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           opacity: showOverlay ? 1 : 0,
           transition: 'opacity 0.2s',
@@ -107,7 +107,7 @@ const AvatarCircle = ({ name, email, logoUrl, size = 72, onClick, uploading }) =
 
 // ── Section header ─────────────────────────────────────────────────────────────
 const SectionTitle = ({ children }) => (
-  <div style={{ fontSize: 14, fontWeight: 700, color: C.tealDark, marginBottom: 16, paddingBottom: 8, borderBottom: `2px solid ${C.tealLight}` }}>
+  <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginBottom: 16, paddingBottom: 8, borderBottom: `2px solid ${C.primarySoft}` }}>
     {children}
   </div>
 );
@@ -261,7 +261,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
       />
 
       {/* Profile Header Card */}
-      <div style={{ background: 'white', borderRadius: 16, padding: 24, marginBottom: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', display: 'flex', alignItems: 'center', gap: 20 }}>
+      <div style={{ background: 'white', borderRadius: 16, padding: 24, marginBottom: 20, boxShadow: '0 1px 4px rgba(27,23,70,0.07)', display: 'flex', alignItems: 'center', gap: 20 }}>
         <AvatarCircle
           name={displayName}
           email={authUser?.email}
@@ -271,10 +271,10 @@ export default function ProfilePage({ authUser, onUpdate }) {
           uploading={uploading}
         />
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 20, fontWeight: 800, color: C.tealDark }}>{displayName || '—'}</div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: C.ink }}>{displayName || '—'}</div>
           <div style={{ fontSize: 13, color: C.gray, marginTop: 2 }}>{authUser?.email}</div>
           <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
-            <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', background: role === 'admin' ? '#FEF3C7' : role === 'consultant' ? C.tealLight : C.grayLight, color: role === 'admin' ? '#D97706' : role === 'consultant' ? C.teal : C.gray }}>
+            <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', background: role === 'admin' ? '#FEEDC6' : role === 'consultant' ? C.primarySoft : C.grayLight, color: role === 'admin' ? '#9A5B07' : role === 'consultant' ? C.primary : C.gray }}>
               {role === 'admin' ? 'مدير النظام' : role === 'consultant' ? 'مستشار' : 'عميل'}
             </span>
             {role === 'client' && authUser?.org_type && (
@@ -292,10 +292,10 @@ export default function ProfilePage({ authUser, onUpdate }) {
           <button key={id} onClick={() => setTab(id)} style={{
             padding: '9px 22px', borderRadius: 10, border: 'none',
             background: tab === id ? 'white' : 'transparent',
-            color: tab === id ? C.teal : C.gray,
+            color: tab === id ? C.primary : C.gray,
             fontWeight: tab === id ? 700 : 500, fontSize: 13,
-            fontFamily: "'Cairo', sans-serif", cursor: 'pointer',
-            boxShadow: tab === id ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+            fontFamily: "inherit", cursor: 'pointer',
+            boxShadow: tab === id ? '0 1px 4px rgba(27,23,70,0.08)' : 'none',
             transition: 'all 0.2s',
           }}>
             {label}
@@ -305,11 +305,11 @@ export default function ProfilePage({ authUser, onUpdate }) {
 
       {/* ── Profile Tab ── */}
       {tab === 'profile' && (
-        <div style={{ background: 'white', borderRadius: 16, padding: 28, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+        <div style={{ background: 'white', borderRadius: 16, padding: 28, boxShadow: '0 1px 4px rgba(27,23,70,0.07)' }}>
 
           {/* تنبيه إكمال البيانات (حساب جديد عبر Google بلا رقم جوال) */}
           {role === 'client' && !authUser?.phone && (
-            <div role="status" style={{ background: '#FFF7ED', border: '1px solid #fed7aa', borderRadius: 12, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#9a3412', lineHeight: 1.8 }}>
+            <div role="status" style={{ background: '#FFF8EA', border: '1px solid #FCD98B', borderRadius: 12, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#7A4706', lineHeight: 1.8 }}>
               <strong>أكمل بيانات منظمتك:</strong> راجع اسم المنظمة ونوعها وأضف رقم الجوال، ثم اضغط «حفظ التغييرات».
             </div>
           )}
@@ -318,23 +318,23 @@ export default function ProfilePage({ authUser, onUpdate }) {
           {role === 'client' && (
             <>
               <SectionTitle>بيانات المنظمة</SectionTitle>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginBottom: 24 }}>
                 <Field label="اسم المنظمة *" name="org_name" value={form.org_name} onChange={handleChange} />
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: C.tealDark, display: 'block', marginBottom: 6 }}>نوع المنظمة</label>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: C.ink, display: 'block', marginBottom: 6 }}>نوع المنظمة</label>
                   <select
                     name="org_type" value={form.org_type || ''} onChange={handleChange}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', background: 'white' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none', background: 'white' }}
                   >
                     <option value="">اختر النوع</option>
                     {['جمعية خيرية', 'مؤسسة غير ربحية', 'وقف', 'هيئة حكومية', 'أخرى'].map(o => <option key={o} value={o}>{o}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: C.tealDark, display: 'block', marginBottom: 6 }}>القطاع</label>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: C.ink, display: 'block', marginBottom: 6 }}>القطاع</label>
                   <select
                     name="sector" value={form.sector || ''} onChange={handleChange}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', background: 'white' }}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none', background: 'white' }}
                   >
                     <option value="">اختر القطاع</option>
                     {['تعليم', 'صحة', 'بيئة', 'تنمية اجتماعية', 'إغاثة', 'رياضة', 'ثقافة', 'أخرى'].map(o => <option key={o} value={o}>{o}</option>)}
@@ -342,7 +342,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
                 </div>
               </div>
               <SectionTitle>بيانات الممثل</SectionTitle>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginBottom: 24 }}>
                 <Field label="اسم الممثل *" name="rep_name" value={form.rep_name} onChange={handleChange} />
                 <Field label="البريد الإلكتروني *" name="email" value={form.email} onChange={handleChange} type="email" />
                 <Field label="رقم الجوال" name="phone" value={form.phone} onChange={handleChange} type="tel" placeholder="05xxxxxxxx" />
@@ -354,7 +354,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
           {role === 'consultant' && (
             <>
               <SectionTitle>المعلومات الشخصية</SectionTitle>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginBottom: 24 }}>
                 <Field label="الاسم الكامل *" name="rep_name" value={form.rep_name} onChange={handleChange} />
                 <Field label="البريد الإلكتروني *" name="email" value={form.email} onChange={handleChange} type="email" />
                 <Field label="رقم الجوال" name="phone" value={form.phone} onChange={handleChange} type="tel" placeholder="05xxxxxxxx" />
@@ -372,7 +372,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
           {role === 'admin' && (
             <>
               <SectionTitle>بيانات المدير</SectionTitle>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginBottom: 24 }}>
                 <Field label="الاسم الكامل *" name="rep_name" value={form.rep_name} onChange={handleChange} />
                 <Field label="البريد الإلكتروني *" name="email" value={form.email} onChange={handleChange} type="email" />
                 <Field label="رقم الجوال" name="phone" value={form.phone} onChange={handleChange} type="tel" placeholder="05xxxxxxxx" />
@@ -383,7 +383,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
 
           {/* تأكيد البريد الجديد قبل تطبيقه */}
           {emailChange && (
-            <div style={{ border: `1.5px solid ${C.teal}40`, background: '#f8fbfc', borderRadius: 12, padding: '14px 18px', marginBottom: 18, maxWidth: 520 }}>
+            <div style={{ border: `1.5px solid ${C.primary}40`, background: '#FBF9F5', borderRadius: 12, padding: '14px 18px', marginBottom: 18, maxWidth: 520 }}>
               <OtpVerification
                 compact
                 key={emailChange.email}
@@ -415,7 +415,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
 
           {/* Error messages */}
           {Object.keys(errors).length > 0 && (
-            <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FEF2F2', border: '1px solid #fecaca', marginBottom: 16 }}>
+            <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FDECE9', border: '1px solid #F5B8AE', marginBottom: 16 }}>
               {Object.values(errors).flat().map((e, i) => (
                 <div key={i} style={{ fontSize: 12, color: C.red }}>• {e}</div>
               ))}
@@ -428,12 +428,12 @@ export default function ProfilePage({ authUser, onUpdate }) {
               disabled={saving}
               style={{
                 padding: '11px 32px', borderRadius: 12, border: 'none',
-                background: saving ? C.grayLight : C.teal,
+                background: saving ? C.grayLight : C.primary,
                 color: saving ? C.gray : 'white',
-                fontWeight: 700, fontSize: 14, fontFamily: "'Cairo', sans-serif",
+                fontWeight: 700, fontSize: 14, fontFamily: "inherit",
                 cursor: saving ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s',
-                boxShadow: saving ? 'none' : `0 4px 14px ${C.teal}40`,
+                boxShadow: saving ? 'none' : `0 4px 14px ${C.primary}40`,
               }}
             >
               {saving ? 'جارٍ الحفظ…' : 'حفظ التغييرات'}
@@ -444,7 +444,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
 
       {/* ── Security Tab ── */}
       {tab === 'security' && (
-        <div style={{ background: 'white', borderRadius: 16, padding: 28, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+        <div style={{ background: 'white', borderRadius: 16, padding: 28, boxShadow: '0 1px 4px rgba(27,23,70,0.07)' }}>
           <SectionTitle>تغيير كلمة المرور</SectionTitle>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14, maxWidth: 440, marginBottom: 24 }}>
@@ -488,9 +488,9 @@ export default function ProfilePage({ authUser, onUpdate }) {
                     const hasNum = /\d/.test(pwForm.new_password);
                     const hasSpecial = /[!@#$%^&*]/.test(pwForm.new_password);
                     const score = (len >= 8 ? 1 : 0) + (len >= 12 ? 1 : 0) + (hasUpper || hasNum ? 1 : 0) + (hasSpecial ? 1 : 0);
-                    const colors = ['#dc2626', '#f97316', '#eab308', '#16a34a'];
+                    const colors = ['#D03F2A', '#9A5B07', '#9A5B07', '#0B7F5D'];
                     return (
-                      <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= score ? colors[score - 1] || '#dc2626' : C.grayBorder, transition: 'background 0.3s' }} />
+                      <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= score ? colors[score - 1] || '#D03F2A' : C.grayBorder, transition: 'background 0.3s' }} />
                     );
                   })}
                 </div>
@@ -502,9 +502,9 @@ export default function ProfilePage({ authUser, onUpdate }) {
               disabled={pwSaving || !pwForm.current_password || !pwForm.new_password || !pwForm.new_password_confirmation}
               style={{
                 marginTop: 8, padding: '11px 24px', borderRadius: 12, border: 'none',
-                background: (!pwForm.current_password || !pwForm.new_password) ? C.grayLight : C.orange,
-                color: (!pwForm.current_password || !pwForm.new_password) ? C.gray : 'white',
-                fontWeight: 700, fontSize: 14, fontFamily: "'Cairo', sans-serif",
+                background: (!pwForm.current_password || !pwForm.new_password) ? C.grayLight : C.amber,
+                color: (!pwForm.current_password || !pwForm.new_password) ? C.gray : '#1B1746',
+                fontWeight: 700, fontSize: 14, fontFamily: "inherit",
                 cursor: (pwSaving || !pwForm.current_password || !pwForm.new_password) ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s',
                 alignSelf: 'flex-start',
@@ -515,11 +515,11 @@ export default function ProfilePage({ authUser, onUpdate }) {
           </div>
 
           {/* Security info */}
-          <div style={{ padding: 16, borderRadius: 12, background: C.tealLight, border: `1px solid ${C.teal}20` }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}><IcLightbulb width={14} height={14}/> نصائح لكلمة مرور آمنة</div>
+          <div style={{ padding: 16, borderRadius: 12, background: C.primarySoft, border: `1px solid ${C.primary}20` }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}><IcLightbulb width={14} height={14}/> نصائح لكلمة مرور آمنة</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               {['استخدم 8 أحرف على الأقل', 'اجمع بين الأحرف والأرقام والرموز', 'تجنب استخدام معلوماتك الشخصية', 'لا تستخدم كلمة المرور ذاتها في أكثر من موقع'].map((t, i) => (
-                <div key={i} style={{ fontSize: 12, color: C.tealDark, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div key={i} style={{ fontSize: 12, color: C.ink, display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ color: C.green, display: 'inline-flex' }}><IcCheck width={12} height={12}/></span> {t}
                 </div>
               ))}

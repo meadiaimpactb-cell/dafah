@@ -105,7 +105,7 @@ export default function Register({ onLogin, onGoLogin }) {
               onLogin={onLogin}
               onError={msg => setErrors(msg ? { general: msg } : {})}
             />
-            <p style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', margin: '8px 0 0', lineHeight: 1.7 }}>
+            <p style={{ fontSize: 12, color: '#8F8BA3', textAlign: 'center', margin: '8px 0 0', lineHeight: 1.7 }}>
               بالتسجيل عبر Google يُؤكَّد بريدك تلقائيًا، وتوافق على الشروط والأحكام. ستُكمل بيانات منظمتك بعد الدخول.
             </p>
             <OrDivider label="أو سجّل بالبريد الإلكتروني" />
@@ -171,7 +171,7 @@ export default function Register({ onLogin, onGoLogin }) {
           </div>
 
           <div style={{ textAlign: 'right', marginBottom: 20 }}>
-            <label style={{ fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+            <label style={{ fontSize: 13, color: '#34314A', cursor: 'pointer' }}>
               <input name="terms" type="checkbox" checked={form.terms} onChange={handleChange} style={{ marginLeft: 6 }} />
               أوافق على الشروط والأحكام
             </label>
@@ -197,12 +197,12 @@ export default function Register({ onLogin, onGoLogin }) {
 const styles = {
   overlay: {
     minHeight: '100vh',
-    background: '#F8FAFB',
+    background: '#FBF9F5',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     direction: 'rtl',
-    fontFamily: "'Cairo', sans-serif",
+    fontFamily: "inherit",
     padding: '24px 16px',
   },
   card: {
@@ -212,7 +212,7 @@ const styles = {
     width: '100%',
     maxWidth: 620,
     boxSizing: 'border-box',
-    boxShadow: '0 4px 32px rgba(0,0,0,0.08)',
+    boxShadow: '0 4px 32px rgba(27,23,70,0.08)',
   },
   logo: {
     display: 'flex',
@@ -223,14 +223,14 @@ const styles = {
   logoText: {
     fontSize: 22,
     fontWeight: 700,
-    color: '#1A6B7C',
+    color: '#5546D6',
     marginTop: 6,
   },
   title: {
     textAlign: 'center',
     fontSize: 22,
     fontWeight: 700,
-    color: '#1a1a2e',
+    color: '#1B1746',
     marginBottom: 24,
   },
   row: {
@@ -243,40 +243,40 @@ const styles = {
   label: {
     fontSize: 13,
     fontWeight: 600,
-    color: '#374151',
+    color: '#34314A',
     marginBottom: 5,
     textAlign: 'right',
   },
   input: {
     padding: '10px 12px',
-    border: '1.5px solid #e5e7eb',
+    border: '1.5px solid #E8E3DA',
     borderRadius: 8,
     fontSize: 14,
-    color: '#1a1a2e',
-    background: '#fafafa',
+    color: '#1B1746',
+    background: '#FBF9F5',
     textAlign: 'right',
     direction: 'rtl',
     outline: 'none',
-    fontFamily: "'Cairo', sans-serif",
+    fontFamily: "inherit",
     boxSizing: 'border-box',
     width: '100%',
   },
   btn: {
     width: '100%',
     padding: '13px',
-    background: '#E8620A',
-    color: '#fff',
+    background: '#F5A524',
+    color: '#1B1746',
     border: 'none',
     borderRadius: 10,
     fontSize: 16,
     fontWeight: 700,
     cursor: 'pointer',
-    fontFamily: "'Cairo', sans-serif",
+    fontFamily: "inherit",
   },
   error: {
-    background: '#fef2f2',
-    color: '#dc2626',
-    border: '1px solid #fecaca',
+    background: '#FDECE9',
+    color: '#D03F2A',
+    border: '1px solid #F5B8AE',
     borderRadius: 8,
     padding: '10px 14px',
     fontSize: 13,
@@ -284,7 +284,7 @@ const styles = {
     textAlign: 'right',
   },
   fieldError: {
-    color: '#dc2626',
+    color: '#D03F2A',
     fontSize: 12,
     marginTop: 3,
     display: 'block',
@@ -292,11 +292,11 @@ const styles = {
   footer: {
     textAlign: 'center',
     fontSize: 14,
-    color: '#6b7280',
+    color: '#67637A',
     marginTop: 16,
   },
   link: {
-    color: '#1A6B7C',
+    color: '#5546D6',
     cursor: 'pointer',
     fontWeight: 600,
   },

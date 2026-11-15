@@ -6,8 +6,8 @@ import React, { useEffect, useRef, useState } from 'react';
  * تُستخدم في صفحات دفع التخطيط الاستراتيجي والتشغيلي والسياسات.
  */
 
-const TEAL = '#1A6B7C';
-const TEAL_DARK = '#14505E';
+const PRIMARY = '#5546D6';
+const INK = '#1B1746';
 
 const LOGOS = {
   visa:          { src: '/payments/visa.png',          alt: 'Visa',            ratio: 247 / 80 },
@@ -38,7 +38,7 @@ export const PAYMENT_METHODS = [
 ];
 
 const Check = () => (
-  <span aria-hidden="true" style={{ position: 'absolute', top: 8, insetInlineStart: 8, width: 20, height: 20, borderRadius: '50%', background: TEAL, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(26,107,124,0.35)' }}>
+  <span aria-hidden="true" style={{ position: 'absolute', top: 8, insetInlineStart: 8, width: 20, height: 20, borderRadius: '50%', background: PRIMARY, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(85,70,214,0.35)' }}>
     <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
   </span>
 );
@@ -66,17 +66,17 @@ export function PaymentMethodPicker({ value, onChange, columns = 2 }) {
           <button key={m.key} type="button" role="radio" aria-checked={on} onClick={() => onChange(m.key)}
             style={{
               position: 'relative', minHeight: 92, padding: '16px 10px 12px', borderRadius: 14, cursor: 'pointer',
-              border: on ? `2px solid ${TEAL}` : '1.5px solid #E5E7EB',
-              background: on ? '#F3FAFB' : '#fff',
-              boxShadow: on ? `0 0 0 4px ${TEAL}1F, 0 6px 16px rgba(20,80,94,0.10)` : '0 1px 2px rgba(17,24,39,0.04)',
+              border: on ? `2px solid ${PRIMARY}` : '1.5px solid #E8E3DA',
+              background: on ? '#F3F2FE' : '#fff',
+              boxShadow: on ? `0 0 0 4px ${PRIMARY}1F, 0 6px 16px rgba(27,23,70,0.10)` : '0 1px 2px rgba(27,23,70,0.04)',
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 9,
-              fontFamily: "'Cairo', sans-serif", transition: 'border-color .15s, box-shadow .15s, background .15s', touchAction: 'manipulation',
+              fontFamily: "inherit", transition: 'border-color .15s, box-shadow .15s, background .15s', touchAction: 'manipulation',
             }}>
             {on && <Check />}
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, height: 26, direction: 'ltr' }}>
               {m.logos.map(([name, h]) => <PayLogo key={name} name={name} height={h} />)}
             </span>
-            <span style={{ fontSize: 12.5, fontWeight: on ? 800 : 600, color: on ? TEAL_DARK : '#374151', lineHeight: 1.3 }}>{m.label}</span>
+            <span style={{ fontSize: 12.5, fontWeight: on ? 800 : 600, color: on ? INK : '#34314A', lineHeight: 1.3 }}>{m.label}</span>
           </button>
         );
       })}
@@ -90,7 +90,7 @@ export const CardNetworkLogo = ({ brand, height = 18 }) => {
   if (brand === 'mc') return <PayLogo name="mastercard" height={height + 2} />;
   if (brand === 'mada') return <PayLogo name="mada" height={height + 2} />;
   return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#9CA3AF" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#8F8BA3" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="2" y="5" width="20" height="14" rx="2.5" /><line x1="2" y1="10" x2="22" y2="10" />
     </svg>
   );
@@ -119,9 +119,9 @@ export const ApplePayButton = ({ onClick, disabled }) => (
 /** شارة الثقة أسفل نموذج الدفع: مدفوعات آمنة عبر EdfaPay + الشبكات المقبولة */
 export function SecurePaymentBadge() {
   return (
-    <div style={{ marginTop: 16, border: '1px solid #E5E7EB', borderRadius: 12, padding: '12px 14px', background: '#FAFBFC' }}>
+    <div style={{ marginTop: 16, border: '1px solid #E8E3DA', borderRadius: 12, padding: '12px 14px', background: '#FBF9F5' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 12.5, fontWeight: 700, color: '#15803D' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 12.5, fontWeight: 700, color: '#086449' }}>
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" />
           </svg>

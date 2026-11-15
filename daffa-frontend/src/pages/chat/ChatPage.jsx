@@ -3,13 +3,13 @@ import { chatApi } from '../../api/chat';
 import { IcSearch, IcChat, IcCheck, IcDoubleCheck, IcLock } from '../../utils/icons';
 
 const C = {
-  teal: '#1A6B7C', tealDark: '#14505E', tealLight: '#E8F4F6',
-  orange: '#E8620A', green: '#16a34a',
-  gray: '#6B7280', grayLight: '#F3F4F6', grayBorder: '#E5E7EB',
-  white: '#FFFFFF', bg: '#F8FAFB',
+  primary: '#5546D6', ink: '#1B1746', primarySoft: '#E7E5FD',
+  orange: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F', green: '#0B7F5D',
+  gray: '#67637A', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
+  white: '#FFFFFF', bg: '#FBF9F5',
 };
 
-const Avatar = ({ name = '?', size = 40, color = C.teal }) => (
+const Avatar = ({ name = '?', size = 40, color = C.primary }) => (
   <div style={{
     width: size, height: size, borderRadius: '50%',
     background: color, color: 'white',
@@ -32,13 +32,13 @@ const ConversationList = ({ conversations, selectedId, onSelect, loading, role, 
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: C.white }}>
       {/* Header */}
       <div style={{ padding: '16px 14px', borderBottom: `1px solid ${C.grayBorder}`, flexShrink: 0 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: C.tealDark, marginBottom: 10 }}>المحادثات</div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: C.ink, marginBottom: 10 }}>المحادثات</div>
         <div style={{ position: 'relative' }}>
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="بحث..."
-            style={{ width: '100%', padding: '7px 34px 7px 10px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 12, fontFamily: "'Cairo', sans-serif", outline: 'none', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '7px 34px 7px 10px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 12, fontFamily: "inherit", outline: 'none', boxSizing: 'border-box' }}
           />
           <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: C.gray, display: 'flex' }}><IcSearch width={14} height={14}/></span>
         </div>
@@ -59,7 +59,7 @@ const ConversationList = ({ conversations, selectedId, onSelect, loading, role, 
             {conversations.length === 0 && role !== 'consultant' && role !== 'admin' && (
               <button
                 onClick={onStart}
-                style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: C.teal, color: 'white', fontSize: 13, fontFamily: "'Cairo', sans-serif", cursor: 'pointer', fontWeight: 600 }}
+                style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: C.primary, color: 'white', fontSize: 13, fontFamily: "inherit", cursor: 'pointer', fontWeight: 600 }}
               >
                 بدء محادثة مع مستشارك
               </button>
@@ -73,18 +73,18 @@ const ConversationList = ({ conversations, selectedId, onSelect, loading, role, 
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '12px 14px', cursor: 'pointer',
-                background: selectedId === c.id ? `${C.teal}0D` : 'transparent',
-                borderLeft: selectedId === c.id ? `3px solid ${C.teal}` : '3px solid transparent',
+                background: selectedId === c.id ? `${C.primary}0D` : 'transparent',
+                borderLeft: selectedId === c.id ? `3px solid ${C.primary}` : '3px solid transparent',
                 borderBottom: `1px solid ${C.grayLight}`,
                 transition: 'all 0.15s',
               }}
               onMouseEnter={e => { if (selectedId !== c.id) e.currentTarget.style.background = C.grayLight; }}
               onMouseLeave={e => { if (selectedId !== c.id) e.currentTarget.style.background = 'transparent'; }}
             >
-              <Avatar name={c.other_name} size={42} color={C.teal} />
+              <Avatar name={c.other_name} size={42} color={C.primary} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: C.tealDark }}>{c.other_name}</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{c.other_name}</span>
                   <span style={{ fontSize: 10, color: C.gray, flexShrink: 0 }}>{c.last_at}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
@@ -92,12 +92,12 @@ const ConversationList = ({ conversations, selectedId, onSelect, loading, role, 
                     {c.last_message || 'لا توجد رسائل بعد'}
                   </span>
                   {c.unread > 0 && (
-                    <span style={{ width: 20, height: 20, borderRadius: '50%', background: C.orange, color: 'white', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 6 }}>
+                    <span style={{ width: 20, height: 20, borderRadius: '50%', background: C.amber, color: '#1B1746', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 6 }}>
                       {c.unread}
                     </span>
                   )}
                 </div>
-                <span style={{ fontSize: 10, color: C.teal, opacity: 0.7 }}>{c.other_role}</span>
+                <span style={{ fontSize: 10, color: C.primary, opacity: 0.7 }}>{c.other_role}</span>
               </div>
             </div>
           ))
@@ -185,9 +185,9 @@ const ChatWindow = ({ conversation, currentUserId, onMessageSent, canSend = true
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: C.bg, borderRight: `1px solid ${C.grayBorder}` }}>
       {/* Header */}
       <div style={{ padding: '12px 18px', background: C.white, borderBottom: `1px solid ${C.grayBorder}`, display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-        <Avatar name={conversation.other_name} size={38} color={C.teal} />
+        <Avatar name={conversation.other_name} size={38} color={C.primary} />
         <div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: C.tealDark }}>{conversation.other_name}</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: C.ink }}>{conversation.other_name}</div>
           <div style={{ fontSize: 11, color: C.green }}>● {conversation.other_role}</div>
         </div>
       </div>
@@ -208,16 +208,16 @@ const ChatWindow = ({ conversation, currentUserId, onMessageSent, canSend = true
                 <div style={{
                   padding: '10px 14px',
                   borderRadius: m.is_mine ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
-                  background: m.is_mine ? C.white : C.teal,
-                  color: m.is_mine ? '#1F2937' : 'white',
+                  background: m.is_mine ? C.white : C.primary,
+                  color: m.is_mine ? '#1B1746' : 'white',
                   fontSize: 13, lineHeight: 1.7,
-                  boxShadow: m.is_mine ? '0 1px 3px rgba(0,0,0,0.06)' : 'none',
+                  boxShadow: m.is_mine ? '0 1px 3px rgba(27,23,70,0.06)' : 'none',
                 }}>
                   {m.body}
                 </div>
                 <div style={{ fontSize: 10, color: C.gray, marginTop: 3, textAlign: m.is_mine ? 'right' : 'left' }}>
                   {m.time}
-                  {m.is_mine && m.read_at && <span style={{ marginRight: 4, color: C.teal, display: 'inline-flex' }}><IcDoubleCheck width={12} height={12}/></span>}
+                  {m.is_mine && m.read_at && <span style={{ marginRight: 4, color: C.primary, display: 'inline-flex' }}><IcDoubleCheck width={12} height={12}/></span>}
                   {m.is_mine && !m.read_at && <span style={{ marginRight: 4, color: C.gray, display: 'inline-flex' }}><IcCheck width={12} height={12}/></span>}
                 </div>
               </div>
@@ -240,11 +240,11 @@ const ChatWindow = ({ conversation, currentUserId, onMessageSent, canSend = true
             style={{
               flex: 1, padding: '10px 14px', borderRadius: 12,
               border: `1.5px solid ${C.grayBorder}`, fontSize: 13,
-              fontFamily: "'Cairo', sans-serif", outline: 'none',
+              fontFamily: "inherit", outline: 'none',
               resize: 'none', lineHeight: 1.5, maxHeight: 120, overflowY: 'auto',
               transition: 'border 0.2s',
             }}
-            onFocus={e => e.target.style.borderColor = C.teal}
+            onFocus={e => e.target.style.borderColor = C.primary}
             onBlur={e => e.target.style.borderColor = C.grayBorder}
           />
           <button
@@ -252,8 +252,8 @@ const ChatWindow = ({ conversation, currentUserId, onMessageSent, canSend = true
             disabled={!body.trim() || sending}
             style={{
               width: 42, height: 42, borderRadius: 12, border: 'none',
-              background: body.trim() ? C.orange : C.grayLight,
-              color: body.trim() ? 'white' : C.gray,
+              background: body.trim() ? C.amber : C.grayLight,
+              color: body.trim() ? '#1B1746' : C.gray,
               cursor: body.trim() ? 'pointer' : 'default',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'all 0.2s', flexShrink: 0,
@@ -326,16 +326,16 @@ export default function ChatPage({ role, userId, canSend = true, autoStart = fal
   };
 
   if (error) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300, color: '#dc2626', flexDirection: 'column', gap: 12 }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300, color: '#D03F2A', flexDirection: 'column', gap: 12 }}>
       <div>{error}</div>
-      <button onClick={() => loadConversations(false)} style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: C.teal, color: 'white', cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>إعادة المحاولة</button>
+      <button onClick={() => loadConversations(false)} style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: C.primary, color: 'white', cursor: 'pointer', fontFamily: "inherit" }}>إعادة المحاولة</button>
     </div>
   );
 
   return (
     <div className="animate-in" style={{
       display: 'grid',
-      gridTemplateColumns: '280px 1fr',
+      gridTemplateColumns: 'var(--g-280-main)',
       height: 'calc(100vh - 120px)',
       borderRadius: 14, overflow: 'hidden',
       border: `1px solid ${C.grayBorder}`,
@@ -361,7 +361,7 @@ export default function ChatPage({ role, userId, canSend = true, autoStart = fal
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: C.gray, background: C.bg, borderRight: `1px solid ${C.grayBorder}` }}>
           <div style={{ marginBottom: 12, color: C.gray }}><IcChat width={48} height={48}/></div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: C.tealDark, marginBottom: 6 }}>اختر محادثة</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: C.ink, marginBottom: 6 }}>اختر محادثة</div>
           <div style={{ fontSize: 12, color: C.gray }}>اختر محادثة من القائمة لعرضها</div>
         </div>
       )}

@@ -4,12 +4,12 @@ import { adminApi } from '../../api/admin';
 import StrategicContentEditor from './StrategicContentEditor';
 
 const C = {
-  teal: '#1A6B7C', tealDark: '#14505E', tealLight: '#E8F4F6',
-  green: '#16A34A', greenLight: '#F0FDF4',
-  orange: '#E8620A', orangeLight: '#FFF7ED',
-  gray: '#6B7280', grayLight: '#F3F4F6', grayBorder: '#E5E7EB',
-  red: '#DC2626',
-  white: '#FFFFFF', dark: '#111827',
+  primary: '#5546D6', ink: '#1B1746', primarySoft: '#E7E5FD',
+  green: '#0B7F5D', greenLight: '#E8F8F2',
+  orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F', amberSoft: '#FFF8EA',
+  gray: '#67637A', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
+  red: '#D03F2A',
+  white: '#FFFFFF', dark: '#1B1746',
 };
 
 const TABS = [
@@ -41,7 +41,7 @@ function Toast({ msg, type, onClose }) {
   useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t); }, []);
   const bg = type === 'success' ? C.green : C.red;
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', bottom: 24, left: 24, background: bg, color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, zIndex: 9999, fontFamily: 'inherit', boxShadow: '0 4px 20px rgba(0,0,0,.2)' }}>
+    <div style={{ position: 'fixed', bottom: 24, left: 24, background: bg, color: '#fff', padding: '12px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, zIndex: 9999, fontFamily: 'inherit', boxShadow: '0 4px 20px rgba(27,23,70,.2)' }}>
       {msg}
     </div>,
     document.body
@@ -50,12 +50,12 @@ function Toast({ msg, type, onClose }) {
 
 function Modal({ title, subtitle, onClose, children, wide }) {
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9000, padding: 20 }}>
-      <div style={{ background: C.white, borderRadius: 16, width: '100%', maxWidth: wide ? 680 : 560, maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 60px rgba(0,0,0,.25)', direction: 'rtl', fontFamily: 'inherit' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(27,23,70,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9000, padding: 20 }}>
+      <div style={{ background: C.white, borderRadius: 16, width: '100%', maxWidth: wide ? 680 : 560, maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 60px rgba(27,23,70,.25)', direction: 'rtl', fontFamily: 'inherit' }}>
         <div style={{ padding: '18px 22px', borderBottom: `1px solid ${C.grayBorder}`, flexShrink: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: C.tealDark, fontFamily: 'inherit' }}>{title}</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: C.ink, fontFamily: 'inherit' }}>{title}</div>
               {subtitle && <div style={{ fontSize: 12, color: C.gray, marginTop: 3, fontFamily: 'inherit' }}>{subtitle}</div>}
             </div>
             <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: C.gray, lineHeight: 1, fontFamily: 'inherit' }}>×</button>
@@ -70,8 +70,8 @@ function Modal({ title, subtitle, onClose, children, wide }) {
 
 function Btn({ children, onClick, variant = 'primary', small, disabled }) {
   const v = {
-    primary: { background: C.teal,      color: '#fff'     },
-    ghost:   { background: C.grayLight, color: C.tealDark },
+    primary: { background: C.primary,      color: '#fff'     },
+    ghost:   { background: C.grayLight, color: C.ink },
     danger:  { background: C.red,       color: '#fff'     },
   };
   return (
@@ -92,8 +92,8 @@ function ContentBadge({ filled, label, onClick }) {
       style={{
         padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, fontFamily: 'inherit',
         background: filled
-          ? (hover ? '#15803d' : C.greenLight)
-          : (hover ? C.teal : C.grayLight),
+          ? (hover ? '#086449' : C.greenLight)
+          : (hover ? C.primary : C.grayLight),
         color: filled
           ? (hover ? '#fff' : C.green)
           : (hover ? '#fff' : C.gray),
@@ -117,8 +117,8 @@ function NameBadge({ onClick }) {
       onMouseLeave={() => setHover(false)}
       style={{
         padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, fontFamily: 'inherit',
-        background: hover ? C.teal : C.tealLight,
-        color: hover ? '#fff' : C.tealDark,
+        background: hover ? C.primary : C.primarySoft,
+        color: hover ? '#fff' : C.ink,
         border: 'none', cursor: 'pointer',
         display: 'inline-flex', alignItems: 'center', gap: 4,
         transition: 'all .15s',
@@ -139,18 +139,18 @@ const FieldRef = React.forwardRef(function Field({ label, fkey, form, set, rows,
         marginBottom: 16,
         borderRadius: 10,
         padding: highlight ? '10px 12px' : '0',
-        background: highlight ? C.tealLight : 'transparent',
+        background: highlight ? C.primarySoft : 'transparent',
         transition: 'background .3s',
       }}
     >
-      <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 6, fontFamily: 'inherit' }}>{label}</label>
+      <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 6, fontFamily: 'inherit' }}>{label}</label>
       {rows ? (
         <textarea
           value={form[fkey] || ''}
           onChange={e => set(fkey, e.target.value)}
           placeholder={placeholder}
           rows={rows}
-          style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${highlight ? C.teal : C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', resize: 'vertical', outline: 'none', boxSizing: 'border-box', lineHeight: 1.6, transition: 'border .3s' }}
+          style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${highlight ? C.primary : C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', resize: 'vertical', outline: 'none', boxSizing: 'border-box', lineHeight: 1.6, transition: 'border .3s' }}
         />
       ) : (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -159,7 +159,7 @@ const FieldRef = React.forwardRef(function Field({ label, fkey, form, set, rows,
             value={form[fkey] || ''}
             onChange={e => set(fkey, e.target.value)}
             placeholder={placeholder}
-            style={{ flex: 1, padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${highlight ? C.teal : C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', transition: 'border .3s' }}
+            style={{ flex: 1, padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${highlight ? C.primary : C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', transition: 'border .3s' }}
           />
           {suffix && <span style={{ fontSize: 13, color: C.gray, fontFamily: 'inherit', whiteSpace: 'nowrap' }}>{suffix}</span>}
         </div>
@@ -179,22 +179,22 @@ function ListEditor({ label, value, onChange, placeholder = 'العنوان', pl
   return (
     <div style={{ marginBottom: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <label style={{ fontSize: 12, fontWeight: 700, color: C.tealDark, fontFamily: 'inherit' }}>{label}</label>
-        <button onClick={add} style={{ padding: '3px 10px', borderRadius: 6, border: `1px solid ${C.teal}`, background: C.tealLight, color: C.tealDark, fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>+ إضافة</button>
+        <label style={{ fontSize: 12, fontWeight: 700, color: C.ink, fontFamily: 'inherit' }}>{label}</label>
+        <button onClick={add} style={{ padding: '3px 10px', borderRadius: 6, border: `1px solid ${C.primary}`, background: C.primarySoft, color: C.ink, fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>+ إضافة</button>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {items.length === 0 && (
           <div style={{ fontSize: 12, color: C.gray, fontStyle: 'italic', padding: '8px 12px', background: C.grayLight, borderRadius: 6, fontFamily: 'inherit' }}>لا توجد عناصر — اضغط + إضافة</div>
         )}
         {items.map((item, i) => (
-          <div key={i} style={{ border: `1px solid ${C.grayBorder}`, borderRadius: 8, padding: '10px 12px', background: '#fafafa', position: 'relative' }}>
+          <div key={i} style={{ border: `1px solid ${C.grayBorder}`, borderRadius: 8, padding: '10px 12px', background: '#FBF9F5', position: 'relative' }}>
             <button onClick={() => remove(i)} style={{ position: 'absolute', top: 6, left: 8, background: 'none', border: 'none', cursor: 'pointer', color: C.red, fontSize: 16, lineHeight: 1, fontFamily: 'inherit' }}>×</button>
             <div style={{ marginBottom: 6 }}>
               <input value={item.t} onChange={e => update(i, 't', e.target.value)} placeholder={placeholder}
                 style={{ width: '100%', padding: '7px 10px', borderRadius: 6, border: `1px solid ${C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', fontWeight: 600 }} />
             </div>
             <textarea value={item.d} onChange={e => update(i, 'd', e.target.value)} placeholder={placeholderD} rows={2}
-              style={{ width: '100%', padding: '7px 10px', borderRadius: 6, border: `1px solid ${C.grayBorder}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box', lineHeight: 1.6, color: '#4b5563' }} />
+              style={{ width: '100%', padding: '7px 10px', borderRadius: 6, border: `1px solid ${C.grayBorder}`, fontSize: 12, fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box', lineHeight: 1.6, color: '#4A4660' }} />
           </div>
         ))}
       </div>
@@ -276,8 +276,8 @@ function EditModal({ unit, section, focusField, onClose, onSaved }) {
     <Modal title={`تعديل — ${unit.name}`} subtitle={unitLabel} onClose={onClose} wide>
 
       {/* Identity section */}
-      <div style={{ background: C.tealLight, borderRadius: 8, padding: '12px 14px', marginBottom: 18 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 10, fontFamily: 'inherit' }}>الهوية والاسم</div>
+      <div style={{ background: C.primarySoft, borderRadius: 8, padding: '12px 14px', marginBottom: 18 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 10, fontFamily: 'inherit' }}>الهوية والاسم</div>
         <FieldRef ref={refs.name} label="الاسم / العنوان" fkey="name" form={form} set={set} placeholder="اسم الوحدة..." highlight={highlight === 'name'} />
         {isPolicies && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'end' }}>
@@ -288,7 +288,7 @@ function EditModal({ unit, section, focusField, onClose, onSaved }) {
       </div>
 
       {/* Educational content */}
-      <div style={{ fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 10, fontFamily: 'inherit' }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 10, fontFamily: 'inherit' }}>
         المحتوى التعليمي (يظهر في تبويبات الوحدة)
       </div>
 
@@ -311,16 +311,16 @@ function EditModal({ unit, section, focusField, onClose, onSaved }) {
       )}
 
       {/* Video row */}
-      <div ref={refs.video_url} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'end', borderRadius: 10, padding: highlight === 'video_url' ? '10px 12px' : '0', background: highlight === 'video_url' ? C.tealLight : 'transparent', transition: 'background .3s', marginBottom: 16 }}>
+      <div ref={refs.video_url} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'end', borderRadius: 10, padding: highlight === 'video_url' ? '10px 12px' : '0', background: highlight === 'video_url' ? C.primarySoft : 'transparent', transition: 'background .3s', marginBottom: 16 }}>
         <div style={{ marginBottom: 0 }}>
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 6, fontFamily: 'inherit' }}>رابط الفيديو التوجيهي (YouTube)</label>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 6, fontFamily: 'inherit' }}>رابط الفيديو التوجيهي (YouTube)</label>
           <input type="text" value={form.video_url} onChange={e => set('video_url', e.target.value)} placeholder="https://www.youtube.com/watch?v=..."
-            style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${highlight === 'video_url' ? C.teal : C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', transition: 'border .3s' }} />
+            style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${highlight === 'video_url' ? C.primary : C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', transition: 'border .3s' }} />
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 6, fontFamily: 'inherit' }}>مدة الفيديو</label>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 6, fontFamily: 'inherit' }}>مدة الفيديو</label>
           <input type="text" value={form.video_duration} onChange={e => set('video_duration', e.target.value)} placeholder="5:30"
-            style={{ width: 90, padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${highlight === 'video_url' ? C.teal : C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', transition: 'border .3s' }} />
+            style={{ width: 90, padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${highlight === 'video_url' ? C.primary : C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', transition: 'border .3s' }} />
         </div>
       </div>
 
@@ -349,7 +349,7 @@ function UnitRow({ unit, section, onEdit }) {
           onClick={() => onEdit(unit, section === 'strategic' ? 'general' : 'name')}
           title="اضغط لتعديل الاسم"
         >
-          <div style={{ width: 30, height: 30, borderRadius: 8, background: C.teal, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0, fontFamily: 'inherit', marginTop: 2 }}>
+          <div style={{ width: 30, height: 30, borderRadius: 8, background: C.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0, fontFamily: 'inherit', marginTop: 2 }}>
             {num}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -360,7 +360,7 @@ function UnitRow({ unit, section, onEdit }) {
                   <span style={{ fontSize: 12, color: C.gray, fontFamily: 'inherit' }}>{unit.description}</span>
                 )}
                 {unit.price != null && (
-                  <span style={{ fontSize: 12, fontWeight: 700, color: C.orange, fontFamily: 'inherit', background: C.orangeLight, padding: '1px 8px', borderRadius: 12 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: C.amberText, fontFamily: 'inherit', background: C.amberSoft, padding: '1px 8px', borderRadius: 12 }}>
                     {Number(unit.price).toLocaleString('en-US')} ريال
                   </span>
                 )}
@@ -411,10 +411,10 @@ function ProgressBar({ units, section }) {
     <div style={{ marginBottom: 16, padding: '12px 18px', background: C.grayLight, borderRadius: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
         <span style={{ fontSize: 12, color: C.gray, fontFamily: 'inherit' }}>اكتمال المحتوى</span>
-        <span style={{ fontSize: 12, fontWeight: 700, color: C.tealDark, fontFamily: 'inherit' }}>{filled} / {total} حقل ({pct}%)</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: C.ink, fontFamily: 'inherit' }}>{filled} / {total} حقل ({pct}%)</span>
       </div>
       <div style={{ height: 6, background: C.grayBorder, borderRadius: 3, overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: `${pct}%`, background: pct === 100 ? C.green : C.teal, borderRadius: 3, transition: 'width .4s' }} />
+        <div style={{ height: '100%', width: `${pct}%`, background: pct === 100 ? C.green : C.primary, borderRadius: 3, transition: 'width .4s' }} />
       </div>
     </div>
   );
@@ -485,7 +485,7 @@ export default function AdminContent() {
 
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: C.tealDark, margin: '0 0 6px', fontFamily: 'inherit' }}>إدارة مكونات النظام</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink, margin: '0 0 6px', fontFamily: 'inherit' }}>إدارة مكونات النظام</h2>
         <p style={{ fontSize: 13, color: C.gray, margin: 0, lineHeight: 1.7, fontFamily: 'inherit' }}>
           اضغط على أي حقل (نبذة، شرح، إرشادات، فيديو) مباشرة لتحريره — المودل يفتح على الحقل المحدد تلقائياً.
         </p>
@@ -495,9 +495,9 @@ export default function AdminContent() {
       <div style={{ display: 'flex', gap: 4, background: C.grayLight, borderRadius: 12, padding: 4, marginBottom: 16, width: 'fit-content' }}>
         {TABS.map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key)}
-            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: activeTab === t.key ? 700 : 400, background: activeTab === t.key ? C.white : 'transparent', color: activeTab === t.key ? C.teal : C.gray, boxShadow: activeTab === t.key ? '0 1px 4px rgba(0,0,0,.1)' : 'none', transition: 'all .18s', whiteSpace: 'nowrap' }}>
+            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: activeTab === t.key ? 700 : 400, background: activeTab === t.key ? C.white : 'transparent', color: activeTab === t.key ? C.primary : C.gray, boxShadow: activeTab === t.key ? '0 1px 4px rgba(27,23,70,.1)' : 'none', transition: 'all .18s', whiteSpace: 'nowrap' }}>
             {t.label}
-            <span style={{ marginRight: 6, padding: '1px 7px', borderRadius: 12, background: activeTab === t.key ? C.tealLight : 'transparent', color: activeTab === t.key ? C.teal : C.gray, fontSize: 11, fontWeight: 700, fontFamily: 'inherit' }}>
+            <span style={{ marginRight: 6, padding: '1px 7px', borderRadius: 12, background: activeTab === t.key ? C.primarySoft : 'transparent', color: activeTab === t.key ? C.primary : C.gray, fontSize: 11, fontWeight: 700, fontFamily: 'inherit' }}>
               {data[t.key]?.length || t.count}
             </span>
           </button>
@@ -505,7 +505,7 @@ export default function AdminContent() {
       </div>
 
       {activeTab === 'strategic' && (
-        <div style={{ background: C.tealLight, border: `1px solid ${C.teal}30`, borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 12.5, color: C.tealDark, lineHeight: 1.8, fontFamily: 'inherit' }}>
+        <div style={{ background: C.primarySoft, border: `1px solid ${C.primary}30`, borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 12.5, color: C.ink, lineHeight: 1.8, fontFamily: 'inherit' }}>
           كل ما يظهر للمستخدم في الوحدات الاستراتيجية قابل للتعديل من هنا: الاسم ونوع النموذج والفيديو، النبذة، الشرح وأمثلته،
           الإرشادات، تعليمات نماذج العمل وتوضيحات ⓘ وأمثلتها، وملفات PDF. التعديل يُنشر للمستخدمين فور الحفظ، مع معاينة مباشرة قبل الحفظ.
         </div>

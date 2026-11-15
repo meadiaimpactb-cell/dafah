@@ -16,13 +16,13 @@ const STEPS = [
   { id: 5, label: 'الاعتماد' },
 ];
 
-const C = { teal: '#1A6B7C', tealDark: '#14505E', orange: '#E8620A' };
+const C = { primary: '#5546D6', ink: '#1B1746', orange: '#F5A524', amberLine: '#E0920F' };
 
 const STATUS_CFG = {
-  pending:   { label: 'جارٍ الإعداد',   color: '#6b7280', bg: '#f3f4f6' },
-  active:    { label: 'جارٍ التنفيذ',   color: '#1A6B7C', bg: '#E8F4F6' },
-  review:    { label: 'قيد المراجعة',   color: '#7c3aed', bg: '#ede9fe' },
-  completed: { label: 'مكتملة',          color: '#16a34a', bg: '#dcfce7' },
+  pending:   { label: 'جارٍ الإعداد',   color: '#67637A', bg: '#F3EFE8' },
+  active:    { label: 'جارٍ التنفيذ',   color: '#5546D6', bg: '#E7E5FD' },
+  review:    { label: 'قيد المراجعة',   color: '#5546D6', bg: '#E7E5FD' },
+  completed: { label: 'مكتملة',          color: '#0B7F5D', bg: '#C9EFE1' },
 };
 
 // ── PlansList ────────────────────────────────────────────────────────────────
@@ -30,9 +30,9 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
   if (loading) return (
     <div style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
-      <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
         {[...Array(3)].map((_, i) => (
-          <div key={i} style={{ height: 96, borderRadius: 10, background: '#f3f4f6', marginBottom: 12 }} />
+          <div key={i} style={{ height: 96, borderRadius: 10, background: '#F3EFE8', marginBottom: 12 }} />
         ))}
       </div>
     </div>
@@ -41,10 +41,10 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
   return (
     <div className="animate-in">
       {/* Header */}
-      <div style={{ background: '#fff', borderRadius: 12, padding: '20px 28px', marginBottom: 20, boxShadow: '0 1px 8px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: '20px 28px', marginBottom: 20, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: C.tealDark, marginBottom: 4 }}>خططك الاستراتيجية</h2>
-          <p style={{ fontSize: 13, color: '#6b7280' }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 4 }}>خططك الاستراتيجية</h2>
+          <p style={{ fontSize: 13, color: '#67637A' }}>
             {plans.length === 0 ? 'لم تبدأ أي خطة بعد' : `لديك ${plans.length} ${plans.length === 1 ? 'خطة' : 'خطط'} استراتيجية`}
           </p>
         </div>
@@ -53,8 +53,8 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
           title={canCreate ? '' : 'يجب إكمال تسليم جميع الوحدات الـ11 في الخطة الحالية أولاً'}
           style={{
             padding: '11px 24px',
-            background: canCreate ? C.orange : '#d1d5db',
-            color: canCreate ? '#fff' : '#9ca3af',
+            background: canCreate ? C.amber : '#D9D3C7',
+            color: canCreate ? '#1B1746' : '#8F8BA3',
             border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700,
             cursor: canCreate ? 'pointer' : 'not-allowed',
             fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 8,
@@ -67,11 +67,11 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
 
       {/* Warning banner when creation is locked */}
       {!canCreate && plans.length > 0 && (
-        <div style={{ marginBottom: 20, padding: '14px 20px', background: '#fffbeb', border: '1.5px solid #fcd34d', borderRadius: 12, display: 'flex', alignItems: 'flex-start', gap: 12, direction: 'rtl' }}>
+        <div style={{ marginBottom: 20, padding: '14px 20px', background: '#FFF8EA', border: '1.5px solid #F9C152', borderRadius: 12, display: 'flex', alignItems: 'flex-start', gap: 12, direction: 'rtl' }}>
           <span style={{ fontSize: 22, lineHeight: 1, flexShrink: 0 }}>⚠️</span>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#92400e', marginBottom: 4 }}>لا يمكن إنشاء خطة جديدة حالياً</div>
-            <div style={{ fontSize: 13, color: '#78350f', lineHeight: 1.6 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#7A4706', marginBottom: 4 }}>لا يمكن إنشاء خطة جديدة حالياً</div>
+            <div style={{ fontSize: 13, color: '#5F3705', lineHeight: 1.6 }}>
               يجب إكمال تسليم جميع الوحدات الـ11 في الخطة الحالية قبل البدء في خطة جديدة. استمر في العمل على خطتك الحالية وأرسل جميع الوحدات للمستشار.
             </div>
           </div>
@@ -80,15 +80,15 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
 
       {/* Empty state */}
       {plans.length === 0 && (
-        <div style={{ background: '#fff', borderRadius: 12, padding: '60px 24px', boxShadow: '0 1px 8px rgba(0,0,0,0.06)', textAlign: 'center' }}>
-          <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#E8F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}>📋</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: C.tealDark, marginBottom: 10 }}>ابدأ خطتك الاستراتيجية الأولى</div>
-          <p style={{ fontSize: 13, color: '#6b7280', maxWidth: 420, margin: '0 auto 28px', lineHeight: 1.7 }}>
+        <div style={{ background: '#fff', borderRadius: 12, padding: '60px 24px', boxShadow: '0 1px 8px rgba(27,23,70,0.06)', textAlign: 'center' }}>
+          <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}>📋</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: C.ink, marginBottom: 10 }}>ابدأ خطتك الاستراتيجية الأولى</div>
+          <p style={{ fontSize: 13, color: '#67637A', maxWidth: 420, margin: '0 auto 28px', lineHeight: 1.7 }}>
             بناء خطة استراتيجية متكاملة للمنظمة من خلال 11 وحدة تخطيطية بمرافقة مستشار متخصص
           </p>
           <button
             onClick={onCreateNew}
-            style={{ padding: '13px 36px', background: C.orange, color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+            style={{ padding: '13px 36px', background: C.amber, color: '#1B1746', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
           >
             ابدأ الآن ←
           </button>
@@ -110,43 +110,43 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
             return (
               <div
                 key={plan.id}
-                style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', boxShadow: '0 1px 8px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 20, cursor: 'pointer', transition: 'box-shadow 0.2s', border: '1.5px solid transparent' }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(26,107,124,0.12)'}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 8px rgba(0,0,0,0.06)'}
+                style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', boxShadow: '0 1px 8px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', gap: 20, cursor: 'pointer', transition: 'box-shadow 0.2s', border: '1.5px solid transparent' }}
+                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(85,70,214,0.12)'}
+                onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 8px rgba(27,23,70,0.06)'}
                 onClick={() => onSelect(plan.id)}
               >
                 {/* Plan number badge */}
-                <div style={{ width: 48, height: 48, borderRadius: '50%', background: isDone ? '#dcfce7' : '#E8F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span style={{ fontSize: 18, fontWeight: 800, color: isDone ? '#16a34a' : C.teal }}>#{planNum}</span>
+                <div style={{ width: 48, height: 48, borderRadius: '50%', background: isDone ? '#C9EFE1' : '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <span style={{ fontSize: 18, fontWeight: 800, color: isDone ? '#0B7F5D' : C.primary }}>#{planNum}</span>
                 </div>
 
                 {/* Info */}
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: C.tealDark }}>الخطة الاستراتيجية #{planNum}</span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: C.ink }}>الخطة الاستراتيجية #{planNum}</span>
                     <span style={{ padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: cfg.bg, color: cfg.color }}>{cfg.label}</span>
                   </div>
-                  <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>
+                  <div style={{ fontSize: 12, color: '#67637A', marginBottom: 8 }}>
                     {plan.consultant ? `المستشار: ${plan.consultant.name}` : 'لم يُختر مستشار بعد'}
                     {stepLabel && plan.status !== 'completed' && <span style={{ marginRight: 12 }}>· المرحلة: {stepLabel}</span>}
                   </div>
                   {/* Progress bar */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ flex: 1, height: 6, background: '#e5e7eb', borderRadius: 4, overflow: 'hidden' }}>
-                      <div style={{ width: `${pct}%`, height: '100%', background: isDone ? '#16a34a' : C.teal, borderRadius: 4, transition: 'width 0.4s' }} />
+                    <div style={{ flex: 1, height: 6, background: '#E8E3DA', borderRadius: 4, overflow: 'hidden' }}>
+                      <div style={{ width: `${pct}%`, height: '100%', background: isDone ? '#0B7F5D' : C.primary, borderRadius: 4, transition: 'width 0.4s' }} />
                     </div>
-                    <span style={{ fontSize: 12, color: '#6b7280', whiteSpace: 'nowrap' }}>{approved}/{total} وحدة معتمدة</span>
+                    <span style={{ fontSize: 12, color: '#67637A', whiteSpace: 'nowrap' }}>{approved}/{total} وحدة معتمدة</span>
                   </div>
                 </div>
 
                 {/* Date + Action */}
                 <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                  <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>
+                  <div style={{ fontSize: 11, color: '#8F8BA3', marginBottom: 10 }}>
                     {new Date(plan.created_at).toLocaleDateString('ar-SA')}
                   </div>
                   <button
                     onClick={e => { e.stopPropagation(); onSelect(plan.id); }}
-                    style={{ padding: '8px 20px', background: isDone ? '#dcfce7' : C.teal, color: isDone ? '#16a34a' : '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+                    style={{ padding: '8px 20px', background: isDone ? '#C9EFE1' : C.primary, color: isDone ? '#0B7F5D' : '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
                   >
                     {isDone ? 'عرض' : 'استمرار'}
                   </button>
@@ -173,37 +173,37 @@ function ServiceSummary({ workflow, pricing, onContinue }) {
 
   return (
     <div className="animate-in" style={{ maxWidth: 600, margin: '0 auto' }}>
-      <div style={{ background: '#fff', borderRadius: 12, padding: 28, boxShadow: '0 1px 8px rgba(0,0,0,0.06)', marginBottom: 16 }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: 28, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-          <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#E8F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📋</div>
+          <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📋</div>
           <div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: C.tealDark }}>الخدمات المختارة</div>
-            <div style={{ fontSize: 12, color: '#6b7280' }}>ملخص ما تم اختياره في بداية الخطة</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: C.ink }}>الخدمات المختارة</div>
+            <div style={{ fontSize: 12, color: '#67637A' }}>ملخص ما تم اختياره في بداية الخطة</div>
           </div>
         </div>
 
         {items.map((item, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: item.included ? '#f0fdf4' : '#f9fafb', borderRadius: 8, marginBottom: 8, border: `1px solid ${item.included ? '#bbf7d0' : '#e5e7eb'}` }}>
+          <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: item.included ? '#E8F8F2' : '#FBF9F5', borderRadius: 8, marginBottom: 8, border: `1px solid ${item.included ? '#A9E4CF' : '#E8E3DA'}` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ fontSize: 16 }}>{item.included ? '✅' : '⬜'}</span>
-              <span style={{ fontSize: 13, color: item.included ? '#166534' : '#9ca3af', fontWeight: item.included ? 600 : 400 }}>{item.label}</span>
+              <span style={{ fontSize: 13, color: item.included ? '#086449' : '#8F8BA3', fontWeight: item.included ? 600 : 400 }}>{item.label}</span>
             </div>
-            <span style={{ fontSize: 13, fontWeight: 700, color: item.included ? '#16a34a' : '#9ca3af' }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: item.included ? '#0B7F5D' : '#8F8BA3' }}>
               {item.price.toLocaleString('en-US')} ريال
             </span>
           </div>
         ))}
 
-        <div style={{ marginTop: 16, padding: '14px 16px', background: '#f8fafb', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 14, fontWeight: 700, color: C.tealDark }}>الإجمالي المدفوع</span>
-          <span style={{ fontSize: 16, fontWeight: 800, color: C.teal }}>{Number(workflow?.total ?? 0).toLocaleString('en-US')} ريال</span>
+        <div style={{ marginTop: 16, padding: '14px 16px', background: '#FBF9F5', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 14, fontWeight: 700, color: C.ink }}>الإجمالي المدفوع</span>
+          <span style={{ fontSize: 16, fontWeight: 800, color: C.primary }}>{Number(workflow?.total ?? 0).toLocaleString('en-US')} ريال</span>
         </div>
       </div>
 
       <div style={{ textAlign: 'center' }}>
         <button
           onClick={onContinue}
-          style={{ padding: '11px 32px', background: C.teal, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+          style={{ padding: '11px 32px', background: C.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
         >
           العودة للخطوة الحالية ←
         </button>
@@ -217,7 +217,7 @@ function WorkflowStepper({ step, workflow, onStepClick }) {
   const realStep = workflow?.current_step ?? step;
 
   return (
-    <div style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', marginBottom: 24, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
+    <div style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', marginBottom: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
       <div style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', gap: 0 }}>
         {STEPS.map((s, i) => {
           const isCompleted = workflow?.status === 'completed';
@@ -235,17 +235,17 @@ function WorkflowStepper({ step, workflow, onStepClick }) {
                   title={clickable ? `مراجعة: ${s.label}` : undefined}
                   style={{
                     width: 36, height: 36, borderRadius: '50%',
-                    background: done ? C.teal : current ? C.orange : '#e5e7eb',
-                    color: done || current ? '#fff' : '#9ca3af',
+                    background: done ? C.primary : current ? C.amber : '#E8E3DA',
+                    color: done || current ? '#1B1746' : '#8F8BA3',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 14, fontWeight: 700, transition: 'all 0.2s',
                     cursor: clickable ? 'pointer' : 'default',
-                    outline: step === s.id && done ? `3px solid ${C.orange}` : 'none',
+                    outline: step === s.id && done ? `3px solid ${C.amberLine}` : 'none',
                     outlineOffset: 2,
-                    boxShadow: clickable ? '0 2px 6px rgba(26,107,124,0.18)' : 'none',
+                    boxShadow: clickable ? '0 2px 6px rgba(85,70,214,0.18)' : 'none',
                   }}
-                  onMouseEnter={e => { if (clickable) e.currentTarget.style.background = C.tealDark; }}
-                  onMouseLeave={e => { if (clickable) e.currentTarget.style.background = C.teal; }}
+                  onMouseEnter={e => { if (clickable) e.currentTarget.style.background = C.ink; }}
+                  onMouseLeave={e => { if (clickable) e.currentTarget.style.background = C.primary; }}
                 >
                   {done ? '✓' : s.id + 1}
                 </div>
@@ -253,19 +253,19 @@ function WorkflowStepper({ step, workflow, onStepClick }) {
                   onClick={() => clickable && onStepClick(s.id)}
                   style={{
                     fontSize: 11,
-                    color: current ? C.orange : done ? C.teal : '#9ca3af',
+                    color: current ? C.amberText : done ? C.primary : '#8F8BA3',
                     marginTop: 6, textAlign: 'center',
                     fontWeight: current || (done && step === s.id) ? 700 : 400,
                     cursor: clickable ? 'pointer' : 'default',
                     textDecoration: clickable ? 'underline dotted' : 'none',
-                    textDecorationColor: 'rgba(26,107,124,0.4)',
+                    textDecorationColor: 'rgba(85,70,214,0.4)',
                   }}
                 >
                   {s.label}
                 </div>
               </div>
               {i < STEPS.length - 1 && (
-                <div style={{ flex: 1, height: 2, background: (isCompleted || realStep > s.id) ? C.teal : '#e5e7eb', minWidth: 20, marginBottom: 20, transition: 'background 0.3s' }} />
+                <div style={{ flex: 1, height: 2, background: (isCompleted || realStep > s.id) ? C.primary : '#E8E3DA', minWidth: 20, marginBottom: 20, transition: 'background 0.3s' }} />
               )}
             </React.Fragment>
           );
@@ -273,13 +273,13 @@ function WorkflowStepper({ step, workflow, onStepClick }) {
       </div>
       {/* مؤشر وضع المراجعة */}
       {workflow && step < realStep && (
-        <div style={{ marginTop: 12, padding: '6px 14px', background: '#fff8f0', borderRadius: 8, border: `1px solid ${C.orange}30`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 12, color: C.orange, fontWeight: 600 }}>
+        <div style={{ marginTop: 12, padding: '6px 14px', background: '#FFF8EA', borderRadius: 8, border: `1px solid ${C.amberLine}30`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 12, color: C.amberText, fontWeight: 600 }}>
             🔍 وضع المراجعة — تستعرض: {STEPS[step]?.label}
           </span>
           <button
             onClick={() => onStepClick && onStepClick(realStep)}
-            style={{ background: 'none', border: 'none', color: C.teal, cursor: 'pointer', fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}
+            style={{ background: 'none', border: 'none', color: C.primary, cursor: 'pointer', fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}
           >
             العودة للخطوة الحالية ←
           </button>
@@ -388,7 +388,7 @@ export default function StrategicRoadmap({ activeUnit, setActiveUnit, navigate, 
         <div style={{ marginBottom: 16 }}>
           <button
             onClick={() => setIsCreatingNew(false)}
-            style={{ background: 'none', border: 'none', color: C.teal, cursor: 'pointer', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, padding: 0 }}
+            style={{ background: 'none', border: 'none', color: C.primary, cursor: 'pointer', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, padding: 0 }}
           >
             ← العودة إلى قائمة الخطط
           </button>
@@ -409,17 +409,17 @@ export default function StrategicRoadmap({ activeUnit, setActiveUnit, navigate, 
   if (loading) return (
     <div style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
-      <div style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', marginBottom: 24, boxShadow: '0 1px 8px rgba(0,0,0,0.06)', display: 'flex', gap: 8 }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', marginBottom: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', display: 'flex', gap: 8 }}>
         {[...Array(6)].map((_, i) => (
           <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#e5e7eb' }} />
-            <div style={{ width: 60, height: 10, borderRadius: 4, background: '#e5e7eb' }} />
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#E8E3DA' }} />
+            <div style={{ width: 60, height: 10, borderRadius: 4, background: '#E8E3DA' }} />
           </div>
         ))}
       </div>
-      <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
-        <div style={{ width: '40%', height: 20, borderRadius: 4, background: '#e5e7eb', marginBottom: 16 }} />
-        {[...Array(4)].map((_, i) => <div key={i} style={{ height: 56, borderRadius: 8, background: '#f3f4f6', marginBottom: 10 }} />)}
+      <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+        <div style={{ width: '40%', height: 20, borderRadius: 4, background: '#E8E3DA', marginBottom: 16 }} />
+        {[...Array(4)].map((_, i) => <div key={i} style={{ height: 56, borderRadius: 8, background: '#F3EFE8', marginBottom: 10 }} />)}
       </div>
     </div>
   );
@@ -441,7 +441,7 @@ export default function StrategicRoadmap({ activeUnit, setActiveUnit, navigate, 
       <div style={{ marginBottom: 16 }}>
         <button
           onClick={() => onWorkflowSelect && onWorkflowSelect(null)}
-          style={{ background: 'none', border: 'none', color: C.teal, cursor: 'pointer', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, padding: 0 }}
+          style={{ background: 'none', border: 'none', color: C.primary, cursor: 'pointer', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, padding: 0 }}
         >
           ← العودة إلى قائمة الخطط
         </button>

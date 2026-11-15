@@ -2,11 +2,11 @@ import React, { useState, useEffect, useCallback } from "react";
 import api from "../../api/axios";
 
 const colors = {
-  teal: "#1A6B7C", tealDark: "#145A68", tealCard: "#1E5E6E",
-  orange: "#E8713A", orangeLight: "#FDF0E8",
-  bg: "#F8FAFB", white: "#FFFFFF",
-  gray: "#6B7280", grayLight: "#F3F4F6", grayBorder: "#E5E7EB",
-  green: "#10B981", red: "#EF4444",
+  primary: "#5546D6", ink: "#1B1746", primaryDeep: "#2B2470",
+  orange: "#F5A524", amberText: '#9A5B07', amberSoft: "#FFF8EA",
+  bg: "#FBF9F5", white: "#FFFFFF",
+  gray: "#67637A", grayLight: "#F3EFE8", grayBorder: "#E8E3DA",
+  green: "#0E9F74", red: "#E5533D",
 };
 
 const GROUP_LABELS = {
@@ -94,9 +94,9 @@ export default function AdminSiteContent() {
   const currentItems = grouped[activeTab] || [];
 
   return (
-    <div style={{ fontFamily: "'Cairo', sans-serif", direction: "rtl" }}>
+    <div style={{ fontFamily: "inherit", direction: "rtl" }}>
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 800, color: colors.tealDark, marginBottom: 4 }}>محتوى موقع الزائر</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 800, color: colors.ink, marginBottom: 4 }}>محتوى موقع الزائر</h2>
         <p style={{ fontSize: 13, color: colors.gray }}>تحكم كامل في نصوص وبيانات جميع صفحات الموقع العامة</p>
       </div>
 
@@ -108,9 +108,9 @@ export default function AdminSiteContent() {
             onClick={() => setActiveTab(g)}
             style={{
               padding: "8px 20px", borderRadius: 10, fontSize: 13, fontWeight: 600,
-              fontFamily: "'Cairo', sans-serif", cursor: "pointer", border: "none",
-              background: activeTab === g ? colors.teal : colors.grayLight,
-              color: activeTab === g ? "white" : colors.tealDark,
+              fontFamily: "inherit", cursor: "pointer", border: "none",
+              background: activeTab === g ? colors.primary : colors.grayLight,
+              color: activeTab === g ? "white" : colors.ink,
               position: "relative",
             }}
           >
@@ -118,7 +118,7 @@ export default function AdminSiteContent() {
             {isDirty(g) && activeTab !== g && (
               <span style={{
                 position: "absolute", top: 4, left: 4, width: 7, height: 7,
-                borderRadius: "50%", background: colors.orange,
+                borderRadius: "50%", background: colors.amber,
               }} />
             )}
           </button>
@@ -132,9 +132,9 @@ export default function AdminSiteContent() {
           disabled={bulkSaving || !isDirty(activeTab)}
           style={{
             padding: "10px 28px", borderRadius: 10, fontSize: 13, fontWeight: 700,
-            fontFamily: "'Cairo', sans-serif", cursor: isDirty(activeTab) ? "pointer" : "default",
-            border: "none", background: isDirty(activeTab) ? colors.orange : colors.grayBorder,
-            color: isDirty(activeTab) ? "white" : colors.gray,
+            fontFamily: "inherit", cursor: isDirty(activeTab) ? "pointer" : "default",
+            border: "none", background: isDirty(activeTab) ? colors.amber : colors.grayBorder,
+            color: isDirty(activeTab) ? "#1B1746" : colors.gray,
             transition: "all 0.2s",
           }}
         >
@@ -155,13 +155,13 @@ export default function AdminSiteContent() {
               key={item.key}
               style={{
                 background: "white", borderRadius: 12, padding: "16px 20px",
-                border: `1.5px solid ${isSaved ? colors.green : isChanged ? colors.orange : colors.grayBorder}`,
+                border: `1.5px solid ${isSaved ? colors.green : isChanged ? colors.amberLine : colors.grayBorder}`,
                 transition: "border-color 0.2s",
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                 <div>
-                  <label style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, display: "block" }}>
+                  <label style={{ fontSize: 13, fontWeight: 700, color: colors.ink, display: "block" }}>
                     {item.label}
                   </label>
                 </div>
@@ -170,9 +170,9 @@ export default function AdminSiteContent() {
                   disabled={isSaving || !isChanged}
                   style={{
                     padding: "6px 18px", borderRadius: 8, fontSize: 12, fontWeight: 700,
-                    fontFamily: "'Cairo', sans-serif", cursor: isChanged ? "pointer" : "default",
+                    fontFamily: "inherit", cursor: isChanged ? "pointer" : "default",
                     border: "none",
-                    background: isSaved ? colors.green : isChanged ? colors.teal : colors.grayBorder,
+                    background: isSaved ? colors.green : isChanged ? colors.primary : colors.grayBorder,
                     color: isChanged || isSaved ? "white" : colors.gray,
                     flexShrink: 0, marginRight: 12,
                     transition: "all 0.2s",
@@ -190,7 +190,7 @@ export default function AdminSiteContent() {
                   style={{
                     width: "100%", padding: "10px 14px", borderRadius: 8,
                     border: `1.5px solid ${colors.grayBorder}`, fontSize: 13,
-                    fontFamily: "'Cairo', sans-serif", direction: "rtl",
+                    fontFamily: "inherit", direction: "rtl",
                     resize: "vertical", lineHeight: 1.8, outline: "none",
                     boxSizing: "border-box",
                   }}
@@ -204,7 +204,7 @@ export default function AdminSiteContent() {
                   style={{
                     width: "100%", padding: "10px 14px", borderRadius: 8,
                     border: `1.5px solid ${colors.grayBorder}`, fontSize: 13,
-                    fontFamily: "'Cairo', sans-serif", outline: "none",
+                    fontFamily: "inherit", outline: "none",
                     boxSizing: "border-box",
                   }}
                 />

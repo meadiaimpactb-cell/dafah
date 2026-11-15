@@ -9,20 +9,20 @@ import { IcClock, IcUpload, IcCheckCircle, IcArrowPath, IcSearch, IcWarning, IcL
 
 // ─── Colors ─────────────────────────────────────────────────────
 const colors = {
-  teal: "#1A6B7C", tealDark: "#145A68", tealCard: "#1E5E6E",
-  orange: "#E8713A", orangeLight: "#FDF0E8",
-  gray: "#6B7280", grayLight: "#F3F4F6", grayBorder: "#E5E7EB",
-  green: "#10B981", greenLight: "#D1FAE5",
-  blue: "#3B82F6", blueLight: "#DBEAFE",
-  yellow: "#F59E0B", yellowLight: "#FEF3C7",
+  primary: "#5546D6", ink: "#1B1746", primaryDeep: "#2B2470",
+  orange: "#F5A524", amberLine: '#E0920F', amberSoft: "#FFF8EA",
+  gray: "#67637A", grayLight: "#F3EFE8", grayBorder: "#E8E3DA",
+  green: "#0E9F74", greenLight: "#C9EFE1",
+  blue: "#2E8FE6", blueLight: "#CFE5FA",
+  yellow: "#F5A524", yellowLight: "#FEEDC6",
 };
 
 // ─── Plans list constants ────────────────────────────────────────
 const OP_STATUS_CFG = {
-  pending:   { label: 'جارٍ الإعداد',   color: '#6b7280', bg: '#f3f4f6' },
-  active:    { label: 'جارٍ التنفيذ',   color: '#1A6B7C', bg: '#E8F4F6' },
-  review:    { label: 'قيد المراجعة',   color: '#7c3aed', bg: '#ede9fe' },
-  completed: { label: 'مكتملة',          color: '#16a34a', bg: '#dcfce7' },
+  pending:   { label: 'جارٍ الإعداد',   color: '#67637A', bg: '#F3EFE8' },
+  active:    { label: 'جارٍ التنفيذ',   color: '#5546D6', bg: '#E7E5FD' },
+  review:    { label: 'قيد المراجعة',   color: '#5546D6', bg: '#E7E5FD' },
+  completed: { label: 'مكتملة',          color: '#0B7F5D', bg: '#C9EFE1' },
 };
 
 // ─── OpPlansList ─────────────────────────────────────────────────
@@ -30,9 +30,9 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
   if (loading) return (
     <div style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
-      <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
         {[...Array(3)].map((_, i) => (
-          <div key={i} style={{ height: 96, borderRadius: 10, background: '#f3f4f6', marginBottom: 12 }} />
+          <div key={i} style={{ height: 96, borderRadius: 10, background: '#F3EFE8', marginBottom: 12 }} />
         ))}
       </div>
     </div>
@@ -42,10 +42,10 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
 
   return (
     <div className="animate-in">
-      <div style={{ background: '#fff', borderRadius: 12, padding: '20px 28px', marginBottom: 20, boxShadow: '0 1px 8px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: '20px 28px', marginBottom: 20, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 4 }}>خططك التشغيلية</h2>
-          <p style={{ fontSize: 13, color: '#6b7280' }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 4 }}>خططك التشغيلية</h2>
+          <p style={{ fontSize: 13, color: '#67637A' }}>
             {plans.length === 0 ? 'لم تبدأ أي خطة بعد' : `لديك ${plans.length} ${plans.length === 1 ? 'خطة' : 'خطط'} تشغيلية`}
           </p>
         </div>
@@ -53,12 +53,12 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
           <button
             onClick={onCreateNew}
             disabled={hasActive}
-            style={{ padding: '11px 24px', background: hasActive ? '#e5e7eb' : colors.orange, color: hasActive ? '#9ca3af' : '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: hasActive ? 'not-allowed' : 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 8 }}
+            style={{ padding: '11px 24px', background: hasActive ? '#E8E3DA' : colors.amber, color: hasActive ? '#8F8BA3' : '#1B1746', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: hasActive ? 'not-allowed' : 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 8 }}
           >
             <span style={{ fontSize: 20, lineHeight: 1 }}>+</span> إنشاء خطة جديدة
           </button>
           {hasActive && (
-            <div style={{ marginTop: 6, fontSize: 11, color: '#6b7280', maxWidth: 220 }}>
+            <div style={{ marginTop: 6, fontSize: 11, color: '#67637A', maxWidth: 220 }}>
               أكمل الخطة الحالية أولاً لفتح هذا الخيار
             </div>
           )}
@@ -66,15 +66,15 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
       </div>
 
       {plans.length === 0 && (
-        <div style={{ background: '#fff', borderRadius: 12, padding: '60px 24px', boxShadow: '0 1px 8px rgba(0,0,0,0.06)', textAlign: 'center' }}>
-          <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#E8F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}>⚙️</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: colors.tealDark, marginBottom: 10 }}>ابدأ خطتك التشغيلية الأولى</div>
-          <p style={{ fontSize: 13, color: '#6b7280', maxWidth: 420, margin: '0 auto 28px', lineHeight: 1.7 }}>
+        <div style={{ background: '#fff', borderRadius: 12, padding: '60px 24px', boxShadow: '0 1px 8px rgba(27,23,70,0.06)', textAlign: 'center' }}>
+          <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}>⚙️</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: colors.ink, marginBottom: 10 }}>ابدأ خطتك التشغيلية الأولى</div>
+          <p style={{ fontSize: 13, color: '#67637A', maxWidth: 420, margin: '0 auto 28px', lineHeight: 1.7 }}>
             بناء خطة تشغيلية متكاملة من خلال 5 وحدات تخطيطية بمرافقة المستشار الاستراتيجي
           </p>
           <button
             onClick={onCreateNew}
-            style={{ padding: '13px 36px', background: colors.orange, color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+            style={{ padding: '13px 36px', background: colors.amber, color: '#1B1746', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
           >
             ابدأ الآن ←
           </button>
@@ -94,36 +94,36 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
             return (
               <div
                 key={plan.id}
-                style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', boxShadow: '0 1px 8px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 20, cursor: 'pointer', transition: 'box-shadow 0.2s', border: '1.5px solid transparent' }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(26,107,124,0.12)'}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 8px rgba(0,0,0,0.06)'}
+                style={{ background: '#fff', borderRadius: 12, padding: '20px 24px', boxShadow: '0 1px 8px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', gap: 20, cursor: 'pointer', transition: 'box-shadow 0.2s', border: '1.5px solid transparent' }}
+                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(85,70,214,0.12)'}
+                onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 8px rgba(27,23,70,0.06)'}
                 onClick={() => onSelect(plan.id)}
               >
-                <div style={{ width: 48, height: 48, borderRadius: '50%', background: isDone ? '#dcfce7' : '#E8F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span style={{ fontSize: 18, fontWeight: 800, color: isDone ? '#16a34a' : colors.teal }}>#{planNum}</span>
+                <div style={{ width: 48, height: 48, borderRadius: '50%', background: isDone ? '#C9EFE1' : '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <span style={{ fontSize: 18, fontWeight: 800, color: isDone ? '#0B7F5D' : colors.primary }}>#{planNum}</span>
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark }}>الخطة التشغيلية #{planNum}</span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: colors.ink }}>الخطة التشغيلية #{planNum}</span>
                     <span style={{ padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: cfg.bg, color: cfg.color }}>{cfg.label}</span>
                   </div>
-                  <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>
+                  <div style={{ fontSize: 12, color: '#67637A', marginBottom: 8 }}>
                     {plan.consultant ? `المستشار: ${plan.consultant.name}` : 'لم يُختر مستشار بعد'}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ flex: 1, height: 6, background: '#e5e7eb', borderRadius: 4, overflow: 'hidden' }}>
-                      <div style={{ width: `${pct}%`, height: '100%', background: isDone ? '#16a34a' : colors.teal, borderRadius: 4, transition: 'width 0.4s' }} />
+                    <div style={{ flex: 1, height: 6, background: '#E8E3DA', borderRadius: 4, overflow: 'hidden' }}>
+                      <div style={{ width: `${pct}%`, height: '100%', background: isDone ? '#0B7F5D' : colors.primary, borderRadius: 4, transition: 'width 0.4s' }} />
                     </div>
-                    <span style={{ fontSize: 12, color: '#6b7280', whiteSpace: 'nowrap' }}>{approved}/{total} وحدة معتمدة</span>
+                    <span style={{ fontSize: 12, color: '#67637A', whiteSpace: 'nowrap' }}>{approved}/{total} وحدة معتمدة</span>
                   </div>
                 </div>
                 <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                  <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 10 }}>
+                  <div style={{ fontSize: 11, color: '#8F8BA3', marginBottom: 10 }}>
                     {new Date(plan.created_at).toLocaleDateString('ar-SA')}
                   </div>
                   <button
                     onClick={e => { e.stopPropagation(); onSelect(plan.id); }}
-                    style={{ padding: '8px 20px', background: isDone ? '#dcfce7' : colors.teal, color: isDone ? '#16a34a' : '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+                    style={{ padding: '8px 20px', background: isDone ? '#C9EFE1' : colors.primary, color: isDone ? '#0B7F5D' : '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
                   >
                     {isDone ? 'عرض' : 'استمرار'}
                   </button>
@@ -141,11 +141,11 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
 const Badge = ({ text, color = "gray", small }) => {
   const map = {
     green:  { bg: colors.greenLight,  text: colors.green  },
-    orange: { bg: colors.orangeLight, text: colors.orange },
+    orange: { bg: colors.amberSoft, text: colors.amberText },
     blue:   { bg: colors.blueLight,   text: colors.blue   },
-    yellow: { bg: colors.yellowLight, text: colors.yellow },
+    yellow: { bg: colors.yellowLight, text: colors.amberText },
     gray:   { bg: colors.grayLight,   text: colors.gray   },
-    teal:   { bg: "#E0F2F5",          text: colors.teal   },
+    primary:   { bg: "#E7E5FD",          text: colors.primary   },
   };
   const c = map[color] || map.gray;
   return (
@@ -157,28 +157,28 @@ const Badge = ({ text, color = "gray", small }) => {
 
 const Btn = ({ children, variant = "primary", onClick, disabled, small }) => {
   const styles = {
-    primary:   { bg: colors.orange, color: "white",       border: "none" },
-    secondary: { bg: "transparent", color: colors.teal,   border: `2px solid ${colors.teal}` },
-    ghost:     { bg: "transparent", color: colors.teal,   border: "none" },
+    primary:   { bg: colors.amber, color: "#1B1746",       border: "none" },
+    secondary: { bg: "transparent", color: colors.primary,   border: `2px solid ${colors.primary}` },
+    ghost:     { bg: "transparent", color: colors.primary,   border: "none" },
   };
   const s = styles[variant] || styles.primary;
   return (
-    <button onClick={onClick} disabled={disabled} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: small ? "6px 14px" : "10px 24px", borderRadius: 10, fontSize: small ? 12 : 14, fontWeight: 600, fontFamily: "'Cairo', sans-serif", background: disabled ? colors.grayLight : s.bg, color: disabled ? colors.gray : s.color, border: s.border, cursor: disabled ? "not-allowed" : "pointer", transition: "all 0.2s", opacity: disabled ? 0.6 : 1 }}>
+    <button onClick={onClick} disabled={disabled} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: small ? "6px 14px" : "10px 24px", borderRadius: 10, fontSize: small ? 12 : 14, fontWeight: 600, fontFamily: "inherit", background: disabled ? colors.grayLight : s.bg, color: disabled ? colors.gray : s.color, border: s.border, cursor: disabled ? "not-allowed" : "pointer", transition: "all 0.2s", opacity: disabled ? 0.6 : 1 }}>
       {children}
     </button>
   );
 };
 
 const Card = ({ children, accent, onClick, style }) => (
-  <div onClick={onClick} style={{ background: "white", borderRadius: 14, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.06)", borderBottom: accent ? `3px solid ${colors.orange}` : "none", cursor: onClick ? "pointer" : "default", transition: "all 0.2s", ...style }}>
+  <div onClick={onClick} style={{ background: "white", borderRadius: 14, padding: 20, boxShadow: "0 1px 4px rgba(27,23,70,0.06)", borderBottom: accent ? `3px solid ${colors.amberLine}` : "none", cursor: onClick ? "pointer" : "default", transition: "all 0.2s", ...style }}>
     {children}
   </div>
 );
 
 const Input = ({ label, placeholder, type = "text", value, onChange }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-    {label && <label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark }}>{label}</label>}
-    <input type={type} placeholder={placeholder} value={value} onChange={onChange} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif", outline: "none" }} />
+    {label && <label style={{ fontSize: 13, fontWeight: 600, color: colors.ink }}>{label}</label>}
+    <input type={type} placeholder={placeholder} value={value} onChange={onChange} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
   </div>
 );
 
@@ -271,11 +271,11 @@ const fmtExpiry = v => { const d = v.replace(/\D/g,'').slice(0,4); return d.leng
 const fmtCvv    = v => v.replace(/\D/g,'').slice(0,3);
 
 const CardForm = ({ card, onChange, isMada }) => {
-  const inp = { padding: "10px 14px", border: `1.5px solid ${colors.grayBorder}`, borderRadius: 10, fontSize: 13, fontFamily: "'Cairo', sans-serif", width: "100%", boxSizing: "border-box", outline: "none", direction: "ltr" };
+  const inp = { padding: "10px 14px", border: `1.5px solid ${colors.grayBorder}`, borderRadius: 10, fontSize: 13, fontFamily: "inherit", width: "100%", boxSizing: "border-box", outline: "none", direction: "ltr" };
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       {/* Test card hint */}
-      <div style={{ padding: "8px 12px", background: "#f0fdf4", borderRadius: 8, fontSize: 11, color: "#15803d", direction: "rtl" }}>
+      <div style={{ padding: "8px 12px", background: "#E8F8F2", borderRadius: 8, fontSize: 11, color: "#086449", direction: "rtl" }}>
         بطاقة الاختبار: <strong>4111 1111 1111 1111</strong> | تاريخ: <strong>12/26</strong> | CVV: <strong>123</strong>
       </div>
       <div style={{ position: "relative" }}>
@@ -291,7 +291,7 @@ const CardForm = ({ card, onChange, isMada }) => {
           <CardNetworkLogo brand={isMada ? "mada" : detectCardNetwork(card.number)} />
         </span>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 10 }}>
         <input
           placeholder="تاريخ الانتهاء — MM/YY"
           style={inp} maxLength={5}
@@ -318,22 +318,22 @@ const CardForm = ({ card, onChange, isMada }) => {
 const ApplePayForm = () => (
   <div style={{ textAlign: "center", padding: "16px 0" }}>
     <ApplePayButton />
-    <p style={{ fontSize: 12, color: colors.gray, marginTop: 10, fontFamily: "'Cairo', sans-serif" }}>سيتم فتح نافذة Apple Pay لإتمام عملية الدفع</p>
+    <p style={{ fontSize: 12, color: colors.gray, marginTop: 10, fontFamily: "inherit" }}>سيتم فتح نافذة Apple Pay لإتمام عملية الدفع</p>
   </div>
 );
 
 const BankTransferInfo = () => (
-  <div style={{ background: "#f8fafb", borderRadius: 10, padding: 16, direction: "rtl" }}>
-    <div style={{ fontWeight: 700, color: colors.tealDark, fontSize: 13, marginBottom: 10 }}>بيانات التحويل البنكي</div>
+  <div style={{ background: "#FBF9F5", borderRadius: 10, padding: 16, direction: "rtl" }}>
+    <div style={{ fontWeight: 700, color: colors.ink, fontSize: 13, marginBottom: 10 }}>بيانات التحويل البنكي</div>
     <div style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 13 }}>
       {[["اسم المستفيد","منصة دفة للاستشارات"],["البنك","بنك الرياض"],["رقم الآيبان","SA12 1000 1234 5678 9012 3456"],["رقم الحساب","1234567890"]].map(([l,v]) => (
         <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"6px 0", borderBottom:`1px solid ${colors.grayBorder}` }}>
           <span style={{ color: colors.gray }}>{l}</span>
-          <span style={{ fontWeight: 600, color: colors.tealDark }}>{v}</span>
+          <span style={{ fontWeight: 600, color: colors.ink }}>{v}</span>
         </div>
       ))}
     </div>
-    <div style={{ marginTop: 12, padding: "8px 10px", background: "#FEF3C7", borderRadius: 8, fontSize: 11, color: "#92400E", display: "flex", alignItems: "center", gap: 6 }}>
+    <div style={{ marginTop: 12, padding: "8px 10px", background: "#FEEDC6", borderRadius: 8, fontSize: 11, color: "#7A4706", display: "flex", alignItems: "center", gap: 6 }}>
       <IcWarning width={14} height={14}/> بعد التحويل، أرسل إيصال الدفع عبر البريد الإلكتروني لتفعيل الخدمة
     </div>
   </div>
@@ -416,13 +416,13 @@ const EmbeddedChat = ({ consultantName }) => {
     </div>
   );
   if (error) return (
-    <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#dc2626', fontSize: 13 }}>{error}</div>
+    <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D03F2A', fontSize: 13 }}>{error}</div>
   );
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: 380, border: `1px solid ${colors.grayBorder}`, borderRadius: 12, overflow: 'hidden' }}>
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 10, background: '#f8fafb' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 10, background: '#FBF9F5' }}>
         {messages.length === 0 && (
           <div style={{ textAlign: 'center', color: colors.gray, fontSize: 13, marginTop: 60, lineHeight: 1.8 }}>
             <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center' }}><IcChat width={32} height={32}/></div>
@@ -431,7 +431,7 @@ const EmbeddedChat = ({ consultantName }) => {
         )}
         {messages.map(m => (
           <div key={m.id} style={{ display: 'flex', justifyContent: m.is_mine ? 'flex-start' : 'flex-end' }}>
-            <div style={{ maxWidth: '75%', padding: '10px 14px', borderRadius: m.is_mine ? '12px 12px 12px 4px' : '12px 12px 4px 12px', background: m.is_mine ? colors.teal : 'white', color: m.is_mine ? 'white' : colors.tealDark, fontSize: 13, lineHeight: 1.6, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+            <div style={{ maxWidth: '75%', padding: '10px 14px', borderRadius: m.is_mine ? '12px 12px 12px 4px' : '12px 12px 4px 12px', background: m.is_mine ? colors.primary : 'white', color: m.is_mine ? 'white' : colors.ink, fontSize: 13, lineHeight: 1.6, boxShadow: '0 1px 3px rgba(27,23,70,0.08)' }}>
               <div style={{ direction: 'rtl' }}>{m.body}</div>
               <div style={{ fontSize: 10, opacity: 0.65, marginTop: 3, textAlign: m.is_mine ? 'left' : 'right' }}>{m.time}</div>
             </div>
@@ -447,10 +447,10 @@ const EmbeddedChat = ({ consultantName }) => {
           onChange={e => setBody(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
           placeholder="اكتب رسالتك..."
-          style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', direction: 'rtl' }}
+          style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none', direction: 'rtl' }}
         />
         <button onClick={handleSend} disabled={!body.trim() || sending}
-          style={{ padding: '10px 16px', borderRadius: 10, background: body.trim() && !sending ? colors.orange : colors.grayLight, border: 'none', cursor: body.trim() && !sending ? 'pointer' : 'not-allowed', color: 'white', display: 'flex', alignItems: 'center', transition: 'background 0.2s' }}>
+          style={{ padding: '10px 16px', borderRadius: 10, background: body.trim() && !sending ? colors.amber : colors.grayLight, border: 'none', cursor: body.trim() && !sending ? 'pointer' : 'not-allowed', color: '#1B1746', display: 'flex', alignItems: 'center', transition: 'background 0.2s' }}>
           {Icons.send}
         </button>
       </div>
@@ -461,7 +461,7 @@ const EmbeddedChat = ({ consultantName }) => {
 const Tab = ({ tabs, active, onChange }) => (
   <div style={{ display: "flex", gap: 2, background: colors.grayLight, borderRadius: 12, padding: 3, overflowX: "auto" }}>
     {tabs.map((t, i) => (
-      <button key={i} onClick={() => onChange(i)} style={{ padding: "8px 18px", borderRadius: 10, fontSize: 13, fontWeight: active === i ? 700 : 500, fontFamily: "'Cairo', sans-serif", background: active === i ? "white" : "transparent", color: active === i ? colors.teal : colors.gray, border: "none", cursor: "pointer", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+      <button key={i} onClick={() => onChange(i)} style={{ padding: "8px 18px", borderRadius: 10, fontSize: 13, fontWeight: active === i ? 700 : 500, fontFamily: "inherit", background: active === i ? "white" : "transparent", color: active === i ? colors.primary : colors.gray, border: "none", cursor: "pointer", transition: "all 0.2s", whiteSpace: "nowrap" }}>
         {t}
       </button>
     ))}
@@ -480,7 +480,7 @@ const StatusBar = ({ status }) => {
     not_submitted: { bg: colors.grayLight,   color: colors.gray,   text: "لم يُرسل بعد" },
     submitted:     { bg: colors.blueLight,   color: colors.blue,   text: "تم الإرسال للمراجعة — بانتظار المستشار" },
     approved:      { bg: colors.greenLight,  color: colors.green,  text: "معتمد — يمكنك الانتقال للوحدة التالية" },
-    revision:      { bg: colors.orangeLight, color: colors.orange, text: "يحتاج تعديل — راجع ملاحظات المستشار" },
+    revision:      { bg: colors.amberSoft, color: colors.amberText, text: "يحتاج تعديل — راجع ملاحظات المستشار" },
   };
   const s = map[status] || map.not_submitted;
   return (
@@ -608,12 +608,12 @@ const OpWorkflowStepper = ({ opStep, setOpStep, workflow }) => {
                   width: 36, height: 36,
                   borderRadius: ws.id === 5 ? 0 : current ? 10 : "50%",
                   transform: ws.id === 5 ? "rotate(45deg)" : "none",
-                  background: done ? (current ? colors.orange : colors.green) : colors.grayLight,
-                  color: (done || current) ? "white" : colors.gray,
+                  background: done ? (current ? colors.amber : colors.green) : colors.grayLight,
+                  color: (done || current) ? "#1B1746" : colors.gray,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 14, fontWeight: 700, transition: "all 0.3s",
-                  boxShadow: current ? `0 4px 12px ${colors.orange}40` : done ? `0 2px 8px ${colors.green}30` : "none",
-                  outline: clickable && !current ? `2px solid ${colors.teal}30` : "none",
+                  boxShadow: current ? `0 4px 12px ${colors.amberLine}40` : done ? `0 2px 8px ${colors.green}30` : "none",
+                  outline: clickable && !current ? `2px solid ${colors.primary}30` : "none",
                   outlineOffset: 2,
                 }}>
                   <span style={{ transform: ws.id === 5 ? "rotate(-45deg)" : "none", display: "flex" }}>
@@ -622,7 +622,7 @@ const OpWorkflowStepper = ({ opStep, setOpStep, workflow }) => {
                       : ws.icon}
                   </span>
                 </div>
-                <span style={{ fontSize: 9, fontWeight: current ? 700 : 500, color: done ? (current ? colors.orange : colors.green) : colors.gray, textAlign: "center", maxWidth: 80, lineHeight: 1.3 }}>{ws.label}</span>
+                <span style={{ fontSize: 9, fontWeight: current ? 700 : 500, color: done ? (current ? colors.amberText : colors.green) : colors.gray, textAlign: "center", maxWidth: 80, lineHeight: 1.3 }}>{ws.label}</span>
               </div>
               {i < opWorkflowSteps.length - 1 && (
                 <div style={{ flex: 1, height: 3, background: i < realOpStep ? colors.green : colors.grayBorder, borderRadius: 2, margin: "0 2px", marginBottom: 20, transition: "background 0.3s" }} />
@@ -634,13 +634,13 @@ const OpWorkflowStepper = ({ opStep, setOpStep, workflow }) => {
 
       {/* مؤشر وضع المراجعة */}
       {reviewing && (
-        <div style={{ marginTop: 4, padding: '6px 14px', background: '#fff8f0', borderRadius: 8, border: `1px solid ${colors.orange}30`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 12, color: colors.orange, fontWeight: 600 }}>
+        <div style={{ marginTop: 4, padding: '6px 14px', background: '#FFF8EA', borderRadius: 8, border: `1px solid ${colors.amberLine}30`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: 12, color: colors.amberText, fontWeight: 600 }}>
             🔍 وضع المراجعة — تستعرض: {opWorkflowSteps[opStep]?.label}
           </span>
           <button
             onClick={() => setOpStep(realOpStep)}
-            style={{ background: 'none', border: 'none', color: colors.teal, cursor: 'pointer', fontSize: 12, fontWeight: 700, fontFamily: "'Cairo', sans-serif" }}
+            style={{ background: 'none', border: 'none', color: colors.primary, cursor: 'pointer', fontSize: 12, fontWeight: 700, fontFamily: "inherit" }}
           >
             العودة للخطوة الحالية ←
           </button>
@@ -654,7 +654,7 @@ const OpWorkflowStepper = ({ opStep, setOpStep, workflow }) => {
 const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
   const templateType = unit.template_type || unit.templateType;
   const [newItem, setNewItem] = useState('');
-  const iStyle = { width: "100%", padding: "6px 8px", border: `1px solid ${readOnly ? 'transparent' : colors.grayBorder}`, borderRadius: 6, fontSize: 12, fontFamily: "'Cairo', sans-serif", background: readOnly ? 'transparent' : 'white', outline: 'none' };
+  const iStyle = { width: "100%", padding: "6px 8px", border: `1px solid ${readOnly ? 'transparent' : colors.grayBorder}`, borderRadius: 6, fontSize: 12, fontFamily: "inherit", background: readOnly ? 'transparent' : 'white', outline: 'none' };
   const emptyState = (emoji, msg) => (
     <div style={{ textAlign: 'center', padding: '28px 16px', background: colors.grayLight, borderRadius: 10, marginBottom: 14 }}>
       <div style={{ fontSize: 30, marginBottom: 6 }}>{emoji}</div>
@@ -663,8 +663,8 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
   );
   const addRowInput = (placeholder, onAdd) => !readOnly && (
     <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-      <input value={newItem} onChange={e => setNewItem(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onAdd(newItem); } }} placeholder={placeholder} style={{ flex: 1, padding: "8px 12px", borderRadius: 8, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none' }} />
-      <button onClick={() => onAdd(newItem)} style={{ padding: "8px 16px", background: colors.teal, color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap' }}>+ إضافة</button>
+      <input value={newItem} onChange={e => setNewItem(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onAdd(newItem); } }} placeholder={placeholder} style={{ flex: 1, padding: "8px 12px", borderRadius: 8, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none' }} />
+      <button onClick={() => onAdd(newItem)} style={{ padding: "8px 16px", background: colors.primary, color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit", whiteSpace: 'nowrap' }}>+ إضافة</button>
     </div>
   );
 
@@ -687,12 +687,12 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
     };
     return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 12 }}>المبادرات الاستراتيجية</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 12 }}>المبادرات الاستراتيجية</h4>
         {items.length === 0 && emptyState('📋', readOnly ? 'لم يتم إضافة أي مبادرات' : 'أضف مبادراتك يدوياً أو استخدم زر التعبئة التجريبية')}
         {items.map((it, i) => (
-          <Card key={i} style={{ marginBottom: 10, padding: 14, display: "flex", alignItems: "center", justifyContent: "space-between", borderRight: `3px solid ${colors.teal}` }}>
+          <Card key={i} style={{ marginBottom: 10, padding: 14, display: "flex", alignItems: "center", justifyContent: "space-between", borderRight: `3px solid ${colors.primary}` }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <input type="checkbox" checked={!!it.checked} onChange={() => toggle(i)} disabled={readOnly} style={{ accentColor: colors.teal }} />
+              <input type="checkbox" checked={!!it.checked} onChange={() => toggle(i)} disabled={readOnly} style={{ accentColor: colors.primary }} />
               <div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>{it.name}</div>
                 <div style={{ fontSize: 11, color: colors.gray }}>المبادرة {i + 1}</div>
@@ -700,7 +700,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Badge text={it.checked ? "معتمد" : "غير محدد"} color={it.checked ? "green" : "gray"} small />
-              {!readOnly && <button onClick={() => removeItem(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontSize: 13, padding: '2px 6px', borderRadius: 4 }}>✕</button>}
+              {!readOnly && <button onClick={() => removeItem(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D03F2A', fontSize: 13, padding: '2px 6px', borderRadius: 4 }}>✕</button>}
             </div>
           </Card>
         ))}
@@ -731,19 +731,19 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
         {groups.length === 0 && emptyState('📌', readOnly ? 'لم يتم إضافة أي مبادرات' : 'أضف مبادرتك الأولى أو استخدم زر التعبئة التجريبية')}
         {groups.map((g, gi) => (
           <div key={gi} style={{ marginBottom: 20, border: `1.5px solid ${colors.grayBorder}`, borderRadius: 12, overflow: "hidden" }}>
-            <div style={{ padding: "10px 16px", background: colors.tealCard, color: "white", fontWeight: 600, fontSize: 14 }}>المبادرة: {g.initiative}</div>
+            <div style={{ padding: "10px 16px", background: colors.primaryDeep, color: "white", fontWeight: 600, fontSize: 14 }}>المبادرة: {g.initiative}</div>
             <div style={{ padding: 16 }}>
               {g.activities.map((a, ai) => (
-                <div key={ai} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 10, padding: 10, background: colors.grayLight, borderRadius: 8 }}>
+                <div key={ai} style={{ display: "grid", gridTemplateColumns: "var(--g-3)", gap: 10, marginBottom: 10, padding: 10, background: colors.grayLight, borderRadius: 8 }}>
                   {[['name', `اسم النشاط ${ai+1}`, 'مثال: ورشة تدريبية...'], ['desc', 'وصف النشاط', 'ماذا يتضمن؟'], ['output', 'المخرج المتوقع', 'ما الناتج؟']].map(([field, label, ph]) => (
                     <div key={field} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                      <label style={{ fontSize: 11, fontWeight: 600, color: colors.tealDark }}>{label}</label>
+                      <label style={{ fontSize: 11, fontWeight: 600, color: colors.ink }}>{label}</label>
                       <input value={a[field] || ''} onChange={e => updAct(gi, ai, field, e.target.value)} readOnly={readOnly} placeholder={ph} style={iStyle} />
                     </div>
                   ))}
                 </div>
               ))}
-              {!readOnly && <button onClick={() => addRow(gi)} style={{ fontSize: 12, color: colors.teal, background: "none", border: "none", cursor: "pointer", fontFamily: "'Cairo', sans-serif" }}>+ إضافة نشاط</button>}
+              {!readOnly && <button onClick={() => addRow(gi)} style={{ fontSize: 12, color: colors.primary, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>+ إضافة نشاط</button>}
             </div>
           </div>
         ))}
@@ -756,7 +756,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
   if (templateType === "op_gantt") {
     const mths = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
     const acts = formData.activities?.length ? formData.activities : [];
-    const barCols = [colors.teal, colors.blue, colors.teal, colors.orange, colors.orange, colors.green];
+    const barCols = [colors.primary, colors.blue, colors.primary, colors.amberText, colors.amberText, colors.green];
     const toggleM = (ai, mi) => {
       if (readOnly) return;
       setFormData({ ...formData, activities: acts.map((a, i) => i !== ai ? a : { ...a, months: a.months.map((m, j) => j !== mi ? m : (m ? 0 : 1)) }) });
@@ -767,7 +767,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
     };
     return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 4 }}>مخطط جانت — الجدول الزمني</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 4 }}>مخطط جانت — الجدول الزمني</h4>
         {!readOnly && <p style={{ fontSize: 11, color: colors.gray, marginBottom: 10 }}>انقر على الخلايا لتحديد أشهر التنفيذ</p>}
         {acts.length === 0 && emptyState('📅', readOnly ? 'لم يتم إضافة أي أنشطة' : 'استخدم زر التعبئة التجريبية أو أضف نشاطاً جديداً')}
         {acts.length > 0 && (
@@ -775,8 +775,8 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900 }}>
               <thead>
                 <tr>
-                  <th style={{ padding: 8, background: colors.tealCard, color: "white", fontSize: 11, position: "sticky", right: 0, zIndex: 1, minWidth: 160, textAlign: "right" }}>النشاط</th>
-                  {mths.map(m => <th key={m} style={{ padding: "8px 4px", background: colors.tealCard, color: "white", fontSize: 9, fontWeight: 500, textAlign: "center" }}>{m}</th>)}
+                  <th style={{ padding: 8, background: colors.primaryDeep, color: "white", fontSize: 11, position: "sticky", right: 0, zIndex: 1, minWidth: 160, textAlign: "right" }}>النشاط</th>
+                  {mths.map(m => <th key={m} style={{ padding: "8px 4px", background: colors.primaryDeep, color: "white", fontSize: 9, fontWeight: 500, textAlign: "center" }}>{m}</th>)}
                 </tr>
               </thead>
               <tbody>
@@ -790,7 +790,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
                     </td>
                     {a.months.map((active, mi) => (
                       <td key={mi} style={{ padding: 2, textAlign: "center" }}>
-                        <div onClick={() => toggleM(ai, mi)} style={{ height: 22, borderRadius: 4, background: active ? barCols[ai % barCols.length] : (readOnly ? 'transparent' : '#f3f4f6'), cursor: readOnly ? "default" : "pointer", border: !active && !readOnly ? `1px dashed ${colors.grayBorder}` : 'none' }} />
+                        <div onClick={() => toggleM(ai, mi)} style={{ height: 22, borderRadius: 4, background: active ? barCols[ai % barCols.length] : (readOnly ? 'transparent' : '#F3EFE8'), cursor: readOnly ? "default" : "pointer", border: !active && !readOnly ? `1px dashed ${colors.grayBorder}` : 'none' }} />
                       </td>
                     ))}
                   </tr>
@@ -800,7 +800,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
           </div>
         )}
         {!readOnly && (
-          <button onClick={addAct} style={{ marginTop: 8, fontSize: 12, color: colors.teal, background: "none", border: "none", cursor: "pointer", fontFamily: "'Cairo', sans-serif" }}>+ إضافة نشاط</button>
+          <button onClick={addAct} style={{ marginTop: 8, fontSize: 12, color: colors.primary, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>+ إضافة نشاط</button>
         )}
       </div>
     );
@@ -815,12 +815,12 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
     };
     return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 12 }}>تعيين المسؤولين</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 12 }}>تعيين المسؤولين</h4>
         {rows.length === 0 && emptyState('👤', readOnly ? 'لم يتم إضافة أي صفوف' : 'اضغط + إضافة صف أو استخدم زر التعبئة التجريبية')}
         {rows.length > 0 && (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr>{["النشاط","المبادرة","مسؤول التنفيذ","القسم / الإدارة"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.tealCard, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr>
+              <tr>{["النشاط","المبادرة","مسؤول التنفيذ","القسم / الإدارة"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.primaryDeep, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr>
             </thead>
             <tbody>
               {rows.map((r, i) => (
@@ -835,7 +835,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
           </table>
         )}
         {!readOnly && (
-          <button onClick={() => setFormData({ ...formData, rows: [...rows, { activity: '', initiative: '', responsible: '', department: '' }] })} style={{ marginTop: 8, fontSize: 12, color: colors.teal, background: "none", border: "none", cursor: "pointer", fontFamily: "'Cairo', sans-serif" }}>+ إضافة صف</button>
+          <button onClick={() => setFormData({ ...formData, rows: [...rows, { activity: '', initiative: '', responsible: '', department: '' }] })} style={{ marginTop: 8, fontSize: 12, color: colors.primary, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>+ إضافة صف</button>
         )}
       </div>
     );
@@ -861,12 +861,12 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
     const grandTotal = rows.reduce((s, r) => s + (parseFloat(String(r.total || '0').replace(/,/g, '')) || 0), 0);
     return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 12 }}>الميزانية التشغيلية</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 12 }}>الميزانية التشغيلية</h4>
         {rows.length === 0 && emptyState('💰', readOnly ? 'لم يتم إضافة أي بنود' : 'اضغط + إضافة بند أو استخدم زر التعبئة التجريبية')}
         {rows.length > 0 && (
           <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 12 }}>
             <thead>
-              <tr>{["النشاط","بند التكلفة","تكلفة الوحدة","العدد","الإجمالي"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.tealCard, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr>
+              <tr>{["النشاط","بند التكلفة","تكلفة الوحدة","العدد","الإجمالي"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.primaryDeep, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr>
             </thead>
             <tbody>
               {rows.map((r, i) => (
@@ -875,10 +875,10 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
                   <td style={{ padding: 6 }}><input value={r.item || ''} onChange={e => updRow(i, 'item', e.target.value)} readOnly={readOnly} style={iStyle} placeholder="بند التكلفة..." /></td>
                   <td style={{ padding: 6 }}><input value={r.unitCost || ''} onChange={e => updRow(i, 'unitCost', e.target.value)} readOnly={readOnly} style={{ ...iStyle, textAlign: "center" }} placeholder="0" /></td>
                   <td style={{ padding: 6 }}><input value={r.count || ''} onChange={e => updRow(i, 'count', e.target.value)} readOnly={readOnly} style={{ ...iStyle, textAlign: "center" }} placeholder="0" /></td>
-                  <td style={{ padding: 6 }}><input value={r.total || ''} readOnly style={{ ...iStyle, textAlign: "center", fontWeight: 700, background: "#f9fafb" }} /></td>
+                  <td style={{ padding: 6 }}><input value={r.total || ''} readOnly style={{ ...iStyle, textAlign: "center", fontWeight: 700, background: "#FBF9F5" }} /></td>
                 </tr>
               ))}
-              <tr style={{ background: colors.tealCard }}>
+              <tr style={{ background: colors.primaryDeep }}>
                 <td colSpan={4} style={{ padding: 10, color: "white", fontWeight: 700, fontSize: 14, textAlign: "center" }}>الإجمالي الكلي</td>
                 <td style={{ padding: 10, color: "white", fontWeight: 800, fontSize: 16, textAlign: "center" }}>{grandTotal.toLocaleString('en-US')} ريال</td>
               </tr>
@@ -886,7 +886,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
           </table>
         )}
         {!readOnly && (
-          <button onClick={() => setFormData({ ...formData, rows: [...rows, { activity: '', item: '', unitCost: '', count: '', total: '' }] })} style={{ fontSize: 12, color: colors.teal, background: "none", border: "none", cursor: "pointer", fontFamily: "'Cairo', sans-serif" }}>+ إضافة بند</button>
+          <button onClick={() => setFormData({ ...formData, rows: [...rows, { activity: '', item: '', unitCost: '', count: '', total: '' }] })} style={{ fontSize: 12, color: colors.primary, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>+ إضافة بند</button>
         )}
       </div>
     );
@@ -955,7 +955,7 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
     } finally { setSubmitting(false); }
   };
 
-  if (loading) return <div style={{ textAlign: "center", padding: 80, color: colors.teal, fontSize: 16 }}>جاري تحميل الوحدة...</div>;
+  if (loading) return <div style={{ textAlign: "center", padding: 80, color: colors.primary, fontSize: 16 }}>جاري تحميل الوحدة...</div>;
 
   const unit       = unitData?.unit || unitSummary;
   const submission = unitData?.submission;
@@ -966,15 +966,15 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
     <div className="animate-in">
       <div style={{ fontSize: 12, color: colors.gray, marginBottom: 4 }}>التخطيط التشغيلي {">"} {unit.name}</div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-        <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", color: colors.teal, display: "flex" }}>{Icons.arrow}</button>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark }}>{unit.name}</h2>
-        <Badge text={`الوحدة ${unitNum} من ${totalUnits || '؟'}`} color="teal" small />
+        <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", color: colors.primary, display: "flex" }}>{Icons.arrow}</button>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink }}>{unit.name}</h2>
+        <Badge text={`الوحدة ${unitNum} من ${totalUnits || '؟'}`} color="primary" small />
       </div>
       <StatusBar status={status === 'not_started' ? 'not_submitted' : status} />
       <div style={{ margin: "12px 0 16px" }}><Tab tabs={tabs} active={tab} onChange={setTab} /></div>
 
       {msg && (
-        <div style={{ position: "fixed", bottom: 24, right: 24, padding: "12px 20px", borderRadius: 10, background: msg.type==="success"?"#dcfce7":"#fee2e2", color: msg.type==="success"?"#16a34a":"#dc2626", fontWeight: 600, fontSize: 13, boxShadow: "0 4px 16px rgba(0,0,0,0.12)", zIndex: 9999 }}>
+        <div style={{ position: "fixed", bottom: 24, right: 24, padding: "12px 20px", borderRadius: 10, background: msg.type==="success"?"#C9EFE1":"#FAD4CE", color: msg.type==="success"?"#0B7F5D":"#D03F2A", fontWeight: 600, fontSize: 13, boxShadow: "0 4px 16px rgba(27,23,70,0.12)", zIndex: 9999 }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>{msg.type==="success" ? <IcCheck width={14} height={14}/> : <IcXMark width={14} height={14}/>}{msg.text}</span>
         </div>
       )}
@@ -982,17 +982,17 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
       <Card>
         {tab === 0 && (
           <div>
-            <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>نبذة عن {unit.name}</h3>
+            <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>نبذة عن {unit.name}</h3>
             <p style={{ fontSize: 14, color: colors.gray, lineHeight: 2 }}>{unit.overview}</p>
             <p style={{ fontSize: 14, color: colors.gray, lineHeight: 2, marginTop: 12 }}>{unit.overview2}</p>
           </div>
         )}
         {tab === 1 && (
           <div>
-            <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>شرح مكتوب: {unit.name}</h3>
+            <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>شرح مكتوب: {unit.name}</h3>
             {(unit.topics || []).map((tp, i) => (
               <div key={i} style={{ marginBottom: 16 }}>
-                <h4 style={{ fontSize: 15, fontWeight: 600, color: colors.teal, marginBottom: 8 }}>{i + 1}. {tp.t}</h4>
+                <h4 style={{ fontSize: 15, fontWeight: 600, color: colors.primary, marginBottom: 8 }}>{i + 1}. {tp.t}</h4>
                 <p style={{ fontSize: 13, color: colors.gray, lineHeight: 2 }}>{tp.d}</p>
               </div>
             ))}
@@ -1000,19 +1000,19 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
         )}
         {tab === 2 && (
           <div>
-            <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>إرشادات: {unit.name}</h3>
+            <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>إرشادات: {unit.name}</h3>
             {(unit.steps || []).map((s, i) => (
               <div key={i} style={{ display: "flex", gap: 14, marginBottom: 16 }}>
-                <div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.teal, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>{i + 1}</div>
+                <div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>{i + 1}</div>
                 <div>
-                  <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.tealDark }}>{s.title}</h4>
+                  <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.ink }}>{s.title}</h4>
                   <p style={{ fontSize: 13, color: colors.gray }}>{s.desc}</p>
                 </div>
               </div>
             ))}
             {unit.tip && (
-              <div style={{ padding: 14, background: colors.orangeLight, borderRadius: 10, borderRight: `3px solid ${colors.orange}`, display: "flex", alignItems: "flex-start", gap: 8 }}>
-                <span style={{ color: colors.orange, flexShrink: 0 }}><IcLightbulb width={16} height={16}/></span>
+              <div style={{ padding: 14, background: colors.amberSoft, borderRadius: 10, borderRight: `3px solid ${colors.amberLine}`, display: "flex", alignItems: "flex-start", gap: 8 }}>
+                <span style={{ color: colors.amberText, flexShrink: 0 }}><IcLightbulb width={16} height={16}/></span>
                 <span style={{ fontSize: 13, color: colors.gray }}>{unit.tip}</span>
               </div>
             )}
@@ -1030,18 +1030,18 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
                 />
               </div>
             ) : (
-              <div style={{ width: "100%", maxWidth: 600, margin: "0 auto", aspectRatio: "16/9", background: `linear-gradient(135deg, ${colors.tealCard}, #0D4F5E)`, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}>
+              <div style={{ width: "100%", maxWidth: 600, margin: "0 auto", aspectRatio: "16/9", background: `linear-gradient(135deg, ${colors.primaryDeep}, #2B2470)`, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}>
                 <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>{Icons.play}</div>
-                <div style={{ position: "absolute", bottom: 12, left: 12, background: "rgba(0,0,0,0.6)", padding: "4px 10px", borderRadius: 6, color: "white", fontSize: 12 }}>{unit.video_duration || unit.videoDuration}</div>
+                <div style={{ position: "absolute", bottom: 12, left: 12, background: "rgba(27,23,70,0.6)", padding: "4px 10px", borderRadius: 6, color: "white", fontSize: 12 }}>{unit.video_duration || unit.videoDuration}</div>
               </div>
             )}
-            <h4 style={{ fontSize: 15, fontWeight: 600, color: colors.tealDark, marginTop: 16 }}>شرح {unit.name}</h4>
+            <h4 style={{ fontSize: 15, fontWeight: 600, color: colors.ink, marginTop: 16 }}>شرح {unit.name}</h4>
           </div>
         )}
         {tab === 4 && (
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, padding: "10px 14px", background: colors.grayLight, borderRadius: 10 }}>
-              <div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.teal, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14 }}>
+              <div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14 }}>
                 {(consultantName || "م")[0]}
               </div>
               <div>
@@ -1055,7 +1055,7 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
         {tab === 5 && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark }}>نماذج العمل: {unit.name}</h3>
+              <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink }}>نماذج العمل: {unit.name}</h3>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 {!isReadOnly && (
                   <button
@@ -1063,7 +1063,7 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
                       const ttype = unitData?.unit?.template_type || unit.template_type;
                       if (TRIAL_FILL[ttype]) setFormData(TRIAL_FILL[ttype]);
                     }}
-                    style={{ fontSize: 12, color: colors.blue, background: colors.blueLight, border: "none", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: "'Cairo', sans-serif", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
+                    style={{ fontSize: 12, color: colors.blue, background: colors.blueLight, border: "none", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: "inherit", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
                     <IcBeaker width={14} height={14}/> تعبئة تجريبية
                   </button>
                 )}
@@ -1131,43 +1131,43 @@ const OpStepInfo = ({ strategicCompleted, units, catalog, pricing, consultant, o
         <span style={{ flexShrink: 0, color: colors.blue }}><IcLightbulb width={22} height={22}/></span>
         <div>
           <div style={{ fontSize: 14, fontWeight: 700, color: colors.blue, marginBottom: 4 }}>ملاحظة</div>
-          <div style={{ fontSize: 13, color: "#1e40af", lineHeight: 1.7 }}>التخطيط التشغيلي نظام مستقل: يمكنك البدء فيه مباشرة دون خطة استراتيجية، وتختار مستشارك في خطوة الدفع.</div>
+          <div style={{ fontSize: 13, color: "#164F8A", lineHeight: 1.7 }}>التخطيط التشغيلي نظام مستقل: يمكنك البدء فيه مباشرة دون خطة استراتيجية، وتختار مستشارك في خطوة الدفع.</div>
         </div>
       </div>
     )}
 
     <Card accent style={{ padding: 32, textAlign: "center", marginBottom: 20 }}>
-      <div style={{ width: 64, height: 64, borderRadius: "50%", background: colors.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke={colors.orange} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      <div style={{ width: 64, height: 64, borderRadius: "50%", background: colors.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke={colors.amberText} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
       </div>
-      <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.tealDark }}>نظام التخطيط التشغيلي</h2>
+      <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.ink }}>نظام التخطيط التشغيلي</h2>
       <p style={{ fontSize: 14, color: colors.gray, lineHeight: 1.8, maxWidth: 600, margin: "12px auto 0" }}>تحويل المبادرات الاستراتيجية إلى خطة تشغيلية مفصلة بالأنشطة والجدول الزمني والمسؤوليات والتكاليف</p>
     </Card>
 
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 16, marginBottom: 20 }}>
       <Card>
-        <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>ما يشمله النظام</h3>
+        <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>ما يشمله النظام</h3>
         {["استيراد المبادرات من الخطة الاستراتيجية","تفكيك المبادرات إلى أنشطة تشغيلية","مخطط جانت للجدول الزمني (12 شهر)","تعيين المسؤولين عن كل نشاط","تقدير التكلفة المالية والميزانية","مراجعة واعتماد المستشار","وثيقة تشغيلية نهائية"].map((item, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: i < 6 ? `1px solid ${colors.grayLight}` : "none" }}>
             <span style={{ color: colors.green }}><IcCheck width={14} height={14}/></span>
-            <span style={{ fontSize: 13, color: colors.tealDark }}>{item}</span>
+            <span style={{ fontSize: 13, color: colors.ink }}>{item}</span>
           </div>
         ))}
       </Card>
       <Card>
-        <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>الوحدات التخطيطية الـ {displayUnits.length}</h3>
+        <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>الوحدات التخطيطية الـ {displayUnits.length}</h3>
         {displayUnits.map((u, i) => (
           <div key={u.unit_number || i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: i < displayUnits.length - 1 ? `1px solid ${colors.grayLight}` : "none" }}>
-            <span style={{ width: 28, height: 28, borderRadius: 8, background: colors.tealCard, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{u.unit_number || u.id}</span>
-            <span style={{ fontSize: 13, color: colors.tealDark }}>{u.name}</span>
+            <span style={{ width: 28, height: 28, borderRadius: 8, background: colors.primaryDeep, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{u.unit_number || u.id}</span>
+            <span style={{ fontSize: 13, color: colors.ink }}>{u.name}</span>
           </div>
         ))}
         {consultant && (
-          <div style={{ marginTop: 12, padding: "10px 14px", background: "#E0F2F5", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 32, height: 32, borderRadius: "50%", background: colors.teal, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>م</div>
+          <div style={{ marginTop: 12, padding: "10px 14px", background: "#E7E5FD", borderRadius: 8, display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: "50%", background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>م</div>
             <div>
               <div style={{ fontSize: 11, color: colors.gray }}>المستشار المشرف</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark }}>{consultant.name}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: colors.ink }}>{consultant.name}</div>
             </div>
           </div>
         )}
@@ -1178,8 +1178,8 @@ const OpStepInfo = ({ strategicCompleted, units, catalog, pricing, consultant, o
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: colors.gray, marginBottom: 6 }}>
             <span>ضريبة القيمة المضافة ({pricing?.tax_rate ?? 15}%)</span><span>{tax.toLocaleString('en-US')} ريال</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 800, color: colors.tealDark, borderTop: `1px solid ${colors.grayBorder}`, paddingTop: 6 }}>
-            <span>الإجمالي</span><span style={{ color: colors.teal }}>{total.toLocaleString('en-US')} ريال</span>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 800, color: colors.ink, borderTop: `1px solid ${colors.grayBorder}`, paddingTop: 6 }}>
+            <span>الإجمالي</span><span style={{ color: colors.primary }}>{total.toLocaleString('en-US')} ريال</span>
           </div>
         </div>
       </Card>
@@ -1243,11 +1243,11 @@ const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant, onWork
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 4 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: colors.gray }}>
             <span>الخدمة</span>
-            <span style={{ color: '#374151', fontWeight: 600 }}>التخطيط التشغيلي (5 وحدات)</span>
+            <span style={{ color: '#34314A', fontWeight: 600 }}>التخطيط التشغيلي (5 وحدات)</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: colors.gray }}>
             <span>المستشار</span>
-            <span style={{ color: '#374151', fontWeight: 600 }}>{consultant?.name || '—'}</span>
+            <span style={{ color: '#34314A', fontWeight: 600 }}>{consultant?.name || '—'}</span>
           </div>
         </div>
       }
@@ -1256,7 +1256,7 @@ const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant, onWork
 
   return (
     <div className="animate-in">
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 20 }}>إتمام الدفع — التخطيط التشغيلي</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 20 }}>إتمام الدفع — التخطيط التشغيلي</h2>
 
       {(needsConsultant || workflow?.consultant_selected_here) && (
         <ConsultantPicker
@@ -1272,16 +1272,16 @@ const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant, onWork
       )}
 
       {payError && (
-        <div style={{ padding: "12px 16px", background: "#fee2e2", borderRadius: 10, color: "#dc2626", fontSize: 13, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 6 }}>
+        <div style={{ padding: "12px 16px", background: "#FAD4CE", borderRadius: 10, color: "#D03F2A", fontSize: 13, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 6 }}>
           <IcXMark width={14} height={14}/> {payError}
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 20 }}>
 
         {/* ── Order summary ──────────────────────────────────────── */}
         <Card>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>ملخص الطلب</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>ملخص الطلب</h3>
 
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, padding: "10px 0", borderBottom: `1px solid ${colors.grayLight}` }}>
             <span>نظام التخطيط التشغيلي (5 وحدات)</span>
@@ -1292,7 +1292,7 @@ const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant, onWork
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span>المستشار:</span>
               {consultant
-                ? <span style={{ fontWeight: 600, color: colors.tealDark }}>{consultant.name}</span>
+                ? <span style={{ fontWeight: 600, color: colors.ink }}>{consultant.name}</span>
                 : <span style={{ color: colors.gray }}>سيتم تحديده لاحقاً</span>}
             </div>
             <span style={{ color: colors.green, fontSize: 12 }}>مشمول</span>
@@ -1300,34 +1300,34 @@ const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant, onWork
 
           {/* Discount code */}
           <div style={{ marginTop: 12, marginBottom: 4 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: colors.tealDark, marginBottom: 6 }}>كود الخصم (اختياري)</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: colors.ink, marginBottom: 6 }}>كود الخصم (اختياري)</div>
             <div style={{ display: "flex", gap: 8 }}>
               <input
                 placeholder="أدخل كود الخصم"
                 value={discountCode}
                 onChange={e => setDiscountCode(e.target.value.toUpperCase())}
-                style={{ flex: 1, padding: "8px 12px", border: `1.5px solid ${colors.grayBorder}`, borderRadius: 8, fontSize: 12, fontFamily: "'Cairo', sans-serif", outline: "none", direction: "rtl" }}
+                style={{ flex: 1, padding: "8px 12px", border: `1.5px solid ${colors.grayBorder}`, borderRadius: 8, fontSize: 12, fontFamily: "inherit", outline: "none", direction: "rtl" }}
               />
             </div>
           </div>
 
           {/* Totals */}
-          <div style={{ marginTop: 14, padding: "12px 0", borderTop: `2px solid ${colors.tealDark}` }}>
+          <div style={{ marginTop: 14, padding: "12px 0", borderTop: `2px solid ${colors.ink}` }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 4, color: colors.gray }}>
               <span>المجموع الفرعي</span><span>{fmt(subtotal)} ريال</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 4, color: colors.gray }}>
               <span>ضريبة القيمة المضافة ({taxRatePct}%)</span><span>{fmt(taxAmount)} ريال</span>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 18, fontWeight: 800, color: colors.tealDark, marginTop: 8 }}>
-              <span>الإجمالي</span><span style={{ color: colors.teal }}>{fmt(total)} ريال</span>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 18, fontWeight: 800, color: colors.ink, marginTop: 8 }}>
+              <span>الإجمالي</span><span style={{ color: colors.primary }}>{fmt(total)} ريال</span>
             </div>
           </div>
         </Card>
 
         {/* ── Payment method ─────────────────────────────────────── */}
         <Card>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>طريقة الدفع</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>طريقة الدفع</h3>
           <div style={{ marginBottom: 16 }}>
             <PaymentMethodPicker
               value={PAY_METHODS[payMethod]?.key}
@@ -1379,19 +1379,19 @@ const OpStepWork = ({ units, setOpStep, setActiveUnit, readOnly }) => {
 
   const statusSummary = [
     { label: 'معتمدة',         count: approvedCount,                                                              color: colors.green  },
-    { label: 'قيد المراجعة',   count: (units||[]).filter(u=>u.submission_status==='reviewing').length,            color: '#7c3aed'     },
+    { label: 'قيد المراجعة',   count: (units||[]).filter(u=>u.submission_status==='reviewing').length,            color: '#5546D6'     },
     { label: 'مُرسلة',         count: (units||[]).filter(u=>u.submission_status==='submitted').length,            color: colors.blue   },
-    { label: 'تحتاج تعديل',    count: (units||[]).filter(u=>u.submission_status==='revision').length,            color: colors.orange },
-    { label: 'قيد العمل',      count: (units||[]).filter(u=>u.submission_status==='in_progress').length,         color: '#d97706'     },
+    { label: 'تحتاج تعديل',    count: (units||[]).filter(u=>u.submission_status==='revision').length,            color: colors.amberText },
+    { label: 'قيد العمل',      count: (units||[]).filter(u=>u.submission_status==='in_progress').length,         color: '#9A5B07'     },
     { label: 'لم تبدأ',        count: (units||[]).filter(u=>!u.submission_status||u.submission_status==='not_started').length, color: colors.gray },
   ].filter(s => s.count > 0);
 
   return (
     <div className="animate-in">
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-        <div style={{ width: 48, height: 48, borderRadius: "50%", background: colors.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", color: colors.orange }}><IcCog width={22} height={22}/></div>
+        <div style={{ width: 48, height: 48, borderRadius: "50%", background: colors.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", color: colors.amberText }}><IcCog width={22} height={22}/></div>
         <div>
-          <h2 style={{ fontSize: 20, fontWeight: 800, color: colors.tealDark }}>تعبئة النماذج — التخطيط التشغيلي</h2>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: colors.ink }}>تعبئة النماذج — التخطيط التشغيلي</h2>
           <div style={{ fontSize: 12, color: colors.gray }}>
             {readOnly ? '🔍 وضع المراجعة — اضغط على أي وحدة لعرض بياناتها' : '5 وحدات تخطيطية — أكمل كل وحدة وأرسلها للمراجعة لفتح التالية'}
           </div>
@@ -1400,8 +1400,8 @@ const OpStepWork = ({ units, setOpStep, setActiveUnit, readOnly }) => {
 
       {/* ملخص الحالات في وضع المراجعة */}
       {readOnly && statusSummary.length > 0 && (
-        <div style={{ background: '#f0fdf4', borderRadius: 10, padding: '10px 14px', marginBottom: 14, display: 'flex', flexWrap: 'wrap', gap: 8, border: '1px solid #bbf7d0' }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#065f46', width: '100%', marginBottom: 4 }}>ملخص الوحدات:</span>
+        <div style={{ background: '#E8F8F2', borderRadius: 10, padding: '10px 14px', marginBottom: 14, display: 'flex', flexWrap: 'wrap', gap: 8, border: '1px solid #A9E4CF' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#086449', width: '100%', marginBottom: 4 }}>ملخص الوحدات:</span>
           {statusSummary.map(s => (
             <span key={s.label} style={{ padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: s.color + '20', color: s.color }}>
               {s.label}: {s.count}
@@ -1410,7 +1410,7 @@ const OpStepWork = ({ units, setOpStep, setActiveUnit, readOnly }) => {
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "var(--g-5)", gap: 12, marginBottom: 20 }}>
         {(units || []).map((u, i) => {
           const accessible = isAccessible(i);
           const status = u.submission_status || 'not_started';
@@ -1418,8 +1418,8 @@ const OpStepWork = ({ units, setOpStep, setActiveUnit, readOnly }) => {
           return (
             <div key={u.id || u.unit_number}
               onClick={() => accessible && setActiveUnit(u)}
-              style={{ background: accessible ? colors.tealCard : '#94a3b8', borderRadius: 12, padding: "20px 12px", textAlign: "center", borderBottom: `3px solid ${accessible ? (status==='approved'?colors.green:colors.orange) : '#64748b'}`, cursor: accessible ? "pointer" : "not-allowed", position: "relative", transition: "transform 0.2s, box-shadow 0.2s", opacity: accessible ? 1 : 0.65 }}
-              onMouseEnter={e => { if (accessible) { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.15)"; } }}
+              style={{ background: accessible ? colors.primaryDeep : '#8F8BA3', borderRadius: 12, padding: "20px 12px", textAlign: "center", borderBottom: `3px solid ${accessible ? (status==='approved'?colors.green:colors.amberLine) : '#67637A'}`, cursor: accessible ? "pointer" : "not-allowed", position: "relative", transition: "transform 0.2s, box-shadow 0.2s", opacity: accessible ? 1 : 0.65 }}
+              onMouseEnter={e => { if (accessible) { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(27,23,70,0.15)"; } }}
               onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
               {!accessible && !readOnly && <div style={{ position: "absolute", top: 8, left: 8, color: "white" }}><IcLock width={16} height={16}/></div>}
               <div style={{ color: "white", fontSize: 13, fontWeight: 600, marginBottom: 10, minHeight: 40, lineHeight: 1.4 }}>{u.name}</div>
@@ -1430,14 +1430,14 @@ const OpStepWork = ({ units, setOpStep, setActiveUnit, readOnly }) => {
       </div>
 
       {/* شريط التقدم */}
-      <div style={{ background: "white", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+      <div style={{ background: "white", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(27,23,70,0.06)" }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: colors.gray, marginBottom: 6 }}>
             <span>تقدم الإرسال</span>
-            <span style={{ fontWeight: 700, color: allSubmitted ? colors.green : colors.teal }}>{submittedCount} / {total} وحدة</span>
+            <span style={{ fontWeight: 700, color: allSubmitted ? colors.green : colors.primary }}>{submittedCount} / {total} وحدة</span>
           </div>
           <div style={{ height: 6, background: colors.grayLight, borderRadius: 4, overflow: "hidden" }}>
-            <div style={{ height: "100%", width: `${total ? (submittedCount / total) * 100 : 0}%`, background: allSubmitted ? colors.green : colors.teal, borderRadius: 4, transition: "width 0.4s" }} />
+            <div style={{ height: "100%", width: `${total ? (submittedCount / total) * 100 : 0}%`, background: allSubmitted ? colors.green : colors.primary, borderRadius: 4, transition: "width 0.4s" }} />
           </div>
         </div>
         {allSubmitted && (
@@ -1487,15 +1487,15 @@ const OpStepReview = ({ units, setOpStep, refreshData }) => {
 
   return (
     <div className="animate-in">
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 6 }}>مراجعة المستشار — التخطيط التشغيلي</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>مراجعة المستشار — التخطيط التشغيلي</h2>
       <p style={{ fontSize: 13, color: colors.gray, marginBottom: 20 }}>يقوم المستشار بمراجعة مخرجاتك واعتمادها أو طلب تعديل. سيتم إشعارك عند اكتمال الاعتماد.</p>
 
       {anyRevision && (
-        <Card style={{ marginBottom: 16, padding: "14px 18px", background: "#FFF7ED", borderRight: `4px solid ${colors.orange}` }}>
+        <Card style={{ marginBottom: 16, padding: "14px 18px", background: "#FFF8EA", borderRight: `4px solid ${colors.amberLine}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ color: colors.orange }}><IcArrowPath width={22} height={22}/></span>
+            <span style={{ color: colors.amberText }}><IcArrowPath width={22} height={22}/></span>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: colors.orange }}>بعض الوحدات تحتاج تعديل</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: colors.amberText }}>بعض الوحدات تحتاج تعديل</div>
               <div style={{ fontSize: 12, color: colors.gray }}>راجع ملاحظات المستشار وأعد إرسال الوحدات المطلوبة</div>
             </div>
           </div>
@@ -1522,7 +1522,7 @@ const OpStepReview = ({ units, setOpStep, refreshData }) => {
         return (
           <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: `1px solid ${colors.grayLight}`, background: "white" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 28, height: 28, borderRadius: 6, background: colors.tealCard, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700 }}>{u.unit_number || u.id}</div>
+              <div style={{ width: 28, height: 28, borderRadius: 6, background: colors.primaryDeep, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700 }}>{u.unit_number || u.id}</div>
               <span style={{ fontSize: 13, fontWeight: 600 }}>{u.name}</span>
             </div>
             <Badge text={s.badge} color={s.color} small />
@@ -1531,18 +1531,18 @@ const OpStepReview = ({ units, setOpStep, refreshData }) => {
       })}
 
       {allApproved && (
-        <div style={{ background: '#dcfce7', border: '1.5px solid #86efac', borderRadius: 12, padding: '18px 22px', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+        <div style={{ background: '#C9EFE1', border: '1.5px solid #7FD3B5', borderRadius: 12, padding: '18px 22px', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 28 }}>🎉</span>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#166534' }}>تهانينا! تم اعتماد جميع الوحدات</div>
-              <div style={{ fontSize: 12, color: '#15803d', marginTop: 2 }}>خطتك التشغيلية جاهزة للاعتماد النهائي وتحميل الوثيقة</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#086449' }}>تهانينا! تم اعتماد جميع الوحدات</div>
+              <div style={{ fontSize: 12, color: '#086449', marginTop: 2 }}>خطتك التشغيلية جاهزة للاعتماد النهائي وتحميل الوثيقة</div>
             </div>
           </div>
           <button
             onClick={handleProceed}
             disabled={proceeding}
-            style={{ padding: '11px 26px', background: proceeding ? '#9ca3af' : colors.teal, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: proceeding ? 'not-allowed' : 'pointer', fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(26,107,124,0.3)' }}
+            style={{ padding: '11px 26px', background: proceeding ? '#8F8BA3' : colors.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: proceeding ? 'not-allowed' : 'pointer', fontFamily: "inherit", whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(85,70,214,0.3)' }}
           >
             {proceeding ? '...' : 'الاعتماد النهائي ←'}
           </button>
@@ -1591,27 +1591,27 @@ const OpStepApproval = ({ workflow, setWorkflow, setOpStep, navigate, workflowId
   return (
     <div className="animate-in" style={{ textAlign: "center", maxWidth: 580, margin: "0 auto" }}>
       <div style={{ width: 80, height: 80, borderRadius: "50%", background: colors.greenLight, margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center", color: colors.green }}><IcCheckCircle width={40} height={40}/></div>
-      <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.tealDark, marginBottom: 8 }}>تم اعتماد الخطة التشغيلية!</h2>
-      <p style={{ fontSize: 14, color: colors.gray, lineHeight: 1.8, marginBottom: 20 }}>تهانينا! اعتمد المستشار <strong style={{ color: colors.tealDark }}>{consultant?.name || '—'}</strong> خطتك التشغيلية بتاريخ {completedAt}.</p>
+      <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.ink, marginBottom: 8 }}>تم اعتماد الخطة التشغيلية!</h2>
+      <p style={{ fontSize: 14, color: colors.gray, lineHeight: 1.8, marginBottom: 20 }}>تهانينا! اعتمد المستشار <strong style={{ color: colors.ink }}>{consultant?.name || '—'}</strong> خطتك التشغيلية بتاريخ {completedAt}.</p>
 
       {/* Info cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 12, marginBottom: 16 }}>
         <Card style={{ padding: 16, textAlign: "center" }}>
-          <div style={{ marginBottom: 6, display: "flex", justifyContent: "center", color: colors.teal }}><IcUser width={22} height={22}/></div>
+          <div style={{ marginBottom: 6, display: "flex", justifyContent: "center", color: colors.primary }}><IcUser width={22} height={22}/></div>
           <div style={{ fontSize: 11, color: colors.gray, marginBottom: 4 }}>المستشار المشرف</div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark }}>{consultant?.name || '—'}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: colors.ink }}>{consultant?.name || '—'}</div>
         </Card>
         <Card style={{ padding: 16, textAlign: "center" }}>
-          <div style={{ marginBottom: 6, display: "flex", justifyContent: "center", color: colors.teal }}><IcCalendar width={22} height={22}/></div>
+          <div style={{ marginBottom: 6, display: "flex", justifyContent: "center", color: colors.primary }}><IcCalendar width={22} height={22}/></div>
           <div style={{ fontSize: 11, color: colors.gray, marginBottom: 4 }}>تاريخ الاعتماد</div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark }}>{completedAt}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: colors.ink }}>{completedAt}</div>
         </Card>
       </div>
 
       {/* PDF download */}
       <Card accent style={{ marginBottom: 16, textAlign: "right" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.tealCard, display: "flex", alignItems: "center", justifyContent: "center", color: "white", flexShrink: 0 }}><IcDocument width={20} height={20}/></div>
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.primaryDeep, display: "flex", alignItems: "center", justifyContent: "center", color: "white", flexShrink: 0 }}><IcDocument width={20} height={20}/></div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 14, fontWeight: 700 }}>الوثيقة التشغيلية النهائية</div>
             <div style={{ fontSize: 12, color: colors.gray }}>وثيقة رسمية معتمدة — {workflow?.user?.org_name || 'خطة التشغيل'}</div>
@@ -1637,22 +1637,22 @@ const OpStepApproval = ({ workflow, setWorkflow, setOpStep, navigate, workflowId
       {/* Arbitration */}
       <Card style={{ marginBottom: 16, padding: 22 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 12 }}>
-          <div style={{ width: 36, height: 36, background: colors.orange, transform: "rotate(45deg)", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <div style={{ width: 36, height: 36, background: colors.amber, transform: "rotate(45deg)", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <span style={{ transform: "rotate(-45deg)", color: "white", fontWeight: 700, fontSize: 14 }}>؟</span>
           </div>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark }}>هل تود تحكيم واعتماد الخطة من جهة استشارية؟</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink }}>هل تود تحكيم واعتماد الخطة من جهة استشارية؟</h3>
         </div>
         <p style={{ fontSize: 13, color: colors.gray, lineHeight: 1.7, marginBottom: 18 }}>
           يمكنك طلب تحكيم الخطة التشغيلية من جهة استشارية معتمدة لمزيد من المصداقية والجودة — الخدمة الإضافية اختيارية.
         </p>
-        <div style={{ background: "#f8fafb", borderRadius: 10, padding: "14px 16px", marginBottom: 16, textAlign: "right" }}>
+        <div style={{ background: "#FBF9F5", borderRadius: 10, padding: "14px 16px", marginBottom: 16, textAlign: "right" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 6 }}>
             <span>تحكيم الخطة التشغيلية</span><span style={{ fontWeight: 600 }}>2,500 ريال</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: colors.gray, marginBottom: 6 }}>
             <span>ضريبة القيمة المضافة 15%</span><span>375 ريال</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 800, color: colors.tealDark, borderTop: `1px solid ${colors.grayBorder}`, paddingTop: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 800, color: colors.ink, borderTop: `1px solid ${colors.grayBorder}`, paddingTop: 8 }}>
             <span>الإجمالي</span><span>2,875 ريال</span>
           </div>
         </div>
@@ -1690,33 +1690,33 @@ const OpStepArbitration = ({ setOpStep, setWorkflow, workflowId }) => {
 
   return (
     <div className="animate-in" style={{ maxWidth: 600, margin: "0 auto" }}>
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 6, textAlign: "center" }}>اختيار جهة التحكيم</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 6, textAlign: "center" }}>اختيار جهة التحكيم</h2>
       <p style={{ fontSize: 13, color: colors.gray, textAlign: "center", marginBottom: 20 }}>اختر الجهة الاستشارية التي ستتولى تحكيم وإجازة خطتك التشغيلية</p>
 
       <Card style={{ marginBottom: 16 }}>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>الجهات المعتمدة</h3>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>الجهات المعتمدة</h3>
         {arbitrators.map((j, i) => (
-          <div key={i} onClick={() => setSelected(i)} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 10, marginBottom: 8, cursor: "pointer", border: `2px solid ${i===selected ? colors.teal : colors.grayBorder}`, background: i===selected ? `${colors.teal}06` : "white", transition: "all 0.2s" }}>
-            <div style={{ width: 20, height: 20, borderRadius: "50%", border: `2px solid ${i===selected ? colors.teal : colors.grayBorder}`, background: i===selected ? colors.teal : "white", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <div key={i} onClick={() => setSelected(i)} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 10, marginBottom: 8, cursor: "pointer", border: `2px solid ${i===selected ? colors.primary : colors.grayBorder}`, background: i===selected ? `${colors.primary}06` : "white", transition: "all 0.2s" }}>
+            <div style={{ width: 20, height: 20, borderRadius: "50%", border: `2px solid ${i===selected ? colors.primary : colors.grayBorder}`, background: i===selected ? colors.primary : "white", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               {i===selected && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "white" }} />}
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark }}>{j.name}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: colors.ink }}>{j.name}</div>
               <div style={{ fontSize: 11, color: colors.gray, marginTop: 2 }}>{j.desc}</div>
             </div>
-            {i===selected && <span style={{ color: colors.teal }}><IcCheck width={18} height={18}/></span>}
+            {i===selected && <span style={{ color: colors.primary }}><IcCheck width={18} height={18}/></span>}
           </div>
         ))}
       </Card>
 
-      <Card style={{ marginBottom: 20, padding: "14px 18px", background: "#f0f9fb", border: `1px solid #b2d8df` }}>
+      <Card style={{ marginBottom: 20, padding: "14px 18px", background: "#F3F2FE", border: `1px solid #D0CCFA` }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: colors.gray, marginBottom: 4 }}>
           <span>تحكيم الخطة التشغيلية</span><span>2,500 ريال</span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: colors.gray, marginBottom: 8 }}>
           <span>ضريبة القيمة المضافة 15%</span><span>375 ريال</span>
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 800, color: colors.tealDark, borderTop: `1px solid ${colors.grayBorder}`, paddingTop: 8 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 800, color: colors.ink, borderTop: `1px solid ${colors.grayBorder}`, paddingTop: 8 }}>
           <span>الإجمالي المطلوب</span><span>2,875 ريال</span>
         </div>
       </Card>
@@ -1785,40 +1785,40 @@ const OpStepDone = ({ workflow, setWorkflow, navigate, onComplete, units, workfl
   if (!paid) {
     return (
       <div className="animate-in" style={{ maxWidth: 620, margin: "0 auto" }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 6, textAlign: "center" }}>التحكيم والدفع</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 6, textAlign: "center" }}>التحكيم والدفع</h2>
         <p style={{ fontSize: 13, color: colors.gray, textAlign: "center", marginBottom: 20 }}>أكمل الدفع لبدء إجراءات التحكيم الرسمية</p>
 
         {payError && (
-          <div style={{ padding: "12px 16px", background: "#fee2e2", borderRadius: 10, color: "#dc2626", fontSize: 13, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ padding: "12px 16px", background: "#FAD4CE", borderRadius: 10, color: "#D03F2A", fontSize: 13, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 6 }}>
             <IcXMark width={14} height={14}/> {payError}
           </div>
         )}
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 16, marginBottom: 16 }}>
           {/* ملخص الدفع */}
           <Card>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>ملخص التحكيم</h3>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>ملخص التحكيم</h3>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "8px 0", borderBottom: `1px solid ${colors.grayLight}` }}>
               <span>تحكيم الخطة التشغيلية</span><span style={{ fontWeight: 600 }}>2,500 ريال</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: colors.gray, padding: "8px 0", borderBottom: `1px solid ${colors.grayLight}` }}>
               <span>ضريبة القيمة المضافة 15%</span><span>375 ريال</span>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 16, fontWeight: 800, color: colors.tealDark, padding: "12px 0" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 16, fontWeight: 800, color: colors.ink, padding: "12px 0" }}>
               <span>الإجمالي</span><span>2,875 ريال</span>
             </div>
-            <div style={{ padding: "10px 14px", background: "#f0f9fb", borderRadius: 8, fontSize: 12, color: colors.teal, marginTop: 4 }}>
+            <div style={{ padding: "10px 14px", background: "#F3F2FE", borderRadius: 8, fontSize: 12, color: colors.primary, marginTop: 4 }}>
               الجهة: شركة الاستشارات الاستراتيجية
             </div>
           </Card>
 
           {/* طريقة الدفع */}
           <Card>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>طريقة الدفع</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 14 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>طريقة الدفع</h3>
+            <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 6, marginBottom: 14 }}>
               {PAY_METHODS.map((m, i) => (
-                <button key={m.key} onClick={() => setPayMethod(i)} style={{ padding: "10px 6px", borderRadius: 8, border: i===payMethod ? `2px solid ${colors.teal}` : `1.5px solid ${colors.grayBorder}`, background: i===payMethod ? `${colors.teal}10` : "white", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, fontFamily: "'Cairo', sans-serif", transition: "all 0.2s", color: i===payMethod ? colors.teal : colors.gray }}>
-                  <span style={{ color: i===payMethod ? colors.teal : colors.gray }}>{m.icon}</span>
+                <button key={m.key} onClick={() => setPayMethod(i)} style={{ padding: "10px 6px", borderRadius: 8, border: i===payMethod ? `2px solid ${colors.primary}` : `1.5px solid ${colors.grayBorder}`, background: i===payMethod ? `${colors.primary}10` : "white", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, fontFamily: "inherit", transition: "all 0.2s", color: i===payMethod ? colors.primary : colors.gray }}>
+                  <span style={{ color: i===payMethod ? colors.primary : colors.gray }}>{m.icon}</span>
                   <span style={{ fontSize: 10, fontWeight: i===payMethod ? 700 : 500 }}>{m.label}</span>
                 </button>
               ))}
@@ -1848,26 +1848,26 @@ const OpStepDone = ({ workflow, setWorkflow, navigate, onComplete, units, workfl
   return (
     <div className="animate-in" style={{ textAlign: "center", maxWidth: 520, margin: "0 auto" }}>
       <div style={{ width: 100, height: 100, borderRadius: "50%", background: colors.greenLight, margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center", color: colors.green }}><IcSparkles width={48} height={48}/></div>
-      <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.tealDark, marginBottom: 8 }}>اكتمل التخطيط التشغيلي!</h2>
+      <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.ink, marginBottom: 8 }}>اكتمل التخطيط التشغيلي!</h2>
       <p style={{ fontSize: 14, color: colors.gray, lineHeight: 1.8, marginBottom: 20 }}>
-        تم إنجاز خطتك التشغيلية بنجاح تحت إشراف المستشار <strong style={{ color: colors.tealDark }}>{workflow?.consultant?.name || '—'}</strong>.<br/>
+        تم إنجاز خطتك التشغيلية بنجاح تحت إشراف المستشار <strong style={{ color: colors.ink }}>{workflow?.consultant?.name || '—'}</strong>.<br/>
         يمكنك الآن الانتقال لبناء السياسات واللوائح.
       </p>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 12, marginBottom: 16 }}>
         <Card style={{ padding: 14, textAlign: "center" }}>
-          <div style={{ marginBottom: 4, display: "flex", justifyContent: "center", color: colors.teal }}><IcUser width={18} height={18}/></div>
+          <div style={{ marginBottom: 4, display: "flex", justifyContent: "center", color: colors.primary }}><IcUser width={18} height={18}/></div>
           <div style={{ fontSize: 10, color: colors.gray }}>المستشار</div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: colors.tealDark }}>{workflow?.consultant?.name || '—'}</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: colors.ink }}>{workflow?.consultant?.name || '—'}</div>
         </Card>
         <Card style={{ padding: 14, textAlign: "center" }}>
-          <div style={{ marginBottom: 4, display: "flex", justifyContent: "center", color: colors.teal }}><IcCalendar width={18} height={18}/></div>
+          <div style={{ marginBottom: 4, display: "flex", justifyContent: "center", color: colors.primary }}><IcCalendar width={18} height={18}/></div>
           <div style={{ fontSize: 10, color: colors.gray }}>تاريخ الاعتماد</div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: colors.tealDark }}>{completedAt}</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: colors.ink }}>{completedAt}</div>
         </Card>
       </div>
       <Card accent style={{ marginBottom: 16, textAlign: "right" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.tealCard, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}><IcDocument width={20} height={20}/></div>
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.primaryDeep, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}><IcDocument width={20} height={20}/></div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 14, fontWeight: 700 }}>الوثيقة التشغيلية النهائية</div>
             <div style={{ fontSize: 12, color: colors.gray }}>معتمدة ومحكّمة — {workflow?.user?.org_name || ''}</div>
@@ -1891,7 +1891,7 @@ const OpStepDone = ({ workflow, setWorkflow, navigate, onComplete, units, workfl
       )}
 
       {!canNavigate && (
-        <div style={{ padding: "10px 16px", background: colors.yellowLight, borderRadius: 10, fontSize: 12, color: "#92400E", fontWeight: 600, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ padding: "10px 16px", background: colors.yellowLight, borderRadius: 10, fontSize: 12, color: "#7A4706", fontWeight: 600, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
           <IcWarning width={14} height={14}/> {!workflowCompleted
             ? "يجب إتمام الدفع وإجراءات التحكيم أولاً لتفعيل هذا الزر."
             : `لا تزال ${pendingUnits.length} وحدة بانتظار الاعتماد من المستشار.`}
@@ -2019,15 +2019,15 @@ export default function OperationalRoadmap({ navigate, workflowId, onWorkflowSel
         {[...Array(7)].map((_, i) => (
           <React.Fragment key={i}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, minWidth: 70 }}>
-              <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#e5e7eb' }} />
-              <div style={{ width: 50, height: 8, borderRadius: 4, background: '#e5e7eb' }} />
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#E8E3DA' }} />
+              <div style={{ width: 50, height: 8, borderRadius: 4, background: '#E8E3DA' }} />
             </div>
-            {i < 6 && <div style={{ flex: 1, height: 3, background: '#e5e7eb', minWidth: 20, marginBottom: 20 }} />}
+            {i < 6 && <div style={{ flex: 1, height: 3, background: '#E8E3DA', minWidth: 20, marginBottom: 20 }} />}
           </React.Fragment>
         ))}
       </div>
       <div style={{ background: '#fff', borderRadius: 12, padding: 24 }}>
-        {[...Array(3)].map((_, i) => <div key={i} style={{ height: 56, borderRadius: 8, background: '#f3f4f6', marginBottom: 10 }} />)}
+        {[...Array(3)].map((_, i) => <div key={i} style={{ height: 56, borderRadius: 8, background: '#F3EFE8', marginBottom: 10 }} />)}
       </div>
     </div>
   );
@@ -2060,7 +2060,7 @@ export default function OperationalRoadmap({ navigate, workflowId, onWorkflowSel
             setIsCreatingNew(false);
             if (onWorkflowSelect) onWorkflowSelect(null);
           }}
-          style={{ background: 'none', border: 'none', color: colors.teal, cursor: 'pointer', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, padding: 0 }}
+          style={{ background: 'none', border: 'none', color: colors.primary, cursor: 'pointer', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, padding: 0 }}
         >
           ← العودة إلى قائمة الخطط
         </button>

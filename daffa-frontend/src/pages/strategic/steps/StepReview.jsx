@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { strategicApi } from '../../../api/strategic';
 
-const colors = { teal: '#1A6B7C', tealDark: '#14505E', orange: '#E8620A' };
+const colors = { primary: '#5546D6', ink: '#1B1746', orange: '#F5A524', amber: '#F5A524', amberText: '#9A5B07', amberLine: '#E0920F' };
 
 const STATUS_MAP = {
-  not_started: { label: 'لم يبدأ',      bg: '#f3f4f6', color: '#6b7280' },
-  in_progress: { label: 'قيد العمل',    bg: '#fef3c7', color: '#d97706' },
-  submitted:   { label: 'بانتظار المراجعة', bg: '#dbeafe', color: '#2563eb' },
-  reviewing:   { label: 'قيد المراجعة', bg: '#ede9fe', color: '#7c3aed' },
-  revision:    { label: 'يحتاج تعديل',  bg: '#fee2e2', color: '#dc2626' },
-  approved:    { label: 'معتمد',        bg: '#dcfce7', color: '#16a34a' },
+  not_started: { label: 'لم يبدأ',      bg: '#F3EFE8', color: '#67637A' },
+  in_progress: { label: 'قيد العمل',    bg: '#FEEDC6', color: '#9A5B07' },
+  submitted:   { label: 'بانتظار المراجعة', bg: '#CFE5FA', color: '#1F74C4' },
+  reviewing:   { label: 'قيد المراجعة', bg: '#E7E5FD', color: '#5546D6' },
+  revision:    { label: 'يحتاج تعديل',  bg: '#FAD4CE', color: '#D03F2A' },
+  approved:    { label: 'معتمد',        bg: '#C9EFE1', color: '#0B7F5D' },
 };
 
 export default function StepReview({ workflow, setActiveUnit, workflowId, refreshWorkflow }) {
@@ -37,7 +37,7 @@ export default function StepReview({ workflow, setActiveUnit, workflowId, refres
   };
 
   if (loading) return (
-    <div style={{ textAlign: 'center', padding: 60, color: colors.teal }}>جاري تحميل البيانات...</div>
+    <div style={{ textAlign: 'center', padding: 60, color: colors.primary }}>جاري تحميل البيانات...</div>
   );
 
   const approved    = units.filter(u => u.submission_status === 'approved').length;
@@ -48,18 +48,18 @@ export default function StepReview({ workflow, setActiveUnit, workflowId, refres
   return (
     <div className="animate-in">
       {/* Header */}
-      <div style={{ background: '#fff', borderRadius: 12, padding: 24, marginBottom: 20, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: colors.tealDark, marginBottom: 6 }}>مراجعة المستشار</h2>
-        <p style={{ fontSize: 13, color: '#6b7280' }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: 24, marginBottom: 20, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>مراجعة المستشار</h2>
+        <p style={{ fontSize: 13, color: '#67637A' }}>
           يقوم المستشار <strong>{workflow?.consultant?.name}</strong> بمراجعة نماذج العمل التي قدمتها
         </p>
       </div>
 
       {/* إحصائيات سريعة */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 20 }}>
-        <StatCard label="معتمدة" value={approved}  bg="#dcfce7" color="#16a34a" icon="✓" />
-        <StatCard label="قيد المراجعة" value={reviewing} bg="#dbeafe" color="#2563eb" icon="⏳" />
-        <StatCard label="تحتاج تعديل" value={revision}  bg="#fee2e2" color="#dc2626" icon="⚠" />
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-3)', gap: 14, marginBottom: 20 }}>
+        <StatCard label="معتمدة" value={approved}  bg="#C9EFE1" color="#0B7F5D" icon="✓" />
+        <StatCard label="قيد المراجعة" value={reviewing} bg="#CFE5FA" color="#1F74C4" icon="⏳" />
+        <StatCard label="تحتاج تعديل" value={revision}  bg="#FAD4CE" color="#D03F2A" icon="⚠" />
       </div>
 
       {/* قائمة الوحدات */}
@@ -68,29 +68,29 @@ export default function StepReview({ workflow, setActiveUnit, workflowId, refres
           const st = STATUS_MAP[unit.submission_status] || STATUS_MAP.not_started;
           const isRevision = unit.submission_status === 'revision';
           const isApproved = unit.submission_status === 'approved';
-          const borderColor = isRevision ? '#fca5a5' : isApproved ? '#86efac' : '#f3f4f6';
+          const borderColor = isRevision ? '#EE9A8C' : isApproved ? '#7FD3B5' : '#F3EFE8';
           return (
             <div
               key={unit.id}
               onClick={() => setActiveUnit(unit)}
               style={{
                 background: '#fff', borderRadius: 12, padding: '16px 20px',
-                boxShadow: '0 1px 8px rgba(0,0,0,0.06)',
+                boxShadow: '0 1px 8px rgba(27,23,70,0.06)',
                 border: `1.5px solid ${borderColor}`,
                 display: 'flex', alignItems: 'center', gap: 14,
                 cursor: 'pointer', transition: 'box-shadow 0.2s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.10)'; }}
-              onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 8px rgba(0,0,0,0.06)'; }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(27,23,70,0.10)'; }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 8px rgba(27,23,70,0.06)'; }}
             >
-              <div style={{ width: 32, height: 32, borderRadius: '50%', background: colors.teal, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', background: colors.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
                 {i + 1}
               </div>
 
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark }}>{unit.name}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: colors.ink }}>{unit.name}</div>
                 {unit.submission_status === 'revision' && unit.consultant_notes && (
-                  <div style={{ fontSize: 12, color: '#dc2626', marginTop: 4, background: '#fef2f2', padding: '4px 8px', borderRadius: 6 }}>
+                  <div style={{ fontSize: 12, color: '#D03F2A', marginTop: 4, background: '#FDECE9', padding: '4px 8px', borderRadius: 6 }}>
                     ⚠️ ملاحظة المستشار: {unit.consultant_notes}
                   </div>
                 )}
@@ -107,18 +107,18 @@ export default function StepReview({ workflow, setActiveUnit, workflowId, refres
       </div>
 
       {allApproved && (
-        <div style={{ background: '#dcfce7', border: '1.5px solid #86efac', borderRadius: 12, padding: '18px 22px', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+        <div style={{ background: '#C9EFE1', border: '1.5px solid #7FD3B5', borderRadius: 12, padding: '18px 22px', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 28 }}>🎉</span>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#166534' }}>تهانينا! تم اعتماد جميع الوحدات</div>
-              <div style={{ fontSize: 12, color: '#15803d', marginTop: 2 }}>خطتك الاستراتيجية جاهزة للاعتماد النهائي وتحميل الوثيقة</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#086449' }}>تهانينا! تم اعتماد جميع الوحدات</div>
+              <div style={{ fontSize: 12, color: '#086449', marginTop: 2 }}>خطتك الاستراتيجية جاهزة للاعتماد النهائي وتحميل الوثيقة</div>
             </div>
           </div>
           <button
             onClick={handleProceed}
             disabled={proceeding}
-            style={{ padding: '11px 26px', background: proceeding ? '#9ca3af' : colors.teal, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: proceeding ? 'not-allowed' : 'pointer', fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(26,107,124,0.3)' }}
+            style={{ padding: '11px 26px', background: proceeding ? '#8F8BA3' : colors.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: proceeding ? 'not-allowed' : 'pointer', fontFamily: "inherit", whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(85,70,214,0.3)' }}
           >
             {proceeding ? '...' : 'الاعتماد النهائي ←'}
           </button>
@@ -126,13 +126,13 @@ export default function StepReview({ workflow, setActiveUnit, workflowId, refres
       )}
 
       {!allApproved && revision === 0 && reviewing === 0 && approved < 11 && (
-        <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 10, padding: '12px 16px', marginTop: 20, fontSize: 13, color: '#0369a1' }}>
+        <div style={{ background: '#EAF4FD', border: '1px solid #A9D2F5', borderRadius: 10, padding: '12px 16px', marginTop: 20, fontSize: 13, color: '#1A65AD' }}>
           ⏳ جميع الوحدات بانتظار مراجعة المستشار. يتم تحديث الحالة تلقائياً كل 30 ثانية.
         </div>
       )}
 
       {revision > 0 && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 16px', marginTop: 20, fontSize: 13, color: '#dc2626' }}>
+        <div style={{ background: '#FDECE9', border: '1px solid #F5B8AE', borderRadius: 10, padding: '12px 16px', marginTop: 20, fontSize: 13, color: '#D03F2A' }}>
           ⚠️ يوجد {revision} وحدة تحتاج إلى تعديل. اضغط على "تعديل" لإجراء التعديلات المطلوبة.
         </div>
       )}
@@ -146,7 +146,7 @@ const UnitActionButton = ({ unit, setActiveUnit }) => {
     return (
       <button
         onClick={e => { e.stopPropagation(); setActiveUnit(unit); }}
-        style={{ padding: '7px 14px', background: '#f3f4f6', color: '#6b7280', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap' }}
+        style={{ padding: '7px 14px', background: '#F3EFE8', color: '#67637A', border: '1.5px solid #E8E3DA', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit", whiteSpace: 'nowrap' }}
       >
         عرض
       </button>
@@ -156,7 +156,7 @@ const UnitActionButton = ({ unit, setActiveUnit }) => {
     return (
       <button
         onClick={e => { e.stopPropagation(); setActiveUnit(unit); }}
-        style={{ padding: '7px 14px', background: colors.orange, color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap' }}
+        style={{ padding: '7px 14px', background: colors.amber, color: '#1B1746', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit", whiteSpace: 'nowrap' }}
       >
         تعديل ←
       </button>
@@ -165,7 +165,7 @@ const UnitActionButton = ({ unit, setActiveUnit }) => {
   return (
     <button
       onClick={e => { e.stopPropagation(); setActiveUnit(unit); }}
-      style={{ padding: '7px 14px', background: colors.teal, color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap' }}
+      style={{ padding: '7px 14px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit", whiteSpace: 'nowrap' }}
     >
       فتح ←
     </button>

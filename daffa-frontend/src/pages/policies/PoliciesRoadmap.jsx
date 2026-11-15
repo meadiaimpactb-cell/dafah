@@ -35,32 +35,32 @@ const fmtCvv     = v => v.replace(/\D/g, '').slice(0, 3);
 
 // ── Design tokens (نفس ألوان المنصة) ──────────────────────────────────────────
 const C = {
-  teal: "#1A6B7C", tealDark: "#145A68", tealCard: "#1E5E6E",
-  orange: "#E8713A", orangeLight: "#FDF0E8",
-  bg: "#F8FAFB", white: "#FFFFFF",
-  gray: "#6B7280", grayLight: "#F3F4F6", grayBorder: "#E5E7EB",
-  green: "#10B981", greenLight: "#D1FAE5",
-  blue: "#3B82F6", blueLight: "#DBEAFE",
-  red: "#EF4444", redLight: "#FEE2E2",
-  yellow: "#F59E0B", yellowLight: "#FEF3C7",
+  primary: "#5546D6", ink: "#1B1746", primaryDeep: "#2B2470",
+  orange: "#F5A524", amberLine: '#E0920F', amberSoft: "#FFF8EA",
+  bg: "#FBF9F5", white: "#FFFFFF",
+  gray: "#67637A", grayLight: "#F3EFE8", grayBorder: "#E8E3DA",
+  green: "#0E9F74", greenLight: "#C9EFE1",
+  blue: "#2E8FE6", blueLight: "#CFE5FA",
+  red: "#E5533D", redLight: "#FAD4CE",
+  yellow: "#F5A524", yellowLight: "#FEEDC6",
 };
 
 // ── Confirm Modal ─────────────────────────────────────────────────────────────
 const ConfirmModal = ({ open, title, message, onConfirm, onCancel }) => {
   if (!open) return null;
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ background: '#fff', borderRadius: 16, padding: '32px 28px', maxWidth: 420, width: '90%', textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.25)', direction: 'rtl' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 64, height: 64, borderRadius: '50%', background: '#E8F4F6', margin: '0 auto 16px' }}>
-          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#1A6B7C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(27,23,70,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ background: '#fff', borderRadius: 16, padding: '32px 28px', maxWidth: 420, width: '90%', textAlign: 'center', boxShadow: '0 20px 60px rgba(27,23,70,0.25)', direction: 'rtl' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 64, height: 64, borderRadius: '50%', background: '#E7E5FD', margin: '0 auto 16px' }}>
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#5546D6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1 1 .03 2.798-1.442 2.798H4.24c-1.47 0-2.441-1.798-1.442-2.798L4.8 15.3" />
           </svg>
         </div>
-        <div style={{ fontSize: 16, fontWeight: 700, color: '#14505E', marginBottom: 10 }}>{title}</div>
-        <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 28, lineHeight: 1.8 }}>{message}</p>
+        <div style={{ fontSize: 16, fontWeight: 700, color: '#1B1746', marginBottom: 10 }}>{title}</div>
+        <p style={{ fontSize: 13, color: '#67637A', marginBottom: 28, lineHeight: 1.8 }}>{message}</p>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-          <button onClick={onConfirm} style={{ padding: '10px 30px', background: '#1A6B7C', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>تأكيد</button>
-          <button onClick={onCancel}  style={{ padding: '10px 30px', background: '#f3f4f6', color: '#374151', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>إلغاء</button>
+          <button onClick={onConfirm} style={{ padding: '10px 30px', background: '#5546D6', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>تأكيد</button>
+          <button onClick={onCancel}  style={{ padding: '10px 30px', background: '#F3EFE8', color: '#34314A', border: '1.5px solid #E8E3DA', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>إلغاء</button>
         </div>
       </div>
     </div>,
@@ -70,16 +70,16 @@ const ConfirmModal = ({ open, title, message, onConfirm, onCancel }) => {
 
 // ── Shared UI helpers ─────────────────────────────────────────────────────────
 const Card = ({ children, style, onClick }) => (
-  <div onClick={onClick} style={{ background: C.white, borderRadius: 14, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.06)", ...style }}>
+  <div onClick={onClick} style={{ background: C.white, borderRadius: 14, padding: 20, boxShadow: "0 1px 4px rgba(27,23,70,0.06)", ...style }}>
     {children}
   </div>
 );
 
 const Btn = ({ children, onClick, variant = "primary", disabled, small, full, icon }) => {
   const s = {
-    primary:   { bg: C.orange,  color: "white", border: "none" },
-    secondary: { bg: "transparent", color: C.teal, border: `2px solid ${C.teal}` },
-    ghost:     { bg: "transparent", color: C.teal, border: "none" },
+    primary:   { bg: C.amber,  color: "#1B1746", border: "none" },
+    secondary: { bg: "transparent", color: C.primary, border: `2px solid ${C.primary}` },
+    ghost:     { bg: "transparent", color: C.primary, border: "none" },
     success:   { bg: C.green,   color: "white", border: "none" },
     danger:    { bg: C.red,     color: "white", border: "none" },
   }[variant];
@@ -87,7 +87,7 @@ const Btn = ({ children, onClick, variant = "primary", disabled, small, full, ic
     <button onClick={onClick} disabled={disabled}
       style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
         padding: small ? "6px 14px" : "10px 24px", borderRadius: 10, fontSize: small ? 12 : 14,
-        fontWeight: 600, fontFamily: "'Cairo',sans-serif",
+        fontWeight: 600, fontFamily: "inherit",
         background: disabled ? C.grayLight : s.bg, color: disabled ? C.gray : s.color,
         border: s.border || "none", cursor: disabled ? "not-allowed" : "pointer",
         width: full ? "100%" : "auto", opacity: disabled ? 0.6 : 1, transition: "all 0.2s" }}>
@@ -98,14 +98,14 @@ const Btn = ({ children, onClick, variant = "primary", disabled, small, full, ic
 };
 
 const Badge = ({ text, color = "gray" }) => {
-  const map = { green: [C.greenLight, C.green], blue: [C.blueLight, C.blue], orange: [C.orangeLight, C.orange], gray: [C.grayLight, C.gray], yellow: [C.yellowLight, C.yellow], red: [C.redLight, C.red] };
+  const map = { green: [C.greenLight, C.green], blue: [C.blueLight, C.blue], orange: [C.amberSoft, C.amberText], gray: [C.grayLight, C.gray], yellow: [C.yellowLight, C.amberText], red: [C.redLight, C.red] };
   const [bg, fg] = map[color] || map.gray;
   return <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600, background: bg, color: fg, whiteSpace: "nowrap" }}>{text}</span>;
 };
 
 const ProgressBar = ({ percent }) => (
   <div style={{ width: "100%", height: 8, background: C.grayLight, borderRadius: 8, overflow: "hidden" }}>
-    <div style={{ width: `${percent}%`, height: "100%", background: `linear-gradient(90deg,${C.teal},${C.orange})`, borderRadius: 8, transition: "width 0.8s ease" }} />
+    <div style={{ width: `${percent}%`, height: "100%", background: `linear-gradient(90deg,${C.primary},${C.amber})`, borderRadius: 8, transition: "width 0.8s ease" }} />
   </div>
 );
 
@@ -152,12 +152,12 @@ const Stepper = ({ step, allDone, realStep, onStepClick }) => {
                 width: 32, height: 32,
                 borderRadius: done ? "50%" : ws.diamond ? 0 : current ? 8 : "50%",
                 transform: (!done && ws.diamond) ? "rotate(45deg)" : "none",
-                background: done ? (current ? C.orange : C.green) : current ? C.orange : C.grayLight,
-                color: (done || current) ? "white" : C.gray,
+                background: done ? (current ? C.amber : C.green) : current ? C.amber : C.grayLight,
+                color: (done || current) ? "#1B1746" : C.gray,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 12, fontWeight: 700, transition: "all 0.3s",
-                boxShadow: current ? `0 3px 10px ${C.orange}40` : done ? `0 2px 8px ${C.green}40` : "none",
-                outline: clickable && !current ? `2px solid ${C.teal}30` : "none",
+                boxShadow: current ? `0 3px 10px ${C.amberLine}40` : done ? `0 2px 8px ${C.green}40` : "none",
+                outline: clickable && !current ? `2px solid ${C.primary}30` : "none",
                 outlineOffset: 2,
               }}>
                 <span style={{ transform: (!done && ws.diamond) ? "rotate(-45deg)" : "none", display: "flex" }}>
@@ -166,7 +166,7 @@ const Stepper = ({ step, allDone, realStep, onStepClick }) => {
                     : ws.icon}
                 </span>
               </div>
-              <span style={{ fontSize: 8, fontWeight: current ? 700 : 400, color: done ? (current ? C.orange : C.green) : C.gray, textAlign: "center", maxWidth: 70, lineHeight: 1.2 }}>
+              <span style={{ fontSize: 8, fontWeight: current ? 700 : 400, color: done ? (current ? C.amberText : C.green) : C.gray, textAlign: "center", maxWidth: 70, lineHeight: 1.2 }}>
                 {ws.label}
               </span>
             </div>
@@ -180,13 +180,13 @@ const Stepper = ({ step, allDone, realStep, onStepClick }) => {
 
     {/* مؤشر وضع المراجعة */}
     {reviewing && (
-      <div style={{ marginTop: 6, padding: '6px 14px', background: '#fff8f0', borderRadius: 8, border: `1px solid ${C.orange}30`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 12, color: C.orange, fontWeight: 600 }}>
+      <div style={{ marginTop: 6, padding: '6px 14px', background: '#FFF8EA', borderRadius: 8, border: `1px solid ${C.amberLine}30`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 12, color: C.amberText, fontWeight: 600 }}>
           🔍 وضع المراجعة — تستعرض: {STEPS[step]?.label}
         </span>
         <button
           onClick={() => onStepClick(effective)}
-          style={{ background: 'none', border: 'none', color: C.teal, cursor: 'pointer', fontSize: 12, fontWeight: 700, fontFamily: "'Cairo', sans-serif" }}
+          style={{ background: 'none', border: 'none', color: C.primary, cursor: 'pointer', fontSize: 12, fontWeight: 700, fontFamily: "inherit" }}
         >
           العودة للخطوة الحالية ←
         </button>
@@ -211,9 +211,9 @@ const groupActivePolicies = (policyTypes) => {
 
 const StepIntro = ({ policyTypes, onStart, loading }) => (
   <div className="animate-in">
-    <Card style={{ padding: 32, textAlign: "center", marginBottom: 20, borderBottom: `3px solid ${C.orange}` }}>
-      <div style={{ width: 64, height: 64, borderRadius: "50%", background: C.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: C.orange }}><IcScroll width={28} height={28}/></div>
-      <h2 style={{ fontSize: 24, fontWeight: 800, color: C.tealDark }}>نظام بناء السياسات واللوائح</h2>
+    <Card style={{ padding: 32, textAlign: "center", marginBottom: 20, borderBottom: `3px solid ${C.amberLine}` }}>
+      <div style={{ width: 64, height: 64, borderRadius: "50%", background: C.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: C.amberText }}><IcScroll width={28} height={28}/></div>
+      <h2 style={{ fontSize: 24, fontWeight: 800, color: C.ink }}>نظام بناء السياسات واللوائح</h2>
       <p style={{ fontSize: 14, color: C.gray, lineHeight: 1.8, maxWidth: 600, margin: "12px auto 0" }}>
         بناء السياسات واللوائح الداخلية لمنظمتك من خلال استبيانات ذكية موجهة — أجب على الأسئلة والنظام يولّد السياسة تلقائياً
       </p>
@@ -223,37 +223,37 @@ const StepIntro = ({ policyTypes, onStart, loading }) => (
       <span style={{ flexShrink: 0, color: C.blue }}><IcLightbulb width={22} height={22}/></span>
       <div>
         <div style={{ fontSize: 14, fontWeight: 700, color: C.blue, marginBottom: 4 }}>نظام مستقل</div>
-        <div style={{ fontSize: 13, color: "#1e40af", lineHeight: 1.7 }}>
+        <div style={{ fontSize: 13, color: "#164F8A", lineHeight: 1.7 }}>
           يمكنك البدء ببناء السياسات واللوائح مباشرة دون التخطيط الاستراتيجي أو التشغيلي، وتختار مستشارك في خطوة الدفع.
         </div>
       </div>
     </div>
 
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 16, marginBottom: 20 }}>
       <Card>
-        <h3 style={{ fontSize: 16, fontWeight: 700, color: C.tealDark, marginBottom: 14 }}>كيف يعمل النظام</h3>
+        <h3 style={{ fontSize: 16, fontWeight: 700, color: C.ink, marginBottom: 14 }}>كيف يعمل النظام</h3>
         {["اختر السياسات التي تحتاجها منظمتك", "ادفع حسب السياسات المختارة (تسعير مستقل)", "أجب على استبيان ذكي لكل سياسة", "شاهد الفيديوهات التعليمية المرفقة", "النظام يولّد السياسة تلقائياً من إجاباتك", "المستشار يراجع ويعتمد", "حمّل السياسات بتصميم تلقائي أو احترافي"].map((item, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: i < 6 ? `1px solid ${C.grayLight}` : "none" }}>
-            <div style={{ width: 24, height: 24, borderRadius: "50%", background: C.teal, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
-            <span style={{ fontSize: 13, color: C.tealDark }}>{item}</span>
+            <div style={{ width: 24, height: 24, borderRadius: "50%", background: C.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
+            <span style={{ fontSize: 13, color: C.ink }}>{item}</span>
           </div>
         ))}
       </Card>
 
       <Card>
-        <h3 style={{ fontSize: 16, fontWeight: 700, color: C.tealDark, marginBottom: 4 }}>السياسات المتاحة ({policyTypes.filter(p => p.active !== false).length})</h3>
+        <h3 style={{ fontSize: 16, fontWeight: 700, color: C.ink, marginBottom: 4 }}>السياسات المتاحة ({policyTypes.filter(p => p.active !== false).length})</h3>
         <div style={{ fontSize: 11, color: C.gray, marginBottom: 10 }}>حزمة سياسات ولوائح القطاع غير الربحي — الإصدار 3.0</div>
         <div style={{ maxHeight: 360, overflowY: "auto" }}>
           {groupActivePolicies(policyTypes).map(g => (
             <div key={g.name} style={{ marginBottom: 8 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: C.orange, padding: "6px 0 2px" }}>{g.name}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: C.amberText, padding: "6px 0 2px" }}>{g.name}</div>
               {g.items.map((p, i) => (
                 <div key={p.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "6px 0", borderBottom: i < g.items.length - 1 ? `1px solid ${C.grayLight}` : "none" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ color: C.teal, flexShrink: 0 }}><IcDocument width={14} height={14}/></span>
+                    <span style={{ color: C.primary, flexShrink: 0 }}><IcDocument width={14} height={14}/></span>
                     <span style={{ fontSize: 12 }}>{p.name}</span>
                   </div>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: C.teal, whiteSpace: "nowrap" }}>{p.price.toLocaleString('en-US')} ريال</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: C.primary, whiteSpace: "nowrap" }}>{p.price.toLocaleString('en-US')} ريال</span>
                 </div>
               ))}
             </div>
@@ -289,7 +289,7 @@ const StepSelect = ({ policyTypes, workflow, onNext, onSave, loading }) => {
 
   return (
     <div className="animate-in">
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: C.tealDark, marginBottom: 6 }}>اختر السياسات واللوائح المرادة</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 6 }}>اختر السياسات واللوائح المرادة</h2>
       <p style={{ fontSize: 13, color: C.gray, marginBottom: 20 }}>يمكنك اختيار سياسة واحدة أو أكثر — التسعير مستقل لكل سياسة. جميع النماذج من حزمة سياسات دفة الإصدار 3.0.</p>
 
       {groupActivePolicies(policyTypes).map(g => {
@@ -297,10 +297,10 @@ const StepSelect = ({ policyTypes, workflow, onNext, onSave, loading }) => {
         const allSel   = groupIds.every(id => selected.includes(id));
         return (
           <div key={g.name} style={{ marginBottom: 22 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, paddingBottom: 6, borderBottom: `2px solid ${C.orangeLight}` }}>
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: C.tealDark }}>{g.name} <span style={{ fontSize: 12, color: C.gray, fontWeight: 400 }}>({g.items.length})</span></h3>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, paddingBottom: 6, borderBottom: `2px solid ${C.amberSoft}` }}>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: C.ink }}>{g.name} <span style={{ fontSize: 12, color: C.gray, fontWeight: 400 }}>({g.items.length})</span></h3>
               <button onClick={() => setSelected(s => allSel ? s.filter(id => !groupIds.includes(id)) : [...new Set([...s, ...groupIds])])}
-                style={{ fontSize: 12, color: C.teal, background: "none", border: "none", cursor: "pointer", fontFamily: "'Cairo',sans-serif", fontWeight: 600 }}>
+                style={{ fontSize: 12, color: C.primary, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>
                 {allSel ? "إلغاء تحديد المجموعة" : "تحديد المجموعة"}
               </button>
             </div>
@@ -308,17 +308,17 @@ const StepSelect = ({ policyTypes, workflow, onNext, onSave, loading }) => {
               {g.items.map(p => {
                 const sel = selected.includes(p.id);
                 return (
-                  <Card key={p.id} style={{ cursor: "pointer", border: sel ? `2px solid ${C.orange}` : "2px solid transparent", transition: "all 0.2s", display: "flex", flexDirection: "column" }}
+                  <Card key={p.id} style={{ cursor: "pointer", border: sel ? `2px solid ${C.amberLine}` : "2px solid transparent", transition: "all 0.2s", display: "flex", flexDirection: "column" }}
                     onClick={() => toggle(p.id)}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                      <div style={{ width: 44, height: 44, borderRadius: "50%", background: C.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", color: C.orange }}><IcDocument width={20} height={20}/></div>
-                      {sel && <div style={{ width: 26, height: 26, borderRadius: "50%", background: C.orange, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}><IcCheck width={14} height={14}/></div>}
+                      <div style={{ width: 44, height: 44, borderRadius: "50%", background: C.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", color: C.amberText }}><IcDocument width={20} height={20}/></div>
+                      {sel && <div style={{ width: 26, height: 26, borderRadius: "50%", background: C.amber, display: "flex", alignItems: "center", justifyContent: "center", color: "#1B1746" }}><IcCheck width={14} height={14}/></div>}
                     </div>
-                    {p.code && <div style={{ fontSize: 10, color: C.teal, fontWeight: 700, marginTop: 10, direction: "ltr", textAlign: "right" }}>{p.code}</div>}
-                    <h3 style={{ fontSize: 14, fontWeight: 700, color: C.tealDark, marginTop: 4 }}>{p.name}</h3>
+                    {p.code && <div style={{ fontSize: 10, color: C.primary, fontWeight: 700, marginTop: 10, direction: "ltr", textAlign: "right" }}>{p.code}</div>}
+                    <h3 style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginTop: 4 }}>{p.name}</h3>
                     <p style={{ fontSize: 11, color: C.gray, marginTop: 4, lineHeight: 1.6, flex: 1 }}>{p.description}</p>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-                      <span style={{ fontSize: 16, fontWeight: 800, color: C.teal }}>{p.price.toLocaleString('en-US')} ريال</span>
+                      <span style={{ fontSize: 16, fontWeight: 800, color: C.primary }}>{p.price.toLocaleString('en-US')} ريال</span>
                       <span style={{ fontSize: 11, color: C.gray }}>{p.sections.length} أقسام</span>
                     </div>
                   </Card>
@@ -330,10 +330,10 @@ const StepSelect = ({ policyTypes, workflow, onNext, onSave, loading }) => {
       })}
 
       {selected.length > 0 && (
-        <div style={{ position: "sticky", bottom: 0, background: C.white, padding: "14px 20px", borderTop: `2px solid ${C.grayBorder}`, borderRadius: "14px 14px 0 0", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 -4px 12px rgba(0,0,0,0.1)" }}>
+        <div style={{ position: "sticky", bottom: 0, background: C.white, padding: "14px 20px", borderTop: `2px solid ${C.grayBorder}`, borderRadius: "14px 14px 0 0", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 -4px 12px rgba(27,23,70,0.1)" }}>
           <div>
-            <span style={{ fontSize: 14, fontWeight: 600, color: C.tealDark }}>السياسات المحددة: {selected.length}</span>
-            <span style={{ fontSize: 18, fontWeight: 800, color: C.teal, marginRight: 16 }}> | الإجمالي: {total.toLocaleString('en-US')} ريال</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: C.ink }}>السياسات المحددة: {selected.length}</span>
+            <span style={{ fontSize: 18, fontWeight: 800, color: C.primary, marginRight: 16 }}> | الإجمالي: {total.toLocaleString('en-US')} ريال</span>
           </div>
           <Btn onClick={handleNext} disabled={loading}>التالي: الدفع ←</Btn>
         </div>
@@ -353,15 +353,15 @@ const PAY_METHODS = [
 const EMPTY_CARD = { number: '', expiry: '', cvv: '', name: '' };
 
 const CardInputForm = ({ card, onChange, isMada }) => {
-  const inp = { padding: '10px 14px', border: `1.5px solid ${C.grayBorder}`, borderRadius: 10, fontSize: 13, fontFamily: "'Cairo',sans-serif", width: '100%', boxSizing: 'border-box', outline: 'none', direction: 'ltr' };
+  const inp = { padding: '10px 14px', border: `1.5px solid ${C.grayBorder}`, borderRadius: 10, fontSize: 13, fontFamily: "inherit", width: '100%', boxSizing: 'border-box', outline: 'none', direction: 'ltr' };
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {/* Test card hint */}
-      <div style={{ padding: '8px 12px', background: '#f0fdf4', borderRadius: 8, fontSize: 11, color: '#15803d', direction: 'rtl', lineHeight: 1.8 }}>
+      <div style={{ padding: '8px 12px', background: '#E8F8F2', borderRadius: 8, fontSize: 11, color: '#086449', direction: 'rtl', lineHeight: 1.8 }}>
         بطاقة الاختبار: <strong>4111 1111 1111 1111</strong> | تاريخ: <strong>12/26</strong> | CVV: <strong>123</strong>
       </div>
       <div>
-        <label style={{ fontSize: 12, fontWeight: 600, color: C.tealDark, display: 'block', marginBottom: 4 }}>رقم البطاقة</label>
+        <label style={{ fontSize: 12, fontWeight: 600, color: C.ink, display: 'block', marginBottom: 4 }}>رقم البطاقة</label>
         <div style={{ position: 'relative' }}>
           <input value={card.number} onChange={e => onChange({ ...card, number: fmtCardNum(e.target.value) })}
             placeholder="XXXX XXXX XXXX XXXX" maxLength={19} inputMode="numeric" autoComplete="cc-number" aria-label="رقم البطاقة"
@@ -371,20 +371,20 @@ const CardInputForm = ({ card, onChange, isMada }) => {
           </span>
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 10 }}>
         <div>
-          <label style={{ fontSize: 12, fontWeight: 600, color: C.tealDark, display: 'block', marginBottom: 4 }}>تاريخ الانتهاء</label>
+          <label style={{ fontSize: 12, fontWeight: 600, color: C.ink, display: 'block', marginBottom: 4 }}>تاريخ الانتهاء</label>
           <input value={card.expiry} onChange={e => onChange({ ...card, expiry: fmtExpiry(e.target.value) })}
             placeholder="MM/YY" maxLength={5} style={inp} />
         </div>
         <div>
-          <label style={{ fontSize: 12, fontWeight: 600, color: C.tealDark, display: 'block', marginBottom: 4 }}>CVV</label>
+          <label style={{ fontSize: 12, fontWeight: 600, color: C.ink, display: 'block', marginBottom: 4 }}>CVV</label>
           <input value={card.cvv} onChange={e => onChange({ ...card, cvv: fmtCvv(e.target.value) })}
             placeholder="123" maxLength={3} type="password" style={{ ...inp, letterSpacing: 4 }} />
         </div>
       </div>
       <div>
-        <label style={{ fontSize: 12, fontWeight: 600, color: C.tealDark, display: 'block', marginBottom: 4 }}>اسم حامل البطاقة</label>
+        <label style={{ fontSize: 12, fontWeight: 600, color: C.ink, display: 'block', marginBottom: 4 }}>اسم حامل البطاقة</label>
         <input value={card.name} onChange={e => onChange({ ...card, name: e.target.value })}
           placeholder="كما هو مكتوب على البطاقة" style={{ ...inp, direction: 'rtl' }} />
       </div>
@@ -425,14 +425,14 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate })
               return p ? (
                 <div key={id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: C.gray }}>
                   <span>{p.name}</span>
-                  <span style={{ color: '#374151', fontWeight: 600 }}>{p.price.toLocaleString('en-US')} ر.س</span>
+                  <span style={{ color: '#34314A', fontWeight: 600 }}>{p.price.toLocaleString('en-US')} ر.س</span>
                 </div>
               ) : null;
             })}
             {workflow?.include_arbitration && (
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: C.gray }}>
                 <span>تحكيم السياسات</span>
-                <span style={{ color: '#374151', fontWeight: 600 }}>2,000 ر.س</span>
+                <span style={{ color: '#34314A', fontWeight: 600 }}>2,000 ر.س</span>
               </div>
             )}
           </div>
@@ -467,7 +467,7 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate })
 
   return (
     <div className="animate-in">
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: C.tealDark, marginBottom: 20 }}>إتمام الدفع — السياسات واللوائح</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 20 }}>إتمام الدفع — السياسات واللوائح</h2>
 
       {(needsConsultant || pickedHere) && (
         <ConsultantPicker
@@ -490,10 +490,10 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate })
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 20 }}>
         {/* ── Order summary ── */}
         <Card>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: C.tealDark, marginBottom: 14 }}>ملخص الطلب</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: C.ink, marginBottom: 14 }}>ملخص الطلب</h3>
           {selected.map(id => { const p = policyTypes.find(x => x.id === id); return p && (
             <div key={id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: `1px solid ${C.grayLight}`, fontSize: 13 }}>
               <span>{p.icon} {p.name}</span>
@@ -503,16 +503,16 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate })
 
           <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', cursor: 'pointer', marginTop: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <input type="checkbox" checked={arbitration} onChange={e => setArbitration(e.target.checked)} style={{ accentColor: C.teal }} />
+              <input type="checkbox" checked={arbitration} onChange={e => setArbitration(e.target.checked)} style={{ accentColor: C.primary }} />
               <span style={{ fontSize: 13 }}>تحكيم السياسات من مستشار</span>
             </div>
-            <span style={{ fontSize: 12, fontWeight: 600, color: C.orange }}>2,000 ريال</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: C.amberText }}>2,000 ريال</span>
           </label>
 
           <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
             <input value={discountCode} onChange={e => setDiscountCode(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && applyDiscount()}
-              placeholder="كود الخصم" style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "'Cairo',sans-serif", outline: 'none' }} />
+              placeholder="كود الخصم" style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none' }} />
             <Btn small onClick={applyDiscount}>تطبيق</Btn>
           </div>
 
@@ -520,13 +520,13 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate })
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}><span>المجموع الفرعي</span><span>{subtotal.toLocaleString('en-US')} ريال</span></div>
             {discAmt > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4, color: C.green }}><span>خصم</span><span>-{discAmt.toLocaleString('en-US')} ريال</span></div>}
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}><span>ضريبة 15%</span><span>{vat.toLocaleString('en-US')} ريال</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 800, color: C.tealDark, marginTop: 8 }}><span>الإجمالي</span><span>{total.toLocaleString('en-US')} ريال</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 800, color: C.ink, marginTop: 8 }}><span>الإجمالي</span><span>{total.toLocaleString('en-US')} ريال</span></div>
           </div>
         </Card>
 
         {/* ── Payment method ── */}
         <Card>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: C.tealDark, marginBottom: 14 }}>طريقة الدفع</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: C.ink, marginBottom: 14 }}>طريقة الدفع</h3>
           <div style={{ marginBottom: 16 }}>
             <PaymentMethodPicker
               value={methodKey}
@@ -540,16 +540,16 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate })
           {methodKey === 'apple_pay' && (
             <div style={{ textAlign: 'center', padding: '16px 0' }}>
               <ApplePayButton />
-              <p style={{ fontSize: 12, color: C.gray, marginTop: 10, fontFamily: "'Cairo',sans-serif" }}>سيتم فتح نافذة Apple Pay لإتمام عملية الدفع</p>
+              <p style={{ fontSize: 12, color: C.gray, marginTop: 10, fontFamily: "inherit" }}>سيتم فتح نافذة Apple Pay لإتمام عملية الدفع</p>
             </div>
           )}
           {methodKey === 'bank_transfer' && (
-            <div style={{ background: C.blueLight, borderRadius: 10, padding: '16px 18px', fontSize: 13, color: '#1e40af', lineHeight: 1.9 }}>
+            <div style={{ background: C.blueLight, borderRadius: 10, padding: '16px 18px', fontSize: 13, color: '#164F8A', lineHeight: 1.9 }}>
               <div style={{ fontWeight: 700, marginBottom: 8 }}>تفاصيل التحويل البنكي</div>
               <div>البنك: بنك الرياض</div>
               <div>رقم الحساب: SA12 3456 7890 1234 5678</div>
               <div>الاسم: شركة دفة للتخطيط</div>
-              <div style={{ marginTop: 8, fontSize: 11, color: '#1e40af99' }}>أرسل إيصال التحويل لمستشارك بعد الدفع</div>
+              <div style={{ marginTop: 8, fontSize: 11, color: '#164F8A99' }}>أرسل إيصال التحويل لمستشارك بعد الدفع</div>
             </div>
           )}
 
@@ -560,7 +560,7 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate })
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 24 }}>
         <Btn variant="secondary" onClick={onBack} disabled={paying}>→ السابق</Btn>
         <button onClick={handlePay} disabled={paying || needsConsultant}
-          style={{ padding: '14px 40px', background: paying || needsConsultant ? C.gray : C.orange, color: '#fff', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: paying || needsConsultant ? 'not-allowed' : 'pointer', fontFamily: "'Cairo',sans-serif", display: 'flex', alignItems: 'center', gap: 8, boxShadow: paying ? 'none' : `0 4px 16px ${C.orange}40`, transition: 'all 0.2s' }}>
+          style={{ padding: '14px 40px', background: paying || needsConsultant ? C.gray : C.amber, color: '#1B1746', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: paying || needsConsultant ? 'not-allowed' : 'pointer', fontFamily: "inherit", display: 'flex', alignItems: 'center', gap: 8, boxShadow: paying ? 'none' : `0 4px 16px ${C.amberLine}40`, transition: 'all 0.2s' }}>
           <IcLock width={16} height={16}/>
           {paying ? '⏳ جارٍ معالجة الدفع…' : `ادفع الآن — ${total.toLocaleString('en-US')} ريال`}
         </button>
@@ -626,17 +626,17 @@ const PolicyInfoPanel = ({ policyType }) => {
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '10px 16px', borderRadius: open ? '10px 10px 0 0' : 10,
-          background: `${C.teal}12`, border: `1.5px solid ${C.teal}30`,
-          cursor: 'pointer', fontFamily: "'Cairo',sans-serif", fontSize: 13, fontWeight: 600,
-          color: C.tealDark, transition: 'all .2s',
+          background: `${C.primary}12`, border: `1.5px solid ${C.primary}30`,
+          cursor: 'pointer', fontFamily: "inherit", fontSize: 13, fontWeight: 600,
+          color: C.ink, transition: 'all .2s',
         }}
       >
         <span>معلومات هذه السياسة</span>
-        <span style={{ fontSize: 11, color: C.teal }}>{open ? '▲ إخفاء' : '▼ عرض'}</span>
+        <span style={{ fontSize: 11, color: C.primary }}>{open ? '▲ إخفاء' : '▼ عرض'}</span>
       </button>
 
       {open && (
-        <div style={{ background: C.white, border: `1.5px solid ${C.teal}30`, borderTop: 'none', borderRadius: '0 0 10px 10px', padding: '16px 18px' }}>
+        <div style={{ background: C.white, border: `1.5px solid ${C.primary}30`, borderTop: 'none', borderRadius: '0 0 10px 10px', padding: '16px 18px' }}>
           {/* Tab bar */}
           <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
             {tabs.map(t => (
@@ -645,8 +645,8 @@ const PolicyInfoPanel = ({ policyType }) => {
                 onClick={() => setTab(t.key)}
                 style={{
                   padding: '6px 16px', borderRadius: 20, border: 'none', cursor: 'pointer',
-                  fontFamily: "'Cairo',sans-serif", fontSize: 12, fontWeight: tab === t.key ? 700 : 400,
-                  background: tab === t.key ? C.teal : C.grayLight,
+                  fontFamily: "inherit", fontSize: 12, fontWeight: tab === t.key ? 700 : 400,
+                  background: tab === t.key ? C.primary : C.grayLight,
                   color: tab === t.key ? '#fff' : C.gray, transition: 'all .15s',
                 }}
               >
@@ -656,23 +656,23 @@ const PolicyInfoPanel = ({ policyType }) => {
           </div>
 
           {tab === 'overview' && (
-            <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.9, margin: 0 }}>
+            <p style={{ fontSize: 14, color: '#34314A', lineHeight: 1.9, margin: 0 }}>
               {policyType.overview}
             </p>
           )}
 
           {tab === 'desc' && (
-            <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.9, whiteSpace: 'pre-line', margin: 0 }}>
+            <p style={{ fontSize: 14, color: '#34314A', lineHeight: 1.9, whiteSpace: 'pre-line', margin: 0 }}>
               {policyType.written_description}
             </p>
           )}
 
           {tab === 'tip' && (
-            <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 10 }}>
-              <span style={{ color: '#92400e', flexShrink: 0 }}><IcLightbulb width={20} height={20}/></span>
+            <div style={{ background: '#FFF8EA', border: '1px solid #FCD98B', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 10 }}>
+              <span style={{ color: '#7A4706', flexShrink: 0 }}><IcLightbulb width={20} height={20}/></span>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#92400e', marginBottom: 4 }}>نصيحة</div>
-                <div style={{ fontSize: 13, color: '#78350f', lineHeight: 1.7 }}>{policyType.tip}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#7A4706', marginBottom: 4 }}>نصيحة</div>
+                <div style={{ fontSize: 13, color: '#5F3705', lineHeight: 1.7 }}>{policyType.tip}</div>
               </div>
             </div>
           )}
@@ -759,16 +759,16 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
 
   const renderQuestion = (q) => {
     const key = `q${q.id}`;
-    const label = <label style={{ fontSize: 14, fontWeight: 600, color: C.tealDark, display: "block", marginBottom: 8 }}>{q.question}{q.required && <span style={{ color: C.red }}> *</span>}</label>;
+    const label = <label style={{ fontSize: 14, fontWeight: 600, color: C.ink, display: "block", marginBottom: 8 }}>{q.question}{q.required && <span style={{ color: C.red }}> *</span>}</label>;
     const hint  = q.hint && <div style={{ fontSize: 12, color: C.gray, marginBottom: 6 }}>{q.hint}</div>;
     if (q.type === "text") return (
-      <div key={q.id}>{label}{hint}<textarea value={getAns(q.id)} onChange={e => setAns(q.id, e.target.value)} rows={3} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "'Cairo',sans-serif", resize: "vertical", boxSizing: "border-box" }} /></div>
+      <div key={q.id}>{label}{hint}<textarea value={getAns(q.id)} onChange={e => setAns(q.id, e.target.value)} rows={3} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "inherit", resize: "vertical", boxSizing: "border-box" }} /></div>
     );
     if (q.type === "single") return (
       <div key={q.id}>{label}{hint}
         {(q.options || []).map((o, i) => (
-          <label key={i} onClick={() => setAns(q.id, o)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, marginBottom: 4, cursor: "pointer", border: `1.5px solid ${getAns(q.id) === o ? C.teal : C.grayBorder}`, background: getAns(q.id) === o ? `${C.teal}08` : "transparent" }}>
-            <input type="radio" checked={getAns(q.id) === o} onChange={() => setAns(q.id, o)} style={{ accentColor: C.teal }} />
+          <label key={i} onClick={() => setAns(q.id, o)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, marginBottom: 4, cursor: "pointer", border: `1.5px solid ${getAns(q.id) === o ? C.primary : C.grayBorder}`, background: getAns(q.id) === o ? `${C.primary}08` : "transparent" }}>
+            <input type="radio" checked={getAns(q.id) === o} onChange={() => setAns(q.id, o)} style={{ accentColor: C.primary }} />
             <span style={{ fontSize: 13 }}>{o}</span>
           </label>
         ))}
@@ -780,8 +780,8 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
       return (
         <div key={q.id}>{label}{hint}
           {(q.options || []).map((o, i) => (
-            <label key={i} onClick={() => toggle(o)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, marginBottom: 4, cursor: "pointer", border: `1.5px solid ${vals.includes(o) ? C.teal : C.grayBorder}`, background: vals.includes(o) ? `${C.teal}08` : "transparent" }}>
-              <input type="checkbox" checked={vals.includes(o)} onChange={() => toggle(o)} style={{ accentColor: C.teal }} />
+            <label key={i} onClick={() => toggle(o)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, marginBottom: 4, cursor: "pointer", border: `1.5px solid ${vals.includes(o) ? C.primary : C.grayBorder}`, background: vals.includes(o) ? `${C.primary}08` : "transparent" }}>
+              <input type="checkbox" checked={vals.includes(o)} onChange={() => toggle(o)} style={{ accentColor: C.primary }} />
               <span style={{ fontSize: 13 }}>{o}</span>
             </label>
           ))}
@@ -791,8 +791,8 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
     if (q.type === "yesno") return (
       <div key={q.id}>{label}{hint}
         {["نعم", "لا"].map((o) => (
-          <label key={o} onClick={() => setAns(q.id, o)} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 18px", borderRadius: 8, marginLeft: 8, cursor: "pointer", border: `1.5px solid ${getAns(q.id) === o ? C.teal : C.grayBorder}`, background: getAns(q.id) === o ? `${C.teal}08` : "transparent" }}>
-            <input type="radio" checked={getAns(q.id) === o} onChange={() => setAns(q.id, o)} style={{ accentColor: C.teal }} />
+          <label key={o} onClick={() => setAns(q.id, o)} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 18px", borderRadius: 8, marginLeft: 8, cursor: "pointer", border: `1.5px solid ${getAns(q.id) === o ? C.primary : C.grayBorder}`, background: getAns(q.id) === o ? `${C.primary}08` : "transparent" }}>
+            <input type="radio" checked={getAns(q.id) === o} onChange={() => setAns(q.id, o)} style={{ accentColor: C.primary }} />
             <span style={{ fontSize: 14, fontWeight: 600 }}>{o}</span>
           </label>
         ))}
@@ -802,7 +802,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
       <div key={q.id}>{label}{hint}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {[1,2,3,4,5].map(n => (
-            <button key={n} onClick={() => setAns(q.id, String(n))} style={{ width: 44, height: 44, borderRadius: 10, border: `2px solid ${String(getAns(q.id)) === String(n) ? C.teal : C.grayBorder}`, background: String(getAns(q.id)) === String(n) ? C.teal : "#fff", color: String(getAns(q.id)) === String(n) ? "#fff" : C.gray, fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "'Cairo',sans-serif" }}>{n}</button>
+            <button key={n} onClick={() => setAns(q.id, String(n))} style={{ width: 44, height: 44, borderRadius: 10, border: `2px solid ${String(getAns(q.id)) === String(n) ? C.primary : C.grayBorder}`, background: String(getAns(q.id)) === String(n) ? C.primary : "#fff", color: String(getAns(q.id)) === String(n) ? "#fff" : C.gray, fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{n}</button>
           ))}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: C.gray, marginTop: 4 }}><span>منخفض جداً</span><span>مرتفع جداً</span></div>
@@ -817,7 +817,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
 
   if (apiSections.length === 0) return (
     <div>
-      <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", color: C.teal, fontSize: 20, marginBottom: 12 }}>←</button>
+      <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", color: C.primary, fontSize: 20, marginBottom: 12 }}>←</button>
       <div style={{ padding: 40, textAlign: "center", color: C.gray, fontSize: 13 }}>لم يتم إعداد أسئلة لهذه السياسة بعد. يمكن للمشرف إضافتها من لوحة التحكم.</div>
     </div>
   );
@@ -840,11 +840,11 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", color: C.teal, fontSize: 20 }}>←</button>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: C.tealDark }}>{policyType?.name}</h2>
+          <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", color: C.primary, fontSize: 20 }}>←</button>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink }}>{policyType?.name}</h2>
         </div>
         {!readOnly && (
-          <button onClick={() => setDemoConfirm(true)} style={{ fontSize: 12, color: C.blue, background: C.blueLight, border: "none", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: "'Cairo',sans-serif", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
+          <button onClick={() => setDemoConfirm(true)} style={{ fontSize: 12, color: C.blue, background: C.blueLight, border: "none", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: "inherit", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
             <IcBeaker width={14} height={14}/> تعبئة تجريبية
           </button>
         )}
@@ -853,7 +853,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
       <div style={{ marginBottom: 16 }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
           <span style={{ fontSize: 12, color: C.gray }}>القسم {section + 1} من {apiSections.length}</span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: C.teal }}>{Math.round(((section + 1) / apiSections.length) * 100)}%</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: C.primary }}>{Math.round(((section + 1) / apiSections.length) * 100)}%</span>
         </div>
         <ProgressBar percent={((section + 1) / apiSections.length) * 100} />
       </div>
@@ -869,10 +869,10 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
             <button key={s.id} onClick={() => handleSectionJump(i)}
               title={locked ? 'أكمل الأقسام السابقة أولاً' : ''}
               style={{ display: "flex", alignItems: "center", gap: 4, padding: "5px 10px", borderRadius: 20, fontSize: 10,
-                fontWeight: active ? 700 : 400, fontFamily: "'Cairo',sans-serif",
-                background: active ? C.teal : done ? C.greenLight : locked ? '#f3f4f6' : C.grayLight,
-                color: active ? "white" : done ? C.green : locked ? '#9ca3af' : C.gray,
-                border: locked ? `1px dashed #d1d5db` : "none",
+                fontWeight: active ? 700 : 400, fontFamily: "inherit",
+                background: active ? C.primary : done ? C.greenLight : locked ? '#F3EFE8' : C.grayLight,
+                color: active ? "white" : done ? C.green : locked ? '#8F8BA3' : C.gray,
+                border: locked ? `1px dashed #D9D3C7` : "none",
                 cursor: locked ? "not-allowed" : "pointer",
                 whiteSpace: "nowrap", opacity: locked ? 0.65 : 1 }}>
               {done && !active && <IcCheck width={10} height={10}/>}
@@ -886,12 +886,12 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
       <PolicyInfoPanel policyType={policyType} />
 
       {["submitted","reviewing"].includes(selection?.status) && (
-        <div style={{ marginBottom: 12, padding: "10px 14px", background: C.yellowLight, borderRadius: 8, fontSize: 12, color: "#92400E", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ marginBottom: 12, padding: "10px 14px", background: C.yellowLight, borderRadius: 8, fontSize: 12, color: "#7A4706", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
           <IcWarning width={14} height={14}/> هذه الاستمارة مُرسَلة للمراجعة — يمكنك التعديل وإعادة الإرسال وستُحدَّث مراجعة المستشار تلقائياً
         </div>
       )}
       {selection?.status === "revision" && (
-        <div style={{ marginBottom: 12, padding: "10px 14px", background: C.orangeLight, borderRadius: 8, fontSize: 12, color: C.orange, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ marginBottom: 12, padding: "10px 14px", background: C.amberSoft, borderRadius: 8, fontSize: 12, color: C.amberText, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
           <IcArrowPath width={14} height={14}/> طلب المستشار تعديلاً — عدّل الإجابات وأعد الإرسال
         </div>
       )}
@@ -902,7 +902,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
       )}
 
       <Card>
-        <h3 style={{ fontSize: 17, fontWeight: 700, color: C.tealDark, marginBottom: 6 }}>القسم {section + 1}: {currentSection?.name}</h3>
+        <h3 style={{ fontSize: 17, fontWeight: 700, color: C.ink, marginBottom: 6 }}>القسم {section + 1}: {currentSection?.name}</h3>
         <p style={{ fontSize: 13, color: C.gray, marginBottom: 20 }}>
           {readOnly ? 'استعراض إجاباتك على هذا القسم' : 'أجب على الأسئلة التالية — سيتم توليد السياسة تلقائياً بناءً على إجاباتك'}
         </p>
@@ -972,10 +972,10 @@ const StepWork = ({ policyTypes, selections, onSave, onSubmit, onSubmitAll, load
 
   return (
     <div className="animate-in">
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: C.tealDark, marginBottom: 6 }}>تعبئة الاستمارات ومشاهدة الفيديوهات</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 6 }}>تعبئة الاستمارات ومشاهدة الفيديوهات</h2>
       <p style={{ fontSize: 13, color: C.gray, marginBottom: 20 }}>اضغط على أي سياسة لبدء تعبئة الاستبيان أو تعديله في أي وقت</p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "var(--g-3)", gap: 14, marginBottom: 20 }}>
         {selections.map(sel => {
           const p = policyTypes.find(x => x.id === sel.policy_type_id) || sel.policy_type;
           const isSubmitted = ["submitted","reviewing"].includes(sel.status);
@@ -984,20 +984,20 @@ const StepWork = ({ policyTypes, selections, onSave, onSubmit, onSubmitAll, load
           return (
             <Card key={sel.id} style={{ cursor: "pointer", textAlign: "center", border: isApproved ? `2px solid ${C.green}30` : isSubmitted ? `2px solid ${C.blue}30` : "2px solid transparent" }}
               onClick={() => isApproved ? onView && onView(sel.id) : setActive(sel.id)}>
-              <div style={{ width: 56, height: 56, borderRadius: "50%", background: isApproved ? C.greenLight : C.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", color: isApproved ? C.green : C.orange }}><IcDocument width={26} height={26}/></div>
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: C.tealDark }}>{p?.name || "سياسة"}</h3>
+              <div style={{ width: 56, height: 56, borderRadius: "50%", background: isApproved ? C.greenLight : C.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", color: isApproved ? C.green : C.amberText }}><IcDocument width={26} height={26}/></div>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: C.ink }}>{p?.name || "سياسة"}</h3>
               <div style={{ marginTop: 8 }}>{statusBadge(sel.status)}</div>
               <div style={{ fontSize: 11, color: C.gray, marginTop: 6 }}>{p?.sections?.length || 0} أقسام</div>
               {isSubmitted && <div style={{ fontSize: 10, color: C.blue, marginTop: 4, display: "flex", alignItems: "center", gap: 3, justifyContent: "center" }}><IcPencil width={10} height={10}/> يمكن التعديل وإعادة الإرسال</div>}
               {isApproved && <div style={{ fontSize: 10, color: C.green, marginTop: 4, display: "flex", alignItems: "center", gap: 3, justifyContent: "center" }}><IcEye width={10} height={10}/> اضغط لاستعراض</div>}
               {isViewable && !isApproved && (
                 <button onClick={e => { e.stopPropagation(); onView && onView(sel.id); }}
-                  style={{ marginTop: 8, fontSize: 10, color: C.teal, background: `${C.teal}10`, border: `1px solid ${C.teal}20`, borderRadius: 6, padding: "3px 8px", cursor: "pointer", fontFamily: "'Cairo',sans-serif", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 3 }}>
+                  style={{ marginTop: 8, fontSize: 10, color: C.primary, background: `${C.primary}10`, border: `1px solid ${C.primary}20`, borderRadius: 6, padding: "3px 8px", cursor: "pointer", fontFamily: "inherit", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 3 }}>
                   <IcEye width={10} height={10}/> عرض فقط
                 </button>
               )}
               {sel.consultant_notes && sel.status === "revision" && (
-                <div style={{ marginTop: 8, padding: "8px 10px", background: C.orangeLight, borderRadius: 8, fontSize: 11, color: C.orange, textAlign: "right" }}>
+                <div style={{ marginTop: 8, padding: "8px 10px", background: C.amberSoft, borderRadius: 8, fontSize: 11, color: C.amberText, textAlign: "right" }}>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><IcChat width={12} height={12}/>{sel.consultant_notes}</span>
                 </div>
               )}
@@ -1034,7 +1034,7 @@ const StepReview = ({ policyTypes, selections, onEdit, onView, refreshData }) =>
 
   return (
   <div className="animate-in">
-    <h2 style={{ fontSize: 20, fontWeight: 700, color: C.tealDark, marginBottom: 6 }}>مراجعة المستشار — السياسات واللوائح</h2>
+    <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 6 }}>مراجعة المستشار — السياسات واللوائح</h2>
     <Card style={{ marginBottom: 16, padding: "16px 20px", background: C.blueLight, borderRight: `4px solid ${C.blue}` }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -1057,17 +1057,17 @@ const StepReview = ({ policyTypes, selections, onEdit, onView, refreshData }) =>
         return (
           <div key={sel.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderBottom: i < selections.length - 1 ? `1px solid ${C.grayLight}` : "none" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ color: C.teal }}><IcDocument width={20} height={20}/></span>
+              <span style={{ color: C.primary }}><IcDocument width={20} height={20}/></span>
               <span style={{ fontSize: 14, fontWeight: 600 }}>{p?.name || "سياسة"}</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               {statusBadge(sel.status)}
               <button onClick={() => onView && onView(sel.id)}
-                style={{ fontSize: 11, color: C.blue, background: C.blueLight, border: `1px solid ${C.blue}30`, borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "'Cairo',sans-serif", fontWeight: 600, whiteSpace: "nowrap" }}>
+                style={{ fontSize: 11, color: C.blue, background: C.blueLight, border: `1px solid ${C.blue}30`, borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit", fontWeight: 600, whiteSpace: "nowrap" }}>
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}><IcEye width={11} height={11}/>عرض</span>
               </button>
               {canEdit && (
-                <button onClick={() => onEdit(sel.id)} style={{ fontSize: 11, color: C.teal, background: `${C.teal}10`, border: `1px solid ${C.teal}30`, borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "'Cairo',sans-serif", fontWeight: 600, whiteSpace: "nowrap" }}>
+                <button onClick={() => onEdit(sel.id)} style={{ fontSize: 11, color: C.primary, background: `${C.primary}10`, border: `1px solid ${C.primary}30`, borderRadius: 6, padding: "4px 10px", cursor: "pointer", fontFamily: "inherit", fontWeight: 600, whiteSpace: "nowrap" }}>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}><IcPencil width={11} height={11}/>تعديل</span>
                 </button>
               )}
@@ -1078,18 +1078,18 @@ const StepReview = ({ policyTypes, selections, onEdit, onView, refreshData }) =>
     </Card>
 
     {allApproved && (
-      <div style={{ background: '#dcfce7', border: '1.5px solid #86efac', borderRadius: 12, padding: '18px 22px', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+      <div style={{ background: '#C9EFE1', border: '1.5px solid #7FD3B5', borderRadius: 12, padding: '18px 22px', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ fontSize: 28 }}>🎉</span>
           <div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: '#166534' }}>تهانينا! تم اعتماد جميع السياسات</div>
-            <div style={{ fontSize: 12, color: '#15803d', marginTop: 2 }}>انتقل للخطوة التالية لمراجعة الاعتماد النهائي</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#086449' }}>تهانينا! تم اعتماد جميع السياسات</div>
+            <div style={{ fontSize: 12, color: '#086449', marginTop: 2 }}>انتقل للخطوة التالية لمراجعة الاعتماد النهائي</div>
           </div>
         </div>
         <button
           onClick={handleProceed}
           disabled={proceeding}
-          style={{ padding: '11px 26px', background: proceeding ? '#9ca3af' : C.teal, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: proceeding ? 'not-allowed' : 'pointer', fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(26,107,124,0.3)' }}
+          style={{ padding: '11px 26px', background: proceeding ? '#8F8BA3' : C.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: proceeding ? 'not-allowed' : 'pointer', fontFamily: "inherit", whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(85,70,214,0.3)' }}
         >
           {proceeding ? '...' : 'الاعتماد النهائي ←'}
         </button>
@@ -1103,23 +1103,23 @@ const StepReview = ({ policyTypes, selections, onEdit, onView, refreshData }) =>
 const StepApproval = ({ workflow, selections, policyTypes, onNext, onView }) => (
   <div className="animate-in" style={{ textAlign: "center", maxWidth: 500, margin: "0 auto" }}>
     <div style={{ width: 80, height: 80, borderRadius: "50%", background: C.greenLight, margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#0B7F5D" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="20 6 9 17 4 12"/>
       </svg>
     </div>
-    <h2 style={{ fontSize: 22, fontWeight: 800, color: C.tealDark, marginBottom: 8 }}>تم اعتماد السياسات!</h2>
+    <h2 style={{ fontSize: 22, fontWeight: 800, color: C.ink, marginBottom: 8 }}>تم اعتماد السياسات!</h2>
     <p style={{ fontSize: 14, color: C.gray, marginBottom: 8 }}>تهانينا! تم اعتماد جميع السياسات المحددة من المستشار.</p>
 
     {selections?.length > 0 && onView && (
       <div style={{ marginBottom: 20, textAlign: 'right', maxWidth: 400, margin: '0 auto 20px' }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 8, textAlign: 'center' }}>استعراض السياسات المعتمدة</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 8, textAlign: 'center' }}>استعراض السياسات المعتمدة</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {selections.map(sel => {
             const p = policyTypes?.find(x => x.id === sel.policy_type_id) || sel.policy_type;
             return (
               <button key={sel.id} onClick={() => onView(sel.id)}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px', borderRadius: 8, border: `1px solid ${C.green}30`, background: C.greenLight, cursor: 'pointer', fontFamily: "'Cairo',sans-serif" }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: C.tealDark }}>{p?.name || 'سياسة'}</span>
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px', borderRadius: 8, border: `1px solid ${C.green}30`, background: C.greenLight, cursor: 'pointer', fontFamily: "inherit" }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{p?.name || 'سياسة'}</span>
                 <span style={{ fontSize: 11, color: C.green, display: 'inline-flex', alignItems: 'center', gap: 3 }}><IcEye width={12} height={12}/>عرض</span>
               </button>
             );
@@ -1132,12 +1132,12 @@ const StepApproval = ({ workflow, selections, policyTypes, onNext, onView }) => 
       <div style={{ display: "flex", justifyContent: "center", gap: 20, marginBottom: 20 }}>
         <Card style={{ padding: "12px 24px", textAlign: "center" }}>
           <span style={{ display: "flex", justifyContent: "center", marginBottom: 4 }}>
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke={C.teal} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke={C.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
             </svg>
           </span>
           <div style={{ fontSize: 11, color: C.gray }}>المستشار المشرف</div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: C.tealDark }}>{workflow.consultant.name}</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: C.ink }}>{workflow.consultant.name}</div>
         </Card>
       </div>
     )}
@@ -1148,7 +1148,7 @@ const StepApproval = ({ workflow, selections, policyTypes, onNext, onView }) => 
 // ── Step 6: Download ──────────────────────────────────────────────────────────
 const StepDownload = ({ policyTypes, selections, workflow, onNext, onDownload, onTemplateDownload, loadingId, onView }) => (
   <div className="animate-in">
-    <h2 style={{ fontSize: 20, fontWeight: 700, color: C.tealDark, marginBottom: 8, textAlign: "center" }}>تحميل السياسات</h2>
+    <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 8, textAlign: "center" }}>تحميل السياسات</h2>
     <p style={{ fontSize: 12, color: C.gray, textAlign: "center", marginBottom: 20, lineHeight: 1.7 }}>
       لكل سياسة ملف بحقول التخصيص الخاصة بجهتك، والنموذج المرجعي الكامل (الإصدار 3.0) بصيغتي Word وPDF.
       <br/>الوثائق نماذج استرشادية تصبح نافذة بعد صدور قرار الاعتماد من صاحب الصلاحية في جهتك.
@@ -1156,11 +1156,11 @@ const StepDownload = ({ policyTypes, selections, workflow, onNext, onDownload, o
     {selections.map(sel => {
       const p = policyTypes.find(x => x.id === sel.policy_type_id) || sel.policy_type;
       const canTemplate = p?.has_template && sel.status === "approved" && onTemplateDownload;
-      const tplBtn = { fontSize: 11, color: C.orange, background: `${C.orange}10`, border: `1px solid ${C.orange}30`, borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontFamily: "'Cairo',sans-serif", fontWeight: 600 };
+      const tplBtn = { fontSize: 11, color: C.amberText, background: `${C.amber}10`, border: `1px solid ${C.amberLine}30`, borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 };
       return (
         <Card key={sel.id} style={{ marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 10, background: C.tealCard, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}><IcDocument width={20} height={20}/></div>
+            <div style={{ width: 44, height: 44, borderRadius: 10, background: C.primaryDeep, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}><IcDocument width={20} height={20}/></div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 600 }}>{p?.name || "سياسة"}</div>
               <div style={{ fontSize: 11, color: C.gray }}>{p?.code ? `${p.code} — ` : ""}حقول التخصيص — PDF</div>
@@ -1174,7 +1174,7 @@ const StepDownload = ({ policyTypes, selections, workflow, onNext, onDownload, o
             ))}
             {onView && (
               <button onClick={() => onView(sel.id)}
-                style={{ fontSize: 11, color: C.teal, background: `${C.teal}10`, border: `1px solid ${C.teal}30`, borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontFamily: "'Cairo',sans-serif", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 3 }}>
+                style={{ fontSize: 11, color: C.primary, background: `${C.primary}10`, border: `1px solid ${C.primary}30`, borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontFamily: "inherit", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 3 }}>
                 <IcEye width={11} height={11}/>عرض
               </button>
             )}
@@ -1230,8 +1230,8 @@ const StepDesign = ({
   if (wantedDesign && (designStatus === 'pending' || designStatus === 'revision_requested')) {
     return (
       <div className="animate-in" style={{ textAlign: "center", maxWidth: 520, margin: "0 auto" }}>
-        <div style={{ marginBottom: 12, display: "flex", justifyContent: "center", color: C.teal }}><IcClock width={52} height={52}/></div>
-        <h2 style={{ fontSize: 20, fontWeight: 800, color: C.tealDark, marginBottom: 8 }}>
+        <div style={{ marginBottom: 12, display: "flex", justifyContent: "center", color: C.primary }}><IcClock width={52} height={52}/></div>
+        <h2 style={{ fontSize: 20, fontWeight: 800, color: C.ink, marginBottom: 8 }}>
           {designStatus === 'revision_requested' ? 'تم طلب التعديل — بانتظار التصميم المعدّل' : 'تم الدفع — بانتظار رفع التصميم'}
         </h2>
         <p style={{ fontSize: 13, color: C.gray, lineHeight: 1.8, marginBottom: 20 }}>
@@ -1241,13 +1241,13 @@ const StepDesign = ({
         </p>
 
         {workflow?.design_revision_notes && (
-          <Card style={{ marginBottom: 16, textAlign: "right", border: `1px solid ${C.yellow}50`, background: C.yellowLight }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: C.yellow, marginBottom: 4 }}>ملاحظات التعديل المُرسلة:</div>
-            <div style={{ fontSize: 12, color: C.tealDark }}>{workflow.design_revision_notes}</div>
+          <Card style={{ marginBottom: 16, textAlign: "right", border: `1px solid ${C.amberLine}50`, background: C.yellowLight }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: C.amberText, marginBottom: 4 }}>ملاحظات التعديل المُرسلة:</div>
+            <div style={{ fontSize: 12, color: C.ink }}>{workflow.design_revision_notes}</div>
           </Card>
         )}
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 12, marginBottom: 20 }}>
           {[
             ["الجهة المنفذة",   'فريق التصميم — دفة', <IcUser width={20} height={20}/>],
             ["تاريخ الدفع",     paidAt,               <IcCalendar width={20} height={20}/>],
@@ -1255,9 +1255,9 @@ const StepDesign = ({
             ["عدد السياسات",    `${selCount} سياسة`,  <IcScroll width={20} height={20}/>],
           ].map(([lbl, val, icon]) => (
             <Card key={lbl} style={{ padding: "12px 14px", textAlign: "center" }}>
-              <div style={{ marginBottom: 3, display: "flex", justifyContent: "center", color: C.teal }}>{icon}</div>
+              <div style={{ marginBottom: 3, display: "flex", justifyContent: "center", color: C.primary }}>{icon}</div>
               <div style={{ fontSize: 10, color: C.gray, marginBottom: 2 }}>{lbl}</div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: C.tealDark }}>{val}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: C.ink }}>{val}</div>
             </Card>
           ))}
         </div>
@@ -1274,8 +1274,8 @@ const StepDesign = ({
     return (
       <div className="animate-in" style={{ maxWidth: 600, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 20 }}>
-          <div style={{ marginBottom: 8, display: "flex", justifyContent: "center", color: C.orange }}><IcPalette width={48} height={48}/></div>
-          <h2 style={{ fontSize: 20, fontWeight: 800, color: C.tealDark, marginBottom: 6 }}>التصميم الاحترافي جاهز للمراجعة</h2>
+          <div style={{ marginBottom: 8, display: "flex", justifyContent: "center", color: C.amberText }}><IcPalette width={48} height={48}/></div>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: C.ink, marginBottom: 6 }}>التصميم الاحترافي جاهز للمراجعة</h2>
           <p style={{ fontSize: 13, color: C.gray, lineHeight: 1.8 }}>
             قام <strong>فريق التصميم</strong> برفع التصميم الاحترافي لمنظمتك. يرجى المراجعة ثم الاعتماد أو طلب التعديل.
           </p>
@@ -1283,18 +1283,18 @@ const StepDesign = ({
 
         {/* معاينة الملف */}
         {designFileUrl && (
-          <Card style={{ marginBottom: 16, textAlign: "center", border: `2px dashed ${C.teal}40` }}>
-            <div style={{ marginBottom: 8, display: "flex", justifyContent: "center", color: C.teal }}><IcDocument width={40} height={40}/></div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: C.tealDark, marginBottom: 12 }}>ملف التصميم</div>
+          <Card style={{ marginBottom: 16, textAlign: "center", border: `2px dashed ${C.primary}40` }}>
+            <div style={{ marginBottom: 8, display: "flex", justifyContent: "center", color: C.primary }}><IcDocument width={40} height={40}/></div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: C.ink, marginBottom: 12 }}>ملف التصميم</div>
             <a href={designFileUrl} target="_blank" rel="noreferrer"
-              style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 8, background: C.teal, color: "white", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 8, background: C.primary, color: "white", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
               <IcEye width={14} height={14}/> معاينة / تحميل التصميم
             </a>
           </Card>
         )}
 
         {!showRevision ? (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 12 }}>
             <Btn variant="success" full onClick={onApprove} disabled={loading}>
               {loading ? "جارٍ المعالجة..." : "اعتماد التصميم النهائي"}
             </Btn>
@@ -1303,11 +1303,11 @@ const StepDesign = ({
             </Btn>
           </div>
         ) : (
-          <Card style={{ border: `1px solid ${C.yellow}60` }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, marginBottom: 8 }}>اذكر ملاحظات التعديل المطلوبة:</div>
+          <Card style={{ border: `1px solid ${C.amberLine}60` }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 8 }}>اذكر ملاحظات التعديل المطلوبة:</div>
             <textarea value={revisionNotes} onChange={e => setRevisionNotes(e.target.value)}
               placeholder="مثال: يرجى تغيير لون الشعار وتعديل الخط..."
-              style={{ width: "100%", minHeight: 90, padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.grayBorder}`, fontSize: 12, fontFamily: "'Cairo',sans-serif", resize: "vertical", boxSizing: "border-box" }} />
+              style={{ width: "100%", minHeight: 90, padding: "8px 10px", borderRadius: 8, border: `1px solid ${C.grayBorder}`, fontSize: 12, fontFamily: "inherit", resize: "vertical", boxSizing: "border-box" }} />
             <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
               <Btn full onClick={() => { if (revisionNotes.trim()) onRevision(revisionNotes); }} disabled={loading || !revisionNotes.trim()}>
                 {loading ? "جارٍ الإرسال..." : "إرسال طلب التعديل"}
@@ -1322,8 +1322,8 @@ const StepDesign = ({
 
   // ── عنصر مشترك: رحلتك الإدارية المكتملة ──
   const journeyEl = (
-    <div style={{ background: '#f0fdf4', borderRadius: 14, border: '1px solid #bbf7d0', padding: 20, marginBottom: 20, textAlign: 'right' }}>
-      <div style={{ fontSize: 13, fontWeight: 700, color: '#065f46', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
+    <div style={{ background: '#E8F8F2', borderRadius: 14, border: '1px solid #A9E4CF', padding: 20, marginBottom: 20, textAlign: 'right' }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: '#086449', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
         <IcSparkles width={15} height={15} /> اكتملت رحلتك الإدارية الكاملة!
       </div>
       {[
@@ -1331,13 +1331,13 @@ const StepDesign = ({
         { icon: '📋', label: 'التخطيط التشغيلي',   note: 'تحويل الأهداف إلى خطط عمل' },
         { icon: '📜', label: 'السياسات واللوائح',  note: 'بناء الإطار التنظيمي والحوكمة' },
       ].map((s, i, arr) => (
-        <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < arr.length - 1 ? '1px solid #bbf7d050' : 'none' }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>{s.icon}</div>
+        <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < arr.length - 1 ? '1px solid #A9E4CF50' : 'none' }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: '#C9EFE1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>{s.icon}</div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#065f46' }}>{s.label}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#086449' }}>{s.label}</div>
             <div style={{ fontSize: 11, color: C.gray }}>{s.note}</div>
           </div>
-          <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#0B7F5D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
           </div>
         </div>
@@ -1352,13 +1352,13 @@ const StepDesign = ({
         <div style={{ width: 80, height: 80, borderRadius: '50%', background: C.greenLight, margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{ fontSize: 38 }}>🎉</span>
         </div>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: C.tealDark, marginBottom: 8 }}>تم اعتماد التصميم النهائي</h2>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: C.ink, marginBottom: 8 }}>تم اعتماد التصميم النهائي</h2>
         <p style={{ fontSize: 13, color: C.gray, lineHeight: 1.8, marginBottom: 20 }}>
           اكتمل نظام السياسات واللوائح مع التصميم الاحترافي المعتمد بهوية منظمتك.
         </p>
         {designFileUrl && (
           <a href={designFileUrl} target="_blank" rel="noreferrer"
-            style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 24px", borderRadius: 10, background: C.teal, color: "white", fontSize: 13, fontWeight: 700, textDecoration: "none", marginBottom: 20 }}>
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 24px", borderRadius: 10, background: C.primary, color: "white", fontSize: 13, fontWeight: 700, textDecoration: "none", marginBottom: 20 }}>
             تحميل التصميم المعتمد
           </a>
         )}
@@ -1375,7 +1375,7 @@ const StepDesign = ({
         <div style={{ width: 80, height: 80, borderRadius: '50%', background: C.greenLight, margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{ fontSize: 38 }}>🎉</span>
         </div>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: C.tealDark, marginBottom: 8 }}>اكتملت السياسات واللوائح</h2>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: C.ink, marginBottom: 8 }}>اكتملت السياسات واللوائح</h2>
         <p style={{ fontSize: 13, color: C.gray, lineHeight: 1.8, marginBottom: 24 }}>
           تم بناء {selCount} سياسة بالتصميم التلقائي بنجاح.
         </p>
@@ -1396,7 +1396,7 @@ const StepDesign = ({
     org_website: '', org_city:    '',
     // التصميم
     design_scope: 'unified',           // 'unified' | 'color_coded' | 'per_policy'
-    primary_color: '#1A6B7C', secondary_color: '#E8713A',
+    primary_color: '#5546D6', secondary_color: '#9A5B07',
     design_style:  'corporate',        // 'modern' | 'corporate' | 'classic'
     language:      'arabic',           // 'arabic' | 'english' | 'bilingual'
     include_cover: true, include_toc: true,
@@ -1456,22 +1456,22 @@ const StepDesign = ({
     <div className="animate-in" style={{ maxWidth: 660, margin: "0 auto" }}>
       {/* العنوان */}
       <div style={{ textAlign: 'center', marginBottom: 20 }}>
-        <div style={{ width: 52, height: 52, background: C.orange, transform: 'rotate(45deg)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+        <div style={{ width: 52, height: 52, background: C.amber, transform: 'rotate(45deg)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
           <IcPalette width={26} height={26} style={{ transform: 'rotate(-45deg)', color: 'white' }} />
         </div>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: C.tealDark, marginBottom: 6 }}>هل تود تصميم احترافي لسياساتك؟</h2>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: C.ink, marginBottom: 6 }}>هل تود تصميم احترافي لسياساتك؟</h2>
         <p style={{ fontSize: 13, color: C.gray, lineHeight: 1.8 }}>
           تم اعتماد <strong>{selCount}</strong> {selCount === 1 ? 'سياسة' : 'سياسات'} بنجاح. يمكنك الحصول على وثائق رسمية مصممة بهوية منظمتك.
         </p>
         <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap', marginTop: 10 }}>
-          {selections?.map(s => <span key={s.id} style={{ padding: '3px 12px', borderRadius: 20, background: `${C.teal}15`, color: C.teal, fontSize: 11, fontWeight: 600 }}>{s.policy_type?.name}</span>)}
+          {selections?.map(s => <span key={s.id} style={{ padding: '3px 12px', borderRadius: 20, background: `${C.primary}15`, color: C.primary, fontSize: 11, fontWeight: 600 }}>{s.policy_type?.name}</span>)}
         </div>
       </div>
 
       {/* ما الذي يشمله التصميم */}
-      <div style={{ background: '#fff', borderRadius: 14, padding: '16px 20px', marginBottom: 16, boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, marginBottom: 12 }}>📦 ماذا يشمل التصميم الاحترافي؟</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+      <div style={{ background: '#fff', borderRadius: 14, padding: '16px 20px', marginBottom: 16, boxShadow: '0 1px 6px rgba(27,23,70,0.06)' }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 12 }}>📦 ماذا يشمل التصميم الاحترافي؟</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 8 }}>
           {[
             ['🖼️ صفحة غلاف', 'غلاف احترافي لكل سياسة بشعار منظمتك'],
             ['📑 فهرس المحتوى', 'جدول محتويات مرتب وقابل للتنقل'],
@@ -1480,8 +1480,8 @@ const StepDesign = ({
             ['🔖 تصميم الأقسام', 'فواصل وعناوين أقسام بتصميم متناسق'],
             ['📤 ملف PDF جاهز', 'وثيقة نهائية جاهزة للطباعة والنشر الرسمي'],
           ].map(([icon_label, desc]) => (
-            <div key={icon_label} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '8px 10px', background: '#f8fafb', borderRadius: 8 }}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, minWidth: 100 }}>{icon_label}</span>
+            <div key={icon_label} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '8px 10px', background: '#FBF9F5', borderRadius: 8 }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: C.ink, minWidth: 100 }}>{icon_label}</span>
               <span style={{ fontSize: 11, color: C.gray, lineHeight: 1.5 }}>{desc}</span>
             </div>
           ))}
@@ -1489,16 +1489,16 @@ const StepDesign = ({
       </div>
 
       {/* الخيارات */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 14, marginBottom: 14 }}>
         {/* لا شكراً */}
         <Card style={{ border: `2px solid ${C.grayBorder}`, textAlign: 'center' }}>
-          <div style={{ marginBottom: 10, display: 'flex', justifyContent: 'center', color: '#9ca3af', fontSize: 36 }}>📃</div>
-          <h3 style={{ fontSize: 14, fontWeight: 700, color: C.tealDark, marginBottom: 6 }}>التصميم التلقائي</h3>
+          <div style={{ marginBottom: 10, display: 'flex', justifyContent: 'center', color: '#8F8BA3', fontSize: 36 }}>📃</div>
+          <h3 style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginBottom: 6 }}>التصميم التلقائي</h3>
           <p style={{ fontSize: 11, color: C.gray, lineHeight: 1.7, marginBottom: 12 }}>
             وثيقة نصية بسيطة جاهزة للتحميل<br />
             <span style={{ color: C.green, fontWeight: 600 }}>بدون رسوم إضافية</span>
           </p>
-          <div style={{ padding: '8px 10px', background: '#f8fafb', borderRadius: 8, fontSize: 10, color: C.gray, marginBottom: 14, textAlign: 'right', lineHeight: 1.6 }}>
+          <div style={{ padding: '8px 10px', background: '#FBF9F5', borderRadius: 8, fontSize: 10, color: C.gray, marginBottom: 14, textAlign: 'right', lineHeight: 1.6 }}>
             ✓ تنزيل PDF فوري<br/>
             ✗ بدون شعار أو هوية بصرية<br/>
             ✗ تصميم موحد لجميع المنظمات
@@ -1507,22 +1507,22 @@ const StepDesign = ({
         </Card>
 
         {/* التصميم الاحترافي */}
-        <Card style={{ border: `2px solid ${C.orange}`, background: `${C.orange}05` }}>
-          <div style={{ background: C.orange, color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20, display: 'inline-block', marginBottom: 8 }}>موصى به</div>
-          <div style={{ marginBottom: 6, display: 'flex', justifyContent: 'center', color: C.orange, fontSize: 32 }}>🎨</div>
-          <h3 style={{ fontSize: 14, fontWeight: 700, color: C.tealDark, marginBottom: 6, textAlign: 'center' }}>تصميم بهوية منظمتك</h3>
+        <Card style={{ border: `2px solid ${C.amberLine}`, background: `${C.amber}05` }}>
+          <div style={{ background: C.amber, color: '#1B1746', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20, display: 'inline-block', marginBottom: 8 }}>موصى به</div>
+          <div style={{ marginBottom: 6, display: 'flex', justifyContent: 'center', color: C.amberText, fontSize: 32 }}>🎨</div>
+          <h3 style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginBottom: 6, textAlign: 'center' }}>تصميم بهوية منظمتك</h3>
           <p style={{ fontSize: 11, color: C.gray, lineHeight: 1.7, marginBottom: 10, textAlign: 'center' }}>
             وثيقة احترافية كاملة بشعارك وألوانك<br />
             لجميع السياسات الـ{selCount} المعتمدة
           </p>
-          <div style={{ padding: '8px 10px', background: `${C.orange}10`, borderRadius: 8, fontSize: 10, color: '#92400e', marginBottom: 10, textAlign: 'right', lineHeight: 1.6 }}>
+          <div style={{ padding: '8px 10px', background: `${C.amber}10`, borderRadius: 8, fontSize: 10, color: '#7A4706', marginBottom: 10, textAlign: 'right', lineHeight: 1.6 }}>
             ✓ شعار منظمتك في كل صفحة<br/>
             ✓ ألوانك وهويتك البصرية الكاملة<br/>
             ✓ خيار تصميم مستقل لكل سياسة
           </div>
           <div style={{ textAlign: 'center', marginBottom: 12 }}>
             <div style={{ fontSize: 11, color: C.gray }}>لجميع السياسات الـ{selCount}</div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: C.orange }}>{total.toLocaleString('en-US')} ريال</div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: C.amberText }}>{total.toLocaleString('en-US')} ريال</div>
             <div style={{ fontSize: 10, color: C.gray }}>شامل ضريبة القيمة المضافة 15%</div>
           </div>
           <Btn full onClick={() => { setSubStep('brief'); setBriefPage(1); }}>
@@ -1531,7 +1531,7 @@ const StepDesign = ({
         </Card>
       </div>
 
-      <div style={{ padding: '10px 14px', background: '#f0fdf4', borderRadius: 10, fontSize: 11, color: '#065f46', textAlign: 'center' }}>
+      <div style={{ padding: '10px 14px', background: '#E8F8F2', borderRadius: 10, fontSize: 11, color: '#086449', textAlign: 'center' }}>
         🔒 الدفع آمن ومشفر — سيتم بدء التصميم خلال 3-5 أيام عمل بعد إتمام الدفع
       </div>
     </div>
@@ -1543,32 +1543,32 @@ const StepDesign = ({
     return (
     <div className="animate-in" style={{ maxWidth: 580, margin: '0 auto' }}>
       {/* Progress bar */}
-      <div style={{ background: '#fff', borderRadius: 14, padding: '14px 20px', marginBottom: 14, boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
+      <div style={{ background: '#fff', borderRadius: 14, padding: '14px 20px', marginBottom: 14, boxShadow: '0 1px 6px rgba(27,23,70,0.06)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: C.tealDark }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>
             {briefPage === 1 ? '🏢 هوية المنظمة' : '🎨 تفضيلات التصميم'}
           </span>
           <span style={{ fontSize: 11, color: C.gray }}>{briefPage}/2</span>
         </div>
         <div style={{ height: 6, background: C.grayBorder, borderRadius: 4, overflow: 'hidden' }}>
-          <div style={{ width: `${prog}%`, height: '100%', background: C.teal, borderRadius: 4, transition: 'width 0.4s' }} />
+          <div style={{ width: `${prog}%`, height: '100%', background: C.primary, borderRadius: 4, transition: 'width 0.4s' }} />
         </div>
       </div>
 
-      <div style={{ background: '#fff', borderRadius: 14, padding: '20px 24px', boxShadow: '0 1px 6px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <div style={{ background: '#fff', borderRadius: 14, padding: '20px 24px', boxShadow: '0 1px 6px rgba(27,23,70,0.06)', display: 'flex', flexDirection: 'column', gap: 18 }}>
 
         {briefPage === 1 && (<>
           {/* الشعار */}
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, marginBottom: 4 }}>شعار المنظمة</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 4 }}>شعار المنظمة</div>
             <div style={{ fontSize: 11, color: C.gray, marginBottom: 8 }}>سيظهر في رأس وغلاف جميع الوثائق — PNG أو SVG بخلفية شفافة مثالي</div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '14px 18px', border: `2px dashed ${logoPreview ? C.teal : C.grayBorder}`, borderRadius: 12, cursor: 'pointer', background: logoPreview ? `${C.teal}05` : '#fafafa', transition: 'all 0.2s' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '14px 18px', border: `2px dashed ${logoPreview ? C.primary : C.grayBorder}`, borderRadius: 12, cursor: 'pointer', background: logoPreview ? `${C.primary}05` : '#FBF9F5', transition: 'all 0.2s' }}>
               {logoPreview
                 ? <img src={logoPreview} alt="شعار" style={{ height: 60, maxWidth: 120, objectFit: 'contain', borderRadius: 6 }} />
                 : <div style={{ width: 60, height: 60, borderRadius: 10, background: C.grayLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>🖼️</div>
               }
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: logoPreview ? C.teal : C.tealDark }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: logoPreview ? C.primary : C.ink }}>
                   {logoPreview ? logoFile?.name : 'اضغط لرفع الشعار'}
                 </div>
                 <div style={{ fontSize: 11, color: C.gray, marginTop: 2 }}>PNG • JPG • SVG • حد أقصى 5MB</div>
@@ -1579,29 +1579,29 @@ const StepDesign = ({
           </div>
 
           {/* الاسم الرسمي */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 12 }}>
             <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 6 }}>الاسم الرسمي بالعربية <span style={{ color: C.red }}>*</span></div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 6 }}>الاسم الرسمي بالعربية <span style={{ color: C.red }}>*</span></div>
               <input value={brief.org_name} onChange={e => upd('org_name', e.target.value)}
                 placeholder="جمعية البر الخيرية بالرياض"
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: `1.5px solid ${brief.org_name.trim().length >= 2 ? C.teal : C.grayBorder}`, fontSize: 12, fontFamily: "'Cairo',sans-serif", outline: 'none', boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: `1.5px solid ${brief.org_name.trim().length >= 2 ? C.primary : C.grayBorder}`, fontSize: 12, fontFamily: "inherit", outline: 'none', boxSizing: 'border-box' }} />
             </div>
             <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 6 }}>الاسم بالإنجليزية <span style={{ fontSize: 10, fontWeight: 400, color: C.gray }}>(اختياري)</span></div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 6 }}>الاسم بالإنجليزية <span style={{ fontSize: 10, fontWeight: 400, color: C.gray }}>(اختياري)</span></div>
               <input value={brief.org_name_en} onChange={e => upd('org_name_en', e.target.value)}
                 placeholder="Al-Birr Charity Society"
                 dir="ltr"
-                style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 12, fontFamily: "'Cairo',sans-serif", outline: 'none', boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 12, fontFamily: "inherit", outline: 'none', boxSizing: 'border-box' }} />
             </div>
           </div>
 
           {/* نوع المنظمة */}
           <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 8 }}>نوع المنظمة <span style={{ color: C.red }}>*</span></div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 8 }}>نوع المنظمة <span style={{ color: C.red }}>*</span></div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {orgTypes.map(t => (
                 <button key={t} onClick={() => upd('org_type', t)}
-                  style={{ padding: '5px 14px', borderRadius: 20, fontSize: 11, fontFamily: "'Cairo',sans-serif", cursor: 'pointer', fontWeight: brief.org_type === t ? 700 : 400, background: brief.org_type === t ? C.teal : '#f8fafb', color: brief.org_type === t ? '#fff' : C.gray, border: `1.5px solid ${brief.org_type === t ? C.teal : C.grayBorder}` }}>
+                  style={{ padding: '5px 14px', borderRadius: 20, fontSize: 11, fontFamily: "inherit", cursor: 'pointer', fontWeight: brief.org_type === t ? 700 : 400, background: brief.org_type === t ? C.primary : '#FBF9F5', color: brief.org_type === t ? '#fff' : C.gray, border: `1.5px solid ${brief.org_type === t ? C.primary : C.grayBorder}` }}>
                   {t}
                 </button>
               ))}
@@ -1610,11 +1610,11 @@ const StepDesign = ({
 
           {/* الشعار النصي والتواصل */}
           <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 6 }}>شعار/وصف المنظمة <span style={{ fontSize: 10, fontWeight: 400, color: C.gray }}>(سيظهر في التذييل)</span></div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 6 }}>شعار/وصف المنظمة <span style={{ fontSize: 10, fontWeight: 400, color: C.gray }}>(سيظهر في التذييل)</span></div>
             <input value={brief.org_slogan} onChange={e => upd('org_slogan', e.target.value)}
               placeholder="معاً نبني مجتمعاً أفضل"
-              style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 12, fontFamily: "'Cairo',sans-serif", outline: 'none', boxSizing: 'border-box', marginBottom: 8 }} />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 12, fontFamily: "inherit", outline: 'none', boxSizing: 'border-box', marginBottom: 8 }} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 8 }}>
               {[
                 ['org_phone','📞 رقم الهاتف','0112345678'],
                 ['org_email','📧 البريد الإلكتروني','info@example.sa'],
@@ -1625,7 +1625,7 @@ const StepDesign = ({
                   <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>{label}</div>
                   <input value={brief[key]} onChange={e => upd(key, e.target.value)}
                     placeholder={ph} dir={key === 'org_website' || key === 'org_email' ? 'ltr' : 'rtl'}
-                    style={{ width: '100%', padding: '7px 10px', borderRadius: 8, border: `1px solid ${C.grayBorder}`, fontSize: 11, fontFamily: "'Cairo',sans-serif", outline: 'none', boxSizing: 'border-box' }} />
+                    style={{ width: '100%', padding: '7px 10px', borderRadius: 8, border: `1px solid ${C.grayBorder}`, fontSize: 11, fontFamily: "inherit", outline: 'none', boxSizing: 'border-box' }} />
                 </div>
               ))}
             </div>
@@ -1636,7 +1636,7 @@ const StepDesign = ({
           {/* كيفية التعامل مع السياسات المتعددة */}
           {selCount > 1 && (
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, marginBottom: 4 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 4 }}>
                 كيف تريد تصميم سياساتك الـ{selCount}؟ <span style={{ color: C.red }}>*</span>
               </div>
               <div style={{ fontSize: 11, color: C.gray, marginBottom: 10 }}>
@@ -1645,13 +1645,13 @@ const StepDesign = ({
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {scopeOpts.map(o => (
                   <button key={o.key} onClick={() => upd('design_scope', o.key)}
-                    style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 14px', borderRadius: 12, cursor: 'pointer', textAlign: 'right', fontFamily: "'Cairo',sans-serif", background: brief.design_scope === o.key ? `${C.teal}10` : '#f8fafb', border: `2px solid ${brief.design_scope === o.key ? C.teal : C.grayBorder}`, transition: 'all 0.2s' }}>
+                    style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 14px', borderRadius: 12, cursor: 'pointer', textAlign: 'right', fontFamily: "inherit", background: brief.design_scope === o.key ? `${C.primary}10` : '#FBF9F5', border: `2px solid ${brief.design_scope === o.key ? C.primary : C.grayBorder}`, transition: 'all 0.2s' }}>
                     <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>{o.icon}</span>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: brief.design_scope === o.key ? 700 : 600, color: brief.design_scope === o.key ? C.teal : C.tealDark }}>{o.label}</div>
+                      <div style={{ fontSize: 13, fontWeight: brief.design_scope === o.key ? 700 : 600, color: brief.design_scope === o.key ? C.primary : C.ink }}>{o.label}</div>
                       <div style={{ fontSize: 11, color: C.gray, marginTop: 3, lineHeight: 1.5 }}>{o.desc}</div>
                     </div>
-                    <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${brief.design_scope === o.key ? C.teal : C.grayBorder}`, background: brief.design_scope === o.key ? C.teal : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                    <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${brief.design_scope === o.key ? C.primary : C.grayBorder}`, background: brief.design_scope === o.key ? C.primary : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
                       {brief.design_scope === o.key && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />}
                     </div>
                   </button>
@@ -1662,7 +1662,7 @@ const StepDesign = ({
 
           {/* الألوان */}
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, marginBottom: 4 }}>ألوان الهوية البصرية</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 4 }}>ألوان الهوية البصرية</div>
             <div style={{ fontSize: 11, color: C.gray, marginBottom: 10 }}>ستُطبَّق على الغلاف والرأس والتذييل والعناوين</div>
             <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
               {[
@@ -1674,7 +1674,7 @@ const StepDesign = ({
                     style={{ width: 42, height: 42, borderRadius: 8, border: `2px solid ${C.grayBorder}`, cursor: 'pointer', padding: 2 }} />
                   <div>
                     <div style={{ fontSize: 11, color: C.gray }}>{label}</div>
-                    <div style={{ fontSize: 11, fontFamily: 'monospace', color: C.tealDark, fontWeight: 600 }}>{brief[k]}</div>
+                    <div style={{ fontSize: 11, fontFamily: 'monospace', color: C.ink, fontWeight: 600 }}>{brief[k]}</div>
                   </div>
                 </div>
               ))}
@@ -1688,11 +1688,11 @@ const StepDesign = ({
 
           {/* نمط التصميم */}
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, marginBottom: 10 }}>نمط التصميم</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 10 }}>نمط التصميم</div>
             <div style={{ display: 'flex', gap: 8 }}>
               {styleOpts.map(s => (
                 <button key={s.key} onClick={() => upd('design_style', s.key)}
-                  style={{ flex: 1, padding: '10px 6px', borderRadius: 10, fontSize: 11, fontFamily: "'Cairo',sans-serif", cursor: 'pointer', textAlign: 'center', background: brief.design_style === s.key ? `${C.teal}12` : '#f8fafb', color: brief.design_style === s.key ? C.teal : C.gray, border: `1.5px solid ${brief.design_style === s.key ? C.teal : C.grayBorder}`, fontWeight: brief.design_style === s.key ? 700 : 400 }}>
+                  style={{ flex: 1, padding: '10px 6px', borderRadius: 10, fontSize: 11, fontFamily: "inherit", cursor: 'pointer', textAlign: 'center', background: brief.design_style === s.key ? `${C.primary}12` : '#FBF9F5', color: brief.design_style === s.key ? C.primary : C.gray, border: `1.5px solid ${brief.design_style === s.key ? C.primary : C.grayBorder}`, fontWeight: brief.design_style === s.key ? 700 : 400 }}>
                   <div style={{ fontSize: 20, marginBottom: 4 }}>{s.icon}</div>
                   <div>{s.label}</div>
                   <div style={{ fontSize: 10, color: C.gray, marginTop: 3 }}>{s.desc}</div>
@@ -1703,11 +1703,11 @@ const StepDesign = ({
 
           {/* اللغة */}
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, marginBottom: 8 }}>لغة الوثائق</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 8 }}>لغة الوثائق</div>
             <div style={{ display: 'flex', gap: 8 }}>
               {langOpts.map(l => (
                 <button key={l.key} onClick={() => upd('language', l.key)}
-                  style={{ flex: 1, padding: '9px 6px', borderRadius: 10, fontSize: 12, fontFamily: "'Cairo',sans-serif", cursor: 'pointer', textAlign: 'center', background: brief.language === l.key ? C.teal : '#f8fafb', color: brief.language === l.key ? '#fff' : C.gray, border: `1.5px solid ${brief.language === l.key ? C.teal : C.grayBorder}`, fontWeight: brief.language === l.key ? 700 : 400 }}>
+                  style={{ flex: 1, padding: '9px 6px', borderRadius: 10, fontSize: 12, fontFamily: "inherit", cursor: 'pointer', textAlign: 'center', background: brief.language === l.key ? C.primary : '#FBF9F5', color: brief.language === l.key ? '#fff' : C.gray, border: `1.5px solid ${brief.language === l.key ? C.primary : C.grayBorder}`, fontWeight: brief.language === l.key ? 700 : 400 }}>
                   <div style={{ fontSize: 16, marginBottom: 2 }}>{l.flag}</div>
                   {l.label}
                 </button>
@@ -1717,14 +1717,14 @@ const StepDesign = ({
 
           {/* خيارات إضافية */}
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, marginBottom: 8 }}>عناصر الوثيقة</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 8 }}>عناصر الوثيقة</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {[
                 ['include_cover', '🖼️ صفحة غلاف لكل سياسة'],
                 ['include_toc',   '📑 جدول المحتويات'],
               ].map(([k, label]) => (
                 <button key={k} onClick={() => upd(k, !brief[k])}
-                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', borderRadius: 10, fontSize: 12, fontFamily: "'Cairo',sans-serif", cursor: 'pointer', background: brief[k] ? `${C.teal}12` : '#f8fafb', color: brief[k] ? C.teal : C.gray, border: `1.5px solid ${brief[k] ? C.teal : C.grayBorder}`, fontWeight: brief[k] ? 700 : 400 }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', borderRadius: 10, fontSize: 12, fontFamily: "inherit", cursor: 'pointer', background: brief[k] ? `${C.primary}12` : '#FBF9F5', color: brief[k] ? C.primary : C.gray, border: `1.5px solid ${brief[k] ? C.primary : C.grayBorder}`, fontWeight: brief[k] ? 700 : 400 }}>
                   <span style={{ fontSize: 16 }}>{brief[k] ? '✅' : '⬜'}</span> {label}
                 </button>
               ))}
@@ -1733,12 +1733,12 @@ const StepDesign = ({
 
           {/* ملاحظات */}
           <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 6 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 6 }}>
               ملاحظات وتعليمات إضافية للمصمم <span style={{ fontWeight: 400, color: C.gray }}>(اختياري)</span>
             </div>
             <textarea value={brief.notes} onChange={e => upd('notes', e.target.value)} rows={3}
               placeholder="مثال: أريد خطاً عربياً رسمياً، لا أريد خلفيات داكنة، أرجو أن يكون التصميم محافظاً..."
-              style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 12, fontFamily: "'Cairo',sans-serif", resize: 'vertical', outline: 'none', boxSizing: 'border-box', lineHeight: 1.7 }} />
+              style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 12, fontFamily: "inherit", resize: 'vertical', outline: 'none', boxSizing: 'border-box', lineHeight: 1.7 }} />
           </div>
         </>)}
       </div>
@@ -1747,7 +1747,7 @@ const StepDesign = ({
       <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
         <button
           onClick={() => briefPage === 1 ? setSubStep('choice') : setBriefPage(1)}
-          style={{ padding: '10px 20px', background: 'none', border: `1.5px solid ${C.grayBorder}`, borderRadius: 10, fontSize: 13, color: C.gray, cursor: 'pointer', fontFamily: "'Cairo',sans-serif" }}>
+          style={{ padding: '10px 20px', background: 'none', border: `1.5px solid ${C.grayBorder}`, borderRadius: 10, fontSize: 13, color: C.gray, cursor: 'pointer', fontFamily: "inherit" }}>
           ← رجوع
         </button>
         <Btn full
@@ -1766,25 +1766,25 @@ const StepDesign = ({
   return (
     <div className="animate-in" style={{ maxWidth: 480, margin: "0 auto" }}>
       {/* ملخص المتطلبات */}
-      <div style={{ background: `${C.teal}08`, borderRadius: 12, padding: '12px 16px', marginBottom: 16, border: `1px solid ${C.teal}20`, direction: 'rtl' }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 8 }}>ملخص المتطلبات المُدخلة:</div>
+      <div style={{ background: `${C.primary}08`, borderRadius: 12, padding: '12px 16px', marginBottom: 16, border: `1px solid ${C.primary}20`, direction: 'rtl' }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 8 }}>ملخص المتطلبات المُدخلة:</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {logoPreview && <img src={logoPreview} alt="شعار" style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 6, border: `1px solid ${C.grayBorder}` }} />}
-          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, background: `${C.teal}15`, color: C.teal }}>{brief.org_name}</span>
-          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, background: `${C.teal}15`, color: C.teal }}>{brief.org_type}</span>
-          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, background: `${C.teal}15`, color: C.teal }}>{styleOpts.find(s => s.key === brief.design_style)?.label}</span>
-          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, background: `${C.teal}15`, color: C.teal }}>{langOpts.find(l => l.key === brief.language)?.label}</span>
+          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, background: `${C.primary}15`, color: C.primary }}>{brief.org_name}</span>
+          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, background: `${C.primary}15`, color: C.primary }}>{brief.org_type}</span>
+          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, background: `${C.primary}15`, color: C.primary }}>{styleOpts.find(s => s.key === brief.design_style)?.label}</span>
+          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, background: `${C.primary}15`, color: C.primary }}>{langOpts.find(l => l.key === brief.language)?.label}</span>
           <span title={brief.primary_color} style={{ width: 22, height: 22, borderRadius: '50%', background: brief.primary_color, border: `1px solid ${C.grayBorder}` }} />
           <span title={brief.secondary_color} style={{ width: 22, height: 22, borderRadius: '50%', background: brief.secondary_color, border: `1px solid ${C.grayBorder}` }} />
         </div>
-        <button onClick={() => setSubStep('brief')} style={{ background: 'none', border: 'none', color: C.teal, cursor: 'pointer', fontSize: 11, fontFamily: "'Cairo',sans-serif", marginTop: 6, padding: 0, fontWeight: 600 }}>✎ تعديل المتطلبات</button>
+        <button onClick={() => setSubStep('brief')} style={{ background: 'none', border: 'none', color: C.primary, cursor: 'pointer', fontSize: 11, fontFamily: "inherit", marginTop: 6, padding: 0, fontWeight: 600 }}>✎ تعديل المتطلبات</button>
       </div>
 
       {/* بطاقة الدفع */}
-      <Card style={{ border: `2px solid ${C.orange}`, background: `${C.orange}05` }}>
+      <Card style={{ border: `2px solid ${C.amberLine}`, background: `${C.amber}05` }}>
         <div style={{ textAlign: "center", marginBottom: 14 }}>
-          <div style={{ display: "flex", justifyContent: "center", color: C.orange, marginBottom: 6 }}><IcPalette width={32} height={32}/></div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: C.tealDark }}>إتمام الدفع</div>
+          <div style={{ display: "flex", justifyContent: "center", color: C.amberText, marginBottom: 6 }}><IcPalette width={32} height={32}/></div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: C.ink }}>إتمام الدفع</div>
         </div>
         <div style={{ background: C.white, borderRadius: 8, padding: "8px 12px", marginBottom: 12, border: `1px solid ${C.grayBorder}` }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: C.gray, marginBottom: 3 }}>
@@ -1793,14 +1793,14 @@ const StepDesign = ({
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: C.gray, marginBottom: 6 }}>
             <span>ضريبة 15%</span><span>{tax.toLocaleString('en-US')} ريال</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 800, color: C.orange, borderTop: `1px solid ${C.grayBorder}`, paddingTop: 6 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 800, color: C.amberText, borderTop: `1px solid ${C.grayBorder}`, paddingTop: 6 }}>
             <span>الإجمالي</span><span>{total.toLocaleString('en-US')} ريال</span>
           </div>
         </div>
-        <div style={{ fontSize: 11, fontWeight: 700, color: C.tealDark, marginBottom: 6 }}>طريقة الدفع:</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: C.ink, marginBottom: 6 }}>طريقة الدفع:</div>
         <div style={{ display: "flex", gap: 4, marginBottom: 12 }}>
           {["card","mada","apple_pay"].map(m => (
-            <button key={m} onClick={() => { setMethod(m); setCardErr(""); }} style={{ flex: 1, padding: "6px 4px", borderRadius: 8, fontSize: 10, fontFamily: "'Cairo',sans-serif", border: `1.5px solid ${method === m ? C.teal : C.grayBorder}`, background: method === m ? `${C.teal}12` : C.white, color: method === m ? C.teal : C.gray, fontWeight: method === m ? 700 : 400, cursor: "pointer" }}>
+            <button key={m} onClick={() => { setMethod(m); setCardErr(""); }} style={{ flex: 1, padding: "6px 4px", borderRadius: 8, fontSize: 10, fontFamily: "inherit", border: `1.5px solid ${method === m ? C.primary : C.grayBorder}`, background: method === m ? `${C.primary}12` : C.white, color: method === m ? C.primary : C.gray, fontWeight: method === m ? 700 : 400, cursor: "pointer" }}>
               {paymentLabels[m]}
             </button>
           ))}
@@ -1808,7 +1808,7 @@ const StepDesign = ({
         {(method === "card" || method === "mada") && (
           <div style={{ marginBottom: 12 }}>
             <CardInputForm card={card} onChange={setCard} isMada={method === "mada"} />
-            <div style={{ marginTop: 6, padding: '6px 10px', background: '#f0fdf4', borderRadius: 7, fontSize: 10, color: '#15803d' }}>
+            <div style={{ marginTop: 6, padding: '6px 10px', background: '#E8F8F2', borderRadius: 7, fontSize: 10, color: '#086449' }}>
               بطاقة الاختبار: <strong>4111 1111 1111 1111</strong> | تاريخ: <strong>12/26</strong> | CVV: <strong>123</strong>
             </div>
           </div>
@@ -1819,7 +1819,7 @@ const StepDesign = ({
           </div>
         )}
         {cardErr && (
-          <div style={{ padding: "6px 10px", background: "#FEE2E2", borderRadius: 6, fontSize: 11, color: C.red, marginBottom: 8, display: "flex", alignItems: "center", gap: 4 }}><IcWarning width={11} height={11}/> {cardErr}</div>
+          <div style={{ padding: "6px 10px", background: "#FAD4CE", borderRadius: 6, fontSize: 11, color: C.red, marginBottom: 8, display: "flex", alignItems: "center", gap: 4 }}><IcWarning width={11} height={11}/> {cardErr}</div>
         )}
         <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 10px", background: C.greenLight, borderRadius: 7, fontSize: 11, color: C.green, marginBottom: 10 }}>
           <IcLock width={11} height={11}/> دفع آمن ومشفر
@@ -1827,7 +1827,7 @@ const StepDesign = ({
         <Btn full onClick={handlePay} disabled={loading || paying}>
           {(loading || paying) ? "⏳ جارٍ معالجة الدفع…" : <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><IcLock width={14} height={14}/>ادفع الآن — {total.toLocaleString('en-US')} ريال</span>}
         </Btn>
-        <button onClick={() => setSubStep('brief')} style={{ width: '100%', marginTop: 8, background: 'none', border: 'none', color: C.gray, cursor: 'pointer', fontSize: 11, fontFamily: "'Cairo',sans-serif", padding: '6px 0' }}>← العودة لتعديل المتطلبات</button>
+        <button onClick={() => setSubStep('brief')} style={{ width: '100%', marginTop: 8, background: 'none', border: 'none', color: C.gray, cursor: 'pointer', fontSize: 11, fontFamily: "inherit", padding: '6px 0' }}>← العودة لتعديل المتطلبات</button>
       </Card>
     </div>
   );
@@ -1835,12 +1835,12 @@ const StepDesign = ({
   return (
     <div className="animate-in" style={{ maxWidth: 640, margin: "0 auto" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 14 }}>
-        <div style={{ width: 44, height: 44, background: C.orange, transform: "rotate(45deg)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ width: 44, height: 44, background: C.amber, transform: "rotate(45deg)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <span style={{ transform: "rotate(-45deg)", color: "white", fontWeight: 700, fontSize: 16 }}>؟</span>
         </div>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: C.tealDark }}>هل تود تصميم احترافي؟</h2>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: C.ink }}>هل تود تصميم احترافي؟</h2>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 16, marginBottom: 16, alignItems: "start" }}>
       </div>
 
       <div style={{ padding: 12, background: C.greenLight, borderRadius: 12, border: `1px solid ${C.green}30`, textAlign: "center" }}>
@@ -1893,7 +1893,7 @@ const WorkflowsList = ({ onSelect, onNew }) => {
 
   if (listLoading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 80 }}>
-      <div style={{ width: 44, height: 44, borderRadius: '50%', border: `4px solid ${C.teal}`, borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
+      <div style={{ width: 44, height: 44, borderRadius: '50%', border: `4px solid ${C.primary}`, borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );
@@ -1901,9 +1901,9 @@ const WorkflowsList = ({ onSelect, onNew }) => {
   return (
     <div className="animate-in">
       {/* Header */}
-      <div style={{ background: C.white, borderRadius: 16, padding: '28px 32px', marginBottom: 16, boxShadow: '0 1px 6px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14 }}>
+      <div style={{ background: C.white, borderRadius: 16, padding: '28px 32px', marginBottom: 16, boxShadow: '0 1px 6px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14 }}>
         <div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: C.tealDark, marginBottom: 4 }}>خططك للسياسات واللوائح</h2>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: C.ink, marginBottom: 4 }}>خططك للسياسات واللوائح</h2>
           <p style={{ fontSize: 13, color: C.gray }}>استعرض خطة موجودة أو أنشئ خطة جديدة بعد اكتمال الحالية</p>
         </div>
         {/* New plan button — only enabled if all existing plans are completed */}
@@ -1913,19 +1913,19 @@ const WorkflowsList = ({ onSelect, onNew }) => {
             disabled={!canCreate || creating}
             style={{
               padding: '10px 22px', borderRadius: 10, border: 'none',
-              background: (!canCreate || creating) ? C.grayLight : C.orange,
-              color: (!canCreate || creating) ? C.gray : '#fff',
-              fontSize: 14, fontWeight: 700, fontFamily: "'Cairo',sans-serif",
+              background: (!canCreate || creating) ? C.grayLight : C.amber,
+              color: (!canCreate || creating) ? C.gray : '#1B1746',
+              fontSize: 14, fontWeight: 700, fontFamily: "inherit",
               cursor: (!canCreate || creating) ? 'not-allowed' : 'pointer',
               display: 'inline-flex', alignItems: 'center', gap: 6, transition: 'all 0.2s',
-              boxShadow: (!canCreate || creating) ? 'none' : `0 4px 14px ${C.orange}40`,
+              boxShadow: (!canCreate || creating) ? 'none' : `0 4px 14px ${C.amberLine}40`,
             }}
           >
             <IcDocument width={16} height={16}/>
             {creating ? 'جارٍ الإنشاء…' : '+ إنشاء خطة سياسات جديدة'}
           </button>
           {!canCreate && (
-            <div style={{ fontSize: 11, color: C.yellow, marginTop: 6, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <div style={{ fontSize: 11, color: C.amberText, marginTop: 6, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
               <IcLock width={11} height={11}/>
               أكمل الخطة الحالية أولاً لتفعيل هذا الخيار
             </div>
@@ -1935,11 +1935,11 @@ const WorkflowsList = ({ onSelect, onNew }) => {
 
       {/* Block message when incomplete plan exists */}
       {!canCreate && (
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 18px', background: C.yellowLight, border: `1.5px solid ${C.yellow}`, borderRadius: 12, marginBottom: 16 }}>
-          <span style={{ flexShrink: 0, color: '#92400E', marginTop: 2 }}><IcWarning width={20} height={20}/></span>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 18px', background: C.yellowLight, border: `1.5px solid ${C.amberLine}`, borderRadius: 12, marginBottom: 16 }}>
+          <span style={{ flexShrink: 0, color: '#7A4706', marginTop: 2 }}><IcWarning width={20} height={20}/></span>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#92400E', marginBottom: 2 }}>خطة نشطة موجودة</div>
-            <div style={{ fontSize: 12, color: '#78350F', lineHeight: 1.7 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#7A4706', marginBottom: 2 }}>خطة نشطة موجودة</div>
+            <div style={{ fontSize: 12, color: '#5F3705', lineHeight: 1.7 }}>
               يجب إكمال الخطة الحالية وجميع مراحلها (الاعتماد من المستشار + التحميل + قرار التصميم) قبل إنشاء خطة سياسات جديدة.
             </div>
           </div>
@@ -1949,7 +1949,7 @@ const WorkflowsList = ({ onSelect, onNew }) => {
       {workflows.length === 0 ? (
         <Card style={{ padding: 48, textAlign: 'center' }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: C.tealDark, marginBottom: 8 }}>لا توجد خطط بعد</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: C.ink, marginBottom: 8 }}>لا توجد خطط بعد</h3>
           <p style={{ fontSize: 13, color: C.gray, marginBottom: 24 }}>ابدأ بإنشاء خطة سياسات ولوائح لمنظمتك</p>
           <Btn onClick={handleNew} disabled={creating}>
             {creating ? 'جارٍ الإنشاء…' : '+ إنشاء خطة جديدة'}
@@ -1966,16 +1966,16 @@ const WorkflowsList = ({ onSelect, onNew }) => {
             const planNum  = wf.plan_number;           // sequential per-user number from backend
             const isActive = wf.status !== 'completed';
             return (
-              <Card key={wf.id} style={{ padding: 22, display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap', border: isActive ? `2px solid ${C.orange}20` : '2px solid transparent' }}>
+              <Card key={wf.id} style={{ padding: 22, display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap', border: isActive ? `2px solid ${C.amberLine}20` : '2px solid transparent' }}>
                 {/* Number badge */}
-                <div style={{ width: 52, height: 52, borderRadius: 14, background: isActive ? C.orangeLight : C.greenLight, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, flexDirection: 'column' }}>
-                  <span style={{ fontSize: 18, fontWeight: 800, color: isActive ? C.orange : C.green, lineHeight: 1 }}>#{planNum}</span>
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: isActive ? C.amberSoft : C.greenLight, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, flexDirection: 'column' }}>
+                  <span style={{ fontSize: 18, fontWeight: 800, color: isActive ? C.amberText : C.green, lineHeight: 1 }}>#{planNum}</span>
                 </div>
 
                 {/* Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: C.tealDark }}>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: C.ink }}>
                       خطة السياسات #{planNum}
                     </span>
                     <Badge text={si.text} color={si.color} />
@@ -1985,10 +1985,10 @@ const WorkflowsList = ({ onSelect, onNew }) => {
                     )}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: 12, color: C.gray, flexWrap: 'wrap', marginBottom: 8 }}>
-                    <span>المرحلة: <strong style={{ color: C.tealDark }}>{stepLabel(stepN)}</strong></span>
-                    {wf.consultant?.name && <span>المستشار: <strong style={{ color: C.tealDark }}>{wf.consultant.name}</strong></span>}
+                    <span>المرحلة: <strong style={{ color: C.ink }}>{stepLabel(stepN)}</strong></span>
+                    {wf.consultant?.name && <span>المستشار: <strong style={{ color: C.ink }}>{wf.consultant.name}</strong></span>}
                     {wf.created_at && <span>{new Date(wf.created_at).toLocaleDateString('ar-SA')}</span>}
-                    {wf.total > 0 && <span>المبلغ: <strong style={{ color: C.teal }}>{Number(wf.total).toLocaleString('en-US')} ريال</strong></span>}
+                    {wf.total > 0 && <span>المبلغ: <strong style={{ color: C.primary }}>{Number(wf.total).toLocaleString('en-US')} ريال</strong></span>}
                   </div>
                   <ProgressBar percent={pct} />
                   {(wf.approved_names?.length > 0) && (
@@ -2196,7 +2196,7 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
   if (loading) return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: 80 }}>
       <div style={{ textAlign: "center" }}>
-        <div style={{ width: 48, height: 48, borderRadius: "50%", border: `4px solid ${C.teal}`, borderTopColor: "transparent", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+        <div style={{ width: 48, height: 48, borderRadius: "50%", border: `4px solid ${C.primary}`, borderTopColor: "transparent", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
         <div style={{ color: C.gray, fontSize: 14 }}>جارٍ التحميل...</div>
       </div>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
@@ -2224,7 +2224,7 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
       <div>
         <div style={{ marginBottom: 16 }}>
           <button onClick={() => { setViewingId(null); onWorkflowSelect && onWorkflowSelect(null); }}
-            style={{ background: 'none', border: 'none', color: C.teal, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: "'Cairo', sans-serif", display: 'flex', alignItems: 'center', gap: 4 }}>
+            style={{ background: 'none', border: 'none', color: C.primary, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: "inherit", display: 'flex', alignItems: 'center', gap: 4 }}>
             ← خططي للسياسات
           </button>
         </div>
@@ -2252,7 +2252,7 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
       <div>
         <div style={{ marginBottom: 16 }}>
           <button onClick={() => { setEditingId(null); onWorkflowSelect && onWorkflowSelect(null); }}
-            style={{ background: 'none', border: 'none', color: C.teal, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: "'Cairo', sans-serif", display: 'flex', alignItems: 'center', gap: 4 }}>
+            style={{ background: 'none', border: 'none', color: C.primary, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: "inherit", display: 'flex', alignItems: 'center', gap: 4 }}>
             ← خططي للسياسات
           </button>
         </div>
@@ -2276,7 +2276,7 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
       {/* Breadcrumb */}
       <div style={{ marginBottom: 14 }}>
         <button onClick={() => onWorkflowSelect && onWorkflowSelect(null)}
-          style={{ background: 'none', border: 'none', color: C.teal, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: "'Cairo', sans-serif", display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          style={{ background: 'none', border: 'none', color: C.primary, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: "inherit", display: 'inline-flex', alignItems: 'center', gap: 4 }}>
           ← خططي للسياسات
         </button>
       </div>
