@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Logo from '../../components/brand/Logo';
 import api from '../../api/axios';
 import OtpVerification from './OtpVerification';
 import GoogleAuthButton, { GOOGLE_ENABLED, OrDivider } from './GoogleAuthButton';
@@ -174,8 +175,7 @@ export default function Login({ onLogin, onGoRegister }) {
     <div style={S.overlay}>
       <div style={S.card}>
         <div style={S.logo}>
-          <img src="/logo.png" alt="دفة" style={{ height: 60 }} onError={(e) => { e.target.style.display = 'none'; }} />
-          <div style={S.logoText}>دفة</div>
+          <Logo variant="stacked" size={64} descriptor />
         </div>
 
         {view === 'login' && (
@@ -207,7 +207,7 @@ export default function Login({ onLogin, onGoRegister }) {
 const S = {
   overlay: {
     minHeight: '100vh',
-    background: '#FBF9F5',
+    background: 'radial-gradient(rgba(85,70,214,0.08) 1.2px, transparent 1.3px) 0 0 / 22px 22px, #FBF9F5',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -217,8 +217,9 @@ const S = {
   },
   card: {
     background: '#fff',
-    borderRadius: 16,
-    padding: '40px min(48px, 7vw)',
+    borderRadius: 24,
+    border: '1px solid #E8E3DA',
+    padding: '36px min(44px, 7vw)',
     width: '100%',
     maxWidth: 460,
     boxSizing: 'border-box',

@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>رمز التحقق — منصة دفة</title>
 <style>
-  body { font-family: Tahoma, Arial, sans-serif; direction: rtl; background: #f8fafb; margin: 0; padding: 20px; color: #1a1a2e; }
+  body { font-family: Tahoma, Arial, sans-serif; direction: rtl; background: #FBF9F5; margin: 0; padding: 20px; color: #1B1746; }
   .container { max-width: 480px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
-  .header { background: #1A6B7C; padding: 28px 32px; text-align: center; }
+  .header { background: #5546D6; padding: 28px 32px; text-align: center; }
   .body { padding: 32px; text-align: center; }
   .greeting { font-size: 16px; font-weight: bold; margin: 0 0 8px; }
-  .subtitle { color: #4b5563; font-size: 14px; line-height: 1.8; margin: 0 0 20px; }
-  .code-box { background: #f0f9fa; border: 2px dashed #1A6B7C; border-radius: 12px; padding: 18px 28px; display: inline-block; margin: 4px 0 22px; }
-  .code { font-size: 40px; font-weight: bold; letter-spacing: 12px; color: #1A6B7C; font-family: 'Courier New', monospace; direction: ltr; }
-  .note { color: #6b7280; font-size: 13px; line-height: 1.9; margin: 0; }
-  .note strong { color: #E8620A; }
-  .divider { border: none; border-top: 1px solid #f3f4f6; margin: 0; }
-  .footer { background: #f8fafb; padding: 16px 32px; text-align: center; color: #9ca3af; font-size: 12px; line-height: 1.7; }
+  .subtitle { color: #4A4660; font-size: 14px; line-height: 1.8; margin: 0 0 20px; }
+  .code-box { background: #F3F2FE; border: 2px dashed #5546D6; border-radius: 12px; padding: 18px 28px; display: inline-block; margin: 4px 0 22px; }
+  .code { font-size: 40px; font-weight: bold; letter-spacing: 12px; color: #5546D6; font-family: 'Courier New', monospace; direction: ltr; }
+  .note { color: #67637A; font-size: 13px; line-height: 1.9; margin: 0; }
+  .note strong { color: #9A5B07; }
+  .divider { border: none; border-top: 1px solid #F3EFE8; margin: 0; }
+  .footer { background: #FBF9F5; padding: 16px 32px; text-align: center; color: #8F8BA3; font-size: 12px; line-height: 1.7; }
 </style>
 </head>
 <body>

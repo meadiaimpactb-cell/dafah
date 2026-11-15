@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Logo from '../../components/brand/Logo';
 import api from '../../api/axios';
 
 const C = {
@@ -45,8 +46,7 @@ export default function ResetPasswordPage({ token, email, onDone }) {
       <div style={S.card}>
         {/* Logo */}
         <div style={S.logo}>
-          <img src="/logo.png" alt="دفة" style={{ height: 60 }} onError={e => e.target.style.display = 'none'} />
-          <div style={S.logoText}>دفّة</div>
+          <Logo variant="stacked" size={64} descriptor />
         </div>
 
         {done ? (

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Logo from '../../components/brand/Logo';
 import api from '../../api/axios';
 import OtpVerification from './OtpVerification';
 import GoogleAuthButton, { GOOGLE_ENABLED, OrDivider } from './GoogleAuthButton';
@@ -72,8 +73,7 @@ export default function Register({ onLogin, onGoLogin }) {
       <div style={styles.overlay}>
         <div style={{ ...styles.card, maxWidth: 460 }}>
           <div style={styles.logo}>
-            <img src="/logo.png" alt="دفة" style={{ height: 60 }} onError={(e) => { e.target.style.display = 'none'; }} />
-            <div style={styles.logoText}>دفة</div>
+            <Logo variant="stacked" size={64} descriptor />
           </div>
           <OtpVerification
             email={verification.email}
@@ -92,8 +92,7 @@ export default function Register({ onLogin, onGoLogin }) {
     <div style={styles.overlay}>
       <div style={styles.card}>
         <div style={styles.logo}>
-          <img src="/logo.png" alt="دفة" style={{ height: 60 }} onError={(e) => { e.target.style.display = 'none'; }} />
-          <div style={styles.logoText}>دفة</div>
+          <Logo variant="stacked" size={64} descriptor />
         </div>
 
         <h2 style={styles.title}>إنشاء حساب جديد</h2>
@@ -197,7 +196,7 @@ export default function Register({ onLogin, onGoLogin }) {
 const styles = {
   overlay: {
     minHeight: '100vh',
-    background: '#FBF9F5',
+    background: 'radial-gradient(rgba(85,70,214,0.08) 1.2px, transparent 1.3px) 0 0 / 22px 22px, #FBF9F5',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

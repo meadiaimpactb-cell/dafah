@@ -31,6 +31,8 @@ import { colors as themeColors, systems } from "./theme/tokens";
 import { Badge, ProgressBar, Btn, Card, Input, MetricCard, Tab, StatusBar, Modal, BarChart, DonutChart, LineChart, GenericPage, EmptyState, Loading, SectionTitle } from "./components/ui/kit";
 import { Help, TipLayer } from "./components/ui/Help";
 import AppShell from "./components/shell/AppShell";
+import { PublicNav as PublicNavBar, PublicFooter as PublicFooterBar } from "./pages/public/PublicLayout";
+import Landing from "./pages/public/Landing";
 import GlossaryDrawer from "./components/onboarding/GlossaryDrawer";
 import OnboardingTour from "./components/onboarding/OnboardingTour";
 
@@ -1875,154 +1877,10 @@ export default function DaffaPlatform() {
   const menu = currentRole === "admin" ? adminMenu : currentRole === "consultant" ? consultantMenu : clientMenu;
   const isDashboard = !["landing", "about", "services", "pricing", "contact", "login", "register"].includes(currentView);
 
-  // ============== PUBLIC PAGES NAV ==============
-  const PublicNav = () => (
-    <div style={{ background: "rgba(255,255,255,0.97)", backdropFilter: "blur(10px)", borderBottom: `1px solid ${colors.grayBorder}`, position: "sticky", top: 0, zIndex: 100 }}>
-      <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 30px", maxWidth: 1300, margin: "0 auto" }}>
-        {/* Right: Logo only */}
-        <div onClick={() => navigate("landing")} style={{ cursor: "pointer", display: "flex", alignItems: "center", minWidth: 160 }}>
-          <img src="/logo.png" alt="دفة" style={{ width: 52, height: 52, objectFit: "contain" }} />
-        </div>
-
-        {/* Center: Menu Links */}
-        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-          {[{l:"الرئيسية",v:"landing"},{l:"عن دفة",v:"about"},{l:"الخدمات",v:"services"},{l:"الأسعار",v:"pricing"},{l:"تواصل معنا",v:"contact"}].map(n => (
-            <a key={n.v} onClick={() => navigate(n.v)} style={{ fontSize: 14, fontWeight: currentView === n.v ? 700 : 500, color: currentView === n.v ? colors.amberText : colors.ink, cursor: "pointer", borderBottom: currentView === n.v ? `2px solid ${colors.amberLine}` : "2px solid transparent", paddingBottom: 6, transition: "all 0.2s" }}
-              onMouseEnter={e => { if (currentView !== n.v) e.target.style.color = colors.primary; }}
-              onMouseLeave={e => { if (currentView !== n.v) e.target.style.color = colors.ink; }}>
-              {n.l}
-            </a>
-          ))}
-        </div>
-
-        {/* Left: Auth Buttons */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 160, justifyContent: "flex-end" }}>
-          <Btn variant="secondary" small onClick={() => setAuthPage("login")}>تسجيل الدخول</Btn>
-          <Btn small onClick={() => setAuthPage("register")}>إنشاء حساب</Btn>
-        </div>
-      </nav>
-    </div>
-  );
-
-  const PublicFooter = () => (
-    <div>
-      <div style={{ padding: "50px 40px", background: colors.ink, color: "white" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "var(--g-2-1-1-1)", gap: 40 }}>
-          <div><Logo size="md" white /><p style={{ fontSize: 12, opacity: 0.7, marginTop: 12, lineHeight: 1.8 }}>{sc('footer_desc', 'منصة دفة للتخطيط الاستراتيجي وصناعة السياسات')}</p></div>
-          <div><h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>روابط سريعة</h4>{["الرئيسية", "عن دفة", "الخدمات", "الأسعار"].map((l, i) => <div key={i} style={{ fontSize: 12, opacity: 0.7, padding: "4px 0", cursor: "pointer" }}>{l}</div>)}</div>
-          <div><h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>الخدمات</h4>{["التخطيط الاستراتيجي", "التخطيط التشغيلي", "السياسات واللوائح"].map((l, i) => <div key={i} style={{ fontSize: 12, opacity: 0.7, padding: "4px 0" }}>{l}</div>)}</div>
-          <div><h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>تواصل معنا</h4>
-            <div style={{ fontSize: 12, opacity: 0.7, lineHeight: 2 }}>
-              {sc('contact_email', 'info@daffa.sa')}<br/>
-              {sc('contact_phone', '+966 55 XXX XXXX')}<br/>
-              {sc('contact_address', 'الرياض، المملكة العربية السعودية')}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div style={{ padding: "14px 40px", background: "#120F33", textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.5)" }}>{sc('footer_copyright', 'جميع الحقوق محفوظة © 2026 منصة دفة')}</div>
-    </div>
-  );
-
-  // ============== LANDING PAGE ==============
-  const LandingPage = () => (
-    <div style={{ width: "100%", minHeight: "100vh" }} className="geo-bg">
-      <PublicNav />
-      {/* Hero */}
-      <div style={{ background: `linear-gradient(135deg, ${colors.primary} 0%, #2B2470 100%)`, padding: "80px 40px", textAlign: "center", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", inset: 0, background: "url(\"data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0L100 50L50 100L0 50Z' fill='rgba(255,255,255,0.02)'/%3E%3C/svg%3E\")" }} />
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <Logo size="lg" white />
-          <h1 style={{ color: "white", fontSize: 28, fontWeight: 300, marginTop: 24, lineHeight: 1.6 }}>{sc('hero_title', 'نظام البناء الاستراتيجي والتشغيلي للمنظمات غير الربحية')}</h1>
-          <h2 style={{ color: "white", fontSize: 40, fontWeight: 800, marginTop: 8 }}>{sc('hero_subtitle', 'فكرة النظام وآلية العمل')}</h2>
-          <div style={{ display: "flex", gap: 16, justifyContent: "center", marginTop: 32 }}>
-            <Btn onClick={() => navigate("register")}>ابدأ الآن</Btn>
-            <button onClick={() => navigate("about")} style={{ padding: "10px 24px", borderRadius: 10, fontSize: 14, fontWeight: 600, fontFamily: "inherit", background: "transparent", color: "white", border: "2px solid white", cursor: "pointer" }}>تعرّف أكثر</button>
-          </div>
-        </div>
-      </div>
-
-      {/* How it works */}
-      <div style={{ padding: "50px 40px", maxWidth: 1000, margin: "0 auto" }}>
-        <div style={{ padding: "20px 24px", border: `2px dashed ${colors.primary}40`, borderRadius: 14, textAlign: "center" }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: colors.ink, marginBottom: 10 }}>آلية العمل</h3>
-          <p style={{ fontSize: 14, color: colors.gray, lineHeight: 2 }}>{sc('how_it_works_desc', 'يعمل النظام بشكل شبه آلي، بحيث يوجد مستشار متخصص يراجع عن بعد مخرجات كل مرحلة.')}</p>
-        </div>
-      </div>
-
-      {/* 4 Steps */}
-      <div style={{ padding: "0 40px 50px", maxWidth: 1100, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "var(--g-4)", gap: 16 }}>
-          {[
-            {icon:"1️⃣", t: sc('step1_title','اختر الخدمة'),          d: sc('step1_desc','التخطيط الاستراتيجي أو التشغيلي أو السياسات')},
-            {icon:"2️⃣", t: sc('step2_title','ادفع واختر المستشار'),  d: sc('step2_desc','أسعار مناسبة مع اختيار المستشار المناسب')},
-            {icon:"3️⃣", t: sc('step3_title',"تعلّم ونفّذ"),          d: sc('step3_desc','فيديوهات + شرح + إرشادات + نماذج عمل')},
-            {icon:"4️⃣", t: sc('step4_title','المستشار يراجع ويعتمد'),d: sc('step4_desc','مراجعة واعتماد من مستشار متخصص عن بعد')},
-          ].map((s,i) => (
-            <Card key={i} style={{ textAlign: "center", padding: 24 }}>
-              <div style={{ fontSize: 32, marginBottom: 12 }}>{s.icon}</div>
-              <h4 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>{s.t}</h4>
-              <p style={{ fontSize: 12, color: colors.gray, lineHeight: 1.7 }}>{s.d}</p>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Components */}
-      <div style={{ padding: "60px 40px", background: "white" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "center", marginBottom: 40 }}>
-            <Rosette size={36} />
-            <h2 style={{ fontSize: 28, fontWeight: 800, color: colors.ink }}>مكونات النظام</h2>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "var(--g-3)", gap: 24 }}>
-            {[
-              { title: "نظام التخطيط الاستراتيجي", desc: sc('comp_strategic_desc','11 وحدة تخطيطية لبناء خطة استراتيجية متكاملة'), icon: <IcTarget width={28} height={28}/>, units: sc('comp_strategic_badge','11 وحدة') },
-              { title: "نظام التخطيط التشغيلي",    desc: sc('comp_operational_desc','5 وحدات لتحويل الاستراتيجية إلى خطة تنفيذية'), icon: <IcCog width={28} height={28}/>,    units: sc('comp_operational_badge','5 وحدات') },
-              { title: "نظام بناء السياسات واللوائح",desc: sc('comp_policies_desc','7 سياسات ولوائح تُبنى عبر استبيانات ذكية موجهة'), icon: <IcClipboard width={28} height={28}/>, units: sc('comp_policies_badge','7 سياسات') },
-            ].map((s, i) => (
-              <Card key={i} accent style={{ textAlign: "center", padding: 32 }}>
-                <div style={{ width: 64, height: 64, borderRadius: "50%", background: colors.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: colors.amberText }}>{s.icon}</div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>{s.title}</h3>
-                <Badge text={s.units} color="primary" small />
-                <p style={{ fontSize: 13, color: colors.gray, lineHeight: 1.7, marginTop: 10 }}>{s.desc}</p>
-                <Btn small variant="secondary" style={{ marginTop: 14 }} onClick={() => navigate("services")}>تفاصيل أكثر</Btn>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Pricing */}
-      <div style={{ padding: "60px 40px" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "center", marginBottom: 40 }}>
-            <Rosette size={36} />
-            <h2 style={{ fontSize: 28, fontWeight: 800, color: colors.ink }}>آلية التسعير</h2>
-          </div>
-          {[
-            sc('pricing_point1','يتم وضع أسعار قليلة التكلفة وللجهة اختيار المستشار عن بعد من القائمة'),
-            sc('pricing_point2','يتاح اعتماد الخطة من احدى الجهات في النظام بتكلفة إضافية'),
-            sc('pricing_point3','يتم عرض أنظمة بناء السياسات واللوائح بأسعار مستقلة'),
-            sc('pricing_point4','يتاح خيار تحكيم السياسات واللوائح من احد المستشارين بتكلفة إضافية'),
-            sc('pricing_point5','يتم إتاحة تنزيل الملفات بشكل مصمم تلقائياً ويتاح خدمة التصميم بمقابل'),
-          ].map((t, i) => (
-            <div key={i} className="animate-in" style={{ animationDelay: `${i * 0.1}s`, display: "flex", alignItems: "center", gap: 16, padding: "16px 24px", marginBottom: 10, background: colors.primaryDeep, borderRadius: 12, color: "white", fontSize: 14, lineHeight: 1.7 }}>
-              <Rosette size={32} white /><span>{t}</span>
-            </div>
-          ))}
-          <div style={{ textAlign: "center", marginTop: 20 }}><Btn onClick={() => navigate("pricing")}>عرض الأسعار بالتفصيل</Btn></div>
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div style={{ padding: "50px 40px", background: `linear-gradient(135deg, ${colors.amber}, #F5A524)`, textAlign: "center" }}>
-        <h2 style={{ color: "white", fontSize: 26, fontWeight: 700, marginBottom: 20 }}>{sc('cta_title','ابدأ رحلة التخطيط الاستراتيجي لمنظمتك الآن')}</h2>
-        <button onClick={() => navigate("register")} style={{ padding: "12px 40px", borderRadius: 12, fontSize: 16, fontWeight: 700, fontFamily: "inherit", background: "white", color: colors.amberText, border: "none", cursor: "pointer" }}>سجّل مجاناً</button>
-      </div>
-      <PublicFooter />
-    </div>
-  );
+  // ============== PUBLIC PAGES NAV / FOOTER / LANDING (src/pages/public) ==============
+  const PublicNav = () => <PublicNavBar current={currentView} navigate={navigate} onLogin={() => setAuthPage("login")} onRegister={() => setAuthPage("register")} />;
+  const PublicFooter = () => <PublicFooterBar sc={sc} navigate={navigate} />;
+  const LandingPage = () => <Landing sc={sc} navigate={navigate} onRegister={() => setAuthPage("register")} PublicNav={PublicNav} PublicFooter={PublicFooter} />;
 
   // ============== ABOUT PAGE ==============
   const AboutPage = () => (
