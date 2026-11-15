@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import { operationalApi } from '../../api/operational';
 
@@ -29,11 +30,11 @@ function TemplateOpImport({ formData, setFormData }) {
   return (
     <div>
       <div style={{ background: '#EAF4FD', border: '1px solid #A9D2F5', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#1A65AD' }}>
-        📥 تم استيراد المبادرات الاستراتيجية المعتمدة تلقائياً من خطتك الاستراتيجية
+        <DfIcon name="inbox" size={18} style={{ marginInlineEnd: 6 }} />تم استيراد المبادرات الاستراتيجية المعتمدة تلقائياً من خطتك الاستراتيجية
       </div>
       {initiatives.length === 0 ? (
         <div style={{ background: '#FFF8EA', border: '1px solid #FCD98B', borderRadius: 8, padding: 16, fontSize: 13, color: '#7A4706', textAlign: 'center' }}>
-          ⚠️ لا توجد مبادرات في الخطة الاستراتيجية. تأكد من إكمال الوحدة الخامسة في التخطيط الاستراتيجي.
+          <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />لا توجد مبادرات في الخطة الاستراتيجية. تأكد من إكمال الوحدة الخامسة في التخطيط الاستراتيجي.
         </div>
       ) : (
         <>

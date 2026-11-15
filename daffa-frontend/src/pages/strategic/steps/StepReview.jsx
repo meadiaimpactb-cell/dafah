@@ -1,3 +1,4 @@
+import DfIcon from '../../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import { strategicApi } from '../../../api/strategic';
 
@@ -58,8 +59,8 @@ export default function StepReview({ workflow, setActiveUnit, workflowId, refres
       {/* إحصائيات سريعة */}
       <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-3)', gap: 14, marginBottom: 20 }}>
         <StatCard label="معتمدة" value={approved}  bg="#C9EFE1" color="#0B7F5D" icon="✓" />
-        <StatCard label="قيد المراجعة" value={reviewing} bg="#CFE5FA" color="#1F74C4" icon="⏳" />
-        <StatCard label="تحتاج تعديل" value={revision}  bg="#FAD4CE" color="#D03F2A" icon="⚠" />
+        <StatCard label="قيد المراجعة" value={reviewing} bg="#CFE5FA" color="#1F74C4" icon={<DfIcon name="hourglass" size={20} />} />
+        <StatCard label="تحتاج تعديل" value={revision}  bg="#FAD4CE" color="#D03F2A" icon={<DfIcon name="warning" size={20} />} />
       </div>
 
       {/* قائمة الوحدات */}
@@ -91,7 +92,7 @@ export default function StepReview({ workflow, setActiveUnit, workflowId, refres
                 <div style={{ fontSize: 14, fontWeight: 700, color: colors.ink }}>{unit.name}</div>
                 {unit.submission_status === 'revision' && unit.consultant_notes && (
                   <div style={{ fontSize: 12, color: '#D03F2A', marginTop: 4, background: '#FDECE9', padding: '4px 8px', borderRadius: 6 }}>
-                    ⚠️ ملاحظة المستشار: {unit.consultant_notes}
+                    <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />ملاحظة المستشار: {unit.consultant_notes}
                   </div>
                 )}
               </div>
@@ -109,7 +110,7 @@ export default function StepReview({ workflow, setActiveUnit, workflowId, refres
       {allApproved && (
         <div style={{ background: '#C9EFE1', border: '1.5px solid #7FD3B5', borderRadius: 12, padding: '18px 22px', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: 28 }}>🎉</span>
+            <span style={{ fontSize: 28 }}><DfIcon name="party" size={28} /></span>
             <div>
               <div style={{ fontSize: 15, fontWeight: 700, color: '#086449' }}>تهانينا! تم اعتماد جميع الوحدات</div>
               <div style={{ fontSize: 12, color: '#086449', marginTop: 2 }}>خطتك الاستراتيجية جاهزة للاعتماد النهائي وتحميل الوثيقة</div>
@@ -127,13 +128,13 @@ export default function StepReview({ workflow, setActiveUnit, workflowId, refres
 
       {!allApproved && revision === 0 && reviewing === 0 && approved < 11 && (
         <div style={{ background: '#EAF4FD', border: '1px solid #A9D2F5', borderRadius: 10, padding: '12px 16px', marginTop: 20, fontSize: 13, color: '#1A65AD' }}>
-          ⏳ جميع الوحدات بانتظار مراجعة المستشار. يتم تحديث الحالة تلقائياً كل 30 ثانية.
+          <DfIcon name="hourglass" size={18} style={{ marginInlineEnd: 6 }} />جميع الوحدات بانتظار مراجعة المستشار. يتم تحديث الحالة تلقائياً كل 30 ثانية.
         </div>
       )}
 
       {revision > 0 && (
         <div style={{ background: '#FDECE9', border: '1px solid #F5B8AE', borderRadius: 10, padding: '12px 16px', marginTop: 20, fontSize: 13, color: '#D03F2A' }}>
-          ⚠️ يوجد {revision} وحدة تحتاج إلى تعديل. اضغط على "تعديل" لإجراء التعديلات المطلوبة.
+          <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />يوجد {revision} وحدة تحتاج إلى تعديل. اضغط على "تعديل" لإجراء التعديلات المطلوبة.
         </div>
       )}
     </div>

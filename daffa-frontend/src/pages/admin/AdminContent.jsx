@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
@@ -124,7 +125,7 @@ function NameBadge({ onClick }) {
         transition: 'all .15s',
       }}
     >
-      ✏️ الاسم
+      <DfIcon name="pencil" size={18} style={{ marginInlineEnd: 6 }} />الاسم
     </button>
   );
 }

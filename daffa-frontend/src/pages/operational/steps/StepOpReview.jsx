@@ -1,3 +1,4 @@
+import DfIcon from '../../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import { operationalApi } from '../../../api/operational';
 
@@ -40,8 +41,8 @@ export default function StepOpReview({ workflow, setActiveUnit, initialUnits }) 
 
       <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-3)', gap: 14, marginBottom: 20 }}>
         <StatCard label="معتمدة"       value={approved}  bg="#C9EFE1" color="#0B7F5D" icon="✓" />
-        <StatCard label="قيد المراجعة" value={reviewing} bg="#CFE5FA" color="#1F74C4" icon="⏳" />
-        <StatCard label="تحتاج تعديل"  value={revision}  bg="#FAD4CE" color="#D03F2A" icon="⚠" />
+        <StatCard label="قيد المراجعة" value={reviewing} bg="#CFE5FA" color="#1F74C4" icon={<DfIcon name="hourglass" size={20} />} />
+        <StatCard label="تحتاج تعديل"  value={revision}  bg="#FAD4CE" color="#D03F2A" icon={<DfIcon name="warning" size={20} />} />
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -68,7 +69,7 @@ export default function StepOpReview({ workflow, setActiveUnit, initialUnits }) 
                 <div style={{ fontSize: 14, fontWeight: 700, color: colors.ink }}>{unit.name}</div>
                 {isRevision && unit.consultant_notes && (
                   <div style={{ fontSize: 12, color: '#D03F2A', marginTop: 4, background: '#FDECE9', padding: '4px 8px', borderRadius: 6 }}>
-                    ⚠️ ملاحظة: {unit.consultant_notes}
+                    <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />ملاحظة: {unit.consultant_notes}
                   </div>
                 )}
               </div>
@@ -81,12 +82,12 @@ export default function StepOpReview({ workflow, setActiveUnit, initialUnits }) 
 
       {reviewing === 0 && revision === 0 && approved < 5 && (
         <div style={{ background: '#EAF4FD', border: '1px solid #A9D2F5', borderRadius: 10, padding: '12px 16px', marginTop: 20, fontSize: 13, color: '#1A65AD' }}>
-          ⏳ جميع الوحدات بانتظار مراجعة المستشار. سيتم إشعارك عند اكتمال المراجعة.
+          <DfIcon name="hourglass" size={18} style={{ marginInlineEnd: 6 }} />جميع الوحدات بانتظار مراجعة المستشار. سيتم إشعارك عند اكتمال المراجعة.
         </div>
       )}
       {revision > 0 && (
         <div style={{ background: '#FDECE9', border: '1px solid #F5B8AE', borderRadius: 10, padding: '12px 16px', marginTop: 20, fontSize: 13, color: '#D03F2A' }}>
-          ⚠️ يوجد {revision} وحدة تحتاج إلى تعديل. اضغط على "تعديل" لإجراء التعديلات المطلوبة.
+          <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />يوجد {revision} وحدة تحتاج إلى تعديل. اضغط على "تعديل" لإجراء التعديلات المطلوبة.
         </div>
       )}
     </div>

@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import { operationalApi } from '../../api/operational';
 import OperationalTemplateRenderer from './OperationalTemplateRenderer';
@@ -91,14 +92,14 @@ export default function OperationalUnitPage({ unit: unitSummary, onBack }) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 20, fontWeight: 600, color: statusInfo.color, background: statusInfo.color + '18' }}>{statusInfo.label}</span>
-          <span style={{ fontSize: 12, color: '#8F8BA3' }}>⏱ {unit.video_duration}</span>
+          <span style={{ fontSize: 12, color: '#8F8BA3' }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />{unit.video_duration}</span>
         </div>
       </div>
 
       {/* Revision note */}
       {status === 'revision' && submission?.consultant_notes && (
         <div style={{ background: '#FDECE9', border: '1px solid #F5B8AE', borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: '#D03F2A' }}>
-          ⚠️ <strong>ملاحظة المستشار:</strong> {submission.consultant_notes}
+          <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} /><strong>ملاحظة المستشار:</strong> {submission.consultant_notes}
         </div>
       )}
 
@@ -136,7 +137,7 @@ export default function OperationalUnitPage({ unit: unitSummary, onBack }) {
             )}
             {unit.tip && (
               <div style={{ background: '#FFF8EA', border: '1px solid #FCD98B', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#7A4706', marginTop: 14 }}>
-                💡 <strong>نصيحة:</strong> {unit.tip}
+                <DfIcon name="bulb" size={18} style={{ marginInlineEnd: 6 }} /><strong>نصيحة:</strong> {unit.tip}
               </div>
             )}
           </div>
@@ -166,7 +167,7 @@ export default function OperationalUnitPage({ unit: unitSummary, onBack }) {
           <div>
             {isReadOnly && (
               <div style={{ background: '#E8F8F2', border: '1px solid #7FD3B5', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#0B7F5D' }}>
-                ✅ هذه الوحدة معتمدة — العرض فقط
+                <DfIcon name="check" size={18} style={{ marginInlineEnd: 6 }} />هذه الوحدة معتمدة — العرض فقط
               </div>
             )}
             <OperationalTemplateRenderer unit={unit} formData={formData} setFormData={isReadOnly ? () => {} : setFormData} />

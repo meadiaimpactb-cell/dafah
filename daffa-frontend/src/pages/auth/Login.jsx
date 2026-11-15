@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState } from 'react';
 import Logo from '../../components/brand/Logo';
 import api from '../../api/axios';
@@ -122,7 +123,7 @@ function ForgotForm({ onBack }) {
   if (sent) {
     return (
       <div style={{ textAlign: 'center' }}>
-        <div style={S.mailIcon}>✉</div>
+        <div style={S.mailIcon}><DfIcon name="mail" size={18} /></div>
         <h2 style={{ ...S.title, marginBottom: 12 }}>تحقق من بريدك</h2>
         <p style={S.forgotText}>
           إذا كان البريد الإلكتروني مسجلاً، ستصلك رسالة تحتوي على رابط إعادة التعيين خلال دقائق.

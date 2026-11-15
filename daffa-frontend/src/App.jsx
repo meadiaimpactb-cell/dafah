@@ -1,3 +1,4 @@
+import DfIcon from './components/ui/DfIcon';
 import React, { useState, useEffect, useRef } from "react";
 import { cleanupLegacyPermissions, usePermissions } from "./utils/permissions";
 import { IcClock, IcUpload, IcSearch, IcCheckCircle, IcArrowPath, IcXMark, IcCheck, IcStar, IcSparkles, IcPalette, IcTarget, IcBuilding, IcBuildingLib, IcUser, IcBriefcase, IcMail, IcPhone, IcDownload, IcDocument, IcClipboard, IcShield, IcLock, IcKey, IcWarning, IcChat, IcLightbulb, IcCog, IcBeaker, IcChartBar, IcTrash, IcPencil, IcPlus, IcSave, IcMapPin, IcCalendar, IcCreditCard, IcFolder, IcBell, IcMoney, IcBars } from "./utils/icons";
@@ -26,6 +27,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSiteContent from "./pages/admin/AdminSiteContent";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminPolicyDesigns from "./pages/admin/AdminPolicyDesigns";
+import AdminOutputs from "./pages/admin/AdminOutputs";
 import BrandLogo, { LogoMark } from "./components/brand/Logo";
 import { colors as themeColors, systems } from "./theme/tokens";
 import { Badge, ProgressBar, Btn, Card, Input, MetricCard, Tab, StatusBar, Modal, BarChart, DonutChart, LineChart, GenericPage, EmptyState, Loading, SectionTitle } from "./components/ui/kit";
@@ -1463,7 +1465,7 @@ const KA_VIEWS = new Set([
   'client-dash', 'con-dash', 'admin-dash',
   'client-payments', 'client-chat', 'con-chat',
   'con-clients', 'con-pending', 'con-completed', 'con-earnings', 'con-stats',
-  'admin-orgs', 'admin-consultants', 'admin-users', 'admin-questionnaires',
+  'admin-outputs', 'admin-orgs', 'admin-consultants', 'admin-users', 'admin-questionnaires',
   'admin-designs', 'admin-finance', 'admin-reports',
   'admin-services', 'admin-content', 'admin-site-content',
   'admin-notifications', 'admin-log', 'admin-settings', 'admin-faqs',
@@ -3200,7 +3202,7 @@ export default function DaffaPlatform() {
               <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>نبذة عن {unit.name}</h3>
               <p style={{ fontSize: 14, color: colors.gray, lineHeight: 2 }}>{unit.overview}</p>
               <p style={{ fontSize: 14, color: colors.gray, lineHeight: 2, marginTop: 12 }}>{unit.overview2}</p>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, padding: "8px 14px", background: colors.grayLight, borderRadius: 8, width: "fit-content", fontSize: 12, color: colors.gray }}>⏱ وقت القراءة: 5 دقائق</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, padding: "8px 14px", background: colors.grayLight, borderRadius: 8, width: "fit-content", fontSize: 12, color: colors.gray }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />وقت القراءة: 5 دقائق</div>
             </div>
           )}
           {tab === 1 && (
@@ -4078,7 +4080,7 @@ export default function DaffaPlatform() {
       case "client-settings": case "con-settings": case "admin-profile":
       case "con-dash": case "con-clients":
       case "con-pending": case "con-completed": case "con-earnings": case "con-stats":
-      case "admin-dash": case "admin-orgs": case "admin-consultants":
+      case "admin-dash": case "admin-outputs": case "admin-orgs": case "admin-consultants":
       case "admin-questionnaires": case "admin-designs":
       case "admin-finance": case "admin-reports":
       case "admin-users": case "admin-services": case "admin-content": case "admin-site-content":
@@ -4356,7 +4358,7 @@ export default function DaffaPlatform() {
       animation: 'fadeInUp 0.35s ease',
       whiteSpace: 'nowrap',
     }}>
-      <span style={{ fontSize: 20 }}>🔒</span>
+      <span style={{ fontSize: 20 }}><DfIcon name="lock" size={20} /></span>
       <div>
         <div>انتهت جلستك — يرجى تسجيل الدخول مجدداً</div>
         <div style={{ fontSize: 11, color: '#8F8BA3', marginTop: 2 }}>تم تسجيل خروجك تلقائياً لحماية حسابك</div>
@@ -4474,6 +4476,9 @@ export default function DaffaPlatform() {
           </KeepAlive>
 
           {/* ── صفحات الأدمن ── */}
+          <KeepAlive active={currentView === 'admin-outputs'}>
+            <AdminOutputs />
+          </KeepAlive>
           <KeepAlive active={currentView === 'admin-orgs'}>
             <AdminOrgs />
           </KeepAlive>

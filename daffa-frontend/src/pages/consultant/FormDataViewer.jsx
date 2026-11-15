@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React from 'react';
 
 const colors = {
@@ -169,7 +170,7 @@ const ObjectListViewer = ({ items, type }) => {
           <div key={i} style={{ border: `1px solid ${colors.grayBorder}`, borderRadius: 10, overflow: 'hidden' }}>
             <div style={{ padding: '10px 14px', background: colors.primarySoft, borderBottom: `1px solid ${colors.grayBorder}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <strong style={{ fontSize: 13, color: colors.ink }}>{ini.name}</strong>
-              {ini.budget && <span style={{ fontSize: 11, color: colors.primary, fontWeight: 600 }}>💰 {ini.budget} ريال</span>}
+              {ini.budget && <span style={{ fontSize: 11, color: colors.primary, fontWeight: 600 }}><DfIcon name="money" size={14} style={{ marginInlineEnd: 6 }} />{ini.budget} ريال</span>}
             </div>
             <div style={{ padding: '10px 14px', display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: '6px 16px' }}>
               {[
@@ -216,7 +217,7 @@ const ObjectListViewer = ({ items, type }) => {
 // ── عارض TOC ──────────────────────────────────────────────────────────────────
 const TocViewer = ({ data }) => {
   const order = ['inputs', 'activities', 'outputs', 'outcomes', 'impact', 'assumptions'];
-  const icons = { inputs: '📥', activities: '⚙️', outputs: '📤', outcomes: '🎯', impact: '🌟', assumptions: '📋' };
+  const icons = { inputs: <DfIcon name="inbox" size={20} />, activities: <DfIcon name="gear" size={20} />, outputs: <DfIcon name="upload" size={20} />, outcomes: <DfIcon name="target" size={20} />, impact: <DfIcon name="star" size={20} />, assumptions: <DfIcon name="clipboard" size={20} /> };
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {order.map(k => data[k] ? (
@@ -234,9 +235,9 @@ const TocViewer = ({ data }) => {
 // ── عارض BMC ──────────────────────────────────────────────────────────────────
 const BmcViewer = ({ data }) => {
   const blocks = [
-    ['value_proposition', '💎'], ['customer_segments', '👥'], ['channels', '📡'],
-    ['relationships', '🤝'], ['key_activities', '⚙️'], ['key_resources', '🔧'],
-    ['partners', '🏛️'], ['revenue_streams', '💰'], ['cost_structure', '📊'],
+    ['value_proposition', <DfIcon name="gem" size={20} />], ['customer_segments', <DfIcon name="users" size={20} />], ['channels', <DfIcon name="signal" size={20} />],
+    ['relationships', <DfIcon name="handshake" size={20} />], ['key_activities', <DfIcon name="gear" size={20} />], ['key_resources', <DfIcon name="wrench" size={20} />],
+    ['partners', <DfIcon name="building" size={20} />], ['revenue_streams', <DfIcon name="money" size={20} />], ['cost_structure', <DfIcon name="chart" size={20} />],
   ];
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 10 }}>
@@ -377,7 +378,7 @@ export default function FormDataViewer({ data }) {
         return (
           <Section key={key} title={sectionLabel}>
             <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 10 }}>
-              {[['strengths','#E8F8F2','#0B7F5D','💪'], ['weaknesses','#FDECE9','#D03F2A','⚠️'], ['opportunities','#EAF4FD','#1A65AD','🚀'], ['threats','#FFF8EA','#9A5B07','🛡️']].map(([k, bg, clr, ico]) => value[k] ? (
+              {[['strengths','#E8F8F2','#0B7F5D',<DfIcon name="muscle" size={20} />], ['weaknesses','#FDECE9','#D03F2A',<DfIcon name="warning" size={20} />], ['opportunities','#EAF4FD','#1A65AD',<DfIcon name="rocket" size={20} />], ['threats','#FFF8EA','#9A5B07',<DfIcon name="shield" size={20} />]].map(([k, bg, clr, ico]) => value[k] ? (
                 <div key={k} style={{ padding: 12, background: bg, borderRadius: 10, border: `1px solid ${clr}30` }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: clr, marginBottom: 6 }}>{ico} {LABELS[k]}</div>
                   <div style={{ fontSize: 12, color: '#34314A', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{value[k]}</div>

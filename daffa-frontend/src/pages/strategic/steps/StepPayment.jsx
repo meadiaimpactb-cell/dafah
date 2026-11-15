@@ -1,3 +1,4 @@
+import DfIcon from '../../../components/ui/DfIcon';
 import React, { useState } from 'react';
 import { strategicApi } from '../../../api/strategic';
 import { PayLogo, PaymentMethodPicker, ApplePayButton, SecurePaymentBadge } from '../../shared/PaymentBrand';
@@ -398,7 +399,7 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
             <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 6 }}>
               {[
                 { icon: <IcLock />, text: 'تشفير SSL' },
-                { icon: <span style={{ fontSize: 12 }}>🛡️</span>, text: 'دفع آمن' },
+                { icon: <span style={{ fontSize: 12 }}><DfIcon name="shield" size={14} /></span>, text: 'دفع آمن' },
                 { icon: <span style={{ fontSize: 12 }}>↩️</span>, text: 'استرداد مضمون' },
               ].map(b => (
                 <div key={b.text} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>

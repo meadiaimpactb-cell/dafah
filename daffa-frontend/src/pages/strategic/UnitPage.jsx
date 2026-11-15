@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { strategicApi } from '../../api/strategic';
@@ -148,7 +149,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
             <h2 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, margin: 0 }}>{unit.name}</h2>
             <span style={{ fontSize: 11, color: '#8F8BA3' }}>الوحدة {unitSummary.unit_number} من {allUnits.length || '?'}</span>
           </div>
-          <div style={{ fontSize: 11, color: '#8F8BA3', marginTop: 3, marginRight: 40 }}>⏱ {unit.video_duration}</div>
+          <div style={{ fontSize: 11, color: '#8F8BA3', marginTop: 3, marginRight: 40 }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />{unit.video_duration}</div>
         </div>
         <span style={{ fontSize: 11, padding: '4px 12px', borderRadius: 20, fontWeight: 600, color: st.color, background: st.color + '18', whiteSpace: 'nowrap' }}>{st.label}</span>
       </div>
@@ -175,7 +176,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
           </button>
         ) : nextUnit && !currentSubmitted ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 14px', background: '#F3EFE8', borderRadius: 8, fontSize: 12, color: '#8F8BA3' }}>
-            🔒 {nextUnit.name} — أرسل الوحدة الحالية أولاً
+            <DfIcon name="lock" size={18} style={{ marginInlineEnd: 6 }} />{nextUnit.name} — أرسل الوحدة الحالية أولاً
           </div>
         ) : (
           <div style={{ fontSize: 12, color: '#8F8BA3', padding: '7px 0' }}>آخر وحدة</div>
@@ -185,7 +186,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
       {/* ملاحظة المستشار — تظهر فقط عند status=revision */}
       {submission.status === 'revision' && submission.consultant_notes && (
         <div style={{ background: '#FDECE9', border: '1px solid #F5B8AE', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#D03F2A' }}>
-          ⚠️ ملاحظة المستشار: {submission.consultant_notes}
+          <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />ملاحظة المستشار: {submission.consultant_notes}
         </div>
       )}
 
@@ -240,7 +241,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
           display: 'flex', alignItems: 'center', gap: 10,
           animation: 'fadeInUp 0.3s ease',
         }}>
-          <span style={{ fontSize: 18 }}>{msg.type === 'success' ? '✅' : '❌'}</span>
+          <span style={{ fontSize: 18 }}>{msg.type === 'success' ? <DfIcon name="check" size={20} /> : <DfIcon name="x" size={20} />}</span>
           {msg.text}
         </div>,
         document.body
@@ -253,7 +254,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
           {!isLocked && !validation.valid && (
             <div style={{ background: '#FFF8EA', border: '1.5px solid #FCD98B', borderRadius: 10, padding: '12px 16px', marginBottom: 14, direction: 'rtl' }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#9A5B07', marginBottom: 6 }}>
-                ⚠️ يجب تعبئة الحقول التالية قبل الحفظ:
+                <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />يجب تعبئة الحقول التالية قبل الحفظ:
               </div>
               <ul style={{ margin: 0, padding: '0 20px', fontSize: 12, color: '#7A4706', lineHeight: 2 }}>
                 {validation.errors.map((err, i) => (
@@ -273,7 +274,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
                       onClick={() => setDemoConfirm(true)}
                       style={{ padding: '11px 22px', background: '#EAF4FD', color: '#1A65AD', border: '1.5px solid #A9D2F5', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}
                     >
-                      🧪 تعبئة تجريبية
+                      <DfIcon name="flask" size={18} style={{ marginInlineEnd: 6 }} />تعبئة تجريبية
                     </button>
                     <ConfirmModal
                       open={demoConfirm}
@@ -300,7 +301,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
                     transition: 'all 0.2s',
                   }}
                 >
-                  {saving ? 'جاري الحفظ...' : '💾 حفظ'}
+                  {saving ? 'جاري الحفظ...' : 'حفظ'}
                 </button>
                 <button
                   onClick={handleSubmit}
@@ -349,7 +350,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
 
       {isLocked && (
         <div style={{ background: '#C9EFE1', border: '1px solid #7FD3B5', borderRadius: 10, padding: '10px 16px', marginTop: 14, fontSize: 13, color: '#0B7F5D', textAlign: 'center' }}>
-          ✅ هذه الوحدة معتمدة نهائياً من المستشار
+          <DfIcon name="check" size={18} style={{ marginInlineEnd: 6 }} />هذه الوحدة معتمدة نهائياً من المستشار
         </div>
       )}
     </div>
@@ -431,7 +432,7 @@ function TabGuide({ unit }) {
       ))}
       {unit.tip && (
         <div style={{ background: '#FFF8EA', border: '1px solid #FCD98B', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 10, marginTop: 8 }}>
-          <span style={{ fontSize: 18 }}>💡</span>
+          <span style={{ fontSize: 18 }}><DfIcon name="bulb" size={18} /></span>
           <div>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#7A4706', marginBottom: 2 }}>نصيحة</div>
             <div style={{ fontSize: 13, color: '#5F3705', lineHeight: 1.7 }}>{unit.tip}</div>
@@ -466,7 +467,7 @@ function TabVideo({ unit }) {
         </div>
       ) : (
         <div style={{ background: '#F3EFE8', borderRadius: 12, padding: 60, color: '#8F8BA3', textAlign: 'center' }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>🎬</div>
+          <div style={{ fontSize: 40, marginBottom: 12 }}><DfIcon name="film" size={40} /></div>
           <div style={{ fontSize: 14 }}>الفيديو التعليمي قيد الإعداد</div>
         </div>
       )}
@@ -478,7 +479,7 @@ function TabVideo({ unit }) {
 function TabChat({ onNavigate }) {
   return (
     <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-      <div style={{ fontSize: 40, marginBottom: 14 }}>💬</div>
+      <div style={{ fontSize: 40, marginBottom: 14 }}><DfIcon name="chat" size={40} /></div>
       <div style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>خدمة الدردشة مع المستشار</div>
       <p style={{ fontSize: 13, color: '#67637A', maxWidth: 400, margin: '0 auto 24px' }}>تواصل مع المستشار للحصول على توجيه وإجابة أسئلتك</p>
       <button style={{ padding: '11px 32px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}

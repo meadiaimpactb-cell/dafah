@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useEffect, useMemo, useId } from 'react';
 import { formGuide, GuideBlocks, GuideExamples, LabelWithTip, InfoTip } from './UnitContent';
 import { buildOrgTree, OrgNode } from './OrgChart';
@@ -735,7 +736,7 @@ function OrgchartTemplate({ formData, set, disabled, guide }) {
         )}
         {issueCount > 0 && (
           <div style={{ marginTop: 12, fontSize: 11.5, color: '#7A4706', textAlign: 'center' }}>
-            ⚠️ {issueCount === 1 ? 'وظيفة واحدة لم تُرسم' : `${issueCount} وظائف لم تُرسم`} لعدم وضوح التبعية — راجع التنبيه عند الصف في الجدول.
+            <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />{issueCount === 1 ? 'وظيفة واحدة لم تُرسم' : `${issueCount} وظائف لم تُرسم`} لعدم وضوح التبعية — راجع التنبيه عند الصف في الجدول.
           </div>
         )}
       </div>
@@ -758,7 +759,7 @@ function OrgchartTemplate({ formData, set, disabled, guide }) {
                 <td style={tdStyle}><TextInput value={p.dept}      onChange={v => updatePos(i, 'dept',      v)} placeholder="اسم القسم"       disabled={disabled} /></td>
                 <td style={tdStyle}>
                   <TextInput value={p.reports_to} onChange={v => updatePos(i, 'reports_to', v)} placeholder="يتبع لـ..." disabled={disabled} />
-                  {issues[i] && <div style={{ fontSize: 10.5, color: '#7A4706', marginTop: 3, lineHeight: 1.6 }}>⚠️ {issues[i]}</div>}
+                  {issues[i] && <div style={{ fontSize: 10.5, color: '#7A4706', marginTop: 3, lineHeight: 1.6 }}><DfIcon name="warning" size={14} style={{ marginInlineEnd: 6 }} />{issues[i]}</div>}
                 </td>
                 {!disabled && (
                   <td style={tdStyle}>

@@ -1,3 +1,4 @@
+import DfIcon from '../../../components/ui/DfIcon';
 import React, { useState } from 'react';
 import { operationalApi } from '../../../api/operational';
 
@@ -48,7 +49,7 @@ export default function StepOpServiceSelect({ setWorkflow, setStep, strategicCom
     <div className="animate-in">
       {!strategicCompleted && (
         <div style={{ padding: '14px 18px', background: '#FFF8EA', borderRadius: 10, borderRight: `4px solid ${colors.amberLine}`, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: 22 }}>⚠️</span>
+          <span style={{ fontSize: 22 }}><DfIcon name="warning" size={22} /></span>
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: colors.amberText }}>يتطلب إكمال التخطيط الاستراتيجي أولاً</div>
             <div style={{ fontSize: 12, color: '#67637A', marginTop: 2 }}>يجب اعتماد الخطة الاستراتيجية كاملاً قبل البدء بالتخطيط التشغيلي</div>
@@ -57,7 +58,7 @@ export default function StepOpServiceSelect({ setWorkflow, setStep, strategicCom
       )}
 
       <div style={{ background: '#fff', borderRadius: 12, padding: 28, marginBottom: 20, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', textAlign: 'center' }}>
-        <div style={{ fontSize: 42, marginBottom: 10 }}>⚙️</div>
+        <div style={{ fontSize: 42, marginBottom: 10 }}><DfIcon name="gear" size={42} /></div>
         <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>نظام التخطيط التشغيلي</h2>
         <p style={{ fontSize: 14, color: '#67637A', maxWidth: 540, margin: '0 auto', lineHeight: 1.8 }}>
           تحويل المبادرات الاستراتيجية إلى خطة تشغيلية مفصلة بالأنشطة والجدول الزمني والمسؤوليات والتكاليف
@@ -66,7 +67,7 @@ export default function StepOpServiceSelect({ setWorkflow, setStep, strategicCom
 
       <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 20 }}>
         <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>📊 الوحدات التخطيطية الـ 5</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 16 }}><DfIcon name="chart" size={15} style={{ marginInlineEnd: 6 }} />الوحدات التخطيطية الـ 5</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {UNITS.map((u, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', background: '#FBF9F5', borderRadius: 8 }}>
@@ -76,14 +77,14 @@ export default function StepOpServiceSelect({ setWorkflow, setStep, strategicCom
             ))}
           </div>
           <div style={{ marginTop: 16, padding: '12px 14px', background: `${colors.primary}0d`, borderRadius: 8, textAlign: 'center' }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: colors.ink }}>💰 التكلفة: </span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: colors.ink }}><DfIcon name="money" size={14} style={{ marginInlineEnd: 6 }} />التكلفة: </span>
             <span style={{ fontSize: 18, fontWeight: 800, color: colors.primary }}>{subtotal.toLocaleString('en-US')} ريال</span>
             <span style={{ fontSize: 11, color: '#8F8BA3', display: 'block', marginTop: 2 }}>+ ضريبة {tax.toLocaleString('en-US')} ريال = الإجمالي {total.toLocaleString('en-US')} ريال</span>
           </div>
         </div>
 
         <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)' }}>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>✨ ما يشمله النظام</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}><DfIcon name="sparkle" size={15} style={{ marginInlineEnd: 6 }} />ما يشمله النظام</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {FEATURES.map((f, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

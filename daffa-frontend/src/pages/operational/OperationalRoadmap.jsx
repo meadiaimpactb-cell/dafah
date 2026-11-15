@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { operationalApi } from '../../api/operational';
 import { chatApi } from '../../api/chat';
@@ -67,7 +68,7 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
 
       {plans.length === 0 && (
         <div style={{ background: '#fff', borderRadius: 12, padding: '60px 24px', boxShadow: '0 1px 8px rgba(27,23,70,0.06)', textAlign: 'center' }}>
-          <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}>⚙️</div>
+          <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}><DfIcon name="gear" size={32} /></div>
           <div style={{ fontSize: 18, fontWeight: 700, color: colors.ink, marginBottom: 10 }}>ابدأ خطتك التشغيلية الأولى</div>
           <p style={{ fontSize: 13, color: '#67637A', maxWidth: 420, margin: '0 auto 28px', lineHeight: 1.7 }}>
             بناء خطة تشغيلية متكاملة من خلال 5 وحدات تخطيطية بمرافقة المستشار الاستراتيجي
@@ -636,7 +637,7 @@ const OpWorkflowStepper = ({ opStep, setOpStep, workflow }) => {
       {reviewing && (
         <div style={{ marginTop: 4, padding: '6px 14px', background: '#FFF8EA', borderRadius: 8, border: `1px solid ${colors.amberLine}30`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 12, color: colors.amberText, fontWeight: 600 }}>
-            🔍 وضع المراجعة — تستعرض: {opWorkflowSteps[opStep]?.label}
+            <DfIcon name="search" size={18} style={{ marginInlineEnd: 6 }} />وضع المراجعة — تستعرض: {opWorkflowSteps[opStep]?.label}
           </span>
           <button
             onClick={() => setOpStep(realOpStep)}
@@ -688,7 +689,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
     return (
       <div>
         <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 12 }}>المبادرات الاستراتيجية</h4>
-        {items.length === 0 && emptyState('📋', readOnly ? 'لم يتم إضافة أي مبادرات' : 'أضف مبادراتك يدوياً أو استخدم زر التعبئة التجريبية')}
+        {items.length === 0 && emptyState(<DfIcon name="clipboard" size={20} />, readOnly ? 'لم يتم إضافة أي مبادرات' : 'أضف مبادراتك يدوياً أو استخدم زر التعبئة التجريبية')}
         {items.map((it, i) => (
           <Card key={i} style={{ marginBottom: 10, padding: 14, display: "flex", alignItems: "center", justifyContent: "space-between", borderRight: `3px solid ${colors.primary}` }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -728,7 +729,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
     };
     return (
       <div>
-        {groups.length === 0 && emptyState('📌', readOnly ? 'لم يتم إضافة أي مبادرات' : 'أضف مبادرتك الأولى أو استخدم زر التعبئة التجريبية')}
+        {groups.length === 0 && emptyState(<DfIcon name="pin" size={20} />, readOnly ? 'لم يتم إضافة أي مبادرات' : 'أضف مبادرتك الأولى أو استخدم زر التعبئة التجريبية')}
         {groups.map((g, gi) => (
           <div key={gi} style={{ marginBottom: 20, border: `1.5px solid ${colors.grayBorder}`, borderRadius: 12, overflow: "hidden" }}>
             <div style={{ padding: "10px 16px", background: colors.primaryDeep, color: "white", fontWeight: 600, fontSize: 14 }}>المبادرة: {g.initiative}</div>
@@ -769,7 +770,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
       <div>
         <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 4 }}>مخطط جانت — الجدول الزمني</h4>
         {!readOnly && <p style={{ fontSize: 11, color: colors.gray, marginBottom: 10 }}>انقر على الخلايا لتحديد أشهر التنفيذ</p>}
-        {acts.length === 0 && emptyState('📅', readOnly ? 'لم يتم إضافة أي أنشطة' : 'استخدم زر التعبئة التجريبية أو أضف نشاطاً جديداً')}
+        {acts.length === 0 && emptyState(<DfIcon name="calendar" size={20} />, readOnly ? 'لم يتم إضافة أي أنشطة' : 'استخدم زر التعبئة التجريبية أو أضف نشاطاً جديداً')}
         {acts.length > 0 && (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900 }}>
@@ -816,7 +817,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
     return (
       <div>
         <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 12 }}>تعيين المسؤولين</h4>
-        {rows.length === 0 && emptyState('👤', readOnly ? 'لم يتم إضافة أي صفوف' : 'اضغط + إضافة صف أو استخدم زر التعبئة التجريبية')}
+        {rows.length === 0 && emptyState(<DfIcon name="user" size={20} />, readOnly ? 'لم يتم إضافة أي صفوف' : 'اضغط + إضافة صف أو استخدم زر التعبئة التجريبية')}
         {rows.length > 0 && (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
@@ -862,7 +863,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
     return (
       <div>
         <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 12 }}>الميزانية التشغيلية</h4>
-        {rows.length === 0 && emptyState('💰', readOnly ? 'لم يتم إضافة أي بنود' : 'اضغط + إضافة بند أو استخدم زر التعبئة التجريبية')}
+        {rows.length === 0 && emptyState(<DfIcon name="money" size={20} />, readOnly ? 'لم يتم إضافة أي بنود' : 'اضغط + إضافة بند أو استخدم زر التعبئة التجريبية')}
         {rows.length > 0 && (
           <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 12 }}>
             <thead>
@@ -1393,7 +1394,7 @@ const OpStepWork = ({ units, setOpStep, setActiveUnit, readOnly }) => {
         <div>
           <h2 style={{ fontSize: 20, fontWeight: 800, color: colors.ink }}>تعبئة النماذج — التخطيط التشغيلي</h2>
           <div style={{ fontSize: 12, color: colors.gray }}>
-            {readOnly ? '🔍 وضع المراجعة — اضغط على أي وحدة لعرض بياناتها' : '5 وحدات تخطيطية — أكمل كل وحدة وأرسلها للمراجعة لفتح التالية'}
+            {readOnly ? 'وضع المراجعة — اضغط على أي وحدة لعرض بياناتها' : '5 وحدات تخطيطية — أكمل كل وحدة وأرسلها للمراجعة لفتح التالية'}
           </div>
         </div>
       </div>
@@ -1533,7 +1534,7 @@ const OpStepReview = ({ units, setOpStep, refreshData }) => {
       {allApproved && (
         <div style={{ background: '#C9EFE1', border: '1.5px solid #7FD3B5', borderRadius: 12, padding: '18px 22px', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: 28 }}>🎉</span>
+            <span style={{ fontSize: 28 }}><DfIcon name="party" size={28} /></span>
             <div>
               <div style={{ fontSize: 15, fontWeight: 700, color: '#086449' }}>تهانينا! تم اعتماد جميع الوحدات</div>
               <div style={{ fontSize: 12, color: '#086449', marginTop: 2 }}>خطتك التشغيلية جاهزة للاعتماد النهائي وتحميل الوثيقة</div>

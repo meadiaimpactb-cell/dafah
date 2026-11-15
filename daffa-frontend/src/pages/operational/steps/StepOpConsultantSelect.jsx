@@ -1,3 +1,4 @@
+import DfIcon from '../../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import { operationalApi } from '../../../api/operational';
 
@@ -74,7 +75,7 @@ export default function StepOpConsultantSelect({ setWorkflow, setStep }) {
               </div>
               <div style={{ display: 'flex', gap: 16, marginTop: 14, paddingTop: 12, borderTop: '1px solid #F3EFE8' }}>
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: colors.amberText }}>{'⭐'.repeat(Math.round(c.rating))}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: colors.amberText }}>{<DfIcon name="star" size={20} />.repeat(Math.round(c.rating))}</div>
                   <div style={{ fontSize: 11, color: '#8F8BA3' }}>{c.rating}</div>
                 </div>
                 <div style={{ textAlign: 'center' }}>

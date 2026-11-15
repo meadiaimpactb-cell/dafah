@@ -1,3 +1,4 @@
+import DfIcon from '../../../components/ui/DfIcon';
 import React, { useState } from 'react';
 import { operationalApi } from '../../../api/operational';
 import { CardPreview, CopyBtn, fmtCard, fmtExpiry, detectBrand, IcLock, IcEye, IcCard, IcMada, IcApplePay, IcBank, IcVisa, IcMastercard } from '../../../pages/strategic/steps/StepPayment';
@@ -181,7 +182,7 @@ export default function StepOpPayment({ workflow, setWorkflow, setStep }) {
           <div style={{ marginTop: 14, textAlign: 'center', fontSize: 11, color: C.gray }}>
             <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 4 }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><IcLock /> تشفير SSL</span>
-              <span>🛡️ دفع آمن</span>
+              <span><DfIcon name="shield" size={18} style={{ marginInlineEnd: 6 }} />دفع آمن</span>
               <span>↩️ استرداد مضمون</span>
             </div>
             بياناتك محمية بتشفير 256-bit

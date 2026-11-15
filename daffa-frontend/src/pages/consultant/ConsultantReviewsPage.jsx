@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import api from '../../api/axios';
@@ -101,7 +102,7 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
 
                       {/* Hint */}
                       {q.hint && (
-                        <div style={{ fontSize: 11, color: colors.gray, marginTop: 4 }}>💡 {q.hint}</div>
+                        <div style={{ fontSize: 11, color: colors.gray, marginTop: 4 }}><DfIcon name="bulb" size={14} style={{ marginInlineEnd: 6 }} />{q.hint}</div>
                       )}
                     </div>
                   );
@@ -676,7 +677,7 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
       {clientFilter && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, padding: '8px 14px', background: '#E7E5FD', borderRadius: 10, border: '1.5px solid #5546D630' }}>
           <span style={{ fontSize: 13, fontWeight: 700, color: colors.ink }}>
-            📋 عرض: {clientFilter.orgName}
+            <DfIcon name="clipboard" size={18} style={{ marginInlineEnd: 6 }} />عرض: {clientFilter.orgName}
           </span>
           <button
             onClick={() => setClientFilter(null)}

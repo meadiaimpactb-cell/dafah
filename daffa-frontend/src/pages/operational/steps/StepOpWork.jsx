@@ -1,3 +1,4 @@
+import DfIcon from '../../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import { operationalApi } from '../../../api/operational';
 
@@ -65,17 +66,17 @@ export default function StepOpWork({ setActiveUnit, initialUnits }) {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                 <div style={{ width: 30, height: 30, borderRadius: '50%', background: locked ? '#8F8BA3' : colors.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{i + 1}</div>
-                <span style={{ fontSize: 10, padding: '3px 8px', borderRadius: 20, fontWeight: 600, background: st.bg, color: st.color }}>{locked ? '🔒 مقفل' : st.label}</span>
+                <span style={{ fontSize: 10, padding: '3px 8px', borderRadius: 20, fontWeight: 600, background: st.bg, color: st.color }}>{locked ? 'مقفل' : st.label}</span>
               </div>
               <div style={{ fontSize: 13, fontWeight: 700, color: locked ? '#8F8BA3' : colors.ink, marginBottom: 4 }}>{unit.name}</div>
-              <div style={{ fontSize: 11, color: '#8F8BA3' }}>⏱ {unit.video_duration}</div>
+              <div style={{ fontSize: 11, color: '#8F8BA3' }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />{unit.video_duration}</div>
             </div>
           );
         })}
       </div>
 
       <div style={{ background: '#EAF4FD', border: '1px solid #A9D2F5', borderRadius: 10, padding: '12px 16px', marginTop: 20, fontSize: 13, color: '#1A65AD' }}>
-        💡 اضغط على أي وحدة لبدء العمل عليها. يجب إتمام كل وحدة قبل الانتقال للتالية.
+        <DfIcon name="bulb" size={18} style={{ marginInlineEnd: 6 }} />اضغط على أي وحدة لبدء العمل عليها. يجب إتمام كل وحدة قبل الانتقال للتالية.
       </div>
     </div>
   );

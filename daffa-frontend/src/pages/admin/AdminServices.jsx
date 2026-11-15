@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
@@ -325,7 +326,7 @@ export default function AdminServices() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: C.grayLight, padding: '8px 16px', borderRadius: 10 }}>
             <span style={{ fontSize: 13, color: C.gray, fontFamily: 'inherit' }}>نسبة الضريبة:</span>
             <strong style={{ fontSize: 14, color: C.ink, fontFamily: 'inherit' }}>{taxSetting.value}%</strong>
-            <Btn small variant="ghost" onClick={() => setEditSetting(taxSetting)}>✏️ تعديل</Btn>
+            <Btn small variant="ghost" onClick={() => setEditSetting(taxSetting)}><DfIcon name="pencil" size={18} style={{ marginInlineEnd: 6 }} />تعديل</Btn>
           </div>
         )}
       </div>
@@ -345,7 +346,7 @@ export default function AdminServices() {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <Badge text={s.is_active ? 'مفعّل' : 'معطّل'} color={s.is_active ? 'green' : 'gray'} />
-                <Btn small variant="ghost" onClick={() => setEditSetting(s)}>✏️ تعديل</Btn>
+                <Btn small variant="ghost" onClick={() => setEditSetting(s)}><DfIcon name="pencil" size={18} style={{ marginInlineEnd: 6 }} />تعديل</Btn>
               </div>
             </div>
           );
@@ -361,7 +362,7 @@ export default function AdminServices() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <Badge text={s.is_active ? 'مفعّل' : 'معطّل'} color={s.is_active ? 'green' : 'gray'} />
                 <span style={{ fontWeight: 700, color: C.primary, fontSize: 14, fontFamily: 'inherit', minWidth: 90, textAlign: 'left' }}>{fmt(s.value)} ريال</span>
-                <Btn small variant="ghost" onClick={() => setEditSetting(s)}>✏️ تعديل</Btn>
+                <Btn small variant="ghost" onClick={() => setEditSetting(s)}><DfIcon name="pencil" size={18} style={{ marginInlineEnd: 6 }} />تعديل</Btn>
               </div>
             </div>
           ))}
@@ -398,11 +399,11 @@ export default function AdminServices() {
                     {d.used_count}{d.max_uses ? ` / ${d.max_uses}` : ''}
                   </span>
                   <div style={{ display: 'flex', gap: 6 }}>
-                    <Btn small variant="ghost"   onClick={() => setEditDiscount(d)}>✏️ تعديل</Btn>
+                    <Btn small variant="ghost"   onClick={() => setEditDiscount(d)}><DfIcon name="pencil" size={18} style={{ marginInlineEnd: 6 }} />تعديل</Btn>
                     <Btn small variant={d.is_active ? 'ghost' : 'success'} onClick={() => toggleDiscount(d.id)}>
                       {d.is_active ? 'تعطيل' : 'تفعيل'}
                     </Btn>
-                    <Btn small variant="danger"  onClick={() => setDelConfirm(d)}>🗑️ حذف</Btn>
+                    <Btn small variant="danger"  onClick={() => setDelConfirm(d)}><DfIcon name="trash" size={18} style={{ marginInlineEnd: 6 }} />حذف</Btn>
                   </div>
                 </div>
               );

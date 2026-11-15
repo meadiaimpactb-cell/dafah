@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import api from '../../api/axios';
@@ -96,8 +97,8 @@ const AvatarCircle = ({ name, email, logoUrl, size = 72, onClick, uploading }) =
           pointerEvents: 'none',
         }}>
           {uploading
-            ? <span style={{ fontSize: size * 0.28 }}>⏳</span>
-            : <span style={{ fontSize: size * 0.3 }}>📷</span>}
+            ? <span style={{ fontSize: size * 0.28 }}><DfIcon name="hourglass" size={18} /></span>
+            : <span style={{ fontSize: size * 0.3 }}><DfIcon name="camera" size={18} /></span>}
         </div>
       </div>
 

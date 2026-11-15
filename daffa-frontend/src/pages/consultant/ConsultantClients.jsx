@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useCallback } from 'react';
 import { consultantApi } from '../../api/consultant';
 
@@ -12,9 +13,9 @@ const C = {
 };
 
 const SERVICE_CFG = {
-  strategic:   { label: 'استراتيجي', icon: '🎯', color: C.primary,    bg: '#E7E5FD'   },
-  operational: { label: 'تشغيلي',    icon: '⚙️', color: '#5546D6', bg: '#E7E5FD'   },
-  policies:    { label: 'سياسات',    icon: '📋', color: C.blue,    bg: C.blueLight },
+  strategic:   { label: 'استراتيجي', icon: <DfIcon name="target" size={20} />, color: C.primary,    bg: '#E7E5FD'   },
+  operational: { label: 'تشغيلي',    icon: <DfIcon name="gear" size={20} />, color: '#5546D6', bg: '#E7E5FD'   },
+  policies:    { label: 'سياسات',    icon: <DfIcon name="clipboard" size={20} />, color: C.blue,    bg: C.blueLight },
 };
 
 const STATUS_MAP = {
@@ -185,7 +186,7 @@ export default function ConsultantClients({ navigate }) {
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300, color: C.gray }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 32, marginBottom: 8 }}>⏳</div>
+        <div style={{ fontSize: 32, marginBottom: 8 }}><DfIcon name="hourglass" size={32} /></div>
         <div style={{ fontSize: 14 }}>جارٍ التحميل…</div>
       </div>
     </div>
@@ -207,7 +208,7 @@ export default function ConsultantClients({ navigate }) {
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="🔍 بحث عن منظمة…"
+            placeholder="بحث عن منظمة…"
             style={{ padding: '7px 12px', borderRadius: 10, border: `1px solid ${C.grayBorder}`, fontFamily: "inherit", fontSize: 12, width: 180, outline: 'none' }}
           />
           <button onClick={() => load(false)} style={{ padding: '7px 14px', background: C.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, cursor: 'pointer', fontFamily: "inherit" }}>
@@ -220,10 +221,10 @@ export default function ConsultantClients({ navigate }) {
       <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
         {[
           { key: 'all',         label: `الكل (${clients.length})` },
-          { key: 'pending',     label: `⚡ معلقة (${clients.filter(c => c.total_pending > 0).length})`, urgent: true },
-          { key: 'strategic',   label: `🎯 استراتيجي (${clients.filter(c => c.strategic).length})` },
-          { key: 'operational', label: `⚙️ تشغيلي (${clients.filter(c => c.operational).length})` },
-          { key: 'policies',    label: `📋 سياسات (${clients.filter(c => c.policies).length})` },
+          { key: 'pending',     label: `معلقة (${clients.filter(c => c.total_pending > 0).length})`, urgent: true },
+          { key: 'strategic',   label: `استراتيجي (${clients.filter(c => c.strategic).length})` },
+          { key: 'operational', label: `تشغيلي (${clients.filter(c => c.operational).length})` },
+          { key: 'policies',    label: `سياسات (${clients.filter(c => c.policies).length})` },
         ].map(f => (
           <button key={f.key} onClick={() => setFilterSvc(f.key)}
             style={{ padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: filterSvc === f.key ? 700 : 500, fontFamily: "inherit", cursor: 'pointer', background: filterSvc === f.key ? (f.urgent ? C.amber : C.primary) : '#fff', color: filterSvc === f.key ? '#1B1746' : C.gray, border: `1.5px solid ${filterSvc === f.key ? (f.urgent ? C.amberLine : C.primary) : C.grayBorder}` }}>
@@ -235,7 +236,7 @@ export default function ConsultantClients({ navigate }) {
       {/* Empty state */}
       {filtered.length === 0 && (
         <div style={{ background: 'white', borderRadius: 14, padding: 60, textAlign: 'center', color: C.gray, boxShadow: '0 1px 4px rgba(27,23,70,0.07)' }}>
-          <div style={{ fontSize: 32, marginBottom: 8 }}>👥</div>
+          <div style={{ fontSize: 32, marginBottom: 8 }}><DfIcon name="users" size={32} /></div>
           <div style={{ fontSize: 14 }}>{search ? 'لا توجد نتائج للبحث' : 'لا يوجد عملاء مُسنَدون إليك بعد'}</div>
         </div>
       )}
@@ -266,13 +267,13 @@ export default function ConsultantClients({ navigate }) {
                     {/* شارات الخدمات — تُبرز الخدمة المفلترة */}
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       {client.strategic   && (
-                        <span style={{ fontSize: 11, padding: '1px 8px', borderRadius: 20, fontWeight: vis.strategic ? 700 : 400, background: vis.strategic ? '#E7E5FD' : C.grayLight, color: vis.strategic ? C.primary : C.gray }}>🎯 استراتيجي</span>
+                        <span style={{ fontSize: 11, padding: '1px 8px', borderRadius: 20, fontWeight: vis.strategic ? 700 : 400, background: vis.strategic ? '#E7E5FD' : C.grayLight, color: vis.strategic ? C.primary : C.gray }}><DfIcon name="target" size={14} style={{ marginInlineEnd: 6 }} />استراتيجي</span>
                       )}
                       {client.operational && (
-                        <span style={{ fontSize: 11, padding: '1px 8px', borderRadius: 20, fontWeight: vis.operational ? 700 : 400, background: vis.operational ? '#E7E5FD' : C.grayLight, color: vis.operational ? '#5546D6' : C.gray }}>⚙️ تشغيلي</span>
+                        <span style={{ fontSize: 11, padding: '1px 8px', borderRadius: 20, fontWeight: vis.operational ? 700 : 400, background: vis.operational ? '#E7E5FD' : C.grayLight, color: vis.operational ? '#5546D6' : C.gray }}><DfIcon name="gear" size={14} style={{ marginInlineEnd: 6 }} />تشغيلي</span>
                       )}
                       {client.policies    && (
-                        <span style={{ fontSize: 11, padding: '1px 8px', borderRadius: 20, fontWeight: vis.policies ? 700 : 400, background: vis.policies ? C.blueLight : C.grayLight, color: vis.policies ? C.blue : C.gray }}>📋 سياسات</span>
+                        <span style={{ fontSize: 11, padding: '1px 8px', borderRadius: 20, fontWeight: vis.policies ? 700 : 400, background: vis.policies ? C.blueLight : C.grayLight, color: vis.policies ? C.blue : C.gray }}><DfIcon name="clipboard" size={14} style={{ marginInlineEnd: 6 }} />سياسات</span>
                       )}
                     </div>
                   </div>
@@ -286,7 +287,7 @@ export default function ConsultantClients({ navigate }) {
                   </div>
                 ) : (
                   <div style={{ textAlign: 'center', background: C.greenLight, color: C.green, borderRadius: 10, padding: '6px 14px', flexShrink: 0 }}>
-                    <div style={{ fontSize: 16 }}>✅</div>
+                    <div style={{ fontSize: 16 }}><DfIcon name="check" size={16} /></div>
                     <div style={{ fontSize: 9, marginTop: 2 }}>لا مهام</div>
                   </div>
                 )}

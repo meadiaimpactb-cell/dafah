@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { strategicApi } from '../../api/strategic';
 import StepServiceSelect    from './steps/StepServiceSelect';
@@ -61,14 +62,14 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
             opacity: canCreate ? 1 : 0.75,
           }}
         >
-          <span style={{ fontSize: 20, lineHeight: 1 }}>{canCreate ? '+' : '🔒'}</span> إنشاء خطة جديدة
+          <span style={{ fontSize: 20, lineHeight: 1 }}>{canCreate ? '+' : <DfIcon name="lock" size={20} />}</span> إنشاء خطة جديدة
         </button>
       </div>
 
       {/* Warning banner when creation is locked */}
       {!canCreate && plans.length > 0 && (
         <div style={{ marginBottom: 20, padding: '14px 20px', background: '#FFF8EA', border: '1.5px solid #F9C152', borderRadius: 12, display: 'flex', alignItems: 'flex-start', gap: 12, direction: 'rtl' }}>
-          <span style={{ fontSize: 22, lineHeight: 1, flexShrink: 0 }}>⚠️</span>
+          <span style={{ fontSize: 22, lineHeight: 1, flexShrink: 0 }}><DfIcon name="warning" size={22} /></span>
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#7A4706', marginBottom: 4 }}>لا يمكن إنشاء خطة جديدة حالياً</div>
             <div style={{ fontSize: 13, color: '#5F3705', lineHeight: 1.6 }}>
@@ -81,7 +82,7 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
       {/* Empty state */}
       {plans.length === 0 && (
         <div style={{ background: '#fff', borderRadius: 12, padding: '60px 24px', boxShadow: '0 1px 8px rgba(27,23,70,0.06)', textAlign: 'center' }}>
-          <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}>📋</div>
+          <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}><DfIcon name="clipboard" size={32} /></div>
           <div style={{ fontSize: 18, fontWeight: 700, color: C.ink, marginBottom: 10 }}>ابدأ خطتك الاستراتيجية الأولى</div>
           <p style={{ fontSize: 13, color: '#67637A', maxWidth: 420, margin: '0 auto 28px', lineHeight: 1.7 }}>
             بناء خطة استراتيجية متكاملة للمنظمة من خلال 11 وحدة تخطيطية بمرافقة مستشار متخصص
@@ -175,7 +176,7 @@ function ServiceSummary({ workflow, pricing, onContinue }) {
     <div className="animate-in" style={{ maxWidth: 600, margin: '0 auto' }}>
       <div style={{ background: '#fff', borderRadius: 12, padding: 28, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-          <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📋</div>
+          <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#E7E5FD', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}><DfIcon name="clipboard" size={20} /></div>
           <div>
             <div style={{ fontSize: 16, fontWeight: 700, color: C.ink }}>الخدمات المختارة</div>
             <div style={{ fontSize: 12, color: '#67637A' }}>ملخص ما تم اختياره في بداية الخطة</div>
@@ -185,7 +186,7 @@ function ServiceSummary({ workflow, pricing, onContinue }) {
         {items.map((item, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: item.included ? '#E8F8F2' : '#FBF9F5', borderRadius: 8, marginBottom: 8, border: `1px solid ${item.included ? '#A9E4CF' : '#E8E3DA'}` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 16 }}>{item.included ? '✅' : '⬜'}</span>
+              <span style={{ fontSize: 16 }}>{item.included ? <DfIcon name="check" size={20} /> : '⬜'}</span>
               <span style={{ fontSize: 13, color: item.included ? '#086449' : '#8F8BA3', fontWeight: item.included ? 600 : 400 }}>{item.label}</span>
             </div>
             <span style={{ fontSize: 13, fontWeight: 700, color: item.included ? '#0B7F5D' : '#8F8BA3' }}>
@@ -275,7 +276,7 @@ function WorkflowStepper({ step, workflow, onStepClick }) {
       {workflow && step < realStep && (
         <div style={{ marginTop: 12, padding: '6px 14px', background: '#FFF8EA', borderRadius: 8, border: `1px solid ${C.amberLine}30`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontSize: 12, color: C.amberText, fontWeight: 600 }}>
-            🔍 وضع المراجعة — تستعرض: {STEPS[step]?.label}
+            <DfIcon name="search" size={18} style={{ marginInlineEnd: 6 }} />وضع المراجعة — تستعرض: {STEPS[step]?.label}
           </span>
           <button
             onClick={() => onStepClick && onStepClick(realStep)}

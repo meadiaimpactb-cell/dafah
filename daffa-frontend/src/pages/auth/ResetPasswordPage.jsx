@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState } from 'react';
 import Logo from '../../components/brand/Logo';
 import api from '../../api/axios';
@@ -53,7 +54,7 @@ export default function ResetPasswordPage({ token, email, onDone }) {
           /* ── Success State ── */
           <div style={{ textAlign: 'center' }}>
             <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#C9EFE1', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 36 }}>
-              ✅
+              <DfIcon name="check" size={18} style={{ marginInlineEnd: 6 }} />
             </div>
             <h2 style={{ ...S.title, marginBottom: 12 }}>تم تغيير كلمة المرور</h2>
             <p style={{ fontSize: 14, color: C.gray, lineHeight: 1.8, marginBottom: 28 }}>
@@ -86,7 +87,7 @@ export default function ResetPasswordPage({ token, email, onDone }) {
                   />
                   <button type="button" onClick={() => setShowPass(p => !p)}
                     style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16, color: C.gray }}>
-                    {showPass ? '🙈' : '👁'}
+                    {showPass ? <DfIcon name="eyeoff" size={20} /> : <DfIcon name="eye" size={20} />}
                   </button>
                 </div>
                 {/* Strength indicator */}

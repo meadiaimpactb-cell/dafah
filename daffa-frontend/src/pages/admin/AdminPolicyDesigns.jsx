@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { adminApi } from '../../api/admin';
 
@@ -19,12 +20,12 @@ const STATUS_CFG = {
 };
 
 const SCOPE_LABELS = {
-  unified:    '📋 تصميم موحد للجميع',
-  color_coded:'🎨 لون مختلف لكل سياسة',
-  per_policy: '🖌️ مستقل لكل سياسة',
+  unified:    'تصميم موحد للجميع',
+  color_coded:'لون مختلف لكل سياسة',
+  per_policy: 'مستقل لكل سياسة',
 };
-const STYLE_LABELS = { modern: '✨ عصري', corporate: '🏢 مؤسسي', classic: '📜 كلاسيكي' };
-const LANG_LABELS  = { arabic: '🇸🇦 عربي', english: '🇺🇸 إنجليزي', bilingual: '🌐 ثنائي' };
+const STYLE_LABELS = { modern: 'عصري', corporate: 'مؤسسي', classic: 'كلاسيكي' };
+const LANG_LABELS  = { arabic: '🇸🇦 عربي', english: '🇺🇸 إنجليزي', bilingual: 'ثنائي' };
 
 // ── تصدير موجز المصمم كصفحة HTML قابلة للطباعة ─────────────────────────────
 const exportDesignerBrief = (item) => {
@@ -83,7 +84,7 @@ const exportDesignerBrief = (item) => {
     <!-- Header -->
     <div class="header">
       <div>
-        <div class="header-title">📋 موجز متطلبات التصميم</div>
+        <div class="header-title"><DfIcon name="clipboard" size={18} style={{ marginInlineEnd: 6 }} />موجز متطلبات التصميم</div>
         <div class="header-sub">تم إعداده من منصة دفة — ${new Date().toLocaleDateString('ar-SA', { year:'numeric', month:'long', day:'numeric' })}</div>
         <div style="margin-top:10px;font-size:13px;opacity:0.9">العميل: <strong>${b.org_name || item.org_name || '—'}</strong></div>
         <div style="font-size:12px;opacity:0.75;margin-top:3px">تاريخ الدفع: ${item.design_paid_at || '—'} | المبلغ: ${item.design_fee ? Number(item.design_fee).toLocaleString('en-US') + ' ريال' : '—'}</div>
@@ -96,28 +97,28 @@ const exportDesignerBrief = (item) => {
 
     <!-- أزرار الطباعة -->
     <div class="no-print" style="margin-bottom:20px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
-      <button class="print-btn" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+      <button class="print-btn" onclick="window.print()"><DfIcon name="printer" size={18} style={{ marginInlineEnd: 6 }} />طباعة / حفظ PDF</button>
       ${item.design_logo_url ? `<a class="download-btn" href="${item.design_logo_url}" download target="_blank">⬇ تحميل الشعار</a>` : ''}
       <span style="font-size:11px;color:#67637A">لحفظ كـ PDF: اضغط طباعة ← اختر "حفظ كـ PDF"</span>
     </div>
 
     <!-- السياسات المطلوب تصميمها -->
     <div class="section">
-      <div class="section-title">📄 السياسات المطلوب تصميمها (${item.selected_policies?.length || 0} سياسات)</div>
+      <div class="section-title"><DfIcon name="file" size={18} style={{ marginInlineEnd: 6 }} />السياسات المطلوب تصميمها (${item.selected_policies?.length || 0} سياسات)</div>
       <div class="section-body">
         <div class="policies">
           ${(item.selected_policies || []).map(p => `<span class="policy-tag">${p}</span>`).join('')}
         </div>
         ${item.selected_policies?.length > 1 && b.design_scope ? `
         <div style="margin-top:12px">
-          <div class="scope-box">🎯 طريقة التصميم المطلوبة: ${scopeMap[b.design_scope] || b.design_scope}</div>
+          <div class="scope-box"><DfIcon name="target" size={18} style={{ marginInlineEnd: 6 }} />طريقة التصميم المطلوبة: ${scopeMap[b.design_scope] || b.design_scope}</div>
         </div>` : ''}
       </div>
     </div>
 
     <!-- هوية المنظمة -->
     <div class="section">
-      <div class="section-title">🏢 هوية المنظمة</div>
+      <div class="section-title"><DfIcon name="building" size={18} style={{ marginInlineEnd: 6 }} />هوية المنظمة</div>
       <div class="section-body">
         ${item.design_logo_url ? `
         <div style="margin-bottom:16px;padding:12px;background:#FBF9F5;border-radius:8px;border:1px solid #E8E3DA;display:inline-block">
@@ -139,7 +140,7 @@ const exportDesignerBrief = (item) => {
 
     <!-- تفضيلات التصميم -->
     <div class="section">
-      <div class="section-title">🎨 تفضيلات التصميم</div>
+      <div class="section-title"><DfIcon name="palette" size={18} style={{ marginInlineEnd: 6 }} />تفضيلات التصميم</div>
       <div class="section-body">
         <table style="margin-bottom:16px">
           ${row('نمط التصميم',  styleMap[b.design_style] || b.design_style || '—')}
@@ -167,14 +168,14 @@ const exportDesignerBrief = (item) => {
           ${b.include_cover ? '<span class="checkbox">✓ صفحة غلاف لكل سياسة</span>' : '<span style="padding:5px 12px;border-radius:8px;font-size:12px;background:#F3EFE8;color:#8F8BA3;margin-left:8px">✗ بدون صفحة غلاف</span>'}
           ${b.include_toc   ? '<span class="checkbox">✓ فهرس المحتويات</span>'       : '<span style="padding:5px 12px;border-radius:8px;font-size:12px;background:#F3EFE8;color:#8F8BA3">✗ بدون فهرس</span>'}
         </div>
-        ${b.notes ? `<div style="margin-top:14px"><div style="font-size:12px;color:#67637A;margin-bottom:6px">ملاحظات وتعليمات المصمم:</div><div class="notes-box">💬 ${b.notes}</div></div>` : ''}
+        ${b.notes ? `<div style="margin-top:14px"><div style="font-size:12px;color:#67637A;margin-bottom:6px">ملاحظات وتعليمات المصمم:</div><div class="notes-box">${b.notes}</div></div>` : ''}
       </div>
     </div>
 
     <!-- ملاحظات تعديل إن وجدت -->
     ${item.design_revision_notes ? `
     <div class="section">
-      <div class="section-title" style="background:#FAD4CE;color:#8F2415">⚠️ ملاحظات التعديل من العميل</div>
+      <div class="section-title" style="background:#FAD4CE;color:#8F2415"><DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />ملاحظات التعديل من العميل</div>
       <div class="section-body">
         <div style="font-size:13px;color:#8F2415;line-height:1.7">${item.design_revision_notes}</div>
       </div>
@@ -283,7 +284,7 @@ export default function AdminPolicyDesigns() {
               <span style={{ fontSize: 10, color: refreshing ? C.primary : '#8F8BA3', display: 'flex', alignItems: 'center', gap: 4 }}>
                 {refreshing
                   ? <><span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: C.primary, animation: 'pulse 1s infinite' }} /> يتحدث…</>
-                  : <>🕐 آخر تحديث: {fmtTime(lastSync)}</>
+                  : <><DfIcon name="clock" size={18} style={{ marginInlineEnd: 6 }} />آخر تحديث: {fmtTime(lastSync)}</>
                 }
               </span>
             )}
@@ -294,7 +295,7 @@ export default function AdminPolicyDesigns() {
           disabled={loading || refreshing}
           style={{ padding: '8px 18px', background: loading ? C.grayLight : C.primary, color: loading ? C.gray : '#fff', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6 }}
         >
-          {loading ? '⏳' : '↻'} تحديث
+          {loading ? <DfIcon name="hourglass" size={20} /> : '↻'} تحديث
         </button>
       </div>
 
@@ -346,7 +347,7 @@ export default function AdminPolicyDesigns() {
       {/* Empty */}
       {!loading && filtered.length === 0 && (
         <div style={{ background: '#fff', borderRadius: 14, padding: '50px 24px', textAlign: 'center', boxShadow: '0 1px 6px rgba(27,23,70,0.06)' }}>
-          <div style={{ fontSize: 40, marginBottom: 10 }}>🎨</div>
+          <div style={{ fontSize: 40, marginBottom: 10 }}><DfIcon name="palette" size={40} /></div>
           <div style={{ fontSize: 15, fontWeight: 700, color: C.ink, marginBottom: 6 }}>لا توجد طلبات</div>
           <p style={{ fontSize: 12, color: C.gray }}>{filter === 'all' ? 'لم يطلب أي عميل خدمة التصميم بعد' : 'لا توجد طلبات بهذه الحالة حالياً'}</p>
         </div>
@@ -388,22 +389,22 @@ export default function AdminPolicyDesigns() {
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, fontSize: 11, color: C.gray }}>
                           {item.design_paid_at && (
                             <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                              📅 <strong style={{ color: C.ink }}>{item.design_paid_at}</strong>
+                              <DfIcon name="calendar" size={18} style={{ marginInlineEnd: 6 }} /><strong style={{ color: C.ink }}>{item.design_paid_at}</strong>
                             </span>
                           )}
                           {item.design_fee && (
                             <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                              💰 <strong style={{ color: C.primary }}>{Number(item.design_fee).toLocaleString('en-US')} ريال</strong>
+                              <DfIcon name="money" size={18} style={{ marginInlineEnd: 6 }} /><strong style={{ color: C.primary }}>{Number(item.design_fee).toLocaleString('en-US')} ريال</strong>
                             </span>
                           )}
                           {item.consultant_name && (
-                            <span>👤 {item.consultant_name}</span>
+                            <span><DfIcon name="user" size={18} style={{ marginInlineEnd: 6 }} />{item.consultant_name}</span>
                           )}
                           {item.design_uploaded_at && (
                             <span>⬆ رُفع {item.design_uploaded_at}</span>
                           )}
                           {item.design_approved_at && (
-                            <span style={{ color: C.green }}>✅ اعتُمد {item.design_approved_at}</span>
+                            <span style={{ color: C.green }}><DfIcon name="check" size={18} style={{ marginInlineEnd: 6 }} />اعتُمد {item.design_approved_at}</span>
                           )}
                         </div>
                       </div>
@@ -424,7 +425,7 @@ export default function AdminPolicyDesigns() {
                 {/* Expanded: design brief */}
                 {isExpanded && b && (
                   <div style={{ borderTop: `1px solid ${C.grayBorder}`, padding: '16px 20px', background: '#FBF9F5' }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 12 }}>📋 متطلبات التصميم المُدخلة من العميل</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 12 }}><DfIcon name="clipboard" size={14} style={{ marginInlineEnd: 6 }} />متطلبات التصميم المُدخلة من العميل</div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16 }}>
 
                       {/* Col 1: Identity */}
@@ -502,7 +503,7 @@ export default function AdminPolicyDesigns() {
                 {/* Revision notes */}
                 {item.design_revision_notes && (
                   <div style={{ margin: '0 20px 12px', padding: '10px 14px', background: C.redLight, borderRadius: 10, border: `1px solid ${C.red}30`, fontSize: 12, color: '#8F2415' }}>
-                    <strong>⚠️ ملاحظات التعديل من العميل: </strong>{item.design_revision_notes}
+                    <strong><DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />ملاحظات التعديل من العميل: </strong>{item.design_revision_notes}
                   </div>
                 )}
 
@@ -513,7 +514,7 @@ export default function AdminPolicyDesigns() {
                     onClick={() => exportDesignerBrief(item)}
                     title="تصدير موجز المصمم — يفتح صفحة قابلة للطباعة أو الحفظ كـ PDF"
                     style={{ padding: '7px 14px', background: '#E8F8F2', color: '#086449', border: `1.5px solid #7FD3B5`, borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 5 }}>
-                    📤 تصدير للمصمم
+                    <DfIcon name="upload" size={18} style={{ marginInlineEnd: 6 }} />تصدير للمصمم
                   </button>
                   {/* Download logo directly if available */}
                   {item.design_logo_url && (
@@ -526,7 +527,7 @@ export default function AdminPolicyDesigns() {
                   {item.design_file && (
                     <a href={item.design_file} target="_blank" rel="noreferrer"
                       style={{ padding: '7px 16px', background: C.blueLight, color: '#164F8A', borderRadius: 10, fontSize: 12, fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 5 }}>
-                      👁 عرض التصميم الحالي
+                      <DfIcon name="eye" size={18} style={{ marginInlineEnd: 6 }} />عرض التصميم الحالي
                     </a>
                   )}
 
@@ -542,21 +543,21 @@ export default function AdminPolicyDesigns() {
                         onClick={() => { setSelected(item); setUploadErr(''); setTimeout(() => fileRef.current?.click(), 50); }}
                         disabled={uploading && selected?.id === item.id}
                         style={{ padding: '7px 18px', background: C.amber, color: '#1B1746', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: uploading && selected?.id === item.id ? 'not-allowed' : 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, opacity: uploading && selected?.id === item.id ? 0.6 : 1 }}>
-                        {uploading && selected?.id === item.id ? '⏳ جارٍ الرفع…' : '⬆ رفع التصميم'}
+                        {uploading && selected?.id === item.id ? 'جارٍ الرفع…' : '⬆ رفع التصميم'}
                       </button>
                     </div>
                   )}
 
                   {item.design_status === 'uploaded' && (
-                    <span style={{ fontSize: 12, color: '#164F8A', fontWeight: 600 }}>⏳ بانتظار اعتماد العميل</span>
+                    <span style={{ fontSize: 12, color: '#164F8A', fontWeight: 600 }}><DfIcon name="hourglass" size={14} style={{ marginInlineEnd: 6 }} />بانتظار اعتماد العميل</span>
                   )}
                   {item.design_status === 'approved' && (
-                    <span style={{ fontSize: 12, color: C.green, fontWeight: 700 }}>✅ تم الاعتماد من العميل</span>
+                    <span style={{ fontSize: 12, color: C.green, fontWeight: 700 }}><DfIcon name="check" size={14} style={{ marginInlineEnd: 6 }} />تم الاعتماد من العميل</span>
                   )}
 
                   {/* Upload error */}
                   {uploadErr && selected?.id === item.id && (
-                    <span style={{ fontSize: 11, color: C.red, fontWeight: 600 }}>⚠️ {uploadErr}</span>
+                    <span style={{ fontSize: 11, color: C.red, fontWeight: 600 }}><DfIcon name="warning" size={14} style={{ marginInlineEnd: 6 }} />{uploadErr}</span>
                   )}
                 </div>
               </div>

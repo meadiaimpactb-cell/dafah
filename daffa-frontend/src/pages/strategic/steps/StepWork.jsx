@@ -1,3 +1,4 @@
+import DfIcon from '../../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import { strategicApi } from '../../../api/strategic';
 
@@ -76,10 +77,10 @@ export default function StepWork({ workflow, setActiveUnit, workflowId, refreshW
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                 <div style={{ width: 28, height: 28, borderRadius: '50%', background: locked ? '#8F8BA3' : colors.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{i + 1}</div>
-                <span style={{ fontSize: 10, padding: '3px 8px', borderRadius: 20, fontWeight: 600, background: st.bg, color: st.color }}>{locked ? '🔒 مقفل' : st.label}</span>
+                <span style={{ fontSize: 10, padding: '3px 8px', borderRadius: 20, fontWeight: 600, background: st.bg, color: st.color }}>{locked ? 'مقفل' : st.label}</span>
               </div>
               <div style={{ fontSize: 13, fontWeight: 700, color: locked ? '#8F8BA3' : colors.ink }}>{unit.name}</div>
-              <div style={{ fontSize: 11, color: '#8F8BA3', marginTop: 4 }}>⏱ {unit.video_duration}</div>
+              <div style={{ fontSize: 11, color: '#8F8BA3', marginTop: 4 }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />{unit.video_duration}</div>
             </div>
           );
         })}
@@ -88,7 +89,7 @@ export default function StepWork({ workflow, setActiveUnit, workflowId, refreshW
       {allSubmitted ? (
         <div style={{ background: '#C9EFE1', border: '1.5px solid #7FD3B5', borderRadius: 12, padding: '16px 20px', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 20 }}>✅</span>
+            <span style={{ fontSize: 20 }}><DfIcon name="check" size={20} /></span>
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: '#086449' }}>تم إرسال جميع الوحدات الـ {total} للمراجعة</div>
               <div style={{ fontSize: 12, color: '#086449', marginTop: 2 }}>المستشار يراجع الآن — ستصلك إشعارات عند اعتماد كل وحدة</div>
@@ -104,7 +105,7 @@ export default function StepWork({ workflow, setActiveUnit, workflowId, refreshW
         </div>
       ) : (
         <div style={{ background: '#EAF4FD', border: '1px solid #A9D2F5', borderRadius: 10, padding: '12px 16px', marginTop: 20, fontSize: 13, color: '#1A65AD' }}>
-          💡 اضغط على أي وحدة لبدء العمل عليها. يجب إتمام كل وحدة قبل الانتقال للتالية.
+          <DfIcon name="bulb" size={18} style={{ marginInlineEnd: 6 }} />اضغط على أي وحدة لبدء العمل عليها. يجب إتمام كل وحدة قبل الانتقال للتالية.
         </div>
       )}
     </div>

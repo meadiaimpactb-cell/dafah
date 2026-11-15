@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
@@ -204,14 +205,14 @@ export default function AdminConsultants() {
 
   if (loading) return (
     <div style={{ textAlign: 'center', padding: 80 }}>
-      <div style={{ fontSize: 36, marginBottom: 12 }}>⏳</div>
+      <div style={{ fontSize: 36, marginBottom: 12 }}><DfIcon name="hourglass" size={36} /></div>
       <div style={{ fontSize: 15, color: colors.primary, fontWeight: 600 }}>جاري تحميل المستشارين...</div>
     </div>
   );
 
   if (!can('admin.consultants.view')) return (
     <div style={{ textAlign: 'center', padding: 80, background: '#fff', borderRadius: 12 }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>🔒</div>
+      <div style={{ fontSize: 48, marginBottom: 12 }}><DfIcon name="lock" size={48} /></div>
       <div style={{ fontSize: 16, fontWeight: 700, color: '#D03F2A', marginBottom: 8 }}>غير مصرح بالوصول</div>
       <div style={{ fontSize: 13, color: '#67637A' }}>ليس لديك صلاحية لعرض إدارة المستشارين</div>
     </div>
@@ -219,7 +220,7 @@ export default function AdminConsultants() {
 
   if (loadError) return (
     <div style={{ textAlign: 'center', padding: 80, background: '#fff', borderRadius: 12 }}>
-      <div style={{ fontSize: 36, marginBottom: 12 }}>⚠️</div>
+      <div style={{ fontSize: 36, marginBottom: 12 }}><DfIcon name="warning" size={36} /></div>
       <div style={{ fontSize: 15, fontWeight: 700, color: '#D03F2A', marginBottom: 8 }}>فشل تحميل البيانات</div>
       <div style={{ fontSize: 13, color: '#67637A', marginBottom: 20 }}>{loadError}</div>
       <button onClick={load} style={{ padding: '10px 28px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
@@ -252,15 +253,15 @@ export default function AdminConsultants() {
 
       {/* إحصائيات سريعة */}
       <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-3)', gap: 14, marginBottom: 20 }}>
-        <StatCard label="إجمالي المستشارين" value={consultants.length}         color={colors.primary}    icon="👥" />
-        <StatCard label="متاحون الآن"        value={consultants.filter(c => c.available).length}  color="#0B7F5D" icon="✅" />
-        <StatCard label="غير متاحين"         value={consultants.filter(c => !c.available).length} color="#D03F2A" icon="⏸" />
+        <StatCard label="إجمالي المستشارين" value={consultants.length}         color={colors.primary}    icon={<DfIcon name="users" size={20} />} />
+        <StatCard label="متاحون الآن"        value={consultants.filter(c => c.available).length}  color="#0B7F5D" icon={<DfIcon name="check" size={20} />} />
+        <StatCard label="غير متاحين"         value={consultants.filter(c => !c.available).length} color="#D03F2A" icon={<DfIcon name="pause" size={20} />} />
       </div>
 
       {/* قائمة المستشارين */}
       {consultants.length === 0 ? (
         <div style={{ textAlign: 'center', padding: 60, color: '#8F8BA3', background: '#fff', borderRadius: 12 }}>
-          <div style={{ fontSize: 48, marginBottom: 12 }}>👤</div>
+          <div style={{ fontSize: 48, marginBottom: 12 }}><DfIcon name="user" size={48} /></div>
           <div style={{ fontSize: 15, fontWeight: 600 }}>لا يوجد مستشارون بعد</div>
           <div style={{ fontSize: 13, marginTop: 6 }}>اضغط "إضافة مستشار" للبدء</div>
         </div>
@@ -291,7 +292,7 @@ export default function AdminConsultants() {
                 <div style={{ display: 'inline-block', marginTop: 4, padding: '3px 10px', background: '#EAF4FD', color: colors.primary, fontSize: 11, borderRadius: 20, fontWeight: 600 }}>{c.specialty}</div>
                 {c.user ? (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 5, fontSize: 10, color: '#0B7F5D', fontWeight: 600 }}>
-                    <span>🔑</span><span>{c.user.email}</span>
+                    <span><DfIcon name="key" size={18} /></span><span>{c.user.email}</span>
                   </div>
                 ) : (
                   <div style={{ marginTop: 5, fontSize: 10, color: '#8F8BA3' }}>بدون حساب دخول</div>
@@ -332,14 +333,14 @@ export default function AdminConsultants() {
                     onClick={e => { e.stopPropagation(); openView(c); }}
                     style={{ flex: 1, padding: '7px 0', background: '#EAF4FD', color: colors.primary, border: `1px solid #A9D2F5`, borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}
                   >
-                    👁 عرض
+                    <DfIcon name="eye" size={18} style={{ marginInlineEnd: 6 }} />عرض
                   </button>
                   {can('admin.consultants.toggle') && (
                     <button
                       onClick={e => openToggleConfirm(c, e)}
                       style={{ flex: 1, padding: '7px 0', background: c.available ? '#FDECE9' : '#E8F8F2', color: c.available ? '#D03F2A' : '#0B7F5D', border: `1px solid ${c.available ? '#F5B8AE' : '#7FD3B5'}`, borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}
                     >
-                      {c.available ? '⏸ إيقاف' : '▶ تفعيل'}
+                      {c.available ? 'إيقاف' : '▶ تفعيل'}
                     </button>
                   )}
                   {can('admin.consultants.edit') && (
@@ -347,7 +348,7 @@ export default function AdminConsultants() {
                       onClick={e => openEdit(c, e)}
                       style={{ flex: 1, padding: '7px 0', background: '#FFF8EA', color: colors.amberText, border: `1px solid #FCD98B`, borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}
                     >
-                      ✏️ تعديل
+                      <DfIcon name="pencil" size={18} style={{ marginInlineEnd: 6 }} />تعديل
                     </button>
                   )}
                   {can('admin.consultants.delete') && (
@@ -355,7 +356,7 @@ export default function AdminConsultants() {
                       onClick={e => openDelete(c, e)}
                       style={{ padding: '7px 12px', background: '#FDECE9', color: '#D03F2A', border: `1px solid #F5B8AE`, borderRadius: 8, fontSize: 11, cursor: 'pointer', fontFamily: "inherit" }}
                     >
-                      🗑
+                      <DfIcon name="trash" size={18} style={{ marginInlineEnd: 6 }} />
                     </button>
                   )}
                 </div>
@@ -395,14 +396,14 @@ export default function AdminConsultants() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   {avatarFile ? (
                     <div style={{ fontSize: 11, color: '#0B7F5D', fontWeight: 600, marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      ✅ {avatarFile.name}
+                      <DfIcon name="check" size={18} style={{ marginInlineEnd: 6 }} />{avatarFile.name}
                     </div>
                   ) : (
                     <div style={{ fontSize: 11, color: '#67637A', marginBottom: 8 }}>PNG / JPG / WebP — بحد أقصى 2 ميغابايت</div>
                   )}
                   <div style={{ display: 'flex', gap: 8 }}>
                     <label style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 14px', background: '#fff', border: '1.5px solid #E8E3DA', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', color: colors.ink, fontFamily: "inherit", flexShrink: 0 }}>
-                      📷 {avatarFile || (modal === 'edit' && selected?.avatar_url) ? 'تغيير الصورة' : 'اختر صورة'}
+                      <DfIcon name="camera" size={18} style={{ marginInlineEnd: 6 }} />{avatarFile || (modal === 'edit' && selected?.avatar_url) ? 'تغيير الصورة' : 'اختر صورة'}
                       <input type="file" accept="image/*" onChange={handleAvatarChange} style={{ display: 'none' }} />
                     </label>
                     {(avatarFile || (modal === 'edit' && selected?.avatar_url)) && (
@@ -456,7 +457,7 @@ export default function AdminConsultants() {
               {(modal === 'add' || (modal === 'edit' && selected && !selected.user_id)) && (
                 <div style={{ gridColumn: '1/-1', borderTop: '1.5px dashed #E8E3DA', paddingTop: 16, marginTop: 4 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: colors.ink, marginBottom: 4 }}>
-                    🔑 حساب دخول للمستشار
+                    <DfIcon name="key" size={18} style={{ marginInlineEnd: 6 }} />حساب دخول للمستشار
                   </div>
                   <div style={{ fontSize: 11, color: '#8F8BA3', marginBottom: 12 }}>
                     {modal === 'add'
@@ -478,7 +479,7 @@ export default function AdminConsultants() {
               {modal === 'edit' && selected?.user_id && (
                 <div style={{ gridColumn: '1/-1', borderTop: '1.5px dashed #E8E3DA', paddingTop: 14, marginTop: 4 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: '#E8F8F2', borderRadius: 10, border: '1px solid #A9E4CF' }}>
-                    <span style={{ fontSize: 16 }}>✅</span>
+                    <span style={{ fontSize: 16 }}><DfIcon name="check" size={16} /></span>
                     <div>
                       <div style={{ fontSize: 12, fontWeight: 700, color: '#086449' }}>لديه حساب دخول</div>
                       <div style={{ fontSize: 11, color: '#2DBE92' }}>{selected.user?.email}</div>
@@ -531,7 +532,7 @@ export default function AdminConsultants() {
             )}
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <button onClick={() => setModal(null)} style={{ padding: '9px 22px', background: '#F3EFE8', border: '1.5px solid #E8E3DA', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit", color: '#34314A' }}>إغلاق</button>
-              <button onClick={e => openEdit(selected, e)} style={{ padding: '9px 22px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>✏️ تعديل</button>
+              <button onClick={e => openEdit(selected, e)} style={{ padding: '9px 22px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}><DfIcon name="pencil" size={14} style={{ marginInlineEnd: 6 }} />تعديل</button>
             </div>
           </div>
         </Overlay>
@@ -545,7 +546,7 @@ export default function AdminConsultants() {
               background: selected.available ? '#FDECE9' : '#E8F8F2',
               display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32,
             }}>
-              {selected.available ? '⏸' : '▶'}
+              {selected.available ? <DfIcon name="pause" size={20} /> : '▶'}
             </div>
 
             <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>
@@ -580,7 +581,7 @@ export default function AdminConsultants() {
                   background: selected.available ? '#D03F2A' : '#0B7F5D',
                 }}
               >
-                {saving ? 'جاري...' : (selected.available ? '⏸ نعم، إيقاف' : '▶ نعم، تفعيل')}
+                {saving ? 'جاري...' : (selected.available ? 'نعم، إيقاف' : '▶ نعم، تفعيل')}
               </button>
             </div>
           </div>
@@ -590,7 +591,7 @@ export default function AdminConsultants() {
       {modal === 'delete' && selected && (
         <Overlay onClose={() => setModal(null)} closeOnBackdrop>
           <div style={{ background: '#fff', borderRadius: 16, padding: 32, width: '100%', maxWidth: 420, textAlign: 'center' }}>
-            <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FDECE9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 28 }}>⚠️</div>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#FDECE9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 28 }}><DfIcon name="warning" size={28} /></div>
             <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>حذف المستشار</h3>
             <p style={{ fontSize: 13, color: '#67637A', marginBottom: 4 }}>هل أنت متأكد من حذف</p>
             <p style={{ fontSize: 15, fontWeight: 700, color: '#D03F2A', marginBottom: 20 }}>{selected.name}؟</p>
@@ -625,7 +626,7 @@ const Toast = ({ toast }) => {
       display: 'flex', alignItems: 'center', gap: 10,
       animation: 'fadeInUp 0.3s ease',
     }}>
-      <span style={{ fontSize: 18 }}>{toast.type === 'success' ? '✅' : '❌'}</span>
+      <span style={{ fontSize: 18 }}>{toast.type === 'success' ? <DfIcon name="check" size={20} /> : <DfIcon name="x" size={20} />}</span>
       {toast.text}
     </div>,
     document.body

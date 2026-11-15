@@ -175,6 +175,12 @@ Route::middleware('auth:sanctum')->prefix('notifications')->group(function () {
 
 // ── Admin (protected) ─────────────────────────────────────────────────────────
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
+    // مركز المخرجات (قراءة فقط): مخرجات العملاء في الأنظمة الثلاثة وقرارات المستشارين
+    Route::get('/outputs',                                   [\App\Http\Controllers\Api\Admin\OutputsController::class, 'index']);
+    Route::get('/outputs/consultants',                       [\App\Http\Controllers\Api\Admin\OutputsController::class, 'consultants']);
+    Route::get('/outputs/consultants/{consultant}/reviews',  [\App\Http\Controllers\Api\Admin\OutputsController::class, 'consultantReviews'])->whereNumber('consultant');
+    Route::get('/outputs/{system}/{id}',                     [\App\Http\Controllers\Api\Admin\OutputsController::class, 'show'])->whereIn('system', ['strategic', 'operational', 'policies'])->whereNumber('id');
+
     Route::get('/consultants',                      [AdminConsultantController::class, 'index']);
     Route::post('/consultants',                     [AdminConsultantController::class, 'store']);
     Route::get('/consultants/{consultant}',         [AdminConsultantController::class, 'show']);

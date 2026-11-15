@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
@@ -273,14 +274,14 @@ export default function AdminOrgs() {
   // ── loading / error states
   if (loading) return (
     <div style={{ textAlign: 'center', padding: 80 }}>
-      <div style={{ fontSize: 36, marginBottom: 12 }}>⏳</div>
+      <div style={{ fontSize: 36, marginBottom: 12 }}><DfIcon name="hourglass" size={36} /></div>
       <div style={{ fontSize: 15, color: C.primary, fontWeight: 600 }}>جاري تحميل المنظمات...</div>
     </div>
   );
 
   if (loadError) return (
     <div style={{ textAlign: 'center', padding: 80, background: '#fff', borderRadius: 12 }}>
-      <div style={{ fontSize: 36, marginBottom: 12 }}>⚠️</div>
+      <div style={{ fontSize: 36, marginBottom: 12 }}><DfIcon name="warning" size={36} /></div>
       <div style={{ fontSize: 15, fontWeight: 700, color: C.red, marginBottom: 8 }}>فشل تحميل البيانات</div>
       <div style={{ fontSize: 13, color: C.gray, marginBottom: 20 }}>{loadError}</div>
       <button onClick={() => load(false)} style={{ padding: '10px 28px', background: C.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
@@ -311,9 +312,9 @@ export default function AdminOrgs() {
       {/* ── Stats ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-3)', gap: 14, marginBottom: 20 }}>
         {[
-          { label: 'إجمالي المنظمات', value: orgs.length,                             icon: '🏢', color: C.primary },
-          { label: 'نشطة',            value: orgs.filter(o => o.status !== 'معلق').length, icon: '✅', color: C.green },
-          { label: 'معلقة',           value: orgs.filter(o => o.status === 'معلق').length, icon: '⏸', color: C.red },
+          { label: 'إجمالي المنظمات', value: orgs.length,                             icon: <DfIcon name="building" size={20} />, color: C.primary },
+          { label: 'نشطة',            value: orgs.filter(o => o.status !== 'معلق').length, icon: <DfIcon name="check" size={20} />, color: C.green },
+          { label: 'معلقة',           value: orgs.filter(o => o.status === 'معلق').length, icon: <DfIcon name="pause" size={20} />, color: C.red },
         ].map(s => (
           <div key={s.label} style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 6px rgba(27,23,70,0.06)', display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{ fontSize: 26 }}>{s.icon}</div>
@@ -329,7 +330,7 @@ export default function AdminOrgs() {
       <div style={{ background: '#fff', borderRadius: 12, padding: '14px 18px', marginBottom: 16, boxShadow: '0 1px 6px rgba(27,23,70,0.06)' }}>
         <div style={{ display: 'flex', gap: 12 }}>
           <div style={{ flex: 1, position: 'relative' }}>
-            <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: C.gray, pointerEvents: 'none' }}>🔍</span>
+            <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: C.gray, pointerEvents: 'none' }}><DfIcon name="search" size={18} /></span>
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -353,7 +354,7 @@ export default function AdminOrgs() {
       <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 6px rgba(27,23,70,0.06)', overflow: 'hidden' }}>
         {filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 60, color: C.gray }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🏢</div>
+            <div style={{ fontSize: 48, marginBottom: 12 }}><DfIcon name="building" size={48} /></div>
             <div style={{ fontSize: 15, fontWeight: 600 }}>{search || typeFilter !== 'all' || statusFilter !== 'all' ? 'لا توجد نتائج مطابقة' : 'لا توجد منظمات بعد'}</div>
           </div>
         ) : (
@@ -396,7 +397,7 @@ export default function AdminOrgs() {
                       <button onClick={e => handleToggle(o, e)} style={btnStyle(o.is_active ? '#FDECE9' : '#E8F8F2', o.is_active ? C.red : C.green, o.is_active ? '#F5B8AE' : '#7FD3B5')}>
                         {o.is_active ? 'تعليق' : 'تفعيل'}
                       </button>
-                      <button onClick={e => openDelete(o, e)} style={btnStyle('#FDECE9', C.red, '#F5B8AE')}>🗑</button>
+                      <button onClick={e => openDelete(o, e)} style={btnStyle('#FDECE9', C.red, '#F5B8AE')}><DfIcon name="trash" size={18} /></button>
                     </div>
                   </td>
                 </tr>
@@ -489,7 +490,7 @@ export default function AdminOrgs() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   {logoFile ? (
                     <div style={{ fontSize: 11, color: C.green, fontWeight: 600, marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      ✅ {logoFile.name}
+                      <DfIcon name="check" size={18} style={{ marginInlineEnd: 6 }} />{logoFile.name}
                     </div>
                   ) : (
                     <div style={{ fontSize: 11, color: C.gray, marginBottom: 8 }}>
@@ -498,7 +499,7 @@ export default function AdminOrgs() {
                   )}
                   <div style={{ display: 'flex', gap: 8 }}>
                     <label style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 14px', background: '#fff', border: `1.5px solid ${C.grayBorder}`, borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', color: C.ink, fontFamily: "inherit", flexShrink: 0 }}>
-                      📁 {logoFile || (modal === 'edit' && selected?.logo_url) ? 'تغيير الشعار' : 'اختر شعاراً'}
+                      <DfIcon name="file" size={18} style={{ marginInlineEnd: 6 }} />{logoFile || (modal === 'edit' && selected?.logo_url) ? 'تغيير الشعار' : 'اختر شعاراً'}
                       <input type="file" accept="image/*" onChange={handleLogoChange} style={{ display: 'none' }} />
                     </label>
                     {(logoFile || (modal === 'edit' && selected?.logo_url)) && (
@@ -561,7 +562,7 @@ export default function AdminOrgs() {
       {modal === 'delete' && selected && (
         <Overlay onClose={() => setModal(null)} closeOnBackdrop>
           <div style={{ background: '#fff', borderRadius: 16, padding: 28, width: '100%', maxWidth: 420, textAlign: 'center' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🗑️</div>
+            <div style={{ fontSize: 48, marginBottom: 12 }}><DfIcon name="trash" size={48} /></div>
             <h3 style={{ fontSize: 17, fontWeight: 700, color: C.ink, marginBottom: 8 }}>حذف المنظمة</h3>
             <p style={{ fontSize: 13, color: C.gray, marginBottom: 24 }}>
               هل أنت متأكد من حذف <strong>{selected.org_name}</strong>؟<br />

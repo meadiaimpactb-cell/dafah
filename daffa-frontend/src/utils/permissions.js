@@ -6,7 +6,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'admin.consultants',
       label:  'إدارة المستشارين',
-      icon:   '🧑‍💼',
+      icon:   'briefcase',
       actions: [
         { key: 'view',   label: 'عرض القائمة' },
         { key: 'add',    label: 'إضافة' },
@@ -18,7 +18,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'admin.users',
       label:  'إدارة المستخدمين',
-      icon:   '👥',
+      icon:   'users',
       actions: [
         { key: 'view',        label: 'عرض القائمة' },
         { key: 'add',         label: 'إضافة' },
@@ -31,7 +31,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'admin.organizations',
       label:  'إدارة المنظمات',
-      icon:   '🏢',
+      icon:   'building',
       actions: [
         { key: 'view',   label: 'عرض القائمة' },
         { key: 'add',    label: 'إضافة' },
@@ -43,7 +43,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'admin.finance',
       label:  'الإدارة المالية',
-      icon:   '💰',
+      icon:   'money',
       actions: [
         { key: 'view',   label: 'عرض' },
         { key: 'export', label: 'تصدير' },
@@ -52,7 +52,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'admin.reports',
       label:  'التقارير والإحصاءات',
-      icon:   '📊',
+      icon:   'chart',
       actions: [
         { key: 'view',   label: 'عرض' },
         { key: 'export', label: 'تصدير' },
@@ -62,7 +62,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'admin.content',
       label:  'إدارة المحتوى',
-      icon:   '📝',
+      icon:   'pencil',
       actions: [
         { key: 'view',   label: 'عرض' },
         { key: 'add',    label: 'إضافة' },
@@ -73,7 +73,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'admin.settings',
       label:  'إعدادات النظام',
-      icon:   '🔧',
+      icon:   'wrench',
       actions: [
         { key: 'view', label: 'عرض' },
         { key: 'edit', label: 'تعديل' },
@@ -85,7 +85,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'consultant.strategic',
       label:  'التخطيط الاستراتيجي',
-      icon:   '🎯',
+      icon:   'target',
       actions: [
         { key: 'view',     label: 'عرض' },
         { key: 'approve',  label: 'اعتماد' },
@@ -95,7 +95,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'consultant.operational',
       label:  'التخطيط التشغيلي',
-      icon:   '⚙️',
+      icon:   'gear',
       actions: [
         { key: 'view',     label: 'عرض' },
         { key: 'approve',  label: 'اعتماد' },
@@ -105,7 +105,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'consultant.policies',
       label:  'السياسات والتشريعات',
-      icon:   '📋',
+      icon:   'clipboard',
       actions: [
         { key: 'view',     label: 'عرض' },
         { key: 'approve',  label: 'اعتماد' },
@@ -115,7 +115,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'consultant.design',
       label:  'تصميم السياسات',
-      icon:   '🎨',
+      icon:   'file',
       actions: [
         { key: 'view',   label: 'عرض' },
         { key: 'upload', label: 'رفع تصميم' },
@@ -127,7 +127,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'client.strategic',
       label:  'التخطيط الاستراتيجي',
-      icon:   '🎯',
+      icon:   'target',
       actions: [
         { key: 'view',   label: 'عرض' },
         { key: 'start',  label: 'بدء الخدمة' },
@@ -138,7 +138,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'client.operational',
       label:  'التخطيط التشغيلي',
-      icon:   '⚙️',
+      icon:   'gear',
       actions: [
         { key: 'view',   label: 'عرض' },
         { key: 'start',  label: 'بدء الخدمة' },
@@ -149,7 +149,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'client.policies',
       label:  'السياسات والتشريعات',
-      icon:   '📋',
+      icon:   'clipboard',
       actions: [
         { key: 'view',   label: 'عرض' },
         { key: 'start',  label: 'بدء الخدمة' },
@@ -160,7 +160,7 @@ export const PERMISSIONS_BY_ROLE = {
     {
       module: 'client.chat',
       label:  'المحادثات',
-      icon:   '💬',
+      icon:   'chat',
       actions: [
         { key: 'view', label: 'عرض' },
         { key: 'send', label: 'إرسال رسائل' },

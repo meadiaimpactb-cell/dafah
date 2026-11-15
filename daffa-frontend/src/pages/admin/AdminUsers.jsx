@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import api from '../../api/axios';
@@ -122,7 +123,7 @@ const PermissionsModal = ({ user, onClose, onSaved }) => {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
           <div>
-            <div style={{ fontSize: 17, fontWeight: 800, color: C.ink }}>🔐 إدارة الصلاحيات</div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: C.ink }}><DfIcon name="lock" size={17} style={{ marginInlineEnd: 6 }} />إدارة الصلاحيات</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 5 }}>
               <span style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{user.name}</span>
               <span style={{ background: rm.bg, color: rm.color, padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{rm.label}</span>
@@ -163,7 +164,7 @@ const PermissionsModal = ({ user, onClose, onSaved }) => {
                         {status === 'all'     && <span style={{ color: 'white', fontSize: 12, fontWeight: 700, lineHeight: 1 }}>✓</span>}
                         {status === 'partial' && <span style={{ color: 'white', fontSize: 12, fontWeight: 700, lineHeight: 1 }}>−</span>}
                       </div>
-                      <span style={{ fontSize: 18, flexShrink: 0 }}>{mod.icon}</span>
+                      <span style={{ flexShrink: 0, display: "flex", color: "#5546D6" }}><DfIcon name={mod.icon} size={18} /></span>
                       <span style={{ fontSize: 13, fontWeight: 700, color: C.ink, flex: 1 }}>{mod.label}</span>
                       <span style={{ fontSize: 10, color: C.gray, flexShrink: 0 }}>
                         {modKeys.filter(k => selected.has(k)).length}/{modKeys.length}
@@ -295,13 +296,13 @@ const UserModal = ({ mode, user, onClose, onSaved }) => {
       <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 20, padding: 28, width: 500, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(27,23,70,0.2)', animation: 'modalIn 0.22s ease-out both' }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
-          <div style={{ fontSize: 17, fontWeight: 800, color: C.ink }}>{isEdit ? '✏️ تعديل المستخدم' : '➕ إضافة مستخدم جديد'}</div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: C.ink }}>{isEdit ? 'تعديل المستخدم' : '➕ إضافة مستخدم جديد'}</div>
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: 'none', background: C.grayLight, cursor: 'pointer', fontSize: 16 }}>✕</button>
         </div>
 
         {formError && (
           <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FDECE9', border: `1px solid #F5B8AE`, color: C.red, fontSize: 12, fontWeight: 600, marginBottom: 14 }}>
-            ⚠️ {formError}
+            <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />{formError}
           </div>
         )}
 
@@ -519,7 +520,7 @@ export default function AdminUsers() {
           <div style={{ padding: 40, textAlign: 'center', color: C.red, fontFamily: 'inherit', fontSize: 13 }}>{error} <button onClick={() => load(false)} style={{ marginRight: 12, padding: '6px 14px', borderRadius: 8, border: 'none', background: C.primary, color: 'white', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13 }}>إعادة المحاولة</button></div>
         ) : users.length === 0 ? (
           <div style={{ padding: 60, textAlign: 'center', color: C.gray }}>
-            <div style={{ fontSize: 36, marginBottom: 8 }}>👤</div>
+            <div style={{ fontSize: 36, marginBottom: 8 }}><DfIcon name="user" size={36} /></div>
             <div style={{ fontSize: 14 }}>{search ? 'لا توجد نتائج للبحث' : 'لا يوجد مستخدمون'}</div>
           </div>
         ) : (
@@ -581,7 +582,7 @@ export default function AdminUsers() {
                           {can('admin.users.edit') && (
                             <button onClick={() => setModal({ mode: 'edit', user: u })}
                               style={{ padding: '5px 12px', borderRadius: 8, border: `1px solid ${C.grayBorder}`, background: 'white', color: C.primary, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                              ✏️ تعديل
+                              <DfIcon name="pencil" size={18} style={{ marginInlineEnd: 6 }} />تعديل
                             </button>
                           )}
                           {can('admin.users.permissions') && (() => {
@@ -592,14 +593,14 @@ export default function AdminUsers() {
                             return (
                               <button onClick={() => setPermissionsUser(u)}
                                 style={{ padding: '5px 12px', borderRadius: 8, border: `1px solid ${full ? '#A9E4CF' : '#FCD98B'}`, background: full ? '#E8F8F2' : '#FFF8EA', color: full ? C.green : '#7A4706', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                🔐 {full ? 'كامل' : `${granted}/${total}`}
+                                <DfIcon name="lock" size={18} style={{ marginInlineEnd: 6 }} />{full ? 'كامل' : `${granted}/${total}`}
                               </button>
                             );
                           })()}
                           {can('admin.users.delete') && (
                             <button onClick={() => setDeleteUser(u)}
                               style={{ padding: '5px 10px', borderRadius: 8, border: `1px solid #F5B8AE`, background: '#FDECE9', color: C.red, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
-                              🗑️
+                              <DfIcon name="trash" size={18} style={{ marginInlineEnd: 6 }} />
                             </button>
                           )}
                         </div>

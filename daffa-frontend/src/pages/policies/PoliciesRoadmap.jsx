@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useCallback } from "react";
 import ReactDOM from "react-dom";
 import { policiesApi, policiesDesignApi } from "../../api/policies";
@@ -182,7 +183,7 @@ const Stepper = ({ step, allDone, realStep, onStepClick }) => {
     {reviewing && (
       <div style={{ marginTop: 6, padding: '6px 14px', background: '#FFF8EA', borderRadius: 8, border: `1px solid ${C.amberLine}30`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: 12, color: C.amberText, fontWeight: 600 }}>
-          🔍 وضع المراجعة — تستعرض: {STEPS[step]?.label}
+          <DfIcon name="search" size={18} style={{ marginInlineEnd: 6 }} />وضع المراجعة — تستعرض: {STEPS[step]?.label}
         </span>
         <button
           onClick={() => onStepClick(effective)}
@@ -486,7 +487,7 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate })
 
       {payError && (
         <div style={{ marginBottom: 16, padding: '12px 16px', background: C.redLight, border: `1.5px solid ${C.red}30`, borderRadius: 10, fontSize: 13, color: C.red, fontWeight: 600 }}>
-          ⚠ {payError}
+          <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />{payError}
         </div>
       )}
 
@@ -562,7 +563,7 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate })
         <button onClick={handlePay} disabled={paying || needsConsultant}
           style={{ padding: '14px 40px', background: paying || needsConsultant ? C.gray : C.amber, color: '#1B1746', border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: paying || needsConsultant ? 'not-allowed' : 'pointer', fontFamily: "inherit", display: 'flex', alignItems: 'center', gap: 8, boxShadow: paying ? 'none' : `0 4px 16px ${C.amberLine}40`, transition: 'all 0.2s' }}>
           <IcLock width={16} height={16}/>
-          {paying ? '⏳ جارٍ معالجة الدفع…' : `ادفع الآن — ${total.toLocaleString('en-US')} ريال`}
+          {paying ? 'جارٍ معالجة الدفع…' : `ادفع الآن — ${total.toLocaleString('en-US')} ريال`}
         </button>
       </div>
     </div>
@@ -1080,7 +1081,7 @@ const StepReview = ({ policyTypes, selections, onEdit, onView, refreshData }) =>
     {allApproved && (
       <div style={{ background: '#C9EFE1', border: '1.5px solid #7FD3B5', borderRadius: 12, padding: '18px 22px', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: 28 }}>🎉</span>
+          <span style={{ fontSize: 28 }}><DfIcon name="party" size={28} /></span>
           <div>
             <div style={{ fontSize: 15, fontWeight: 700, color: '#086449' }}>تهانينا! تم اعتماد جميع السياسات</div>
             <div style={{ fontSize: 12, color: '#086449', marginTop: 2 }}>انتقل للخطوة التالية لمراجعة الاعتماد النهائي</div>
@@ -1327,9 +1328,9 @@ const StepDesign = ({
         <IcSparkles width={15} height={15} /> اكتملت رحلتك الإدارية الكاملة!
       </div>
       {[
-        { icon: '📊', label: 'التخطيط الاستراتيجي', note: 'وضع رؤية وأهداف المنظمة' },
-        { icon: '📋', label: 'التخطيط التشغيلي',   note: 'تحويل الأهداف إلى خطط عمل' },
-        { icon: '📜', label: 'السياسات واللوائح',  note: 'بناء الإطار التنظيمي والحوكمة' },
+        { icon: <DfIcon name="chart" size={20} />, label: 'التخطيط الاستراتيجي', note: 'وضع رؤية وأهداف المنظمة' },
+        { icon: <DfIcon name="clipboard" size={20} />, label: 'التخطيط التشغيلي',   note: 'تحويل الأهداف إلى خطط عمل' },
+        { icon: <DfIcon name="scroll" size={20} />, label: 'السياسات واللوائح',  note: 'بناء الإطار التنظيمي والحوكمة' },
       ].map((s, i, arr) => (
         <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < arr.length - 1 ? '1px solid #A9E4CF50' : 'none' }}>
           <div style={{ width: 36, height: 36, borderRadius: 10, background: '#C9EFE1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>{s.icon}</div>
@@ -1350,7 +1351,7 @@ const StepDesign = ({
     return (
       <div className="animate-in" style={{ textAlign: "center", maxWidth: 500, margin: "0 auto" }}>
         <div style={{ width: 80, height: 80, borderRadius: '50%', background: C.greenLight, margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: 38 }}>🎉</span>
+          <span style={{ fontSize: 38 }}><DfIcon name="party" size={38} /></span>
         </div>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: C.ink, marginBottom: 8 }}>تم اعتماد التصميم النهائي</h2>
         <p style={{ fontSize: 13, color: C.gray, lineHeight: 1.8, marginBottom: 20 }}>
@@ -1373,7 +1374,7 @@ const StepDesign = ({
     return (
       <div className="animate-in" style={{ textAlign: "center", maxWidth: 480, margin: "0 auto" }}>
         <div style={{ width: 80, height: 80, borderRadius: '50%', background: C.greenLight, margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: 38 }}>🎉</span>
+          <span style={{ fontSize: 38 }}><DfIcon name="party" size={38} /></span>
         </div>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: C.ink, marginBottom: 8 }}>اكتملت السياسات واللوائح</h2>
         <p style={{ fontSize: 13, color: C.gray, lineHeight: 1.8, marginBottom: 24 }}>
@@ -1407,21 +1408,21 @@ const StepDesign = ({
 
   const orgTypes  = ['شركة','مؤسسة','جمعية','هيئة حكومية','مؤسسة تعليمية','أخرى'];
   const styleOpts = [
-    { key: 'modern',    label: 'عصري وبسيط',     icon: '✨', desc: 'مساحات واسعة، ألوان فاتحة' },
-    { key: 'corporate', label: 'مؤسسي واحترافي',  icon: '🏢', desc: 'رسمي ومهني، مناسب للجهات الحكومية' },
-    { key: 'classic',   label: 'كلاسيكي وأنيق',   icon: '📜', desc: 'تقليدي بتفاصيل دقيقة' },
+    { key: 'modern',    label: 'عصري وبسيط',     icon: <DfIcon name="sparkle" size={20} />, desc: 'مساحات واسعة، ألوان فاتحة' },
+    { key: 'corporate', label: 'مؤسسي واحترافي',  icon: <DfIcon name="building" size={20} />, desc: 'رسمي ومهني، مناسب للجهات الحكومية' },
+    { key: 'classic',   label: 'كلاسيكي وأنيق',   icon: <DfIcon name="scroll" size={20} />, desc: 'تقليدي بتفاصيل دقيقة' },
   ];
   const langOpts  = [
     { key: 'arabic',    label: 'عربي فقط',    flag: '🇸🇦' },
     { key: 'english',   label: 'إنجليزي فقط', flag: '🇺🇸' },
-    { key: 'bilingual', label: 'ثنائي اللغة', flag: '🌐' },
+    { key: 'bilingual', label: 'ثنائي اللغة', flag: <DfIcon name="globe" size={20} /> },
   ];
   const scopeOpts = [
-    { key: 'unified',    icon: '📋', label: 'تصميم موحد للجميع',
+    { key: 'unified',    icon: <DfIcon name="clipboard" size={20} />, label: 'تصميم موحد للجميع',
       desc: `نفس القالب الاحترافي لجميع السياسات بهوية بصرية واحدة — موصى به (${selCount} سياسة بسعر واحد)` },
-    { key: 'color_coded', icon: '🎨', label: 'قالب موحد بلون مختلف لكل سياسة',
+    { key: 'color_coded', icon: <DfIcon name="palette" size={20} />, label: 'قالب موحد بلون مختلف لكل سياسة',
       desc: 'نفس التصميم لكن كل سياسة بلون تمييزي خاص بها — سهل التمييز بين الوثائق' },
-    { key: 'per_policy',  icon: '🖌️', label: 'تصميم مستقل لكل سياسة',
+    { key: 'per_policy',  icon: <DfIcon name="brush" size={20} />, label: 'تصميم مستقل لكل سياسة',
       desc: 'كل سياسة بتصميم فريد ومختلف كلياً — الأكثر تميزاً ومناسب للجهات الكبيرة' },
   ];
 
@@ -1470,15 +1471,15 @@ const StepDesign = ({
 
       {/* ما الذي يشمله التصميم */}
       <div style={{ background: '#fff', borderRadius: 14, padding: '16px 20px', marginBottom: 16, boxShadow: '0 1px 6px rgba(27,23,70,0.06)' }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 12 }}>📦 ماذا يشمل التصميم الاحترافي؟</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 12 }}><DfIcon name="box" size={14} style={{ marginInlineEnd: 6 }} />ماذا يشمل التصميم الاحترافي؟</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 8 }}>
           {[
-            ['🖼️ صفحة غلاف', 'غلاف احترافي لكل سياسة بشعار منظمتك'],
-            ['📑 فهرس المحتوى', 'جدول محتويات مرتب وقابل للتنقل'],
-            ['🎨 هوية بصرية', 'ألوانك وخطوطك المفضلة في كل الصفحات'],
-            ['📄 تنسيق احترافي', 'ترقيم صفحات، رأس وتذييل مع معلومات منظمتك'],
-            ['🔖 تصميم الأقسام', 'فواصل وعناوين أقسام بتصميم متناسق'],
-            ['📤 ملف PDF جاهز', 'وثيقة نهائية جاهزة للطباعة والنشر الرسمي'],
+            ['صفحة غلاف', 'غلاف احترافي لكل سياسة بشعار منظمتك'],
+            ['فهرس المحتوى', 'جدول محتويات مرتب وقابل للتنقل'],
+            ['هوية بصرية', 'ألوانك وخطوطك المفضلة في كل الصفحات'],
+            ['تنسيق احترافي', 'ترقيم صفحات، رأس وتذييل مع معلومات منظمتك'],
+            ['تصميم الأقسام', 'فواصل وعناوين أقسام بتصميم متناسق'],
+            ['ملف PDF جاهز', 'وثيقة نهائية جاهزة للطباعة والنشر الرسمي'],
           ].map(([icon_label, desc]) => (
             <div key={icon_label} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '8px 10px', background: '#FBF9F5', borderRadius: 8 }}>
               <span style={{ fontSize: 13, fontWeight: 700, color: C.ink, minWidth: 100 }}>{icon_label}</span>
@@ -1492,7 +1493,7 @@ const StepDesign = ({
       <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 14, marginBottom: 14 }}>
         {/* لا شكراً */}
         <Card style={{ border: `2px solid ${C.grayBorder}`, textAlign: 'center' }}>
-          <div style={{ marginBottom: 10, display: 'flex', justifyContent: 'center', color: '#8F8BA3', fontSize: 36 }}>📃</div>
+          <div style={{ marginBottom: 10, display: 'flex', justifyContent: 'center', color: '#8F8BA3', fontSize: 36 }}><DfIcon name="file" size={36} /></div>
           <h3 style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginBottom: 6 }}>التصميم التلقائي</h3>
           <p style={{ fontSize: 11, color: C.gray, lineHeight: 1.7, marginBottom: 12 }}>
             وثيقة نصية بسيطة جاهزة للتحميل<br />
@@ -1509,7 +1510,7 @@ const StepDesign = ({
         {/* التصميم الاحترافي */}
         <Card style={{ border: `2px solid ${C.amberLine}`, background: `${C.amber}05` }}>
           <div style={{ background: C.amber, color: '#1B1746', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20, display: 'inline-block', marginBottom: 8 }}>موصى به</div>
-          <div style={{ marginBottom: 6, display: 'flex', justifyContent: 'center', color: C.amberText, fontSize: 32 }}>🎨</div>
+          <div style={{ marginBottom: 6, display: 'flex', justifyContent: 'center', color: C.amberText, fontSize: 32 }}><DfIcon name="palette" size={32} /></div>
           <h3 style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginBottom: 6, textAlign: 'center' }}>تصميم بهوية منظمتك</h3>
           <p style={{ fontSize: 11, color: C.gray, lineHeight: 1.7, marginBottom: 10, textAlign: 'center' }}>
             وثيقة احترافية كاملة بشعارك وألوانك<br />
@@ -1532,7 +1533,7 @@ const StepDesign = ({
       </div>
 
       <div style={{ padding: '10px 14px', background: '#E8F8F2', borderRadius: 10, fontSize: 11, color: '#086449', textAlign: 'center' }}>
-        🔒 الدفع آمن ومشفر — سيتم بدء التصميم خلال 3-5 أيام عمل بعد إتمام الدفع
+        <DfIcon name="lock" size={18} style={{ marginInlineEnd: 6 }} />الدفع آمن ومشفر — سيتم بدء التصميم خلال 3-5 أيام عمل بعد إتمام الدفع
       </div>
     </div>
   );
@@ -1546,7 +1547,7 @@ const StepDesign = ({
       <div style={{ background: '#fff', borderRadius: 14, padding: '14px 20px', marginBottom: 14, boxShadow: '0 1px 6px rgba(27,23,70,0.06)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <span style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>
-            {briefPage === 1 ? '🏢 هوية المنظمة' : '🎨 تفضيلات التصميم'}
+            {briefPage === 1 ? 'هوية المنظمة' : 'تفضيلات التصميم'}
           </span>
           <span style={{ fontSize: 11, color: C.gray }}>{briefPage}/2</span>
         </div>
@@ -1565,7 +1566,7 @@ const StepDesign = ({
             <label style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '14px 18px', border: `2px dashed ${logoPreview ? C.primary : C.grayBorder}`, borderRadius: 12, cursor: 'pointer', background: logoPreview ? `${C.primary}05` : '#FBF9F5', transition: 'all 0.2s' }}>
               {logoPreview
                 ? <img src={logoPreview} alt="شعار" style={{ height: 60, maxWidth: 120, objectFit: 'contain', borderRadius: 6 }} />
-                : <div style={{ width: 60, height: 60, borderRadius: 10, background: C.grayLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>🖼️</div>
+                : <div style={{ width: 60, height: 60, borderRadius: 10, background: C.grayLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}><DfIcon name="image" size={26} /></div>
               }
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: logoPreview ? C.primary : C.ink }}>
@@ -1616,10 +1617,10 @@ const StepDesign = ({
               style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 12, fontFamily: "inherit", outline: 'none', boxSizing: 'border-box', marginBottom: 8 }} />
             <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 8 }}>
               {[
-                ['org_phone','📞 رقم الهاتف','0112345678'],
-                ['org_email','📧 البريد الإلكتروني','info@example.sa'],
-                ['org_website','🌐 الموقع الإلكتروني','www.example.sa'],
-                ['org_city','📍 المدينة','الرياض'],
+                ['org_phone','رقم الهاتف','0112345678'],
+                ['org_email','البريد الإلكتروني','info@example.sa'],
+                ['org_website','الموقع الإلكتروني','www.example.sa'],
+                ['org_city','المدينة','الرياض'],
               ].map(([key, label, ph]) => (
                 <div key={key}>
                   <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>{label}</div>
@@ -1720,12 +1721,12 @@ const StepDesign = ({
             <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 8 }}>عناصر الوثيقة</div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {[
-                ['include_cover', '🖼️ صفحة غلاف لكل سياسة'],
-                ['include_toc',   '📑 جدول المحتويات'],
+                ['include_cover', 'صفحة غلاف لكل سياسة'],
+                ['include_toc',   'جدول المحتويات'],
               ].map(([k, label]) => (
                 <button key={k} onClick={() => upd(k, !brief[k])}
                   style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', borderRadius: 10, fontSize: 12, fontFamily: "inherit", cursor: 'pointer', background: brief[k] ? `${C.primary}12` : '#FBF9F5', color: brief[k] ? C.primary : C.gray, border: `1.5px solid ${brief[k] ? C.primary : C.grayBorder}`, fontWeight: brief[k] ? 700 : 400 }}>
-                  <span style={{ fontSize: 16 }}>{brief[k] ? '✅' : '⬜'}</span> {label}
+                  <span style={{ fontSize: 16 }}>{brief[k] ? <DfIcon name="check" size={20} /> : '⬜'}</span> {label}
                 </button>
               ))}
             </div>
@@ -1825,7 +1826,7 @@ const StepDesign = ({
           <IcLock width={11} height={11}/> دفع آمن ومشفر
         </div>
         <Btn full onClick={handlePay} disabled={loading || paying}>
-          {(loading || paying) ? "⏳ جارٍ معالجة الدفع…" : <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><IcLock width={14} height={14}/>ادفع الآن — {total.toLocaleString('en-US')} ريال</span>}
+          {(loading || paying) ? "جارٍ معالجة الدفع…" : <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><IcLock width={14} height={14}/>ادفع الآن — {total.toLocaleString('en-US')} ريال</span>}
         </Btn>
         <button onClick={() => setSubStep('brief')} style={{ width: '100%', marginTop: 8, background: 'none', border: 'none', color: C.gray, cursor: 'pointer', fontSize: 11, fontFamily: "inherit", padding: '6px 0' }}>← العودة لتعديل المتطلبات</button>
       </Card>
@@ -1948,7 +1949,7 @@ const WorkflowsList = ({ onSelect, onNew }) => {
 
       {workflows.length === 0 ? (
         <Card style={{ padding: 48, textAlign: 'center' }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+          <div style={{ fontSize: 48, marginBottom: 16 }}><DfIcon name="clipboard" size={48} /></div>
           <h3 style={{ fontSize: 18, fontWeight: 700, color: C.ink, marginBottom: 8 }}>لا توجد خطط بعد</h3>
           <p style={{ fontSize: 13, color: C.gray, marginBottom: 24 }}>ابدأ بإنشاء خطة سياسات ولوائح لمنظمتك</p>
           <Btn onClick={handleNew} disabled={creating}>

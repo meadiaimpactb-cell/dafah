@@ -1,3 +1,4 @@
+import DfIcon from '../../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import { strategicApi } from '../../../api/strategic';
 import api from '../../../api/axios';
@@ -27,7 +28,7 @@ export default function StepApproval({ workflow, navigate, workflowId }) {
     <div className="animate-in" style={{ maxWidth: 700, margin: '0 auto' }}>
       {/* نجاح */}
       <div style={{ background: '#fff', borderRadius: 16, padding: 40, marginBottom: 20, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', textAlign: 'center' }}>
-        <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#C9EFE1', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>🎉</div>
+        <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#C9EFE1', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}><DfIcon name="party" size={32} /></div>
         <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>تهانينا! خطتك الاستراتيجية معتمدة</h2>
         <p style={{ fontSize: 14, color: '#67637A', maxWidth: 460, margin: '0 auto' }}>
           لقد أتممت بنجاح جميع مراحل بناء الخطة الاستراتيجية لمنظمتك. الوثيقة النهائية جاهزة للتحميل.
@@ -36,13 +37,13 @@ export default function StepApproval({ workflow, navigate, workflowId }) {
 
       {/* تفاصيل */}
       <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 20, marginBottom: 20 }}>
-        <InfoCard title="المستشار المشرف" value={workflow?.consultant?.name || '—'} icon="👤" />
-        <InfoCard title="تاريخ الاعتماد"  value={workflow?.completed_at ? new Date(workflow.completed_at).toLocaleDateString('en-US') : '—'} icon="📅" />
+        <InfoCard title="المستشار المشرف" value={workflow?.consultant?.name || '—'} icon={<DfIcon name="user" size={20} />} />
+        <InfoCard title="تاريخ الاعتماد"  value={workflow?.completed_at ? new Date(workflow.completed_at).toLocaleDateString('en-US') : '—'} icon={<DfIcon name="calendar" size={20} />} />
       </div>
 
       {/* تحميل الوثيقة */}
       <div style={{ background: '#fff', borderRadius: 12, padding: 28, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', textAlign: 'center', marginBottom: 20 }}>
-        <div style={{ fontSize: 40, marginBottom: 12 }}>📄</div>
+        <div style={{ fontSize: 40, marginBottom: 12 }}><DfIcon name="file" size={40} /></div>
         <div style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>الوثيقة الاستراتيجية النهائية</div>
         <div style={{ fontSize: 13, color: '#67637A', marginBottom: 20 }}>
           الوثيقة الكاملة تتضمن جميع مراحل التخطيط الاستراتيجي المعتمدة من المستشار
@@ -52,7 +53,7 @@ export default function StepApproval({ workflow, navigate, workflowId }) {
           onClick={handleDownload}
           disabled={generating}
         >
-          {generating ? '⏳ جارٍ التحضير…' : '⬇ تحميل الوثيقة PDF'}
+          {generating ? 'جارٍ التحضير…' : '⬇ تحميل الوثيقة PDF'}
         </button>
         {error && (
           <div style={{ marginTop: 12, fontSize: 13, color: '#D03F2A', background: '#FDECE9', padding: '8px 14px', borderRadius: 8 }}>
@@ -76,10 +77,10 @@ export default function StepApproval({ workflow, navigate, workflowId }) {
         <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 1px 8px rgba(27,23,70,0.06)', marginTop: 20 }}>
           <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>الخدمات الإضافية المشتراة</h3>
           {workflow.addon_certification && (
-            <AddonRow icon="🏅" label="اعتماد الخطة من جهة استشارية" status="قيد التنفيذ" />
+            <AddonRow icon={<DfIcon name="medal" size={20} />} label="اعتماد الخطة من جهة استشارية" status="قيد التنفيذ" />
           )}
           {workflow.addon_design && (
-            <AddonRow icon="🎨" label="تصميم احترافي للوثيقة" status="قيد التنفيذ" />
+            <AddonRow icon={<DfIcon name="palette" size={20} />} label="تصميم احترافي للوثيقة" status="قيد التنفيذ" />
           )}
         </div>
       )}
@@ -98,7 +99,7 @@ export default function StepApproval({ workflow, navigate, workflowId }) {
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
             <div style={{ width: 52, height: 52, borderRadius: 14, background: `${colors.amber}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, flexShrink: 0 }}>
-              📋
+              <DfIcon name="clipboard" size={18} style={{ marginInlineEnd: 6 }} />
             </div>
             <div style={{ flex: 1 }}>
               <h3 style={{ fontSize: 17, fontWeight: 800, color: colors.ink, marginBottom: 6 }}>التخطيط التشغيلي</h3>
