@@ -146,7 +146,7 @@ function renderFormData(formData) {
 const PDF_CSS = `
   * { margin:0; padding:0; box-sizing:border-box; }
   .pdf-root {
-    font-family:'Cairo','Segoe UI',Tahoma,Arial,sans-serif;
+    font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,Arial,sans-serif;
     direction:rtl; color:#1B1746; background:#fff;
     font-size:12px; line-height:1.6; width:794px;
   }
@@ -387,7 +387,7 @@ export default async function generateStrategicPDF(workflow, orgInfo) {
 <title>الخطة الاستراتيجية — ${orgName}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 ${PDF_CSS}
 @page { size: A4; margin: 10mm 12mm; }

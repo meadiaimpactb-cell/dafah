@@ -7,9 +7,9 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'dejavusans', 'DejaVu Sans', sans-serif;
+    font-family: 'plexarabic', 'dejavusans', sans-serif;
     direction: rtl;
-    color: #1f2937;
+    color: #1B1746;
     font-size: 12px;
     line-height: 1.7;
 }
@@ -21,7 +21,7 @@ body {
 
 /* ══ غلاف ══ */
 .cover {
-    background-color: #14505E;
+    background-color: #1B1746;
     color: #ffffff;
     padding: 26px 28px 28px;
     border-radius: 0 0 10px 10px;
@@ -37,14 +37,14 @@ body {
 
 .cover-sub-text {
     font-size: 12px;
-    color: #b2d8df;
+    color: #D0CCFA;
     text-align: center;
     margin-bottom: 14px;
 }
 
 .cover-org-type-text {
     font-size: 11px;
-    color: #b2d8df;
+    color: #D0CCFA;
     text-align: center;
     margin-bottom: 6px;
 }
@@ -52,13 +52,13 @@ body {
 .cover-line-div {
     width: 50px;
     height: 3px;
-    background-color: #E8620A;
+    background-color: #F5A524;
     margin: 0 auto 18px;
 }
 
 .cover-badge-span {
-    background-color: #E8620A;
-    color: #ffffff;
+    background-color: #F5A524;
+    color: #1B1746;
     padding: 3px 12px;
     border-radius: 20px;
     font-size: 10px;
@@ -66,28 +66,28 @@ body {
 }
 
 .cover-card-div {
-    border: 1px solid #3a7a8a;
+    border: 1px solid #4537B4;
     border-radius: 6px;
     padding: 9px 14px;
     text-align: center;
-    background-color: #1a6070;
+    background-color: #2B2470;
 }
 
-.cover-card-lbl { font-size: 9px; color: #9ecfda; margin-bottom: 3px; }
+.cover-card-lbl { font-size: 9px; color: #B0A9F6; margin-bottom: 3px; }
 .cover-card-val { font-size: 11px; font-weight: bold; color: #ffffff; }
 
 .cover-footer-div {
     text-align: center;
     margin-top: 26px;
     padding-top: 12px;
-    border-top: 1px solid #3a7a8a;
+    border-top: 1px solid #4537B4;
     font-size: 10px;
-    color: #7fbdca;
+    color: #8D82EF;
 }
 
 /* ══ فهرس ══ */
 .toc-header-div {
-    background-color: #1A6B7C;
+    background-color: #5546D6;
     color: #ffffff;
     padding: 10px 16px;
     border-radius: 6px;
@@ -97,15 +97,15 @@ body {
 }
 
 .toc-item-td {
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
+    background-color: #FBF9F5;
+    border: 1px solid #E8E3DA;
     padding: 7px 10px;
     vertical-align: middle;
     width: 50%;
 }
 
 .toc-num-span {
-    background-color: #1A6B7C;
+    background-color: #5546D6;
     color: #ffffff;
     border-radius: 50%;
     display: inline-block;
@@ -122,13 +122,13 @@ body {
 .toc-name-span {
     font-size: 11px;
     font-weight: bold;
-    color: #374151;
+    color: #34314A;
     vertical-align: middle;
 }
 
 /* ══ وحدات ══ */
 .unit-num-span {
-    background-color: #1A6B7C;
+    background-color: #5546D6;
     color: #ffffff;
     border-radius: 50%;
     display: inline-block;
@@ -144,7 +144,7 @@ body {
 .unit-title-span {
     font-size: 14px;
     font-weight: bold;
-    color: #14505E;
+    color: #1B1746;
     vertical-align: middle;
     padding-right: 10px;
 }
@@ -152,22 +152,22 @@ body {
 /* ══ حقول ══ */
 .field-block {
     margin-bottom: 8px;
-    background-color: #f9fafb;
+    background-color: #FBF9F5;
     padding: 8px 10px 8px 8px;
-    border-right: 3px solid #1A6B7C;
+    border-right: 3px solid #5546D6;
     page-break-inside: avoid;
 }
 
 .field-label {
     font-size: 9px;
     font-weight: bold;
-    color: #1A6B7C;
+    color: #5546D6;
     margin-bottom: 4px;
 }
 
 .field-value {
     font-size: 11px;
-    color: #374151;
+    color: #34314A;
     line-height: 1.65;
 }
 
@@ -181,43 +181,43 @@ body {
     border-spacing: 0;
     font-size: 10px;
     margin-top: 4px;
-    border: 1px solid #d1d5db;
+    border: 1px solid #D9D3C7;
 }
 
 .data-table th {
-    background-color: #1A6B7C;
+    background-color: #5546D6;
     color: #ffffff;
     padding: 5px 8px;
     font-weight: bold;
     text-align: right;
-    border-left: 1px solid #15566a;
+    border-left: 1px solid #382D90;
 }
 
 .data-table td {
     padding: 5px 8px;
-    border-bottom: 1px solid #e5e7eb;
-    border-left: 1px solid #e5e7eb;
-    color: #374151;
+    border-bottom: 1px solid #E8E3DA;
+    border-left: 1px solid #E8E3DA;
+    color: #34314A;
     text-align: right;
 }
 
-.data-table tr:nth-child(even) td { background-color: #f3f4f6; }
+.data-table tr:nth-child(even) td { background-color: #F3EFE8; }
 
 /* ══ nested ══ */
 .nested-table { width: 100%; }
 .nested-key {
     font-weight: bold;
-    color: #6b7280;
+    color: #67637A;
     font-size: 10px;
     padding-left: 10px;
     width: 130px;
     vertical-align: top;
 }
-.nested-val { font-size: 10px; color: #374151; }
+.nested-val { font-size: 10px; color: #34314A; }
 
 /* ══ ختام ══ */
 .closing {
-    background-color: #14505E;
+    background-color: #1B1746;
     color: #ffffff;
     padding: 44px 36px;
     text-align: center;
@@ -226,21 +226,21 @@ body {
 }
 
 .closing-title { font-size: 17px; font-weight: bold; color: #ffffff; margin-bottom: 10px; }
-.closing-text  { font-size: 12px; color: #b2d8df; margin-bottom: 24px; line-height: 1.8; }
+.closing-text  { font-size: 12px; color: #D0CCFA; margin-bottom: 24px; line-height: 1.8; }
 
 .stamp-box {
-    border: 1px solid #3a7a8a;
+    border: 1px solid #4537B4;
     border-radius: 8px;
     padding: 12px 28px;
     display: inline-block;
-    background-color: #1a6070;
+    background-color: #2B2470;
 }
 
-.stamp-lbl  { font-size: 9px; color: #9ecfda; margin-bottom: 3px; }
+.stamp-lbl  { font-size: 9px; color: #B0A9F6; margin-bottom: 3px; }
 .stamp-val  { font-size: 13px; font-weight: bold; color: #ffffff; margin-bottom: 8px; }
-.stamp-date { font-size: 11px; color: #b2d8df; }
+.stamp-date { font-size: 11px; color: #D0CCFA; }
 
-.empty-val  { color: #9ca3af; font-style: italic; }
+.empty-val  { color: #8F8BA3; font-style: italic; }
 .page-break { page-break-before: always; }
 .spacer     { height: 12px; }
 </style>
@@ -249,7 +249,7 @@ body {
 
 {{-- ════ غلاف ════ --}}
 <div class="cover">
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid #3a7a8a;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid #4537B4;">
         <tr>
             <td style="vertical-align:middle;">
                 <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('logo.png'))) }}" alt="منصة دفة" style="height:44px; max-width:140px; background:#ffffff; border-radius:6px; padding:3px;" />
@@ -326,7 +326,7 @@ body {
 @foreach($submissions as $submission)
 <div class="page-break"></div>
 
-<table width="100%" cellpadding="0" cellspacing="0" style="border-bottom:2px solid #1A6B7C; margin-bottom:12px; padding-bottom:8px;">
+<table width="100%" cellpadding="0" cellspacing="0" style="border-bottom:2px solid #5546D6; margin-bottom:12px; padding-bottom:8px;">
     <tr>
         <td width="36" style="vertical-align:middle;">
             <span class="unit-num-span">{{ $submission->unit_number }}</span>

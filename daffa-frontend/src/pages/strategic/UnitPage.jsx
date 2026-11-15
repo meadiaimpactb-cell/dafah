@@ -1,3 +1,4 @@
+import { Help } from '../../components/ui/Help';
 import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
@@ -146,7 +147,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
             <div style={{ width: 30, height: 30, borderRadius: '50%', background: colors.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>
               {unitSummary.unit_number}
             </div>
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, margin: 0 }}>{unit.name}</h2>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, margin: 0, display: 'flex', alignItems: 'center' }}>{unit.name}<Help term={unit.template_type} /></h2>
             <span style={{ fontSize: 11, color: '#8F8BA3' }}>الوحدة {unitSummary.unit_number} من {allUnits.length || '?'}</span>
           </div>
           <div style={{ fontSize: 11, color: '#8F8BA3', marginTop: 3, marginRight: 40 }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />{unit.video_duration}</div>

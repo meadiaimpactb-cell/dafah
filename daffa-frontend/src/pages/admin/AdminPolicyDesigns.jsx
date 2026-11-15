@@ -47,10 +47,10 @@ const exportDesignerBrief = (item) => {
 <head>
   <meta charset="UTF-8">
   <title>موجز التصميم — ${b.org_name || item.org_name || 'عميل'}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Cairo',Tahoma,sans-serif;direction:rtl;background:#FBF9F5;color:#1B1746;padding:0}
+    body{font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;direction:rtl;background:#FBF9F5;color:#1B1746;padding:0}
     .page{max-width:800px;margin:0 auto;background:#fff;min-height:100vh;padding:40px}
     @media print{body{background:#fff}.page{padding:20px;max-width:100%}.no-print{display:none!important}@page{margin:15mm}}
     .header{background:linear-gradient(135deg,#5546D6,#1B1746);color:#fff;padding:28px 32px;border-radius:12px;margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
@@ -72,8 +72,8 @@ const exportDesignerBrief = (item) => {
     .policies{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0}
     .policy-tag{padding:4px 12px;border-radius:20px;background:#E7E5FD;color:#5546D6;font-size:12px;font-weight:600}
     .checkbox{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;background:#C9EFE1;color:#086449;margin-left:8px}
-    .download-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#5546D6;color:#fff;border-radius:10px;text-decoration:none;font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;margin-top:8px}
-    .print-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:#F5A524;color:#fff;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-left:10px}
+    .download-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#5546D6;color:#fff;border-radius:10px;text-decoration:none;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:13px;margin-top:8px}
+    .print-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:#F5A524;color:#1B1746;border:none;border-radius:10px;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-left:10px}
     .footer{margin-top:32px;padding:14px 20px;background:#F3EFE8;border-radius:10px;font-size:11px;color:#67637A;text-align:center}
     .scope-box{padding:12px 16px;border-radius:8px;background:#EAF4FD;border:1.5px solid #A9D2F5;font-size:13px;font-weight:700;color:#1A65AD;margin-bottom:0}
     .notes-box{padding:12px 14px;background:#FFF8EA;border:1px solid #FCD98B;border-radius:8px;font-size:13px;color:#5F3705;line-height:1.7}

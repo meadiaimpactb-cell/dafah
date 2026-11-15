@@ -1,3 +1,4 @@
+import { Help } from '../../components/ui/Help';
 import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { operationalApi } from '../../api/operational';
@@ -968,7 +969,7 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
       <div style={{ fontSize: 12, color: colors.gray, marginBottom: 4 }}>التخطيط التشغيلي {">"} {unit.name}</div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
         <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", color: colors.primary, display: "flex" }}>{Icons.arrow}</button>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink }}>{unit.name}</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, display: 'flex', alignItems: 'center' }}>{unit.name}<Help term={unit.template_type} /></h2>
         <Badge text={`الوحدة ${unitNum} من ${totalUnits || '؟'}`} color="primary" small />
       </div>
       <StatusBar status={status === 'not_started' ? 'not_submitted' : status} />

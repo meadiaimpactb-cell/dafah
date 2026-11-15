@@ -7,9 +7,9 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'dejavusans', 'DejaVu Sans', sans-serif;
+    font-family: 'plexarabic', 'dejavusans', sans-serif;
     direction: rtl;
-    color: #1f2937;
+    color: #1B1746;
     font-size: 12px;
     line-height: 1.7;
 }
@@ -20,7 +20,7 @@ body {
 }
 
 .header {
-    background-color: #14505E;
+    background-color: #1B1746;
     color: #ffffff;
     padding: 22px 24px 18px;
     border-radius: 0 0 10px 10px;
@@ -46,8 +46,8 @@ body {
 }
 
 .invoice-badge {
-    background: #E8713A;
-    color: white;
+    background: #F5A524;
+    color: #1B1746;
     font-size: 16px;
     font-weight: bold;
     padding: 6px 18px;
@@ -63,7 +63,7 @@ body {
     display: flex;
     justify-content: space-between;
     font-size: 11px;
-    color: #b2d8df;
+    color: #D0CCFA;
 }
 
 .section {
@@ -73,15 +73,15 @@ body {
 .section-title {
     font-size: 13px;
     font-weight: bold;
-    color: #14505E;
-    border-right: 3px solid #E8713A;
+    color: #1B1746;
+    border-right: 3px solid #E0920F;
     padding-right: 8px;
     margin-bottom: 10px;
 }
 
 .info-box {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: #FBF9F5;
+    border: 1px solid #E8E3DA;
     border-radius: 8px;
     padding: 12px 14px;
 }
@@ -90,14 +90,14 @@ body {
     display: flex;
     justify-content: space-between;
     padding: 4px 0;
-    border-bottom: 1px solid #f0f4f7;
+    border-bottom: 1px solid #F3EFE8;
     font-size: 11.5px;
 }
 
 .info-row:last-child { border-bottom: none; }
 
-.info-label { color: #64748b; font-weight: 600; }
-.info-value { color: #1e293b; }
+.info-label { color: #67637A; font-weight: 600; }
+.info-value { color: #1B1746; }
 
 .items-table {
     width: 100%;
@@ -106,7 +106,7 @@ body {
 }
 
 .items-table th {
-    background: #14505E;
+    background: #1B1746;
     color: white;
     padding: 9px 10px;
     text-align: right;
@@ -115,16 +115,16 @@ body {
 
 .items-table td {
     padding: 9px 10px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #E8E3DA;
 }
 
 .items-table tr:nth-child(even) td {
-    background: #f8fafc;
+    background: #FBF9F5;
 }
 
 .totals-box {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: #FBF9F5;
+    border: 1px solid #E8E3DA;
     border-radius: 8px;
     padding: 12px 16px;
     width: 50%;
@@ -137,27 +137,27 @@ body {
     justify-content: space-between;
     padding: 5px 0;
     font-size: 12px;
-    border-bottom: 1px solid #f0f4f7;
+    border-bottom: 1px solid #F3EFE8;
 }
 
 .totals-row:last-child {
     border-bottom: none;
     font-size: 14px;
     font-weight: bold;
-    color: #14505E;
+    color: #1B1746;
     padding-top: 8px;
     margin-top: 4px;
-    border-top: 2px solid #14505E;
+    border-top: 2px solid #1B1746;
 }
 
-.totals-label { color: #64748b; }
-.totals-value { color: #1e293b; font-weight: 600; }
+.totals-label { color: #67637A; }
+.totals-value { color: #1B1746; font-weight: 600; }
 
 .clearfix::after { content: ""; display: table; clear: both; }
 
 .status-paid {
-    background: #dcfce7;
-    color: #166534;
+    background: #C9EFE1;
+    color: #086449;
     padding: 3px 10px;
     border-radius: 12px;
     font-size: 11px;
@@ -168,19 +168,19 @@ body {
 .footer {
     margin-top: 30px;
     padding-top: 14px;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid #E8E3DA;
     text-align: center;
     font-size: 10px;
     color: #94a3b8;
 }
 
 .vat-note {
-    background: #fffbeb;
-    border: 1px solid #fde68a;
+    background: #FFF8EA;
+    border: 1px solid #FCD98B;
     border-radius: 6px;
     padding: 8px 12px;
     font-size: 10.5px;
-    color: #92400e;
+    color: #7A4706;
     margin-top: 12px;
 }
 </style>
@@ -200,7 +200,7 @@ body {
     <div class="header-meta">
         <span>رقم الفاتورة: <strong style="color:white;">{{ $order->order_number }}</strong></span>
         <span>تاريخ الإصدار: <strong style="color:white;">{{ ($order->paid_at ?? $order->created_at)->format('Y/m/d') }}</strong></span>
-        <span>حالة الدفع: <strong style="color: #86efac;">مدفوعة</strong></span>
+        <span>حالة الدفع: <strong style="color: #7FD3B5;">مدفوعة</strong></span>
     </div>
 </div>
 
@@ -300,8 +300,8 @@ body {
             @if($order->discount_amount && $order->discount_amount > 0)
             <tr>
                 <td></td>
-                <td colspan="2" style="color:#166534;">خصم ({{ $order->discount_code }})</td>
-                <td style="text-align:left; color:#166534; font-weight:600;">- {{ number_format($order->discount_amount, 2) }}</td>
+                <td colspan="2" style="color:#086449;">خصم ({{ $order->discount_code }})</td>
+                <td style="text-align:left; color:#086449; font-weight:600;">- {{ number_format($order->discount_amount, 2) }}</td>
             </tr>
             @endif
         </tbody>
@@ -322,7 +322,7 @@ body {
         @if($order->discount_amount && $order->discount_amount > 0)
         <div class="totals-row">
             <span class="totals-label">الخصم</span>
-            <span class="totals-value" style="color:#166534;">- {{ number_format($order->discount_amount, 2) }} ريال</span>
+            <span class="totals-value" style="color:#086449;">- {{ number_format($order->discount_amount, 2) }} ريال</span>
         </div>
         @endif
         <div class="totals-row">

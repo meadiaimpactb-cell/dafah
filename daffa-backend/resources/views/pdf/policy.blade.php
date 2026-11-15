@@ -7,12 +7,12 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'dejavusans', 'DejaVu Sans', sans-serif;
+    font-family: 'plexarabic', 'dejavusans', sans-serif;
     direction: rtl;
-    color: #1f2937;
+    color: #1B1746;
     font-size: 12px;
     line-height: 1.7;
-    background: #e8edf2;
+    background: #E8E3DA;
 }
 
 @page { size: A4 portrait; margin: 10mm 12mm; }
@@ -34,7 +34,7 @@ body {
 
 /* ══ شريط الطباعة ══ */
 .print-btn-bar {
-    background: #14505E;
+    background: #1B1746;
     padding: 10px 28px;
     display: flex;
     justify-content: space-between;
@@ -44,35 +44,35 @@ body {
     z-index: 100;
 }
 .print-btn {
-    background: #E8620A;
-    color: #ffffff;
+    background: #F5A524;
+    color: #1B1746;
     border: none;
     padding: 8px 22px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: bold;
     cursor: pointer;
-    font-family: 'dejavusans', sans-serif;
+    font-family: 'plexarabic', 'dejavusans', sans-serif;
 }
-.print-btn:hover { background: #d45508; }
+.print-btn:hover { background: #F9C152; }
 .print-bar-title { font-size: 13px; font-weight: bold; color: #ffffff; }
 
 /* ══ غلاف ══ */
 .cover {
-    background-color: #14505E;
+    background-color: #1B1746;
     color: #ffffff;
     padding: 28px 36px 32px;
 }
 .cover-title-text    { font-size: 24px; font-weight: bold; color: #ffffff; text-align: center; margin-bottom: 4px; }
-.cover-sub-text      { font-size: 12px; color: #b2d8df; text-align: center; margin-bottom: 14px; }
-.cover-org-type-text { font-size: 11px; color: #b2d8df; text-align: center; margin-bottom: 6px; }
-.cover-line-div      { width: 50px; height: 3px; background-color: #E8620A; margin: 0 auto 20px; border-radius: 2px; }
-.cover-badge-span    { background-color: #E8620A; color: #ffffff; padding: 4px 14px; border-radius: 20px; font-size: 10px; font-weight: bold; }
+.cover-sub-text      { font-size: 12px; color: #D0CCFA; text-align: center; margin-bottom: 14px; }
+.cover-org-type-text { font-size: 11px; color: #D0CCFA; text-align: center; margin-bottom: 6px; }
+.cover-line-div      { width: 50px; height: 3px; background-color: #F5A524; margin: 0 auto 20px; border-radius: 2px; }
+.cover-badge-span    { background-color: #F5A524; color: #1B1746; padding: 4px 14px; border-radius: 20px; font-size: 10px; font-weight: bold; }
 
 /* بطاقة السياسة المميزة */
 .policy-card {
-    background: linear-gradient(135deg, #1a6070 0%, #0f4a58 100%);
-    border: 1px solid #3a7a8a;
+    background: linear-gradient(135deg, #2B2470 0%, #0f4a58 100%);
+    border: 1px solid #4537B4;
     border-radius: 8px;
     padding: 10px 20px;
     text-align: center;
@@ -81,16 +81,16 @@ body {
 }
 .policy-card-icon { font-size: 22px; margin-bottom: 4px; }
 .policy-card-name { font-size: 14px; font-weight: bold; color: #ffffff; margin-bottom: 4px; }
-.policy-card-desc { font-size: 10px; color: #9ecfda; line-height: 1.6; }
-.policy-card-divider { width: 32px; height: 2px; background: #E8620A; margin: 6px auto 5px; border-radius: 2px; }
+.policy-card-desc { font-size: 10px; color: #B0A9F6; line-height: 1.6; }
+.policy-card-divider { width: 32px; height: 2px; background: #F5A524; margin: 6px auto 5px; border-radius: 2px; }
 
-.cover-card-div { border: 1px solid #3a7a8a; border-radius: 8px; padding: 10px 14px; text-align: center; background-color: #1a6070; }
-.cover-card-lbl { font-size: 9px; color: #9ecfda; margin-bottom: 4px; }
+.cover-card-div { border: 1px solid #4537B4; border-radius: 8px; padding: 10px 14px; text-align: center; background-color: #2B2470; }
+.cover-card-lbl { font-size: 9px; color: #B0A9F6; margin-bottom: 4px; }
 .cover-card-val { font-size: 11px; font-weight: bold; color: #ffffff; }
 
 .cover-footer-div {
     text-align: center; margin-top: 28px; padding-top: 14px;
-    border-top: 1px solid #3a7a8a; font-size: 10px; color: #7fbdca;
+    border-top: 1px solid #4537B4; font-size: 10px; color: #8D82EF;
 }
 
 /* ══ منطقة المحتوى ══ */
@@ -98,13 +98,13 @@ body {
 
 /* ══ رأس القسم ══ */
 .section-header-row {
-    border-bottom: 2px solid #1A6B7C;
+    border-bottom: 2px solid #5546D6;
     margin-bottom: 14px;
     padding-bottom: 10px;
     margin-top: 4px;
 }
 .section-num-circle {
-    background-color: #1A6B7C;
+    background-color: #5546D6;
     color: #ffffff;
     border-radius: 50%;
     display: inline-block;
@@ -116,36 +116,36 @@ body {
 .section-title-span {
     font-size: 15px;
     font-weight: bold;
-    color: #14505E;
+    color: #1B1746;
     vertical-align: middle;
     padding-right: 10px;
 }
-.section-subtitle { font-size: 10px; color: #6b7280; padding-right: 42px; margin-top: 3px; }
+.section-subtitle { font-size: 10px; color: #67637A; padding-right: 42px; margin-top: 3px; }
 
 /* ══ حقول الإجابات ══ */
 .field-block {
     margin-bottom: 10px;
-    background-color: #f9fafb;
+    background-color: #FBF9F5;
     padding: 10px 12px 10px 10px;
-    border-right: 3px solid #1A6B7C;
+    border-right: 3px solid #5546D6;
     border-radius: 0 4px 4px 0;
     page-break-inside: avoid;
 }
 .field-label {
     font-size: 9px;
     font-weight: bold;
-    color: #1A6B7C;
+    color: #5546D6;
     margin-bottom: 5px;
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
-.field-value { font-size: 11px; color: #374151; line-height: 1.7; }
+.field-value { font-size: 11px; color: #34314A; line-height: 1.7; }
 .field-value ul { padding-right: 18px; margin: 0; }
 .field-value li { margin-bottom: 4px; }
 
 /* حقل مميز للقسم الأول */
 .field-block-accent {
-    border-right-color: #E8620A;
+    border-right-color: #E0920F;
 }
 
 /* ══ بطاقة المعلومات الأساسية ══ */
@@ -154,19 +154,19 @@ body {
 
 /* ══ ملاحظات المستشار ══ */
 .consultant-note-box {
-    background: #f0f9fb;
+    background: #F3F2FE;
     border: 1px solid #bde3ec;
-    border-right: 4px solid #1A6B7C;
+    border-right: 4px solid #5546D6;
     border-radius: 0 8px 8px 0;
     padding: 14px 16px;
     margin-top: 6px;
 }
-.consultant-note-lbl { font-size: 10px; font-weight: bold; color: #1A6B7C; margin-bottom: 6px; }
-.consultant-note-val { font-size: 11px; color: #374151; line-height: 1.8; }
+.consultant-note-lbl { font-size: 10px; font-weight: bold; color: #5546D6; margin-bottom: 6px; }
+.consultant-note-val { font-size: 11px; color: #34314A; line-height: 1.8; }
 
 /* ══ فهرس الأقسام ══ */
 .toc-header-div {
-    background-color: #1A6B7C;
+    background-color: #5546D6;
     color: #ffffff;
     padding: 10px 16px;
     border-radius: 6px;
@@ -175,14 +175,14 @@ body {
     margin-bottom: 12px;
 }
 .toc-item-td {
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
+    background-color: #FBF9F5;
+    border: 1px solid #E8E3DA;
     padding: 8px 12px;
     vertical-align: middle;
     width: 50%;
 }
 .toc-num-span {
-    background-color: #1A6B7C;
+    background-color: #5546D6;
     color: #ffffff;
     border-radius: 50%;
     display: inline-block;
@@ -191,11 +191,11 @@ body {
     font-size: 10px; font-weight: bold;
     margin-left: 8px; vertical-align: middle;
 }
-.toc-name-span { font-size: 11px; font-weight: bold; color: #374151; vertical-align: middle; }
+.toc-name-span { font-size: 11px; font-weight: bold; color: #34314A; vertical-align: middle; }
 
 /* ══ ختام ══ */
 .closing {
-    background-color: #14505E;
+    background-color: #1B1746;
     color: #ffffff;
     padding: 48px 36px;
     text-align: center;
@@ -203,25 +203,25 @@ body {
     border-radius: 12px;
 }
 .closing-title { font-size: 18px; font-weight: bold; color: #ffffff; margin-bottom: 10px; }
-.closing-text  { font-size: 12px; color: #b2d8df; margin-bottom: 28px; line-height: 1.9; }
+.closing-text  { font-size: 12px; color: #D0CCFA; margin-bottom: 28px; line-height: 1.9; }
 .stamp-box {
-    border: 1px solid #3a7a8a;
+    border: 1px solid #4537B4;
     border-radius: 10px;
     padding: 14px 32px;
     display: inline-block;
-    background-color: #1a6070;
+    background-color: #2B2470;
 }
-.stamp-lbl  { font-size: 9px; color: #9ecfda; margin-bottom: 3px; }
+.stamp-lbl  { font-size: 9px; color: #B0A9F6; margin-bottom: 3px; }
 .stamp-val  { font-size: 14px; font-weight: bold; color: #ffffff; margin-bottom: 8px; }
-.stamp-date { font-size: 11px; color: #b2d8df; }
+.stamp-date { font-size: 11px; color: #D0CCFA; }
 
 /* ══ بيانات الوثيقة وحالتها ══ */
-.doc-meta-table td { font-size: 10px; padding: 6px 10px; border: 1px solid #e5e7eb; }
-.doc-meta-lbl { background-color: #f0f9fb; color: #1A6B7C; font-weight: bold; width: 28%; }
+.doc-meta-table td { font-size: 10px; padding: 6px 10px; border: 1px solid #E8E3DA; }
+.doc-meta-lbl { background-color: #F3F2FE; color: #5546D6; font-weight: bold; width: 28%; }
 .status-box {
-    background-color: #fff7ed;
+    background-color: #FFF8EA;
     border: 1px solid #fed7aa;
-    border-right: 4px solid #E8620A;
+    border-right: 4px solid #E0920F;
     padding: 10px 14px;
     margin-top: 10px;
     font-size: 10px;
@@ -229,9 +229,9 @@ body {
     line-height: 1.8;
 }
 .status-box-lbl { font-weight: bold; color: #c2410c; }
-.chapter-item { font-size: 11px; color: #374151; padding: 5px 10px; border-bottom: 1px dashed #e5e7eb; }
+.chapter-item { font-size: 11px; color: #34314A; padding: 5px 10px; border-bottom: 1px dashed #E8E3DA; }
 
-.empty-val   { color: #9ca3af; font-style: italic; }
+.empty-val   { color: #8F8BA3; font-style: italic; }
 .page-break  { page-break-before: always; }
 .spacer      { height: 14px; }
 .section-sep { height: 32px; }
@@ -303,12 +303,12 @@ body {
 {{-- ════ شريط الطباعة ════ --}}
 <div class="print-btn-bar">
     <span class="print-bar-title">{{ $policyType['name'] ?? 'السياسة' }} — {{ $orgName }}</span>
-    <button class="print-btn" onclick="window.print()">&#128438; طباعة / حفظ PDF</button>
+    <button class="print-btn" onclick="window.print()">&#0B7F5D; طباعة / حفظ PDF</button>
 </div>
 
 {{-- ════ غلاف ════ --}}
 <div class="cover">
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid #3a7a8a;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid #4537B4;">
         <tr>
             <td style="vertical-align:middle;">
                 @if($logoWhiteB64)
@@ -484,7 +484,7 @@ body {
     <div class="section-header-row">
         <table width="100%"><tr>
             <td width="40" style="vertical-align:middle;">
-                <span class="section-num-circle" style="background:#E8620A;">&#128172;</span>
+                <span class="section-num-circle" style="background:#F5A524;">&#128172;</span>
             </td>
             <td style="vertical-align:middle;">
                 <span class="section-title-span">ملاحظات المستشار</span>
