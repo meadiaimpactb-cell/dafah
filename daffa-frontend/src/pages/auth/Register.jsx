@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import DfIcon from '../../components/ui/DfIcon';
 import api from '../../api/axios';
 import OtpVerification from './OtpVerification';
-import GoogleAuthButton, { GOOGLE_ENABLED, OrDivider } from './GoogleAuthButton';
+import SocialButtons from './SocialButtons';
 import AuthShell, { PasswordInput, TermsModal, useSiteContent } from './AuthShell';
 
 const SECTORS = ['تعليم', 'صحة', 'بيئة', 'اجتماعي', 'ثقافة', 'رياضة', 'تنمية', 'حقوق الإنسان', 'أخرى'];
@@ -26,7 +26,7 @@ function passwordStrength(pw) {
   return { level: 3, label: 'قوية', color: '#0E9F74' };
 }
 
-export default function Register({ onLogin, onGoLogin, onBack, onHome }) {
+export default function Register({ onLogin, onGoLogin, onBack, onHome, initialError }) {
   const sc = useSiteContent();
   const [form, setForm] = useState({
     org_name: '',
@@ -41,7 +41,7 @@ export default function Register({ onLogin, onGoLogin, onBack, onHome }) {
   });
   const [logo, setLogo] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState(initialError ? { general: initialError } : {});
   const [loading, setLoading] = useState(false);
   const [verification, setVerification] = useState(null);
   const [showTerms, setShowTerms] = useState(false);
@@ -153,20 +153,13 @@ export default function Register({ onLogin, onGoLogin, onBack, onHome }) {
       <h2 style={styles.title}>إنشاء حساب جديد</h2>
       <p style={styles.subtitle}>دقيقتان فقط وتبدأ أول خطة لمنظمتك.</p>
 
-      {GOOGLE_ENABLED && (
-        <div style={{ marginBottom: 6 }}>
-          <GoogleAuthButton
-            text="signup_with"
-            oneTap
-            onLogin={onLogin}
-            onError={msg => setErrors(msg ? { general: msg } : {})}
-          />
-          <p style={{ fontSize: 12, color: '#8C97A3', textAlign: 'center', margin: '8px 0 0', lineHeight: 1.7 }}>
-            بالتسجيل عبر Google يُؤكَّد بريدك تلقائيًا، وتوافق على الشروط والأحكام. ستُكمل بيانات منظمتك بعد الدخول.
-          </p>
-          <OrDivider label="أو سجّل بالبريد الإلكتروني" />
-        </div>
-      )}
+      <SocialButtons
+        intent="register"
+        onLogin={onLogin}
+        onError={msg => setErrors(msg ? { general: msg } : {})}
+        note="بالتسجيل عبر أحد هذه الحسابات يُؤكَّد بريدك تلقائيًا وتوافق على الشروط والأحكام، ثم تُكمل بيانات منظمتك بعد الدخول."
+        after="أو سجّل بالبريد الإلكتروني"
+      />
 
       <form ref={formRef} onSubmit={handleSubmit}>
         <div style={styles.sectionLabel}><DfIcon name="building" size={14} /> بيانات المنظمة</div>

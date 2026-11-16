@@ -1501,6 +1501,19 @@ function KeepAlive({ active, children }) {
   );
 }
 
+// العودة من Google/Facebook/LinkedIn: ?social_code=… (رمز لمرة واحدة) أو ?social_error=…
+// تُقرأ مرة واحدة عند تحميل الصفحة ثم يُنظَّف الرابط.
+const SOCIAL_RETURN = (() => {
+  try {
+    const p = new URLSearchParams(window.location.search);
+    const code = p.get('social_code');
+    const error = p.get('social_error');
+    if (!code && !error) return null;
+    window.history.replaceState({}, '', window.location.pathname);
+    return { code, error, intent: p.get('social_intent') === 'register' ? 'register' : 'login', started: false };
+  } catch { return null; }
+})();
+
 // ============== MAIN APP ==============
 export default function DaffaPlatform() {
   // Clear any stale old-format permissions from localStorage on first render
@@ -1508,6 +1521,9 @@ export default function DaffaPlatform() {
 
   // ALL hooks at the very top — no exceptions
   const [authPage, setAuthPage] = useState(null);
+  const [socialReturn] = useState(SOCIAL_RETURN);
+  const [socialBusy, setSocialBusy] = useState(() => !!socialReturn?.code);
+  const [authError, setAuthError] = useState(() => (socialReturn?.error ? socialReturn.error : null));
   // detect ?token=xxx&email=yyy in URL (from password-reset email link)
   const [resetParams, setResetParams] = useState(() => {
     try {
@@ -1819,7 +1835,30 @@ export default function DaffaPlatform() {
     }
   };
 
+  useEffect(() => {
+    if (!socialReturn || socialReturn.started) return;
+    socialReturn.started = true; // مرة واحدة فقط (الرمز صالح لاستعمال واحد)
+    if (socialReturn.error) { setAuthPage(socialReturn.intent); return; }
+    api.post('/auth/social/exchange', { code: socialReturn.code })
+      .then(r => {
+        localStorage.setItem('token', r.data.token);
+        localStorage.setItem('user', JSON.stringify(r.data.user));
+        handleLogin(r.data.user, { needsProfile: r.data.needs_profile });
+      })
+      .catch(err => {
+        setAuthError(err.response?.data?.message || 'تعذّر إكمال الدخول. حاول مرة أخرى.');
+        setAuthPage('login');
+      })
+      .finally(() => setSocialBusy(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // صفحة إعادة تعيين كلمة المرور — تُشغَّل إذا جاء المستخدم من رابط البريد
+  if (socialBusy) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', direction: 'rtl', background: '#FBF9F5', color: '#235D7F', fontWeight: 700, fontSize: 15 }} role="status">
+      جارٍ تسجيل الدخول…
+    </div>
+  );
   if (resetParams) return (
     <ResetPasswordPage
       token={resetParams.token}
@@ -1831,8 +1870,8 @@ export default function DaffaPlatform() {
       }}
     />
   );
-  if (authPage === 'login') return <Login onLogin={handleLogin} onGoRegister={() => setAuthPage('register')} onBack={closeAuth} onHome={authGoHome} />;
-  if (authPage === 'register') return <Register onLogin={handleLogin} onGoLogin={() => setAuthPage('login')} onBack={closeAuth} onHome={authGoHome} />;
+  if (authPage === 'login') return <Login key={authError || 'login'} initialError={authError} onLogin={handleLogin} onGoRegister={() => { setAuthError(null); setAuthPage('register'); }} onBack={() => { setAuthError(null); closeAuth(); }} onHome={() => { setAuthError(null); authGoHome(); }} />;
+  if (authPage === 'register') return <Register key={authError || 'register'} initialError={authError} onLogin={handleLogin} onGoLogin={() => { setAuthError(null); setAuthPage('login'); }} onBack={() => { setAuthError(null); closeAuth(); }} onHome={() => { setAuthError(null); authGoHome(); }} />;
 
   const navigate = (view, role) => {
     // «ابدأ الآن» و«سجل الآن» في الصفحات العامة تفتح صفحتي التسجيل/الدخول الحقيقيتين

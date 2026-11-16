@@ -2,12 +2,12 @@ import DfIcon from '../../components/ui/DfIcon';
 import React, { useState } from 'react';
 import api from '../../api/axios';
 import OtpVerification from './OtpVerification';
-import GoogleAuthButton, { GOOGLE_ENABLED, OrDivider } from './GoogleAuthButton';
+import SocialButtons from './SocialButtons';
 import AuthShell, { PasswordInput } from './AuthShell';
 
-function LoginForm({ onLogin, onGoRegister, onForgot, onNeedsVerification }) {
+function LoginForm({ onLogin, onGoRegister, onForgot, onNeedsVerification, initialError }) {
   const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
+  const [error, setError] = useState(initialError || '');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -88,8 +88,7 @@ function LoginForm({ onLogin, onGoRegister, onForgot, onNeedsVerification }) {
           {loading ? 'جاري الدخول...' : 'دخول'}
         </button>
 
-        {GOOGLE_ENABLED && <OrDivider />}
-        <GoogleAuthButton text="signin_with" oneTap onLogin={onLogin} onError={setError} />
+        <SocialButtons intent="login" label="أو الدخول عبر" onLogin={onLogin} onError={setError} />
 
         <p style={S.footer}>
           ليس لديك حساب؟{' '}
@@ -163,7 +162,7 @@ function ForgotForm({ onBack }) {
   );
 }
 
-export default function Login({ onLogin, onGoRegister, onBack, onHome }) {
+export default function Login({ onLogin, onGoRegister, onBack, onHome, initialError }) {
   const [view, setView] = useState('login');
   const [verification, setVerification] = useState(null);
 
@@ -183,6 +182,7 @@ export default function Login({ onLogin, onGoRegister, onBack, onHome }) {
           onGoRegister={onGoRegister}
           onForgot={() => setView('forgot')}
           onNeedsVerification={showVerification}
+          initialError={initialError}
         />
       )}
 

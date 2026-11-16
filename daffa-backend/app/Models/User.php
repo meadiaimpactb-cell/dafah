@@ -17,6 +17,8 @@ class User extends Authenticatable
         'rep_name',
         'email',
         'google_id',
+        'facebook_id',
+        'linkedin_id',
         'phone',
         'sector',
         'logo',

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\StrategicController;
 use App\Http\Controllers\Api\OperationalController;
 use App\Http\Controllers\Api\PolicyController;
@@ -41,6 +42,12 @@ Route::prefix('auth')->group(function () {
     Route::post('/resend-otp',   [AuthController::class, 'resendOtp'])->middleware('throttle:6,1,otp-resend');
     Route::post('/login',        [AuthController::class, 'login'])->middleware('throttle:20,1,login');
     Route::post('/google',       [AuthController::class, 'googleLogin'])->middleware('throttle:20,1,google');
+
+    // الدخول عبر Google / Facebook / LinkedIn (انظر SocialAuthController)
+    Route::get('/social/providers',             [SocialAuthController::class, 'providers']);
+    Route::post('/social/exchange',             [SocialAuthController::class, 'exchange'])->middleware('throttle:20,1,social-exchange');
+    Route::get('/social/{provider}/redirect',   [SocialAuthController::class, 'redirect'])->whereIn('provider', ['google', 'facebook', 'linkedin'])->middleware('throttle:30,1,social');
+    Route::get('/social/{provider}/callback',   [SocialAuthController::class, 'callback'])->whereIn('provider', ['google', 'facebook', 'linkedin'])->middleware('throttle:30,1,social');
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout',           [AuthController::class, 'logout']);

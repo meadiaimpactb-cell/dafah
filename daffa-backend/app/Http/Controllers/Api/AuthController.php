@@ -7,6 +7,7 @@ use App\Models\ActivityLog;
 use App\Models\User;
 use App\Rules\RealEmail;
 use App\Support\EmailOtp;
+use App\Support\SocialLogin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
@@ -214,75 +215,20 @@ class AuthController extends Controller
             return response()->json(['message' => 'رمز Google غير مصرح به.'], 422);
         }
 
-        $email    = RealEmail::normalize($data['email'] ?? null);
-        $name     = $data['name'] ?? ($data['given_name'] ?? 'مستخدم Google');
-        $googleId = $data['sub'] ?? null;
-        $emailVerified = filter_var($data['email_verified'] ?? false, FILTER_VALIDATE_BOOLEAN);
-
-        if (!$email) {
-            return response()->json(['message' => 'لم يتم الحصول على البريد الإلكتروني من Google.'], 422);
+        // نفس منطق الربط/الإنشاء المستخدم في الدخول عبر Facebook وLinkedIn (App\Support\SocialLogin)
+        try {
+            [$user, $isNew] = SocialLogin::resolveUser(
+                'google',
+                $data['sub'] ?? null,
+                $data['email'] ?? null,
+                filter_var($data['email_verified'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                $data['name'] ?? ($data['given_name'] ?? null),
+            );
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], $e->getCode() === 403 ? 403 : 422);
         }
 
-        if (!$emailVerified) {
-            return response()->json(['message' => 'بريد حساب Google هذا غير مؤكَّد لدى Google. أكّده أولًا ثم أعد المحاولة.'], 422);
-        }
-
-        if (!$googleId) {
-            return response()->json(['message' => 'تعذّر التعرف على حساب Google. حاول مرة أخرى.'], 422);
-        }
-
-        $user = User::where('google_id', $googleId)->first() ?: User::where('email', $email)->first();
-        $isNew = false;
-
-        if (!$user) {
-            $domain = substr(strrchr($email, '@') ?: '', 1);
-            if ($domain === '' || RealEmail::isDisposable($domain)) {
-                return response()->json(['message' => 'لا يُقبل البريد المؤقت أو الوهمي — استخدم حساب Google ببريد حقيقي.'], 422);
-            }
-            $isNew = true;
-            $user = User::create([
-                'org_name'          => $name,
-                'org_type'          => 'غير ربحية',
-                'rep_name'          => $name,
-                'email'             => $email,
-                'google_id'         => $googleId,
-                'password'          => Hash::make(Str::random(32)),
-                'role'              => 'client',
-                'is_active'         => true,
-                'email_verified_at' => now(),
-            ]);
-
-            ActivityLog::record($user->id, 'تسجيل حساب جديد عبر Google', 'auth', 'client', $email);
-        } else {
-            $updates = [];
-
-            if (!$user->google_id && $googleId) {
-                $updates['google_id'] = $googleId;
-            }
-
-            if (!$user->email_verified_at) {
-                $updates['email_verified_at'] = now();
-            }
-
-            if ($updates) {
-                $user->update($updates);
-            }
-        }
-
-        if (!$user->is_active) {
-            return response()->json(['message' => 'الحساب موقوف، تواصل مع الإدارة.'], 403);
-        }
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        ActivityLog::record($user->id, 'تسجيل دخول عبر Google', 'auth', $user->role, $email);
-
-        return response()->json([
-            'user'          => $user->fresh(),
-            'token'         => $token,
-            'needs_profile' => $user->role === 'client' && !$user->phone,
-            'is_new'        => $isNew,
-        ]);
+        return response()->json(SocialLogin::loginPayload($user, $isNew, 'google'));
     }
 
     // ── POST /api/auth/logout ────────────────────────────────────────────────────
