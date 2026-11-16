@@ -1,9 +1,9 @@
 import DfIcon from '../../components/ui/DfIcon';
 import React, { useState } from 'react';
-import Logo from '../../components/brand/Logo';
 import api from '../../api/axios';
 import OtpVerification from './OtpVerification';
 import GoogleAuthButton, { GOOGLE_ENABLED, OrDivider } from './GoogleAuthButton';
+import AuthShell, { PasswordInput } from './AuthShell';
 
 function LoginForm({ onLogin, onGoRegister, onForgot, onNeedsVerification }) {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -57,19 +57,20 @@ function LoginForm({ onLogin, onGoRegister, onForgot, onNeedsVerification }) {
             name="email"
             type="email"
             placeholder="example@org.sa"
+            autoComplete="email"
             value={form.email}
             onChange={handleChange}
-            style={S.input}
+            style={{ ...S.input, direction: 'ltr', textAlign: 'right' }}
             required
           />
         </div>
 
         <div style={S.field}>
           <label style={S.label}>كلمة المرور</label>
-          <input
+          <PasswordInput
             name="password"
-            type="password"
             placeholder="••••••••"
+            autoComplete="current-password"
             value={form.password}
             onChange={handleChange}
             style={S.input}
@@ -78,7 +79,7 @@ function LoginForm({ onLogin, onGoRegister, onForgot, onNeedsVerification }) {
         </div>
 
         <div style={{ textAlign: 'left', marginBottom: 12 }}>
-          <span onClick={onForgot} style={S.link}>نسيت كلمة المرور؟</span>
+          <button type="button" onClick={onForgot} style={S.link}>نسيت كلمة المرور؟</button>
         </div>
 
         {error && <div style={S.error}>{error}</div>}
@@ -88,11 +89,11 @@ function LoginForm({ onLogin, onGoRegister, onForgot, onNeedsVerification }) {
         </button>
 
         {GOOGLE_ENABLED && <OrDivider />}
-        <GoogleAuthButton text="signin_with" onLogin={onLogin} onError={setError} />
+        <GoogleAuthButton text="signin_with" oneTap onLogin={onLogin} onError={setError} />
 
         <p style={S.footer}>
           ليس لديك حساب؟{' '}
-          <span onClick={onGoRegister} style={S.link}>سجل الآن</span>
+          <button type="button" onClick={onGoRegister} style={S.link}>أنشئ حسابًا الآن</button>
         </p>
       </form>
     </>
@@ -137,7 +138,6 @@ function ForgotForm({ onBack }) {
 
   return (
     <>
-      <button type="button" onClick={onBack} style={S.backBtn}>رجوع</button>
       <h2 style={{ ...S.title, marginBottom: 8 }}>نسيت كلمة المرور؟</h2>
       <p style={S.forgotText}>
         أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين
@@ -163,7 +163,7 @@ function ForgotForm({ onBack }) {
   );
 }
 
-export default function Login({ onLogin, onGoRegister }) {
+export default function Login({ onLogin, onGoRegister, onBack, onHome }) {
   const [view, setView] = useState('login');
   const [verification, setVerification] = useState(null);
 
@@ -172,36 +172,33 @@ export default function Login({ onLogin, onGoRegister }) {
     setView('verify');
   };
 
+  // زر «رجوع» العلوي: داخل الشاشات الفرعية يعود لنموذج الدخول، وإلا يغادر صفحة الدخول
+  const back = view === 'login' ? onBack : () => setView('login');
+
   return (
-    <div style={S.overlay}>
-      <div style={S.card}>
-        <div style={S.logo}>
-          <Logo variant="stacked" size={92} descriptor />
-        </div>
+    <AuthShell onBack={back} onHome={onHome}>
+      {view === 'login' && (
+        <LoginForm
+          onLogin={onLogin}
+          onGoRegister={onGoRegister}
+          onForgot={() => setView('forgot')}
+          onNeedsVerification={showVerification}
+        />
+      )}
 
-        {view === 'login' && (
-          <LoginForm
-            onLogin={onLogin}
-            onGoRegister={onGoRegister}
-            onForgot={() => setView('forgot')}
-            onNeedsVerification={showVerification}
-          />
-        )}
+      {view === 'forgot' && <ForgotForm onBack={() => setView('login')} />}
 
-        {view === 'forgot' && <ForgotForm onBack={() => setView('login')} />}
-
-        {view === 'verify' && verification && (
-          <OtpVerification
-            email={verification.email}
-            message={verification.message}
-            retryAfter={verification.retryAfter}
-            sendFailed={verification.sendFailed}
-            onVerified={onLogin}
-            onBack={() => setView('login')}
-          />
-        )}
-      </div>
-    </div>
+      {view === 'verify' && verification && (
+        <OtpVerification
+          email={verification.email}
+          message={verification.message}
+          retryAfter={verification.retryAfter}
+          sendFailed={verification.sendFailed}
+          onVerified={onLogin}
+          onBack={() => setView('login')}
+        />
+      )}
+    </AuthShell>
   );
 }
 
@@ -276,7 +273,7 @@ const S = {
     textAlign: 'right',
   },
   footer: { textAlign: 'center', fontSize: 14, color: '#5E6B78', marginTop: 16 },
-  link: { color: '#235D7F', cursor: 'pointer', fontWeight: 600 },
+  link: { color: '#235D7F', cursor: 'pointer', fontWeight: 700, background: 'none', border: 'none', padding: 0, fontFamily: 'inherit', fontSize: 'inherit' },
   backBtn: {
     background: 'none',
     border: 'none',

@@ -17,9 +17,10 @@ const GROUP_LABELS = {
   contact:  "تواصل معنا",
   footer:   "الفوتر",
   guides:   "الأدلة والفيديوهات",
+  auth:     "الدخول والتسجيل",
 };
 
-const GROUP_ORDER = ["landing", "about", "services", "pricing", "contact", "footer", "guides"];
+const GROUP_ORDER = ["landing", "about", "services", "pricing", "contact", "footer", "guides", "auth"];
 
 export default function AdminSiteContent() {
   const [grouped, setGrouped]   = useState({});

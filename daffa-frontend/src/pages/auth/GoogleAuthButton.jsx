@@ -38,8 +38,9 @@ function loadGoogleIdentityScript() {
 /**
  * text: 'signin_with' (الدخول عبر Google) | 'signup_with' (التسجيل عبر Google) | 'continue_with'
  * onLogin(user, { needsProfile })، onError(message)
+ * oneTap: يعرض نافذة Google المنبثقة تلقائيًا (One Tap) لمن لديه جلسة Google في المتصفح — دخول بنقرة واحدة.
  */
-export default function GoogleAuthButton({ text = 'signin_with', onLogin, onError }) {
+export default function GoogleAuthButton({ text = 'signin_with', onLogin, onError, oneTap = false }) {
   const boxRef = useRef(null);
   const [loading, setLoading] = useState(false);
   // نحتفظ بآخر نسخة من الدوال دون إعادة رسم الزر عند كل تحديث
@@ -56,6 +57,9 @@ export default function GoogleAuthButton({ text = 'signin_with', onLogin, onErro
         window.google.accounts.id.initialize({
           client_id: GOOGLE_CLIENT_ID,
           ux_mode: 'popup',
+          context: text === 'signup_with' ? 'signup' : 'signin',
+          cancel_on_tap_outside: true,
+          itp_support: true,
           callback: async (response) => {
             const { onLogin: done, onError: fail } = handlers.current;
             if (!response?.credential) { fail?.('تعذّر الحصول على بيانات Google. حاول مرة أخرى.'); return; }
@@ -84,11 +88,15 @@ export default function GoogleAuthButton({ text = 'signin_with', onLogin, onErro
           width: Math.max(220, Math.min(boxRef.current.offsetWidth || 320, 400)),
           locale: 'ar',
         });
+        if (oneTap) window.google.accounts.id.prompt();
       })
       .catch(() => handlers.current.onError?.('تعذّر تحميل خدمة Google. تحقق من الاتصال ثم أعد تحميل الصفحة.'));
 
-    return () => { cancelled = true; };
-  }, [text]);
+    return () => {
+      cancelled = true;
+      if (oneTap) { try { window.google?.accounts?.id?.cancel(); } catch { /* لا شيء */ } }
+    };
+  }, [text, oneTap]);
 
   if (!GOOGLE_ENABLED) return null;
 

@@ -1762,6 +1762,29 @@ export default function DaffaPlatform() {
   }, [currentView]);
 
   // Early returns after ALL hooks
+  // صفحتا الدخول والتسجيل: زر الرجوع في المتصفح/الجوال يغلقهما ويعيد الزائر إلى الصفحة التي جاء منها
+  useEffect(() => {
+    if (!authPage) {
+      if (window.history.state?.dfAuth) window.history.replaceState(null, '');
+      return undefined;
+    }
+    if (window.history.state?.dfAuth) window.history.replaceState({ dfAuth: authPage }, '');
+    else window.history.pushState({ dfAuth: authPage }, '');
+    const onPop = () => setAuthPage(null);
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [authPage]);
+  const closeAuth = () => {
+    if (window.history.state?.dfAuth) window.history.back();
+    else setAuthPage(null);
+  };
+  const authGoHome = () => {
+    setCurrentView('landing');
+    sessionStorage.removeItem('currentView');
+    closeAuth();
+    window.scrollTo(0, 0);
+  };
+
   const handleLogout = () => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -1808,10 +1831,12 @@ export default function DaffaPlatform() {
       }}
     />
   );
-  if (authPage === 'login') return <Login onLogin={handleLogin} onGoRegister={() => setAuthPage('register')} />;
-  if (authPage === 'register') return <Register onLogin={handleLogin} onGoLogin={() => setAuthPage('login')} />;
+  if (authPage === 'login') return <Login onLogin={handleLogin} onGoRegister={() => setAuthPage('register')} onBack={closeAuth} onHome={authGoHome} />;
+  if (authPage === 'register') return <Register onLogin={handleLogin} onGoLogin={() => setAuthPage('login')} onBack={closeAuth} onHome={authGoHome} />;
 
   const navigate = (view, role) => {
+    // «ابدأ الآن» و«سجل الآن» في الصفحات العامة تفتح صفحتي التسجيل/الدخول الحقيقيتين
+    if (view === 'login' || view === 'register') { setAuthPage(view); window.scrollTo(0, 0); return; }
     setCurrentView(view);
     sessionStorage.setItem('currentView', view);
     if (role) setCurrentRole(role);
@@ -2199,95 +2224,6 @@ export default function DaffaPlatform() {
     </div>
   );
 
-  // ============== LOGIN PAGE ==============
-  const LoginPage = () => (
-    <div className="geo-bg" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <Card style={{ width: 420, padding: 40, textAlign: "center" }}>
-        <Logo size="md" />
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.ink, margin: "24px 0" }}>تسجيل الدخول</h2>
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, textAlign: "right" }}>
-          <Input label="البريد الإلكتروني" placeholder="example@org.sa" type="email" />
-          <Input label="كلمة المرور" placeholder="••••••••" type="password" />
-          <div style={{ textAlign: "left" }}><a style={{ fontSize: 12, color: colors.amberText, cursor: "pointer" }}>نسيت كلمة المرور؟</a></div>
-          <Btn full onClick={() => navigate("client-dash", "client")}>دخول</Btn>
-          <p style={{ fontSize: 13, color: colors.gray, textAlign: "center" }}>ليس لديك حساب؟ <a onClick={() => navigate("register")} style={{ color: colors.primary, fontWeight: 600, cursor: "pointer" }}>سجل الآن</a></p>
-        </div>
-      </Card>
-    </div>
-  );
-
-  // ============== REGISTER PAGE ==============
-  const RegisterPage = () => {
-    const [regLogo, setRegLogo] = React.useState(null);
-    const [regLogoPreview, setRegLogoPreview] = React.useState(null);
-    const handleRegLogo = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      setRegLogo(file);
-      const r = new FileReader();
-      r.onload = ev => setRegLogoPreview(ev.target.result);
-      r.readAsDataURL(file);
-    };
-    return (
-      <div className="geo-bg" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-        <Card style={{ width: 520, padding: 40 }}>
-          <div style={{ textAlign: "center" }}><Logo size="md" /></div>
-          <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.ink, margin: "20px 0", textAlign: "center" }}>إنشاء حساب جديد</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 14 }}>
-            <Input label="اسم المنظمة" placeholder="جمعية أثر" />
-            <Input label="نوع المنظمة" placeholder="غير ربحية" />
-            <Input label="اسم الممثل" placeholder="الاسم الكامل" />
-            <Input label="البريد الإلكتروني" placeholder="email@org.sa" type="email" />
-            <Input label="رقم الجوال" placeholder="05XXXXXXXX" />
-            <Input label="القطاع" placeholder="تعليم، صحة..." />
-            <Input label="كلمة المرور" placeholder="••••••••" type="password" />
-            <Input label="تأكيد كلمة المرور" placeholder="••••••••" type="password" />
-          </div>
-          {/* شعار المنظمة */}
-          <div style={{ margin: "14px 0", padding: "16px", background: colors.grayLight, borderRadius: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: colors.ink, marginBottom: 10 }}>
-              شعار المنظمة <span style={{ fontSize: 11, fontWeight: 400, color: colors.gray }}>(اختياري)</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{ flexShrink: 0, width: 52, height: 52, borderRadius: "50%", overflow: "hidden", border: `2px solid ${colors.grayBorder}`, background: `linear-gradient(135deg, ${colors.primary}, ${colors.ink})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                {regLogoPreview ? (
-                  <img src={regLogoPreview} alt="شعار" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                ) : (
-                  <span style={{ color: "#fff" }}><IcBuilding width={20} height={20} /></span>
-                )}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                {regLogo ? (
-                  <div style={{ fontSize: 11, color: colors.green || "#0B7F5D", fontWeight: 600, marginBottom: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {regLogo.name}
-                  </div>
-                ) : (
-                  <div style={{ fontSize: 11, color: colors.gray, marginBottom: 8 }}>PNG / JPG / WebP — بحد أقصى 2 ميغابايت</div>
-                )}
-                <div style={{ display: "flex", gap: 8 }}>
-                  <label style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 14px", background: "#fff", border: `1.5px solid ${colors.grayBorder}`, borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", color: colors.ink, fontFamily: "inherit", flexShrink: 0 }}>
-                    {regLogo ? "تغيير الشعار" : "اختر شعاراً"}
-                    <input type="file" accept="image/*" onChange={handleRegLogo} style={{ display: "none" }} />
-                  </label>
-                  {regLogo && (
-                    <button onClick={() => { setRegLogo(null); setRegLogoPreview(null); }} style={{ padding: "7px 12px", background: "#FCEBEB", color: "#C53A3A", border: "1px solid #F1B2B2", borderRadius: 8, fontSize: 12, cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
-                      حذف
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "4px 0 16px", fontSize: 12, color: colors.gray }}>
-            <input type="checkbox" style={{ accentColor: colors.primary }} />
-            <span>أوافق على الشروط والأحكام</span>
-          </div>
-          <Btn full onClick={() => navigate("client-dash", "client")}>تسجيل</Btn>
-          <p style={{ fontSize: 13, color: colors.gray, textAlign: "center", marginTop: 14 }}>لديك حساب؟ <a onClick={() => navigate("login")} style={{ color: colors.primary, fontWeight: 600, cursor: "pointer" }}>تسجيل الدخول</a></p>
-        </Card>
-      </div>
-    );
-  };
 
   // ============== CLIENT DASHBOARD ==============
   // ── «خطوتك التالية»: توصية واحدة واضحة لغير المتخصص ──
@@ -4072,8 +4008,7 @@ export default function DaffaPlatform() {
       case "services": return <ServicesPage />;
       case "pricing": return <PricingPage />;
       case "contact": return <ContactPage />;
-      case "login": return <LoginPage />;
-      case "register": return <RegisterPage />;
+      case "login": case "register": return <LandingPage />;
       // ── جميع هذه الصفحات يديرها KeepAlive في الـ render ──
       case "client-dash":
       case "strategic-roadmap": case "operational-roadmap": case "policies-select":
