@@ -37,6 +37,7 @@ export const adminApi = {
   removeStrategicPdf:     (id, kind) => api.delete(`/admin/content/strategic/${id}/pdf/${kind}`),
   getOperationalContent:  ()        => api.get('/admin/content/operational'),
   updateOperationalContent:(id, d)  => api.put(`/admin/content/operational/${id}`, d),
+  getOperationalDefault:  (id)      => api.get(`/admin/content/operational/${id}/default`),
   getPoliciesContent:     ()        => api.get('/admin/content/policies'),
   updatePolicyContent:    (tid, d)  => api.put(`/admin/content/policies/${tid}`, d),
 

@@ -293,7 +293,7 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
             <h4 style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, margin: '0 0 12px' }}>{isPol ? 'إجابات استبيان السياسة' : 'عمل العميل'}</h4>
             {subLoading
               ? <div style={{ padding: 20, textAlign: 'center', color: colors.gray, fontSize: 13 }}>جارٍ تحميل بيانات العمل…</div>
-              : isPol ? <PolicyFormViewer formData={sub.form_data} questionnaireSections={questionnaireSections} /> : <FormDataViewer data={sub.form_data} />
+              : isPol ? <PolicyFormViewer formData={sub.form_data} questionnaireSections={questionnaireSections} /> : <FormDataViewer data={sub.form_data} template={sub.unit_template} />
             }
           </div>
 

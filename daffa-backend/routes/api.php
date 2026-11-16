@@ -218,6 +218,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::delete('/content/strategic/{id}/pdf/{kind}',   [AdminContentController::class, 'removeStrategicPdf']);
     Route::get('/content/operational',            [AdminContentController::class, 'operationalUnits']);
     Route::put('/content/operational/{id}',       [AdminContentController::class, 'updateOperational']);
+    Route::get('/content/operational/{id}/default',       [AdminContentController::class, 'operationalDefault']);
     Route::get('/content/policies',               [AdminContentController::class, 'policyTypes']);
     Route::put('/content/policies/{typeId}',      [AdminContentController::class, 'updatePolicy']);
 

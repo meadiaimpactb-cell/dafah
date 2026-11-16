@@ -14,7 +14,7 @@ import TemplateRenderer, { GUIDE_SPEC, guideFields, resolveTip } from '../strate
  * المعاينة تستخدم مكونات صفحة الوحدة نفسها، فما يظهر فيها هو ما سيراه المستخدم بعد الحفظ.
  */
 
-const C = {
+export const C = {
   teal: '#1A6B7C', tealDark: '#14505E', tealLight: '#E8F4F6',
   green: '#16A34A', greenLight: '#F0FDF4', orange: '#E8620A', orangeLight: '#FFF7ED',
   gray: '#6B7280', grayLight: '#F3F4F6', grayBorder: '#E5E7EB', red: '#DC2626', redLight: '#FEF2F2',
@@ -33,8 +33,8 @@ const PDF_KIND_LABEL = { explanation: 'الشرح التفصيلي', guidelines:
 
 /* ───────────── أدوات ───────────── */
 
-const clone = v => JSON.parse(JSON.stringify(v ?? null));
-const norm = s => (s || '').replace(/\s+/g, ' ').trim();
+export const clone = v => JSON.parse(JSON.stringify(v ?? null));
+export const norm = s => (s || '').replace(/\s+/g, ' ').trim();
 
 /** ضمان وجود الأقسام الأساسية في المحتوى حتى يعمل المحرر على أي وحدة */
 function withShape(content) {
@@ -55,12 +55,12 @@ const emptyExample = () => ({ title: '', blocks: [{ type: 'paragraph', text: '' 
 
 /* ───────────── عناصر إدخال ───────────── */
 
-const inputStyle = {
+export const inputStyle = {
   width: '100%', padding: '8px 11px', borderRadius: 8, border: `1.5px solid ${C.grayBorder}`,
   fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', lineHeight: 1.7, background: '#fff',
 };
 
-function Field({ label, hint, value, onChange, multiline, rows = 3, placeholder, dir }) {
+export function Field({ label, hint, value, onChange, multiline, rows = 3, placeholder, dir }) {
   return (
     <label style={{ display: 'block', marginBottom: 12 }}>
       {label && <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 5 }}>{label}</span>}
@@ -75,7 +75,7 @@ function Field({ label, hint, value, onChange, multiline, rows = 3, placeholder,
   );
 }
 
-function SmallBtn({ children, onClick, tone = 'teal', title, disabled }) {
+export function SmallBtn({ children, onClick, tone = 'teal', title, disabled }) {
   const tones = {
     teal:  { background: C.tealLight, color: C.tealDark, border: `1px solid ${C.teal}40` },
     red:   { background: C.redLight, color: C.red, border: '1px solid #fecaca' },
@@ -91,7 +91,7 @@ function SmallBtn({ children, onClick, tone = 'teal', title, disabled }) {
 }
 
 /** أزرار ترتيب/حذف عنصر في قائمة */
-function ItemTools({ i, n, move, remove }) {
+export function ItemTools({ i, n, move, remove }) {
   return (
     <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
       <SmallBtn tone="gray" onClick={() => move(i, -1)} disabled={i === 0} title="تحريك لأعلى">↑</SmallBtn>
@@ -101,7 +101,7 @@ function ItemTools({ i, n, move, remove }) {
   );
 }
 
-const listOps = (items, onChange) => ({
+export const listOps = (items, onChange) => ({
   set:    (i, v) => onChange(items.map((x, j) => (j === i ? v : x))),
   remove: i => onChange(items.filter((_, j) => j !== i)),
   move:   (i, d) => {
@@ -115,7 +115,7 @@ const listOps = (items, onChange) => ({
 });
 
 /** قائمة نصوص (فقرات، نقاط، خطوات تعليمات...) */
-function StrList({ label, hint, items, onChange, multiline = true, addLabel = '+ إضافة', itemName = 'عنصر', rows = 2 }) {
+export function StrList({ label, hint, items, onChange, multiline = true, addLabel = '+ إضافة', itemName = 'عنصر', rows = 2 }) {
   const list = Array.isArray(items) ? items : [];
   const ops = listOps(list, onChange);
   return (
@@ -142,7 +142,7 @@ function StrList({ label, hint, items, onChange, multiline = true, addLabel = '+
 }
 
 /** قائمة عناصر مركّبة (بطاقات، خطوات، كتل...) — كل عنصر في إطار قابل للطي */
-function ObjList({ label, hint, items, onChange, newItem, addLabel = '+ إضافة', itemTitle, render }) {
+export function ObjList({ label, hint, items, onChange, newItem, addLabel = '+ إضافة', itemTitle, render }) {
   const list = Array.isArray(items) ? items : [];
   const ops = listOps(list, onChange);
   const [closed, setClosed] = useState({});
@@ -171,7 +171,7 @@ function ObjList({ label, hint, items, onChange, newItem, addLabel = '+ إضاف
 }
 
 /** قسم اختياري (يظهر/يُخفى للمستخدم) — قيمته null عند الإيقاف */
-function Optional({ label, value, onChange, make, children, hint }) {
+export function Optional({ label, value, onChange, make, children, hint }) {
   const on = value !== null && value !== undefined;
   return (
     <div style={{ border: `1px dashed ${on ? C.teal : C.grayBorder}`, borderRadius: 10, padding: '9px 12px', marginBottom: 12, background: on ? '#fff' : '#fafafa' }}>
@@ -186,7 +186,7 @@ function Optional({ label, value, onChange, make, children, hint }) {
   );
 }
 
-function Section({ title, children, defaultOpen = true, badge }) {
+export function Section({ title, children, defaultOpen = true, badge }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div style={{ border: `1.5px solid ${C.grayBorder}`, borderRadius: 12, marginBottom: 14, background: '#fff' }}>
@@ -225,7 +225,7 @@ const newBlock = type => ({
 }[type]);
 
 /** محرر جدول: عناوين أعمدة + صفوف (fixedCols لجدول الهيكل التنظيمي) */
-function TableEditor({ headers, rows, onChange, fixedHeaders }) {
+export function TableEditor({ headers, rows, onChange, fixedHeaders }) {
   const hs = fixedHeaders || headers || [];
   const cols = hs.length || 1;
   const rs = (rows || []).map(r => Array.from({ length: cols }, (_, k) => r?.[k] ?? ''));

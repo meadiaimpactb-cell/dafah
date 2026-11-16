@@ -14,6 +14,7 @@ use App\Models\ServiceSetting;
 use App\Models\StrategicUnit;
 use App\Models\StrategicWorkflow;
 use App\Models\UnitSubmission;
+use App\Support\OperationalPlanSync;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -308,10 +309,92 @@ class OperationalController extends Controller
             ->where('unit_id', $unit->id)
             ->first();
 
+        // ربط الأجزاء ضمن الخطة نفسها: يُعرض الدمج للمستخدم ويُحفظ عند الحفظ (الوحدة المعتمدة تبقى كما هي)
+        $payload = $submission?->toArray();
+        $sync    = null;
+
+        if ($unit->template_type === 'op_activities') {
+            $this->activitiesSubmission($workflow); // تثبيت معرّفات الأنشطة قبل أي عرض
+            $submission = $submission?->fresh();
+            $payload    = $submission?->toArray();
+            if ($submission && $submission->status !== 'approved') {
+                $import = $this->submissionByType($workflow, 'op_import');
+                [$data, $added] = OperationalPlanSync::syncActivityGroups(
+                    $submission->form_data,
+                    OperationalPlanSync::selectedInitiatives($import?->form_data)
+                );
+                $payload['form_data'] = $data;
+                $sync = ['groups_added' => $added];
+            }
+        } elseif ($unit->template_type === 'op_gantt' && $submission && $submission->status !== 'approved') {
+            $acts = OperationalPlanSync::activities($this->activitiesSubmission($workflow)?->form_data);
+            [$data, $stats] = OperationalPlanSync::syncGantt($submission->form_data, $acts);
+            $payload['form_data'] = $data;
+            $sync = $stats + ['source_count' => count($acts)];
+        }
+
         return response()->json([
             'unit'       => $unit,
-            'submission' => $submission,
+            'submission' => $payload,
+            'sync'       => $sync,
         ]);
+    }
+
+    /** تسليم وحدة الخطة حسب نوع النموذج (ترتيب الوحدات قابل للتغيير فلا يُعتمد على الرقم) */
+    private function submissionByType(OperationalWorkflow $workflow, string $type): ?OperationalSubmission
+    {
+        $unitId = OperationalUnit::where('template_type', $type)->value('id');
+        return $unitId
+            ? OperationalSubmission::where('workflow_id', $workflow->id)->where('unit_id', $unitId)->first()
+            : null;
+    }
+
+    /** تسليم «المبادرات التشغيلية» مع تثبيت معرّف لكل نشاط (يُحفظ بهدوء دون تغيير الحالة أو وقت التعديل) */
+    private function activitiesSubmission(OperationalWorkflow $workflow): ?OperationalSubmission
+    {
+        $sub = $this->submissionByType($workflow, 'op_activities');
+        if ($sub && is_array($sub->form_data)) {
+            [$data, $changed] = OperationalPlanSync::ensureActivityIds($sub->form_data);
+            if ($changed) {
+                $sub->form_data  = $data;
+                $sub->timestamps = false;
+                $sub->save();
+                $sub->timestamps = true;
+            }
+        }
+        return $sub;
+    }
+
+    /** بيانات النموذج قبل الحفظ: معرّف ثابت لكل نشاط في «المبادرات التشغيلية» */
+    private function prepareFormData(OperationalUnit $unit, array $formData): array
+    {
+        if ($unit->template_type === 'op_activities') {
+            [$formData] = OperationalPlanSync::ensureActivityIds($formData);
+        }
+        return $formData;
+    }
+
+    /**
+     * بعد حفظ «المبادرات التشغيلية»: تُحدَّث صفوف «الجدول الزمني للتنفيذ» المحفوظة فورًا (نقل/تسمية/تنبيه الحذف)
+     * حتى يطابق ما يراه المستشار وما يُطبع في التقرير — دون تغيير حالته أو وقت تعديله، ولا تُمس الوحدة المعتمدة.
+     */
+    private function syncSavedGantt(OperationalWorkflow $workflow, OperationalUnit $unit, array $activitiesData): void
+    {
+        if ($unit->template_type !== 'op_activities') {
+            return;
+        }
+        $gantt = $this->submissionByType($workflow, 'op_gantt');
+        // جدول لم يُفتح/يُحفظ بعد: يُنقل عند فتحه (ويرى المستخدم تنبيه النقل)
+        if (!$gantt || $gantt->status === 'approved' || empty($gantt->form_data)) {
+            return;
+        }
+        [$data] = OperationalPlanSync::syncGantt($gantt->form_data, OperationalPlanSync::activities($activitiesData));
+        if ($data != $gantt->form_data) {
+            $gantt->form_data  = $data;
+            $gantt->timestamps = false;
+            $gantt->save();
+            $gantt->timestamps = true;
+        }
     }
 
     // ── POST /api/operational/units/{num}/save ────────────────────────────────
@@ -335,9 +418,10 @@ class OperationalController extends Controller
             : $submission->status;
 
         $submission->update([
-            'form_data' => $request->form_data,
+            'form_data' => $this->prepareFormData($unit, $request->form_data),
             'status'    => $newStatus,
         ]);
+        $this->syncSavedGantt($workflow, $unit, $submission->form_data);
 
         return response()->json(['submission' => $submission]);
     }
@@ -372,10 +456,11 @@ class OperationalController extends Controller
         }
 
         $submission->update([
-            'form_data'    => $request->form_data,
+            'form_data'    => $this->prepareFormData($unit, $request->form_data),
             'status'       => 'submitted',
             'submitted_at' => now(),
         ]);
+        $this->syncSavedGantt($workflow, $unit, $submission->form_data);
 
         // التحقق إذا كل الوحدات مُرسَلة → ننتقل لخطوة المراجعة
         $workflow->load('submissions');

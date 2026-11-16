@@ -252,10 +252,91 @@ const BmcViewer = ({ data }) => {
   );
 };
 
+// ── عارض نماذج التخطيط التشغيلي (حسب نوع النموذج؛ تُخفى المفاتيح التقنية مثل معرّفات الربط) ──
+const OP_MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+const opText = v => (v === null || v === undefined || v === '' ? '—' : String(v));
+const opNum = v => parseFloat(String(v ?? '')
+  .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+  .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+  .replace(/٫/g, '.')
+  .replace(/[,٬\s]/g, '')) || 0;
+const OP_EMPTY = <p style={{ color: colors.gray, fontSize: 13, textAlign: 'center', padding: 20 }}>لا توجد بيانات</p>;
+
+function OperationalViewer({ template, data }) {
+  const arr = v => (Array.isArray(v) ? v.filter(x => x && typeof x === 'object') : []);
+  if (template === 'op_import') {
+    const items = arr(data.items);
+    if (!items.length) return OP_EMPTY;
+    return (
+      <Section title="المبادرات">
+        <TableView headers={['المبادرة', 'الاختيار لهذا العام']} rows={items.map(it => [opText(it.name), it.checked ? '✓ مختارة' : 'غير مختارة'])} />
+      </Section>
+    );
+  }
+  if (template === 'op_activities') {
+    const groups = arr(data.groups);
+    if (!groups.length) return OP_EMPTY;
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {groups.map((g, i) => {
+          const acts = arr(g.activities).filter(a => `${a.name || ''}${a.desc || ''}${a.output || ''}`.trim() !== '');
+          return (
+            <Section key={i} title={`المبادرة: ${opText(g.initiative)}`}>
+              {acts.length
+                ? <TableView headers={['اسم النشاط', 'وصف النشاط', 'المخرج المتوقع']} rows={acts.map(a => [opText(a.name), opText(a.desc), opText(a.output)])} />
+                : <div style={{ fontSize: 12, color: colors.gray }}>لا توجد أنشطة</div>}
+            </Section>
+          );
+        })}
+      </div>
+    );
+  }
+  if (template === 'op_gantt') {
+    const acts = arr(data.activities);
+    if (!acts.length) return OP_EMPTY;
+    const months = a => (Array.isArray(a.months) ? OP_MONTHS.filter((_, j) => a.months[j]) : []);
+    return (
+      <Section title="الأنشطة وأشهر تنفيذها">
+        <TableView headers={['النشاط', 'المبادرة', 'أشهر التنفيذ']}
+          rows={acts.map(a => [opText(a.name), a.source_id ? opText(a.initiative) : 'مضاف يدويًا', months(a).join('، ') || 'لم تُحدَّد'])} />
+      </Section>
+    );
+  }
+  if (template === 'op_responsible') {
+    const rows = arr(data.rows);
+    if (!rows.length) return OP_EMPTY;
+    return (
+      <Section title="مسؤول التنفيذ لكل نشاط">
+        <TableView headers={['النشاط', 'المبادرة', 'مسؤول التنفيذ', 'القسم / الإدارة']}
+          rows={rows.map(r => [opText(r.activity), opText(r.initiative), opText(r.responsible), opText(r.department)])} />
+      </Section>
+    );
+  }
+  if (template === 'op_budget') {
+    const rows = arr(data.rows);
+    if (!rows.length) return OP_EMPTY;
+    const total = r => (r.total !== undefined && r.total !== '' ? opNum(r.total) : opNum(r.unitCost) * opNum(r.count));
+    const grand = rows.reduce((s, r) => s + total(r), 0);
+    return (
+      <Section title="بنود التكلفة">
+        <TableView headers={['النشاط', 'بند التكلفة', 'تكلفة الوحدة', 'العدد', 'الإجمالي']}
+          rows={[
+            ...rows.map(r => [opText(r.activity), opText(r.item), opText(r.unitCost), opText(r.count), `${total(r).toLocaleString('en-US')} ريال`]),
+            ['', '', '', 'الإجمالي الكلي', `${grand.toLocaleString('en-US')} ريال`],
+          ]} />
+      </Section>
+    );
+  }
+  return null;
+}
+
 // ── المكوّن الرئيسي ────────────────────────────────────────────────────────────
-export default function FormDataViewer({ data }) {
+export default function FormDataViewer({ data, template }) {
   if (!data || Object.keys(data).length === 0) {
     return <p style={{ color: colors.gray, fontSize: 13, textAlign: 'center', padding: 20 }}>لا توجد بيانات</p>;
+  }
+  if (['op_import', 'op_activities', 'op_gantt', 'op_responsible', 'op_budget'].includes(template)) {
+    return <OperationalViewer template={template} data={data} />;
   }
 
   const renderSection = (key, value) => {

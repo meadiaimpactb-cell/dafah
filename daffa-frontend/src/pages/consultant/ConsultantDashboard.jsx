@@ -180,7 +180,7 @@ const ReviewDetailModal = ({ submissionId, initialData, serviceType = 'strategic
             {/* Form Data */}
             <div style={{ padding: 24, borderLeft: `1px solid ${colors.grayBorder}`, maxHeight: 500, overflowY: 'auto' }}>
               <h3 style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>عمل العميل</h3>
-              <FormDataViewer data={sub.form_data} />
+              <FormDataViewer data={sub.form_data} template={sub.unit_template} />
             </div>
 
             {/* Review Panel */}

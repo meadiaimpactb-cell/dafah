@@ -12,7 +12,7 @@ class OperationalUnitSeeder extends Seeder
         $units = [
             [
                 'unit_number'   => 1,
-                'name'          => 'المبادرات الاستراتيجية',
+                'name'          => 'المبادرات الاستراتيجية في التخطيط التشغيلي',
                 'template_type' => 'op_import',
                 'overview'      => 'في هذه الوحدة يتم استيراد المبادرات الاستراتيجية المعتمدة من الخطة الاستراتيجية كأساس لبناء الخطة التشغيلية.',
                 'overview2'     => 'يجب التأكد من اعتماد جميع المبادرات قبل البدء في تحويلها إلى أنشطة تشغيلية مفصلة.',
@@ -50,7 +50,7 @@ class OperationalUnitSeeder extends Seeder
             ],
             [
                 'unit_number'   => 3,
-                'name'          => 'شهور التنفيذ',
+                'name'          => 'الجدول الزمني للتنفيذ',
                 'template_type' => 'op_gantt',
                 'overview'      => 'تحديد الجدول الزمني لتنفيذ كل نشاط تشغيلي على مدار 12 شهراً باستخدام مخطط جانت.',
                 'overview2'     => 'يساعد هذا في تنظيم العمل وتوزيعه بشكل متوازن على مدار العام.',
@@ -110,5 +110,8 @@ class OperationalUnitSeeder extends Seeder
         foreach ($units as $unit) {
             OperationalUnit::updateOrCreate(['unit_number' => $unit['unit_number']], $unit);
         }
+
+        // المحتوى المنظَّم المعتمد (يملأ الفارغ فقط)
+        $this->call(OperationalUnitContentSeeder::class);
     }
 }

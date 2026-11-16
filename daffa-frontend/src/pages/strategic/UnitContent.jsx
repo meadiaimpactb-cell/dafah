@@ -66,8 +66,9 @@ const InfoIcon = ({ size = 15 }) => (
 /**
  * ⓘ يفتح نافذة صغيرة قرب الحقل عند النقر أو اللمس أو لوحة المفاتيح، وتُغلق بزر واضح أو Esc.
  * تُرسم عبر Portal حتى لا تقصّها حاويات الجداول القابلة للتمرير.
+ * hover=false: تُفتح بالضغط فقط (مواصفات التخطيط التشغيلي).
  */
-export function InfoTip({ text, example, title, label }) {
+export function InfoTip({ text, example, title, label, hover = true }) {
   const [open, setOpen]     = useState(false);
   const [pinned, setPinned] = useState(false); // فُتح بالنقر/اللمس/لوحة المفاتيح: يبقى حتى الإغلاق
   const [pos, setPos]   = useState(null);
@@ -75,9 +76,9 @@ export function InfoTip({ text, example, title, label }) {
   const popRef = useRef(null);
   const hideTimer = useRef(null);
 
-  // المرور بالمؤشر يعرض التوضيح أيضًا (دون أن يكون الطريقة الوحيدة)
-  const hoverIn  = () => { clearTimeout(hideTimer.current); if (!open) setOpen(true); };
-  const hoverOut = () => { if (!pinned) hideTimer.current = setTimeout(() => setOpen(false), 180); };
+  // المرور بالمؤشر يعرض التوضيح أيضًا (دون أن يكون الطريقة الوحيدة) — إلا إذا كان الفتح بالضغط فقط
+  const hoverIn  = () => { if (!hover) return; clearTimeout(hideTimer.current); if (!open) setOpen(true); };
+  const hoverOut = () => { if (!hover) return; if (!pinned) hideTimer.current = setTimeout(() => setOpen(false), 180); };
   const close    = () => { setOpen(false); setPinned(false); };
   useEffect(() => () => clearTimeout(hideTimer.current), []);
 

@@ -450,10 +450,10 @@ body {
         $tpl      = $unit?->template_type ?? '';
         $unitName = $unit?->name ?? "الوحدة {$submission->unit_number}";
         $subtitles = [
-            'op_import'      => 'قائمة المبادرات الاستراتيجية المُدرجة',
+            'op_import'      => 'المبادرات المختارة لسنة الخطة التشغيلية',
             'op_activities'  => 'الأنشطة التشغيلية الموزعة على المبادرات',
-            'op_gantt'       => 'الجدول الزمني لتنفيذ الأنشطة',
-            'op_responsible' => 'توزيع المسؤوليات ومؤشرات الأداء',
+            'op_gantt'       => 'مخطط جانت لأشهر تنفيذ الأنشطة',
+            'op_responsible' => 'مسؤول التنفيذ والقسم أو الإدارة لكل نشاط',
             'op_budget'      => 'التكاليف التفصيلية والإجمالية',
         ];
         $subtitle = $subtitles[$tpl] ?? '';
@@ -484,7 +484,7 @@ body {
             <thead>
                 <tr>
                     <th style="width:34px; text-align:center;">#</th>
-                    <th>المبادرة / البرنامج</th>
+                    <th>المبادرة</th>
                     <th style="width:100px; text-align:center;">الحالة</th>
                 </tr>
             </thead>
@@ -495,9 +495,9 @@ body {
                     <td>{{ $item['name'] ?? '—' }}</td>
                     <td style="text-align:center;">
                         @if($item['checked'] ?? false)
-                            <span class="pill-yes">&#10003; مُدرج</span>
+                            <span class="pill-yes">&#10003; مختارة</span>
                         @else
-                            <span class="pill-no">غير مُدرج</span>
+                            <span class="pill-no">غير مختارة</span>
                         @endif
                     </td>
                 </tr>
@@ -519,11 +519,11 @@ body {
                         <th style="width:30px; text-align:center;">#</th>
                         <th style="width:34%;">النشاط</th>
                         <th>الوصف</th>
-                        <th style="width:22%;">المخرجات</th>
+                        <th style="width:22%;">المخرج المتوقع</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($group['activities'] ?? [] as $ai => $act)
+                    @foreach(collect($group['activities'] ?? [])->filter(fn ($a) => is_array($a) && trim(($a['name'] ?? '') . ($a['desc'] ?? '') . ($a['output'] ?? '')) !== '')->values() as $ai => $act)
                     <tr>
                         <td style="text-align:center; color:#9ca3af;">{{ $ai + 1 }}</td>
                         <td style="font-weight:bold; color:#14505E;">{{ $act['name'] ?? '—' }}</td>
@@ -557,7 +557,7 @@ body {
             <tbody>
                 @foreach($formData['activities'] as $act)
                 <tr>
-                    <td class="name-td">{{ $act['name'] ?? '—' }}</td>
+                    <td class="name-td">{{ $act['name'] ?? '—' }}@if(!empty($act['initiative']))<div style="font-size:8px; color:#6b7280; font-weight:normal;">{{ $act['initiative'] }}</div>@endif</td>
                     @foreach($act['months'] ?? array_fill(0, 12, false) as $active)
                     <td style="padding:3px; background-color:{{ $active ? '#1A6B7C' : 'transparent' }};">
                         @if($active)<span style="color:rgba(255,255,255,0.9); font-size:9px;">&#9632;</span>@endif
@@ -585,22 +585,20 @@ body {
             <thead>
                 <tr>
                     <th style="width:30px; text-align:center;">#</th>
-                    <th style="width:28%;">النشاط</th>
-                    <th style="width:16%;">المسؤول</th>
-                    <th style="width:13%;">تاريخ البدء</th>
-                    <th style="width:13%;">تاريخ الانتهاء</th>
-                    <th>مؤشر الأداء</th>
+                    <th style="width:30%;">النشاط</th>
+                    <th style="width:24%;">المبادرة</th>
+                    <th style="width:20%;">مسؤول التنفيذ</th>
+                    <th>القسم / الإدارة</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($formData['rows'] as $ri => $row)
                 <tr>
                     <td style="text-align:center; color:#9ca3af;">{{ $ri + 1 }}</td>
-                    <td style="font-weight:bold; color:#14505E;">{{ $row['activity']    ?? '—' }}</td>
-                    <td>{{ $row['responsible'] ?? '—' }}</td>
-                    <td style="text-align:center; color:#1A6B7C;">{{ $row['startDate'] ?? '—' }}</td>
-                    <td style="text-align:center; color:#E8620A;">{{ $row['endDate']   ?? '—' }}</td>
-                    <td style="color:#6b7280;">{{ $row['kpi']         ?? '—' }}</td>
+                    <td style="font-weight:bold; color:#14505E;">{{ ($row['activity'] ?? '') !== '' ? $row['activity'] : '—' }}</td>
+                    <td>{{ ($row['initiative'] ?? '') !== '' ? $row['initiative'] : '—' }}</td>
+                    <td style="color:#1A6B7C;">{{ ($row['responsible'] ?? '') !== '' ? $row['responsible'] : '—' }}</td>
+                    <td style="color:#6b7280;">{{ ($row['department'] ?? '') !== '' ? $row['department'] : '—' }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -613,33 +611,39 @@ body {
     @elseif($tpl === 'op_budget')
         @if(!empty($formData['rows']))
         @php
-            $grandTotal = collect($formData['rows'])->sum('total');
-            $grandCount = collect($formData['rows'])->sum('count');
+            // القيم تُحفظ نصًا قد يحوي فواصل آلاف (15,000) أو أرقامًا عربية (٢٠٠)
+            $num = function ($v) {
+                $v = strtr((string) $v, ['٠'=>'0','١'=>'1','٢'=>'2','٣'=>'3','٤'=>'4','٥'=>'5','٦'=>'6','٧'=>'7','٨'=>'8','٩'=>'9','۰'=>'0','۱'=>'1','۲'=>'2','۳'=>'3','۴'=>'4','۵'=>'5','۶'=>'6','۷'=>'7','۸'=>'8','۹'=>'9','٫'=>'.']);
+                $v = preg_replace('/[^0-9.\-]/', '', $v);
+                return is_numeric($v) ? (float) $v : 0.0;
+            };
+            $rowTotal = fn ($r) => ($r['total'] ?? '') !== '' ? $num($r['total']) : $num($r['unitCost'] ?? 0) * $num($r['count'] ?? 0);
+            $grandTotal = collect($formData['rows'])->sum(fn ($r) => is_array($r) ? $rowTotal($r) : 0);
         @endphp
         <table class="data-table">
             <thead>
                 <tr>
                     <th style="width:30px; text-align:center;">#</th>
-                    <th>البند / الخدمة</th>
-                    <th style="width:18%; text-align:center;">التكلفة الوحدوية</th>
-                    <th style="width:10%; text-align:center;">العدد</th>
-                    <th style="width:18%; text-align:center;">الإجمالي</th>
+                    <th style="width:26%;">النشاط</th>
+                    <th>بند التكلفة</th>
+                    <th style="width:15%; text-align:center;">تكلفة الوحدة</th>
+                    <th style="width:9%; text-align:center;">العدد</th>
+                    <th style="width:16%; text-align:center;">الإجمالي</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($formData['rows'] as $bi => $row)
                 <tr>
                     <td style="text-align:center; color:#9ca3af;">{{ $bi + 1 }}</td>
-                    <td style="font-weight:bold;">{{ $row['item'] ?? '—' }}</td>
-                    <td style="text-align:center;">{{ number_format((float)($row['unitCost'] ?? 0)) }} ريال</td>
-                    <td style="text-align:center; color:#1A6B7C; font-weight:bold;">{{ $row['count'] ?? '—' }}</td>
-                    <td style="text-align:center; font-weight:bold; color:#14505E;">{{ number_format((float)($row['total'] ?? 0)) }} ريال</td>
+                    <td style="color:#14505E;">{{ ($row['activity'] ?? '') !== '' ? $row['activity'] : '—' }}</td>
+                    <td style="font-weight:bold;">{{ ($row['item'] ?? '') !== '' ? $row['item'] : '—' }}</td>
+                    <td style="text-align:center;">{{ number_format($num($row['unitCost'] ?? 0)) }} ريال</td>
+                    <td style="text-align:center; color:#1A6B7C; font-weight:bold;">{{ ($row['count'] ?? '') !== '' ? $row['count'] : '—' }}</td>
+                    <td style="text-align:center; font-weight:bold; color:#14505E;">{{ number_format($rowTotal($row)) }} ريال</td>
                 </tr>
                 @endforeach
                 <tr class="budget-total">
-                    <td colspan="2" style="text-align:right; padding-right:14px;">الإجمالي الكلي للميزانية</td>
-                    <td></td>
-                    <td style="text-align:center;">{{ $grandCount }}</td>
+                    <td colspan="5" style="text-align:right; padding-right:14px;">الإجمالي الكلي</td>
                     <td style="text-align:center;">{{ number_format($grandTotal) }} ريال</td>
                 </tr>
             </tbody>

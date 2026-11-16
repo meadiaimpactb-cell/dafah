@@ -6,6 +6,7 @@ import { PaymentReceipt } from '../strategic/steps/StepPayment';
 import ConsultantPicker from '../shared/ConsultantPicker';
 import { PayLogo, PaymentMethodPicker, ApplePayButton, SecurePaymentBadge, CardNetworkLogo, detectCardNetwork } from '../shared/PaymentBrand';
 import { IcClock, IcUpload, IcCheckCircle, IcArrowPath, IcSearch, IcWarning, IcLock, IcCog, IcLightbulb, IcSave, IcDocument, IcUser, IcCalendar, IcSparkles, IcCheck, IcChat, IcMoney, IcXMark, IcBeaker } from '../../utils/icons';
+import { OpSection, OpFormIntro, OpLabel, hasOpSection } from './OpContent';
 
 // ─── Colors ─────────────────────────────────────────────────────
 const colors = {
@@ -555,6 +556,42 @@ const TRIAL_FILL = {
   },
 };
 
+// معرّف ثابت لكل نشاط في «المبادرات التشغيلية» — تُربط به صفوف «الجدول الزمني للتنفيذ» فتبقى أشهرها عند تغيير الاسم
+const newActId = () => `act_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+
+/** يضمن معرّفًا لكل نشاط قبل الحفظ (للبيانات القديمة أو التجريبية) */
+const withActivityIds = (data) => {
+  if (!Array.isArray(data?.groups)) return data;
+  let changed = false;
+  const groups = data.groups.map(g => {
+    if (!Array.isArray(g?.activities) || g.activities.every(a => !a || a.id)) return g;
+    changed = true;
+    return { ...g, activities: g.activities.map(a => (a && !a.id ? { ...a, id: newActId() } : a)) };
+  });
+  return changed ? { ...data, groups } : data;
+};
+
+/** تعبئة تجريبية بنسخة جديدة في كل مرة؛ في الجدول الزمني تُملأ أشهر الأنشطة المنقولة بدل استبدالها */
+const trialFillFor = (ttype, current) => {
+  const demo = JSON.parse(JSON.stringify(TRIAL_FILL[ttype]));
+  if (ttype === 'op_activities') return withActivityIds(demo);
+  if (ttype === 'op_gantt') {
+    const rows = current?.activities || [];
+    if (rows.some(a => a.source_id)) {
+      const patterns = demo.activities.map(a => a.months);
+      return { ...current, activities: rows.map((a, i) => ({ ...a, months: [...patterns[i % patterns.length]] })) };
+    }
+  }
+  return demo;
+};
+
+// أرقام التكلفة: تقبل فواصل الآلاف والأرقام العربية (٢٠٠ أو ۲۰۰)
+const toNumber = v => parseFloat(String(v ?? '')
+  .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+  .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+  .replace(/٫/g, '.')
+  .replace(/[,٬\s]/g, '')) || 0;
+
 // ─── Workflow Steps (7 steps — original design) ──────────────────
 const opWorkflowSteps = [
   { id: 0, label: "التخطيط التشغيلي",              icon: <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd"/></svg> },
@@ -651,7 +688,7 @@ const OpWorkflowStepper = ({ opStep, setOpStep, workflow }) => {
 };
 
 // ─── OpTemplateRenderer (controlled) ─────────────────────────────
-const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
+export const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly, sync }) => {
   const templateType = unit.template_type || unit.templateType;
   const [newItem, setNewItem] = useState('');
   const iStyle = { width: "100%", padding: "6px 8px", border: `1px solid ${readOnly ? 'transparent' : colors.grayBorder}`, borderRadius: 6, fontSize: 12, fontFamily: "'Cairo', sans-serif", background: readOnly ? 'transparent' : 'white', outline: 'none' };
@@ -687,24 +724,23 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
     };
     return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 12 }}>المبادرات الاستراتيجية</h4>
-        {items.length === 0 && emptyState('📋', readOnly ? 'لم يتم إضافة أي مبادرات' : 'أضف مبادراتك يدوياً أو استخدم زر التعبئة التجريبية')}
+        {items.length === 0 && emptyState('📋', readOnly ? 'لم يتم إضافة أي مبادرات' : 'أضف أسماء المبادرات التي ستعمل عليها خلال العام في الحقل أدناه.')}
         {items.map((it, i) => (
-          <Card key={i} style={{ marginBottom: 10, padding: 14, display: "flex", alignItems: "center", justifyContent: "space-between", borderRight: `3px solid ${colors.teal}` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <input type="checkbox" checked={!!it.checked} onChange={() => toggle(i)} disabled={readOnly} style={{ accentColor: colors.teal }} />
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>{it.name}</div>
-                <div style={{ fontSize: 11, color: colors.gray }}>المبادرة {i + 1}</div>
+          <Card key={i} style={{ marginBottom: 10, padding: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, borderRight: `3px solid ${it.checked ? colors.teal : colors.grayBorder}` }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0, cursor: readOnly ? 'default' : 'pointer' }}>
+              <input type="checkbox" checked={!!it.checked} onChange={() => toggle(i)} disabled={readOnly} aria-label={`اختيار المبادرة لهذا العام: ${it.name}`} style={{ accentColor: colors.teal, width: 17, height: 17, flexShrink: 0 }} />
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, overflowWrap: 'anywhere' }}>{it.name}</div>
+                <div style={{ fontSize: 11, color: colors.gray }}>المبادرة {i + 1}{it.imported ? ' · من الخطة الاستراتيجية' : ''}</div>
               </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Badge text={it.checked ? "معتمد" : "غير محدد"} color={it.checked ? "green" : "gray"} small />
-              {!readOnly && <button onClick={() => removeItem(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontSize: 13, padding: '2px 6px', borderRadius: 4 }}>✕</button>}
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+              <Badge text={it.checked ? "مختارة لهذا العام" : "غير مختارة"} color={it.checked ? "green" : "gray"} small />
+              {!readOnly && <button onClick={() => removeItem(i)} aria-label={`حذف المبادرة: ${it.name}`} title="حذف" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontSize: 13, padding: '2px 6px', borderRadius: 4 }}>✕</button>}
             </div>
           </Card>
         ))}
-        {addRowInput('أضف مبادرة جديدة...', addManually)}
+        {addRowInput('أضف اسم مبادرة...', addManually)}
       </div>
     );
   }
@@ -718,29 +754,47 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
     };
     const addRow = (gi) => {
       if (readOnly) return;
-      setFormData({ ...formData, groups: groups.map((g, gi2) => gi2 !== gi ? g : { ...g, activities: [...g.activities, { name: '', desc: '', output: '' }] }) });
+      setFormData({ ...formData, groups: groups.map((g, gi2) => gi2 !== gi ? g : { ...g, activities: [...g.activities, { id: newActId(), name: '', desc: '', output: '' }] }) });
+    };
+    const removeAct = (gi, ai) => {
+      if (readOnly) return;
+      const a = groups[gi]?.activities?.[ai];
+      if ((a?.name || a?.desc || a?.output) && !window.confirm('حذف هذا النشاط؟ إذا كان قد نُقل إلى «الجدول الزمني للتنفيذ» فسيظهر هناك تنبيه لحذف صفه.')) return;
+      setFormData({ ...formData, groups: groups.map((g, gi2) => gi2 !== gi ? g : { ...g, activities: g.activities.filter((_, i) => i !== ai) }) });
     };
     const addGroup = (name) => {
       const n = name.trim();
       if (!n || readOnly) return;
-      setFormData({ ...formData, groups: [...groups, { initiative: n, activities: [{ name: '', desc: '', output: '' }] }] });
+      setFormData({ ...formData, groups: [...groups, { initiative: n, activities: [{ id: newActId(), name: '', desc: '', output: '' }] }] });
       setNewItem('');
     };
+    const FIELDS = [['name', 'اسم النشاط', 'مثال: ورشة تدريبية...'], ['desc', 'وصف النشاط', 'ماذا يتضمن؟'], ['output', 'المخرج المتوقع', 'ما الناتج؟']];
     return (
       <div>
-        {groups.length === 0 && emptyState('📌', readOnly ? 'لم يتم إضافة أي مبادرات' : 'أضف مبادرتك الأولى أو استخدم زر التعبئة التجريبية')}
+        {!readOnly && sync?.groups_added > 0 && (
+          <div role="status" style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, padding: '9px 14px', marginBottom: 14, fontSize: 12.5, color: '#0369a1' }}>
+            أُضيفت المبادرات التي اخترتها في الجزء الأول ({sync.groups_added}). أضف تحت كل مبادرة أنشطتها ثم احفظ.
+          </div>
+        )}
+        {groups.length === 0 && emptyState('📌', readOnly ? 'لم يتم إضافة أي مبادرات' : 'تظهر هنا المبادرات التي اخترتها في الجزء الأول، ويمكنك إضافة مبادرة في الحقل أدناه.')}
         {groups.map((g, gi) => (
           <div key={gi} style={{ marginBottom: 20, border: `1.5px solid ${colors.grayBorder}`, borderRadius: 12, overflow: "hidden" }}>
             <div style={{ padding: "10px 16px", background: colors.tealCard, color: "white", fontWeight: 600, fontSize: 14 }}>المبادرة: {g.initiative}</div>
             <div style={{ padding: 16 }}>
               {g.activities.map((a, ai) => (
-                <div key={ai} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 10, padding: 10, background: colors.grayLight, borderRadius: 8 }}>
-                  {[['name', `اسم النشاط ${ai+1}`, 'مثال: ورشة تدريبية...'], ['desc', 'وصف النشاط', 'ماذا يتضمن؟'], ['output', 'المخرج المتوقع', 'ما الناتج؟']].map(([field, label, ph]) => (
+                <div key={a.id || ai} style={{ position: 'relative', display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 10, marginBottom: 10, padding: readOnly ? 10 : '10px 10px 10px 34px', background: colors.grayLight, borderRadius: 8 }}>
+                  {FIELDS.map(([field, label, ph]) => (
                     <div key={field} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                      <label style={{ fontSize: 11, fontWeight: 600, color: colors.tealDark }}>{label}</label>
-                      <input value={a[field] || ''} onChange={e => updAct(gi, ai, field, e.target.value)} readOnly={readOnly} placeholder={ph} style={iStyle} />
+                      <div style={{ fontSize: 11, fontWeight: 600, color: colors.tealDark }}>
+                        <OpLabel unit={unit} label={field === 'name' ? `${label} ${ai + 1}` : label} tipKey={label} />
+                      </div>
+                      <input value={a[field] || ''} onChange={e => updAct(gi, ai, field, e.target.value)} readOnly={readOnly} placeholder={ph} aria-label={field === 'name' ? `${label} ${ai + 1}` : label} style={iStyle} />
                     </div>
                   ))}
+                  {!readOnly && (
+                    <button onClick={() => removeAct(gi, ai)} aria-label={`حذف النشاط ${ai + 1}`} title="حذف النشاط"
+                      style={{ position: 'absolute', top: 8, left: 8, background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontSize: 13, padding: '2px 6px', borderRadius: 4 }}>✕</button>
+                  )}
                 </div>
               ))}
               {!readOnly && <button onClick={() => addRow(gi)} style={{ fontSize: 12, color: colors.teal, background: "none", border: "none", cursor: "pointer", fontFamily: "'Cairo', sans-serif" }}>+ إضافة نشاط</button>}
@@ -757,19 +811,37 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
     const mths = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
     const acts = formData.activities?.length ? formData.activities : [];
     const barCols = [colors.teal, colors.blue, colors.teal, colors.orange, colors.orange, colors.green];
+    // صفوف الأنشطة المنقولة من «المبادرات التشغيلية» مرتبطة بها (source_id): الاسم يُعدَّل هناك وتبقى الأشهر هنا
+    const months12 = a => Array.from({ length: 12 }, (_, j) => (a?.months?.[j] ? 1 : 0));
     const toggleM = (ai, mi) => {
       if (readOnly) return;
-      setFormData({ ...formData, activities: acts.map((a, i) => i !== ai ? a : { ...a, months: a.months.map((m, j) => j !== mi ? m : (m ? 0 : 1)) }) });
+      setFormData({ ...formData, activities: acts.map((a, i) => i !== ai ? a : { ...a, months: months12(a).map((m, j) => j !== mi ? m : (m ? 0 : 1)) }) });
     };
     const addAct = () => {
       if (readOnly) return;
       setFormData({ ...formData, activities: [...acts, { name: '', months: Array(12).fill(0) }] });
     };
+    const removeAct = (ai) => {
+      if (readOnly) return;
+      const a = acts[ai];
+      if ((a?.name || months12(a).some(Boolean)) && !window.confirm('حذف هذا النشاط من الجدول الزمني؟')) return;
+      setFormData({ ...formData, activities: acts.filter((_, i) => i !== ai) });
+    };
+    const linkedCount = acts.filter(a => a.source_id && !a.source_missing).length;
+    const syncNotes = !readOnly && sync ? [
+      sync.added > 0   && `أنشطة جديدة نُقلت من «المبادرات التشغيلية»: ${sync.added}. حدّد أشهرها ثم احفظ.`,
+      sync.renamed > 0 && `حُدّثت أسماء أنشطة وفق «المبادرات التشغيلية» مع الإبقاء على أشهرها المحددة: ${sync.renamed}.`,
+      sync.linked > 0  && `رُبطت صفوف محفوظة سابقًا بأنشطتها في «المبادرات التشغيلية» دون تكرار: ${sync.linked}.`,
+    ].filter(Boolean) : [];
     return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 4 }}>مخطط جانت — الجدول الزمني</h4>
-        {!readOnly && <p style={{ fontSize: 11, color: colors.gray, marginBottom: 10 }}>انقر على الخلايا لتحديد أشهر التنفيذ</p>}
-        {acts.length === 0 && emptyState('📅', readOnly ? 'لم يتم إضافة أي أنشطة' : 'استخدم زر التعبئة التجريبية أو أضف نشاطاً جديداً')}
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 10 }}>مخطط جانت — الجدول الزمني</h4>
+        {syncNotes.length > 0 && (
+          <div role="status" style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, padding: '9px 14px', marginBottom: 12, fontSize: 12.5, color: '#0369a1', lineHeight: 1.9 }}>
+            {syncNotes.map((t, i) => <div key={i}>{t}</div>)}
+          </div>
+        )}
+        {acts.length === 0 && emptyState('📅', readOnly ? 'لم يتم إضافة أي أنشطة' : 'لا توجد أنشطة بعد. أضف الأنشطة في «المبادرات التشغيلية» لتظهر هنا تلقائيًا، أو أضف نشاطًا يدويًا.')}
         {acts.length > 0 && (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900 }}>
@@ -777,30 +849,52 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
                 <tr>
                   <th style={{ padding: 8, background: colors.tealCard, color: "white", fontSize: 11, position: "sticky", right: 0, zIndex: 1, minWidth: 160, textAlign: "right" }}>النشاط</th>
                   {mths.map(m => <th key={m} style={{ padding: "8px 4px", background: colors.tealCard, color: "white", fontSize: 9, fontWeight: 500, textAlign: "center" }}>{m}</th>)}
+                  {!readOnly && <th aria-label="حذف" style={{ background: colors.tealCard, width: 34 }} />}
                 </tr>
               </thead>
               <tbody>
-                {acts.map((a, ai) => (
-                  <tr key={ai} style={{ borderBottom: `1px solid ${colors.grayBorder}` }}>
-                    <td style={{ padding: 6, background: "white", position: "sticky", right: 0 }}>
-                      {readOnly
-                        ? <span style={{ fontSize: 11, fontWeight: 600 }}>{a.name}</span>
-                        : <input value={a.name} onChange={e => setFormData({ ...formData, activities: acts.map((x, i) => i !== ai ? x : { ...x, name: e.target.value }) })} style={{ ...iStyle, width: "90%" }} />
-                      }
-                    </td>
-                    {a.months.map((active, mi) => (
-                      <td key={mi} style={{ padding: 2, textAlign: "center" }}>
-                        <div onClick={() => toggleM(ai, mi)} style={{ height: 22, borderRadius: 4, background: active ? barCols[ai % barCols.length] : (readOnly ? 'transparent' : '#f3f4f6'), cursor: readOnly ? "default" : "pointer", border: !active && !readOnly ? `1px dashed ${colors.grayBorder}` : 'none' }} />
+                {acts.map((a, ai) => {
+                  const removable = !a.source_id || a.source_missing;
+                  const rowBg = a.source_missing ? '#fffbeb' : 'white';
+                  return (
+                    <tr key={a.source_id || `manual-${ai}`} style={{ borderBottom: `1px solid ${colors.grayBorder}`, background: rowBg }}>
+                      <td style={{ padding: 6, background: rowBg, position: "sticky", right: 0, minWidth: 170 }}>
+                        {a.source_id || readOnly ? (
+                          <div>
+                            <div style={{ fontSize: 11.5, fontWeight: 600, color: '#111827', overflowWrap: 'anywhere' }}>{a.name || '—'}</div>
+                            {a.initiative && <div style={{ fontSize: 10, color: colors.gray }}>{a.initiative}</div>}
+                            {a.source_missing && !readOnly && <div style={{ fontSize: 10, color: '#b45309', fontWeight: 600 }}>لم يعد ضمن «المبادرات التشغيلية» — احذفه إن لم يعد مطلوبًا</div>}
+                          </div>
+                        ) : (
+                          <div>
+                            <input value={a.name || ''} onChange={e => setFormData({ ...formData, activities: acts.map((x, i) => i !== ai ? x : { ...x, name: e.target.value }) })} placeholder="اسم النشاط" aria-label={`اسم النشاط المضاف يدويًا ${ai + 1}`} style={{ ...iStyle, width: "92%" }} />
+                            <div style={{ fontSize: 10, color: colors.gray, marginTop: 2 }}>مضاف يدويًا</div>
+                          </div>
+                        )}
                       </td>
-                    ))}
-                  </tr>
-                ))}
+                      {months12(a).map((active, mi) => (
+                        <td key={mi} style={{ padding: 2, textAlign: "center" }}>
+                          <button type="button" onClick={() => toggleM(ai, mi)} disabled={readOnly} aria-pressed={!!active} aria-label={`${a.name || 'النشاط'} — ${mths[mi]}`} title={mths[mi]}
+                            style={{ display: 'block', width: '100%', minWidth: 26, height: 22, padding: 0, borderRadius: 4, background: active ? barCols[ai % barCols.length] : (readOnly ? 'transparent' : '#f3f4f6'), cursor: readOnly ? "default" : "pointer", border: !active && !readOnly ? `1px dashed ${colors.grayBorder}` : 'none' }} />
+                        </td>
+                      ))}
+                      {!readOnly && (
+                        <td style={{ padding: 2, textAlign: 'center' }}>
+                          {removable && <button type="button" onClick={() => removeAct(ai)} aria-label={`حذف النشاط: ${a.name || ai + 1}`} title="حذف" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontSize: 13, padding: '2px 6px' }}>✕</button>}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
+        {!readOnly && linkedCount > 0 && (
+          <p style={{ fontSize: 11, color: colors.gray, margin: '8px 0 0' }}>أسماء الأنشطة المنقولة تُعدَّل من «المبادرات التشغيلية»، وتبقى أشهرها المحددة هنا.</p>
+        )}
         {!readOnly && (
-          <button onClick={addAct} style={{ marginTop: 8, fontSize: 12, color: colors.teal, background: "none", border: "none", cursor: "pointer", fontFamily: "'Cairo', sans-serif" }}>+ إضافة نشاط</button>
+          <button onClick={addAct} style={{ marginTop: 8, fontSize: 12, color: colors.teal, background: "none", border: "none", cursor: "pointer", fontFamily: "'Cairo', sans-serif" }}>+ إضافة نشاط يدويًا</button>
         )}
       </div>
     );
@@ -818,9 +912,10 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
         <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 12 }}>تعيين المسؤولين</h4>
         {rows.length === 0 && emptyState('👤', readOnly ? 'لم يتم إضافة أي صفوف' : 'اضغط + إضافة صف أو استخدم زر التعبئة التجريبية')}
         {rows.length > 0 && (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
             <thead>
-              <tr>{["النشاط","المبادرة","مسؤول التنفيذ","القسم / الإدارة"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.tealCard, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr>
+              <tr>{["النشاط","المبادرة","مسؤول التنفيذ","القسم / الإدارة"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.tealCard, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}><OpLabel unit={unit} label={h} /></th>)}</tr>
             </thead>
             <tbody>
               {rows.map((r, i) => (
@@ -833,6 +928,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
               ))}
             </tbody>
           </table>
+          </div>
         )}
         {!readOnly && (
           <button onClick={() => setFormData({ ...formData, rows: [...rows, { activity: '', initiative: '', responsible: '', department: '' }] })} style={{ marginTop: 8, fontSize: 12, color: colors.teal, background: "none", border: "none", cursor: "pointer", fontFamily: "'Cairo', sans-serif" }}>+ إضافة صف</button>
@@ -850,23 +946,22 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
         if (idx !== i) return r;
         const nr = { ...r, [field]: val };
         if (field === 'unitCost' || field === 'count') {
-          const cost = parseFloat(String(nr.unitCost).replace(/,/g, '')) || 0;
-          const cnt  = parseFloat(nr.count) || 0;
-          nr.total   = (cost * cnt).toLocaleString('en-US');
+          nr.total = (toNumber(nr.unitCost) * toNumber(nr.count)).toLocaleString('en-US');
         }
         return nr;
       });
       setFormData({ ...formData, rows: updated });
     };
-    const grandTotal = rows.reduce((s, r) => s + (parseFloat(String(r.total || '0').replace(/,/g, '')) || 0), 0);
+    const grandTotal = rows.reduce((s, r) => s + toNumber(r.total), 0);
     return (
       <div>
         <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 12 }}>الميزانية التشغيلية</h4>
         {rows.length === 0 && emptyState('💰', readOnly ? 'لم يتم إضافة أي بنود' : 'اضغط + إضافة بند أو استخدم زر التعبئة التجريبية')}
         {rows.length > 0 && (
-          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 12 }}>
+          <div style={{ overflowX: "auto", marginBottom: 12 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 620 }}>
             <thead>
-              <tr>{["النشاط","بند التكلفة","تكلفة الوحدة","العدد","الإجمالي"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.tealCard, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr>
+              <tr>{["النشاط","بند التكلفة","تكلفة الوحدة","العدد","الإجمالي"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.tealCard, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}><OpLabel unit={unit} label={h} /></th>)}</tr>
             </thead>
             <tbody>
               {rows.map((r, i) => (
@@ -884,6 +979,7 @@ const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly }) => {
               </tr>
             </tbody>
           </table>
+          </div>
         )}
         {!readOnly && (
           <button onClick={() => setFormData({ ...formData, rows: [...rows, { activity: '', item: '', unitCost: '', count: '', total: '' }] })} style={{ fontSize: 12, color: colors.teal, background: "none", border: "none", cursor: "pointer", fontFamily: "'Cairo', sans-serif" }}>+ إضافة بند</button>
@@ -904,39 +1000,60 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
   const [submitting, setSubmitting] = useState(false);
   const [formData,   setFormData]   = useState({});
   const [msg,        setMsg]        = useState(null);
+  const [loadError,  setLoadError]  = useState(null);
 
   const tabs = ["نبذة", "شرح مكتوب", "إرشادات", "فيديو", "خدمة الدردشة", "نماذج العمل"];
   const unitNum = unitSummary.unit_number || unitSummary.id;
 
   useEffect(() => {
+    let alive = true;
+    // الصفحة نفسها تُستخدم للوحدة التالية/السابقة: تُفرَّغ بيانات الوحدة السابقة حتى لا تُعرض أو تُحفظ باسم الوحدة الجديدة
+    setLoading(true);
+    setLoadError(null);
+    setUnitData(null);
+    setFormData({});
     operationalApi.getUnit(workflowId, unitNum)
       .then(res => {
+        if (!alive) return undefined;
         setUnitData(res.data);
         const saved = res.data.submission?.form_data;
         if (saved && Object.keys(saved).length > 0) {
           setFormData(saved);
-        } else {
-          // Initialize with template-specific empty structure so save never sends {}
-          const ttype = res.data.unit?.template_type || res.data.unit?.templateType;
-          if (ttype === 'op_import') {
-            operationalApi.getStrategicInitiatives(workflowId)
-              .then(r => setFormData({ items: (r.data.initiatives || []).map(name => ({ name, checked: true })) }))
-              .catch(() => setFormData({ items: [] }));
-          } else {
-            const empties = { op_activities: { groups: [] }, op_gantt: { activities: [] }, op_responsible: { rows: [] }, op_budget: { rows: [] } };
-            setFormData(empties[ttype] || {});
-          }
+          return undefined;
         }
+        // Initialize with template-specific empty structure so save never sends {}
+        const ttype = res.data.unit?.template_type || res.data.unit?.templateType;
+        if (ttype === 'op_import') {
+          // أول فتح: استيراد أسماء مبادرات الخطة الاستراتيجية المكتملة في دفة (إن وُجدت) مع مربعات التحديد؛
+          // وإلا تبقى القائمة فارغة لإضافة الأسماء يدويًا
+          return operationalApi.getStrategicInitiatives(workflowId)
+            .then(r => { if (alive) setFormData({ items: (r.data.initiatives || []).map(name => ({ name, checked: true, imported: true })) }); })
+            .catch(() => { if (alive) setFormData({ items: [] }); });
+        }
+        const empties = { op_activities: { groups: [] }, op_gantt: { activities: [] }, op_responsible: { rows: [] }, op_budget: { rows: [] } };
+        setFormData(empties[ttype] || {});
+        return undefined;
       })
-      .finally(() => setLoading(false));
+      .catch(e => { if (alive) setLoadError(e.response?.data?.message || 'تعذّر تحميل الوحدة. تحقق من الاتصال ثم حاول مجددًا.'); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
   }, [unitNum]);
 
   const showMsg = (type, text) => { setMsg({ type, text }); setTimeout(() => setMsg(null), 3500); };
 
+  const ttype = unitData?.unit?.template_type || unitSummary.template_type;
+  // معرّف ثابت لكل نشاط قبل الإرسال حتى تبقى صفوف «الجدول الزمني للتنفيذ» مرتبطة بأنشطتها
+  const preparedData = () => {
+    const data = ttype === 'op_activities' ? withActivityIds(formData) : formData;
+    if (data !== formData) setFormData(data);
+    return data;
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
-      await operationalApi.saveUnit(workflowId, unitNum, { form_data: formData });
+      await operationalApi.saveUnit(workflowId, unitNum, { form_data: preparedData() });
+      setUnitData(prev => (prev ? { ...prev, sync: null } : prev));
       showMsg('success', 'تم حفظ البيانات بنجاح');
     } catch (e) {
       showMsg('error', e.response?.data?.message || 'حدث خطأ في الحفظ');
@@ -946,9 +1063,9 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      const res = await operationalApi.submitUnit(workflowId, unitNum, { form_data: formData });
+      const res = await operationalApi.submitUnit(workflowId, unitNum, { form_data: preparedData() });
       // تحديث الحالة محلياً فوراً → يُفعّل زر "الوحدة التالية"
-      setUnitData(prev => ({ ...prev, submission: res.data.submission }));
+      setUnitData(prev => ({ ...prev, submission: res.data.submission, sync: null }));
       showMsg('success', 'تم الإرسال — يمكنك الانتقال للوحدة التالية');
     } catch (e) {
       showMsg('error', e.response?.data?.message || 'حدث خطأ في الإرسال');
@@ -956,6 +1073,12 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
   };
 
   if (loading) return <div style={{ textAlign: "center", padding: 80, color: colors.teal, fontSize: 16 }}>جاري تحميل الوحدة...</div>;
+  if (loadError || !unitData) return (
+    <div role="alert" style={{ textAlign: "center", padding: 60 }}>
+      <div style={{ color: '#b91c1c', fontSize: 15, fontWeight: 600, marginBottom: 16 }}>{loadError || 'تعذّر تحميل الوحدة.'}</div>
+      <Btn variant="secondary" onClick={onBack}>→ العودة إلى الوحدات</Btn>
+    </div>
+  );
 
   const unit       = unitData?.unit || unitSummary;
   const submission = unitData?.submission;
@@ -980,14 +1103,15 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
       )}
 
       <Card>
-        {tab === 0 && (
+        {/* النبذة والشرح والإرشادات: بطاقة واحدة بخلفية زرقاء فاتحة من المحتوى المُدار في لوحة التحكم (دون مرفقات) */}
+        {tab === 0 && (hasOpSection(unit, 'overview') ? <OpSection unit={unit} section="overview" /> : (
           <div>
             <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>نبذة عن {unit.name}</h3>
             <p style={{ fontSize: 14, color: colors.gray, lineHeight: 2 }}>{unit.overview}</p>
             <p style={{ fontSize: 14, color: colors.gray, lineHeight: 2, marginTop: 12 }}>{unit.overview2}</p>
           </div>
-        )}
-        {tab === 1 && (
+        ))}
+        {tab === 1 && (hasOpSection(unit, 'explanation') ? <OpSection unit={unit} section="explanation" /> : (
           <div>
             <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>شرح مكتوب: {unit.name}</h3>
             {(unit.topics || []).map((tp, i) => (
@@ -997,8 +1121,8 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
               </div>
             ))}
           </div>
-        )}
-        {tab === 2 && (
+        ))}
+        {tab === 2 && (hasOpSection(unit, 'guidelines') ? <OpSection unit={unit} section="guidelines" /> : (
           <div>
             <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>إرشادات: {unit.name}</h3>
             {(unit.steps || []).map((s, i) => (
@@ -1017,7 +1141,7 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
               </div>
             )}
           </div>
-        )}
+        ))}
         {tab === 3 && (
           <div style={{ textAlign: "center" }}>
             {toEmbedUrl(unit.video_url || unit.videoUrl) ? (
@@ -1054,22 +1178,26 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
         )}
         {tab === 5 && (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark }}>نماذج العمل: {unit.name}</h3>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                {!isReadOnly && (
-                  <button
-                    onClick={() => {
-                      const ttype = unitData?.unit?.template_type || unit.template_type;
-                      if (TRIAL_FILL[ttype]) setFormData(TRIAL_FILL[ttype]);
-                    }}
-                    style={{ fontSize: 12, color: colors.blue, background: colors.blueLight, border: "none", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: "'Cairo', sans-serif", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
-                    <IcBeaker width={14} height={14}/> تعبئة تجريبية
-                  </button>
-                )}
-              </div>
-            </div>
-            <OpTemplateRenderer unit={unit} formData={formData} setFormData={isReadOnly ? () => {} : setFormData} readOnly={isReadOnly} />
+            {(() => {
+              const trialBtn = !isReadOnly && TRIAL_FILL[ttype] ? (
+                <button
+                  onClick={() => setFormData(prev => trialFillFor(ttype, prev))}
+                  style={{ fontSize: 12, color: colors.blue, background: colors.blueLight, border: "none", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: "'Cairo', sans-serif", fontWeight: 600, display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+                  <IcBeaker width={14} height={14}/> تعبئة تجريبية
+                </button>
+              ) : null;
+              const f = unit.content?.form;
+              // تعليمات نموذج العمل أعلى النموذج + «عرض مثال توضيحي» (نافذة منبثقة مع «إغلاق»)
+              return f && (f.title || f.heading || f.blocks?.length || f.example) ? (
+                <div style={{ marginBottom: 16 }}><OpFormIntro unit={unit} actions={trialBtn} /></div>
+              ) : (
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, gap: 8 }}>
+                  <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark }}>نماذج العمل: {unit.name}</h3>
+                  {trialBtn}
+                </div>
+              );
+            })()}
+            <OpTemplateRenderer unit={unit} formData={formData} setFormData={isReadOnly ? () => {} : setFormData} readOnly={isReadOnly} sync={unitData?.sync} />
             {!isReadOnly && (
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20, gap: 10, flexWrap: "wrap" }}>
                 {/* Previous unit — far left */}
@@ -1110,9 +1238,9 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
 
 // ─── Step 0: OpStepInfo ──────────────────────────────────────────
 const OP_UNIT_FALLBACK = [
-  {unit_number:1,name:"المبادرات الاستراتيجية"},
+  {unit_number:1,name:"المبادرات الاستراتيجية في التخطيط التشغيلي"},
   {unit_number:2,name:"المبادرات التشغيلية"},
-  {unit_number:3,name:"شهور التنفيذ"},
+  {unit_number:3,name:"الجدول الزمني للتنفيذ"},
   {unit_number:4,name:"مسؤول التنفيذ"},
   {unit_number:5,name:"التكلفة المالية"},
 ];

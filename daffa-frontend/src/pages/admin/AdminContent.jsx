@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
 import StrategicContentEditor from './StrategicContentEditor';
+import OperationalContentEditor from './OperationalContentEditor';
 
 const C = {
   teal: '#1A6B7C', tealDark: '#14505E', tealLight: '#E8F4F6',
@@ -34,6 +35,19 @@ const STRATEGIC_FIELDS = [
   { key: 'form',        label: 'نماذج العمل', tab: 'form',        filled: u => (u.content?.form?.blocks || []).length > 0 || (u.content?.form?.tooltips || []).length > 0 },
   { key: 'video',       label: 'فيديو',       tab: 'general',     filled: u => !!u.video_url },
 ];
+
+// حالة محتوى الوحدة التشغيلية (بطاقات المحتوى المنظَّم التي يراها المستخدم)
+const opCardFilled = c => !!c && (!!c.title || (c.blocks || []).length > 0);
+const OPERATIONAL_FIELDS = [
+  { key: 'overview',    label: 'النبذة',      tab: 'overview',    filled: u => opCardFilled(u.content?.overview) },
+  { key: 'explanation', label: 'الشرح',       tab: 'explanation', filled: u => opCardFilled(u.content?.explanation) },
+  { key: 'guidelines',  label: 'الإرشادات',   tab: 'guidelines',  filled: u => opCardFilled(u.content?.guidelines) },
+  { key: 'form',        label: 'نماذج العمل', tab: 'form',        filled: u => opCardFilled(u.content?.form) || !!u.content?.form?.example },
+  { key: 'video',       label: 'فيديو',       tab: 'general',     filled: u => !!u.video_url },
+];
+
+// الأقسام ذات المحرر الكامل للمحتوى المنظَّم
+const STRUCTURED_FIELDS = { strategic: STRATEGIC_FIELDS, operational: OPERATIONAL_FIELDS };
 
 // ─── Primitives ──────────────────────────────────────────────────────────────
 
@@ -346,7 +360,7 @@ function UnitRow({ unit, section, onEdit }) {
         {/* Left: number + name (clickable → opens on 'name' field) */}
         <div
           style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flex: 1, minWidth: 0, cursor: 'pointer' }}
-          onClick={() => onEdit(unit, section === 'strategic' ? 'general' : 'name')}
+          onClick={() => onEdit(unit, STRUCTURED_FIELDS[section] ? 'general' : 'name')}
           title="اضغط لتعديل الاسم"
         >
           <div style={{ width: 30, height: 30, borderRadius: 8, background: C.teal, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0, fontFamily: 'inherit', marginTop: 2 }}>
@@ -380,6 +394,12 @@ function UnitRow({ unit, section, onEdit }) {
               PDF: {Object.values(unit.pdf_urls || {}).filter(Boolean).length ? `${Object.values(unit.pdf_urls).filter(Boolean).length} مرفوع` : 'المعتمد'}
             </span>
           </div>
+        ) : section === 'operational' ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            {OPERATIONAL_FIELDS.map(f => (
+              <ContentBadge key={f.key} filled={f.filled(unit)} label={f.label} onClick={() => onEdit(unit, f.tab)} />
+            ))}
+          </div>
         ) : (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           <ContentBadge filled={!!unit.overview}            label="نبذة"    onClick={() => onEdit(unit, 'overview')} />
@@ -398,10 +418,10 @@ function UnitRow({ unit, section, onEdit }) {
 function ProgressBar({ units, section }) {
   const extraFields = section === 'policies' ? ['name', 'description', 'price'] : ['name'];
   const allFields   = [...extraFields, ...CONTENT_FIELDS.map(f => f.key)];
-  const strategic   = section === 'strategic';
-  const total  = units.length * (strategic ? STRATEGIC_FIELDS.length : allFields.length);
-  const filled = strategic
-    ? units.reduce((acc, u) => acc + STRATEGIC_FIELDS.filter(f => f.filled(u)).length, 0)
+  const structured  = STRUCTURED_FIELDS[section];
+  const total  = units.length * (structured ? structured.length : allFields.length);
+  const filled = structured
+    ? units.reduce((acc, u) => acc + structured.filter(f => f.filled(u)).length, 0)
     : units.reduce((acc, u) => acc + allFields.filter(k => {
       const v = u[k];
       return v !== null && v !== undefined && v !== '' && v !== 0;
@@ -473,7 +493,16 @@ export default function AdminContent() {
           notify={showToast}
         />
       )}
-      {editState && activeTab !== 'strategic' && (
+      {editState && activeTab === 'operational' && (
+        <OperationalContentEditor
+          unit={editState.unit}
+          initialTab={editState.focusField || 'general'}
+          onClose={() => setEditState(null)}
+          onSaved={updated => setData(prev => ({ ...prev, operational: prev.operational.map(u => (u.id === updated.id ? { ...u, ...updated } : u)) }))}
+          notify={showToast}
+        />
+      )}
+      {editState && activeTab === 'policies' && (
         <EditModal
           unit={editState.unit}
           section={activeTab}
@@ -508,6 +537,12 @@ export default function AdminContent() {
         <div style={{ background: C.tealLight, border: `1px solid ${C.teal}30`, borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 12.5, color: C.tealDark, lineHeight: 1.8, fontFamily: 'inherit' }}>
           كل ما يظهر للمستخدم في الوحدات الاستراتيجية قابل للتعديل من هنا: الاسم ونوع النموذج والفيديو، النبذة، الشرح وأمثلته،
           الإرشادات، تعليمات نماذج العمل وتوضيحات ⓘ وأمثلتها، وملفات PDF. التعديل يُنشر للمستخدمين فور الحفظ، مع معاينة مباشرة قبل الحفظ.
+        </div>
+      )}
+      {activeTab === 'operational' && (
+        <div style={{ background: C.tealLight, border: `1px solid ${C.teal}30`, borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 12.5, color: C.tealDark, lineHeight: 1.8, fontFamily: 'inherit' }}>
+          كل ما يظهر للمستخدم في وحدات التخطيط التشغيلي قابل للتعديل من هنا: الاسم والفيديو، النبذة، الشرح، الإرشادات،
+          تعليمات نموذج العمل ومثالها التوضيحي (نافذة منبثقة) وتوضيحات ⓘ للحقول. التعديل يُنشر للمستخدمين فور الحفظ، مع معاينة مباشرة قبل الحفظ.
         </div>
       )}
 

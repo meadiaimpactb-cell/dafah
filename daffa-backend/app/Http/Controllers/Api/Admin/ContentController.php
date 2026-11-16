@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\PolicyController;
 use App\Models\OperationalUnit;
 use App\Models\PolicyTypeContent;
 use App\Models\StrategicUnit;
+use App\Support\OperationalContent;
 use App\Support\PolicyCatalog;
 use App\Support\StrategicContent;
 use Illuminate\Http\Request;
@@ -14,25 +15,6 @@ use Illuminate\Support\Facades\Storage;
 
 class ContentController extends Controller
 {
-    private function unitRules(): array
-    {
-        return [
-            'name'                 => 'nullable|string|max:255',
-            'overview'             => 'nullable|string',
-            'overview2'            => 'nullable|string',
-            'written_description'  => 'nullable|string',
-            'topics'               => 'nullable|array',
-            'topics.*.t'           => 'nullable|string',
-            'topics.*.d'           => 'nullable|string',
-            'steps'                => 'nullable|array',
-            'steps.*.t'            => 'nullable|string',
-            'steps.*.d'            => 'nullable|string',
-            'tip'                  => 'nullable|string',
-            'video_url'            => 'nullable|string|max:500',
-            'video_duration'       => 'nullable|string|max:20',
-        ];
-    }
-
     private function policyRules(): array
     {
         return [
@@ -45,11 +27,6 @@ class ContentController extends Controller
             'video_url'            => 'nullable|string|max:500',
             'video_duration'       => 'nullable|string|max:20',
         ];
-    }
-
-    private function unitFields(): array
-    {
-        return ['id', 'unit_number', 'name', 'overview', 'overview2', 'written_description', 'topics', 'steps', 'tip', 'video_url', 'video_duration'];
     }
 
     // ── GET /api/admin/content/strategic ─────────────────────────────────────
@@ -174,18 +151,64 @@ class ContentController extends Controller
     }
 
     // ── GET /api/admin/content/operational ───────────────────────────────────
+    // يشمل المحتوى المنظَّم كاملًا (النبذة، الشرح، الإرشادات، تعليمات النموذج ومثاله وتوضيحات ⓘ)
     public function operationalUnits()
     {
-        return response()->json(OperationalUnit::orderBy('unit_number')->get($this->unitFields()));
+        return response()->json(
+            OperationalUnit::orderBy('unit_number')->get()->map(fn ($u) => $this->operationalPayload($u))
+        );
+    }
+
+    private function operationalPayload(OperationalUnit $u): array
+    {
+        return [
+            'id'             => $u->id,
+            'unit_number'    => $u->unit_number,
+            'name'           => $u->name,
+            'template_type'  => $u->template_type,
+            'video_url'      => $u->video_url,
+            'video_duration' => $u->video_duration,
+            'content'        => $u->content,
+            'has_default'    => OperationalContent::defaultFor($u->template_type) !== null,
+        ];
     }
 
     // ── PUT /api/admin/content/operational/{id} ───────────────────────────────
+    // الاسم والفيديو + المحتوى المنظَّم كاملًا (يُضبط على المخطط المعروف قبل الحفظ)
     public function updateOperational(Request $request, int $id)
     {
-        $request->validate($this->unitRules());
+        $request->validate([
+            'name'           => 'sometimes|required|string|max:255',
+            'video_url'      => 'nullable|string|max:500',
+            'video_duration' => 'nullable|string|max:20',
+            'content'        => 'sometimes|array',
+        ]);
+
         $unit = OperationalUnit::findOrFail($id);
-        $unit->update($request->only(['name', 'overview', 'overview2', 'written_description', 'topics', 'steps', 'tip', 'video_url', 'video_duration']));
-        return response()->json($unit->only($this->unitFields()));
+        $data = $request->only(['name', 'video_url', 'video_duration']);
+
+        if ($request->has('content')) {
+            $raw = $request->input('content');
+            if (strlen(json_encode($raw, JSON_UNESCAPED_UNICODE)) > 2_000_000) {
+                return response()->json(['message' => 'حجم المحتوى أكبر من المسموح.'], 422);
+            }
+            $data['content'] = OperationalContent::normalize($raw);
+        }
+
+        $unit->update($data);
+
+        return response()->json($this->operationalPayload($unit->fresh()));
+    }
+
+    // ── GET /api/admin/content/operational/{id}/default ───────────────────────
+    // المحتوى المعتمد الأصلي للوحدة (يُحمَّل في المحرر ولا يُحفظ إلا بالحفظ)
+    public function operationalDefault(int $id)
+    {
+        $unit    = OperationalUnit::findOrFail($id);
+        $default = OperationalContent::defaultFor($unit->template_type);
+        abort_unless($default, 404);
+
+        return response()->json(OperationalContent::normalize($default));
     }
 
     // ── GET /api/admin/content/policies ──────────────────────────────────────
