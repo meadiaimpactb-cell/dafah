@@ -28,6 +28,7 @@ import AdminSiteContent from "./pages/admin/AdminSiteContent";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminPolicyDesigns from "./pages/admin/AdminPolicyDesigns";
 import AdminOutputs from "./pages/admin/AdminOutputs";
+import RoleGuide from "./pages/shared/RoleGuide";
 import BrandLogo, { LogoMark, RosetteShape } from "./components/brand/Logo";
 import { colors as themeColors, systems } from "./theme/tokens";
 import { Badge, ProgressBar, Btn, Card, Input, MetricCard, Tab, StatusBar, Modal, BarChart, DonutChart, LineChart, GenericPage, EmptyState, Loading, SectionTitle } from "./components/ui/kit";
@@ -589,6 +590,7 @@ const ClientHelpPage = () => {
 
   return (
     <GenericPage title="المساعدة والدعم">
+      <RoleGuide role="client" />
       <div style={{ marginBottom: 20 }}>
         <Input placeholder="ابحث عن سؤالك..." value={search} onChange={e => setSearch(e.target.value)} />
       </div>
@@ -1854,6 +1856,7 @@ export default function DaffaPlatform() {
     { id: "con-earnings",      label: "الأرباح",             icon: Icons.payments, group: "حسابي" },
     { id: "con-stats",         label: "إحصائياتي",           icon: Icons.chart,    group: "حسابي" },
     { id: "con-settings",      label: "إعدادات الحساب",      icon: Icons.settings, group: "حسابي" },
+    { id: "con-help",          label: "دليل الاستخدام",      icon: Icons.help,     group: "حسابي" },
   ];
 
   const adminMenu = [
@@ -1874,6 +1877,7 @@ export default function DaffaPlatform() {
     { id: "admin-log",            label: "سجل العمليات",      icon: Icons.log,      group: "النظام" },
     { id: "admin-settings",       label: "إعدادات النظام",    icon: Icons.settings, group: "النظام" },
     { id: "admin-profile",        label: "ملفي الشخصي",       icon: Icons.user,     group: "النظام" },
+    { id: "admin-help",           label: "دليل الاستخدام",    icon: Icons.help,     group: "النظام" },
   ];
 
   const menu = currentRole === "admin" ? adminMenu : currentRole === "consultant" ? consultantMenu : clientMenu;
@@ -4227,6 +4231,8 @@ export default function DaffaPlatform() {
 
       // ======= CLIENT: المساعدة =======
       case "client-help": return <ClientHelpPage />;
+      case "con-help":   return <GenericPage title="دليل الاستخدام"><RoleGuide role="consultant" /></GenericPage>;
+      case "admin-help": return <GenericPage title="دليل الاستخدام"><RoleGuide role="admin" /></GenericPage>;
 
 
       default: return (

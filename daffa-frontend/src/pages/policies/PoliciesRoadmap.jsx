@@ -8,6 +8,7 @@ import { PaymentReceipt } from "../strategic/steps/StepPayment";
 import ConsultantPicker from "../shared/ConsultantPicker";
 import { PaymentMethodPicker, ApplePayButton, SecurePaymentBadge, CardNetworkLogo, detectCardNetwork } from "../shared/PaymentBrand";
 import { IcCheckCircle, IcArrowPath, IcUpload, IcSearch, IcWarning, IcLock, IcLightbulb, IcSave, IcDocument, IcUser, IcCalendar, IcCreditCard, IcSparkles, IcCheck, IcPencil, IcEye, IcPalette, IcBeaker, IcChat, IcScroll, IcClock } from '../../utils/icons';
+import UnitVideo from '../shared/UnitVideo';
 
 // ── Payment Gateway Mock ──────────────────────────────────────────────────────
 // To go live: replace ONLY the body of this function with the real provider SDK
@@ -603,7 +604,7 @@ const PolicyInfoPanel = ({ policyType }) => {
   const hasOverview = !!policyType?.overview;
   const hasDesc     = !!policyType?.written_description;
   const hasTip      = !!policyType?.tip;
-  const hasVideo    = !!policyType?.video_url;
+  const hasVideo    = !!(policyType?.video_url || policyType?.video_url_alt);
   const hasAny      = hasOverview || hasDesc || hasTip || hasVideo;
 
   const [open, setOpen] = useState(false);
@@ -679,15 +680,8 @@ const PolicyInfoPanel = ({ policyType }) => {
           )}
 
           {tab === 'video' && (
-            policyType.video_url ? (
-              <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, borderRadius: 10, overflow: 'hidden' }}>
-                <iframe
-                  src={(() => { try { const u = new URL(policyType.video_url); if (u.hostname.includes('youtube.com') && u.searchParams.get('v')) return `https://www.youtube.com/embed/${u.searchParams.get('v')}`; if (u.hostname === 'youtu.be') return `https://www.youtube.com/embed${u.pathname}`; } catch(_){} return policyType.video_url; })()}
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
-                  allowFullScreen
-                  title={policyType.name}
-                />
-              </div>
+            hasVideo ? (
+              <UnitVideo url={policyType.video_url} altUrl={policyType.video_url_alt} title={policyType.name} radius={10} />
             ) : (
               <div style={{ background: C.grayLight, borderRadius: 10, padding: 40, color: C.gray, textAlign: 'center', fontSize: 13 }}>
                 الفيديو قيد الإعداد

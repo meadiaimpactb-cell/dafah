@@ -12,6 +12,7 @@ use App\Models\PolicyTypeContent;
 use App\Models\PolicyWorkflow;
 use App\Models\QuestionnaireSection;
 use App\Models\ServiceSetting;
+use App\Models\SiteContent;
 use App\Models\StrategicWorkflow;
 use App\Support\PolicyCatalog;
 use Illuminate\Http\Request;
@@ -26,8 +27,10 @@ class PolicyController extends Controller
     public static function policyTypes(): array
     {
         $overrides = PolicyTypeContent::all()->keyBy('policy_type_id');
+        // فيديو شرح رحلة السياسات (محتوى الموقع ← الأدلة والفيديوهات) يظهر لكل سياسة ليس لها فيديو خاص
+        $site = SiteContent::whereIn('key', ['policies_video_url', 'policies_video_url_alt'])->pluck('value', 'key');
 
-        return collect(PolicyCatalog::all())->map(function ($t) use ($overrides) {
+        return collect(PolicyCatalog::all())->map(function ($t) use ($overrides, $site) {
             $o = $overrides->get($t['id']);
             return array_merge($t, [
                 'name'                => ($o && $o->name)             ? $o->name             : $t['name'],
@@ -36,7 +39,8 @@ class PolicyController extends Controller
                 'overview'            => ($o && $o->overview)         ? $o->overview         : $t['overview'],
                 'written_description' => $o?->written_description,
                 'tip'                 => ($o && $o->tip)              ? $o->tip              : $t['tip'],
-                'video_url'           => $o?->video_url,
+                'video_url'           => $o?->video_url ?: ($site['policies_video_url'] ?? null),
+                'video_url_alt'       => $o?->video_url ? $o->video_url_alt : ($site['policies_video_url_alt'] ?? null),
                 'video_duration'      => $o?->video_duration,
                 'has_template'        => (bool) PolicyCatalog::templatePath($t['template'], 'docx'),
             ]);

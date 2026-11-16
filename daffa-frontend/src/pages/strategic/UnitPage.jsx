@@ -7,6 +7,7 @@ import TemplateRenderer from './TemplateRenderer';
 import { DEMO_DATA } from './demoData';
 import { validateTemplate } from './templateValidation';
 import { OverviewContent, ExplanationContent, GuidelinesContent, templateLabel } from './UnitContent';
+import UnitVideo from '../shared/UnitVideo';
 
 const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
 
@@ -444,28 +445,13 @@ function TabGuide({ unit }) {
   );
 }
 
-function toEmbedUrl(url) {
-  if (!url) return null;
-  try {
-    const u = new URL(url);
-    if (u.hostname.includes('youtube.com') && u.searchParams.get('v'))
-      return `https://www.youtube.com/embed/${u.searchParams.get('v')}`;
-    if (u.hostname === 'youtu.be')
-      return `https://www.youtube.com/embed${u.pathname}`;
-  } catch (_) {}
-  return url;
-}
-
 /* ─── تبويب الفيديو ─── */
 function TabVideo({ unit }) {
-  const embedUrl = toEmbedUrl(unit.video_url);
   return (
     <div>
       <div style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>الفيديو التعليمي</div>
-      {embedUrl ? (
-        <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, borderRadius: 12, overflow: 'hidden' }}>
-          <iframe src={embedUrl} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }} allowFullScreen title={unit.name} />
-        </div>
+      {unit.video_url || unit.video_url_alt ? (
+        <UnitVideo url={unit.video_url} altUrl={unit.video_url_alt} title={unit.name} />
       ) : (
         <div style={{ background: '#F3EFE8', borderRadius: 12, padding: 60, color: '#8C97A3', textAlign: 'center' }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}><DfIcon name="film" size={40} /></div>

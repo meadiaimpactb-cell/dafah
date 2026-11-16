@@ -8,7 +8,7 @@ class OperationalUnit extends Model
 {
     protected $fillable = [
         'unit_number', 'name', 'template_type',
-        'overview', 'overview2', 'written_description', 'tips', 'topics', 'steps', 'tip', 'video_duration', 'video_url',
+        'overview', 'overview2', 'written_description', 'tips', 'topics', 'steps', 'tip', 'video_duration', 'video_url', 'video_url_alt',
         'content',
     ];
 

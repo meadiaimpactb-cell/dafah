@@ -25,6 +25,7 @@ class ContentController extends Controller
             'written_description'  => 'nullable|string',
             'tip'                  => 'nullable|string',
             'video_url'            => 'nullable|string|max:500',
+            'video_url_alt'        => 'nullable|string|max:500',
             'video_duration'       => 'nullable|string|max:20',
         ];
     }
@@ -47,6 +48,7 @@ class ContentController extends Controller
             'template_type'  => $u->template_type,
             'table_rows'     => $u->table_rows,
             'video_url'      => $u->video_url,
+            'video_url_alt'  => $u->video_url_alt,
             'video_duration' => $u->video_duration,
             'content'        => $u->content,
             'pdf_urls'       => StrategicContent::pdfUrls($u->content),
@@ -61,12 +63,13 @@ class ContentController extends Controller
         $request->validate([
             'name'           => 'sometimes|required|string|max:255',
             'video_url'      => 'nullable|string|max:500',
+            'video_url_alt'  => 'nullable|string|max:500',
             'video_duration' => 'nullable|string|max:20',
             'content'        => 'sometimes|array',
         ]);
 
         $unit = StrategicUnit::findOrFail($id);
-        $data = $request->only(['name', 'video_url', 'video_duration']);
+        $data = $request->only(['name', 'video_url', 'video_url_alt', 'video_duration']);
 
         if ($request->has('content')) {
             $raw = $request->input('content');
@@ -167,6 +170,7 @@ class ContentController extends Controller
             'name'           => $u->name,
             'template_type'  => $u->template_type,
             'video_url'      => $u->video_url,
+            'video_url_alt'  => $u->video_url_alt,
             'video_duration' => $u->video_duration,
             'content'        => $u->content,
             'has_default'    => OperationalContent::defaultFor($u->template_type) !== null,
@@ -180,12 +184,13 @@ class ContentController extends Controller
         $request->validate([
             'name'           => 'sometimes|required|string|max:255',
             'video_url'      => 'nullable|string|max:500',
+            'video_url_alt'  => 'nullable|string|max:500',
             'video_duration' => 'nullable|string|max:20',
             'content'        => 'sometimes|array',
         ]);
 
         $unit = OperationalUnit::findOrFail($id);
-        $data = $request->only(['name', 'video_url', 'video_duration']);
+        $data = $request->only(['name', 'video_url', 'video_url_alt', 'video_duration']);
 
         if ($request->has('content')) {
             $raw = $request->input('content');

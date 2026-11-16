@@ -11,7 +11,7 @@ class StrategicUnit extends Model
         'unit_number', 'name', 'template_type', 'video_duration',
         'overview', 'overview2', 'table_headers', 'table_rows',
         'topics', 'steps', 'tip',
-        'written_description', 'tips', 'video_url', 'content',
+        'written_description', 'tips', 'video_url', 'video_url_alt', 'content',
     ];
 
     protected $casts = [

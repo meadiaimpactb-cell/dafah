@@ -220,7 +220,8 @@ function GeneralTab({ draft, setDraft }) {
     <Section title="بيانات الوحدة">
       <Field label="اسم الوحدة" value={draft.name} onChange={v => setDraft(d => ({ ...d, name: v }))}
         hint="يظهر في قائمة الوحدات وعنوان الصفحة ومسار التنقل والتقرير النهائي (PDF)." />
-      <Field label="رابط الفيديو" value={draft.video_url} onChange={v => setDraft(d => ({ ...d, video_url: v }))} dir="ltr" placeholder="https://youtube.com/..." />
+      <Field label="رابط الفيديو — الفصحى" value={draft.video_url} onChange={v => setDraft(d => ({ ...d, video_url: v }))} dir="ltr" placeholder="https://youtube.com/..." />
+      <Field label="رابط الفيديو — اللهجة السعودية (اختياري)" value={draft.video_url_alt} onChange={v => setDraft(d => ({ ...d, video_url_alt: v }))} dir="ltr" placeholder="/media/units/...-saudi.mp4" hint="رابط يوتيوب أو فيميو، أو ملف مرفوع على المنصة (مثل /media/units/...mp4). يظهر للمستخدم زر للتبديل بين النسختين عند وجودهما." />
       <Field label="مدة الفيديو" value={draft.video_duration} onChange={v => setDraft(d => ({ ...d, video_duration: v }))} dir="ltr" placeholder="10:00" />
     </Section>
   );
@@ -309,7 +310,7 @@ function Preview({ tab, unit }) {
 
 export default function OperationalContentEditor({ unit: initialUnit, initialTab = 'general', onClose, onSaved, notify }) {
   const [unit, setUnit] = useState(initialUnit);
-  const makeDraft = u => ({ name: u.name || '', video_url: u.video_url || '', video_duration: u.video_duration || '', content: withShape(u.content) });
+  const makeDraft = u => ({ name: u.name || '', video_url: u.video_url || '', video_url_alt: u.video_url_alt || '', video_duration: u.video_duration || '', content: withShape(u.content) });
   const [draft, setDraft] = useState(() => makeDraft(initialUnit));
   const [saved, setSaved] = useState(() => JSON.stringify(makeDraft(initialUnit)));
   const [tab, setTab] = useState(initialTab);

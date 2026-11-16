@@ -9,6 +9,7 @@ import ConsultantPicker from '../shared/ConsultantPicker';
 import { PayLogo, PaymentMethodPicker, ApplePayButton, SecurePaymentBadge, CardNetworkLogo, detectCardNetwork } from '../shared/PaymentBrand';
 import { IcClock, IcUpload, IcCheckCircle, IcArrowPath, IcSearch, IcWarning, IcLock, IcCog, IcLightbulb, IcSave, IcDocument, IcUser, IcCalendar, IcSparkles, IcCheck, IcChat, IcMoney, IcXMark, IcBeaker } from '../../utils/icons';
 import { OpSection, OpFormIntro, OpLabel, hasOpSection } from './OpContent';
+import UnitVideo from '../shared/UnitVideo';
 
 // ─── Colors ─────────────────────────────────────────────────────
 const colors = {
@@ -341,18 +342,6 @@ const BankTransferInfo = () => (
     </div>
   </div>
 );
-
-const toEmbedUrl = (url) => {
-  if (!url) return null;
-  try {
-    const u = new URL(url);
-    if (u.hostname.includes('youtube.com') && u.searchParams.get('v'))
-      return `https://www.youtube.com/embed/${u.searchParams.get('v')}`;
-    if (u.hostname === 'youtu.be')
-      return `https://www.youtube.com/embed${u.pathname}`;
-  } catch (_) {}
-  return url;
-};
 
 // ─── Embedded Chat ──────────────────────────────────────────────────────────
 const EmbeddedChat = ({ consultantName }) => {
@@ -1146,15 +1135,8 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
         ))}
         {tab === 3 && (
           <div style={{ textAlign: "center" }}>
-            {toEmbedUrl(unit.video_url || unit.videoUrl) ? (
-              <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, borderRadius: 14, overflow: "hidden" }}>
-                <iframe
-                  src={toEmbedUrl(unit.video_url || unit.videoUrl)}
-                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
-                  allowFullScreen
-                  title={unit.name}
-                />
-              </div>
+            {unit.video_url || unit.video_url_alt ? (
+              <UnitVideo url={unit.video_url} altUrl={unit.video_url_alt} title={unit.name} radius={14} />
             ) : (
               <div style={{ width: "100%", maxWidth: 600, margin: "0 auto", aspectRatio: "16/9", background: `linear-gradient(135deg, ${colors.primaryDeep}, #123247)`, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}>
                 <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>{Icons.play}</div>

@@ -234,6 +234,7 @@ function EditModal({ unit, section, focusField, onClose, onSaved }) {
     steps:               Array.isArray(unit.steps)  ? unit.steps  : [],
     tip:                 unit.tip                 || '',
     video_url:           unit.video_url           || '',
+    video_url_alt:       unit.video_url_alt       || '',
     video_duration:      unit.video_duration      || '',
   });
   const [saving,    setSaving]    = useState(false);
@@ -272,7 +273,7 @@ function EditModal({ unit, section, focusField, onClose, onSaved }) {
     try {
       let res;
       const payload = isPolicies
-        ? { name: form.name, description: form.description, price: form.price ? parseFloat(form.price) : null, overview: form.overview, written_description: form.written_description, tip: form.tip, video_url: form.video_url, video_duration: form.video_duration }
+        ? { name: form.name, description: form.description, price: form.price ? parseFloat(form.price) : null, overview: form.overview, written_description: form.written_description, tip: form.tip, video_url: form.video_url, video_url_alt: form.video_url_alt, video_duration: form.video_duration }
         : { name: form.name, overview: form.overview, overview2: form.overview2, written_description: form.written_description, topics: form.topics, steps: form.steps, tip: form.tip, video_url: form.video_url, video_duration: form.video_duration };
 
       if (section === 'strategic')   res = await adminApi.updateStrategicContent(unit.id, payload);
@@ -339,6 +340,14 @@ function EditModal({ unit, section, focusField, onClose, onSaved }) {
         </div>
       </div>
 
+      {section === 'policies' && (
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 6, fontFamily: 'inherit' }}>رابط الفيديو — اللهجة السعودية (اختياري)</label>
+          <input type="text" value={form.video_url_alt} onChange={e => set('video_url_alt', e.target.value)} placeholder="/media/units/...-saudi.mp4" dir="ltr"
+            style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+          <div style={{ fontSize: 11, color: C.gray, marginTop: 4, lineHeight: 1.6 }}>إن تُرك رابط الفيديو فارغًا يظهر فيديو شرح السياسات العام (محتوى الموقع ← الأدلة والفيديوهات).</div>
+        </div>
+      )}
       {err && <div style={{ color: C.red, fontSize: 12, marginBottom: 10, fontFamily: 'inherit' }}>{err}</div>}
       <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', borderTop: `1px solid ${C.grayBorder}`, paddingTop: 16, marginTop: 4 }}>
         <Btn variant="ghost" onClick={onClose}>إلغاء</Btn>

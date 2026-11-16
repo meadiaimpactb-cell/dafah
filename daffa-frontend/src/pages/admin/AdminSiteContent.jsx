@@ -16,9 +16,10 @@ const GROUP_LABELS = {
   pricing:  "الأسعار",
   contact:  "تواصل معنا",
   footer:   "الفوتر",
+  guides:   "الأدلة والفيديوهات",
 };
 
-const GROUP_ORDER = ["landing", "about", "services", "pricing", "contact", "footer"];
+const GROUP_ORDER = ["landing", "about", "services", "pricing", "contact", "footer", "guides"];
 
 export default function AdminSiteContent() {
   const [grouped, setGrouped]   = useState({});

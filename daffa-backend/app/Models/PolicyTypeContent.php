@@ -8,7 +8,7 @@ class PolicyTypeContent extends Model
 {
     protected $fillable = [
         'policy_type_id', 'name', 'description', 'price',
-        'overview', 'written_description', 'tip', 'video_url', 'video_duration',
+        'overview', 'written_description', 'tip', 'video_url', 'video_url_alt', 'video_duration',
     ];
 
     protected $casts = ['price' => 'float'];

@@ -421,7 +421,8 @@ function GeneralTab({ draft, setDraft }) {
         hint="يظهر في قائمة الوحدات وعنوان صفحة الوحدة والتقارير." />
       <Field label="نوع النموذج (يظهر في بطاقة النبذة)" value={c.template_label} onChange={v => setDraft(d => ({ ...d, content: { ...d.content, template_label: v || null } }))}
         hint="اتركه فارغًا لاستخدام الاسم الافتراضي للنموذج." />
-      <Field label="رابط الفيديو التوجيهي (YouTube)" dir="ltr" value={draft.video_url} onChange={v => setDraft(d => ({ ...d, video_url: v }))} placeholder="https://www.youtube.com/watch?v=..." />
+      <Field label="رابط الفيديو التوجيهي — الفصحى" dir="ltr" value={draft.video_url} onChange={v => setDraft(d => ({ ...d, video_url: v }))} placeholder="https://www.youtube.com/watch?v=..." />
+      <Field label="رابط الفيديو التوجيهي — اللهجة السعودية (اختياري)" dir="ltr" value={draft.video_url_alt} onChange={v => setDraft(d => ({ ...d, video_url_alt: v }))} placeholder="/media/units/...-saudi.mp4" hint="رابط يوتيوب أو فيميو، أو ملف مرفوع على المنصة (مثل /media/units/...mp4). يظهر للمستخدم زر للتبديل بين النسختين عند وجودهما." />
       <Field label="مدة الفيديو" dir="ltr" value={draft.video_duration} onChange={v => setDraft(d => ({ ...d, video_duration: v }))} placeholder="5:30" />
     </>
   );
@@ -673,7 +674,7 @@ function Preview({ tab, unit }) {
 
 export default function StrategicContentEditor({ unit: initialUnit, initialTab = 'general', onClose, onSaved, notify }) {
   const [unit, setUnit] = useState(initialUnit); // آخر نسخة محفوظة (تتحدّث عند رفع ملفات PDF)
-  const makeDraft = u => ({ name: u.name || '', video_url: u.video_url || '', video_duration: u.video_duration || '', content: withShape(u.content) });
+  const makeDraft = u => ({ name: u.name || '', video_url: u.video_url || '', video_url_alt: u.video_url_alt || '', video_duration: u.video_duration || '', content: withShape(u.content) });
   const [draft, setDraft] = useState(() => makeDraft(initialUnit));
   const [saved, setSaved] = useState(() => JSON.stringify(makeDraft(initialUnit)));
   const [tab, setTab] = useState(initialTab);
