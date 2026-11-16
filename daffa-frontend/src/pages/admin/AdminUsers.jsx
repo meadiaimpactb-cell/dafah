@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import api from '../../api/axios';
@@ -5,9 +6,9 @@ import { adminApi } from '../../api/admin';
 import { PERMISSIONS_BY_ROLE, getAllPermKeys, syncPermissionsToStorage, usePermissions } from '../../utils/permissions';
 
 const C = {
-  teal: '#1A6B7C', tealDark: '#14505E', tealLight: '#E8F4F6',
-  orange: '#E8620A', green: '#16a34a', red: '#dc2626',
-  gray: '#6B7280', grayLight: '#F3F4F6', grayBorder: '#E5E7EB',
+  primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
+  orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F', green: '#0B7F5D', red: '#C53A3A',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
 };
 
 const CACHE_KEY = 'admin_users_cache';
@@ -26,16 +27,16 @@ const ROLES = [
 ];
 
 const ROLE_META = {
-  admin:      { label: 'مدير نظام', bg: '#FEF3C7', color: '#D97706' },
-  consultant: { label: 'مستشار',    bg: C.tealLight, color: C.teal },
-  client:     { label: 'عميل',      bg: '#EFF6FF',  color: '#1D4ED8' },
+  admin:      { label: 'مدير نظام', bg: '#FDE2D2', color: '#A33F12' },
+  consultant: { label: 'مستشار',    bg: C.primarySoft, color: C.primary },
+  client:     { label: 'عميل',      bg: '#EAF4FD',  color: '#1A65AD' },
 };
 
 
 // ── Toast ──────────────────────────────────────────────────────────────────────
 const Toast = ({ toast }) =>
   toast ? ReactDOM.createPortal(
-    <div style={{ position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)', zIndex: 9999999, padding: '12px 24px', borderRadius: 12, background: toast.type === 'success' ? '#065f46' : '#7f1d1d', color: 'white', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', boxShadow: '0 4px 20px rgba(0,0,0,0.3)', whiteSpace: 'nowrap' }}>
+    <div style={{ position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)', zIndex: 9999999, padding: '12px 24px', borderRadius: 12, background: toast.type === 'success' ? '#086449' : '#842525', color: 'white', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', boxShadow: '0 4px 20px rgba(14,42,61,0.3)', whiteSpace: 'nowrap' }}>
       {toast.msg}
     </div>, document.body
   ) : null;
@@ -43,10 +44,10 @@ const Toast = ({ toast }) =>
 // ── Confirm Delete Modal ───────────────────────────────────────────────────────
 const ConfirmDelete = ({ user, onConfirm, onCancel }) =>
   ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>
-      <div style={{ background: 'white', borderRadius: 20, padding: 32, width: 420, textAlign: 'center', boxShadow: '0 24px 64px rgba(0,0,0,0.25)', animation: 'modalIn 0.22s ease-out both' }}>
-        <div style={{ width: 64, height: 64, borderRadius: '50%', margin: '0 auto 20px', background: '#FEF2F2', border: '2px solid #fecaca', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: 26, color: C.red, fontWeight: 700 }}>!</span></div>
-        <div style={{ fontSize: 18, fontWeight: 800, color: C.tealDark, marginBottom: 8 }}>حذف المستخدم</div>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(14,42,61,0.5)', backdropFilter: 'blur(4px)' }}>
+      <div style={{ background: 'white', borderRadius: 20, padding: 32, width: 420, textAlign: 'center', boxShadow: '0 24px 64px rgba(14,42,61,0.25)', animation: 'modalIn 0.22s ease-out both' }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', margin: '0 auto 20px', background: '#FCEBEB', border: '2px solid #F1B2B2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: 26, color: C.red, fontWeight: 700 }}>!</span></div>
+        <div style={{ fontSize: 18, fontWeight: 800, color: C.ink, marginBottom: 8 }}>حذف المستخدم</div>
         <div style={{ fontSize: 13, color: C.gray, lineHeight: 1.8, marginBottom: 24 }}>
           هل أنت متأكد من حذف <strong style={{ color: C.red }}>{user?.name}</strong>؟<br />لا يمكن التراجع عن هذا الإجراء.
         </div>
@@ -116,15 +117,15 @@ const PermissionsModal = ({ user, onClose, onSaved }) => {
   const isNone        = totalSelected === 0;
 
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)' }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 20, padding: 28, width: 560, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(0,0,0,0.2)', animation: 'modalIn 0.22s ease-out both' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(14,42,61,0.45)', backdropFilter: 'blur(4px)' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 20, padding: 28, width: 560, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(14,42,61,0.2)', animation: 'modalIn 0.22s ease-out both' }}>
 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
           <div>
-            <div style={{ fontSize: 17, fontWeight: 800, color: C.tealDark }}>🔐 إدارة الصلاحيات</div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: C.ink }}><DfIcon name="lock" size={17} style={{ marginInlineEnd: 6 }} />إدارة الصلاحيات</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 5 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: C.tealDark }}>{user.name}</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{user.name}</span>
               <span style={{ background: rm.bg, color: rm.color, padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{rm.label}</span>
             </div>
           </div>
@@ -136,12 +137,12 @@ const PermissionsModal = ({ user, onClose, onSaved }) => {
         ) : (
           <>
             {/* Status + global actions */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 14px', borderRadius: 10, marginBottom: 14, background: isFullAccess ? '#F0FDF4' : isNone ? '#FEF2F2' : '#FEF9C3', border: `1px solid ${isFullAccess ? '#bbf7d0' : isNone ? '#fecaca' : '#fde68a'}` }}>
-              <span style={{ fontSize: 13, fontWeight: 700, fontFamily: 'inherit', color: isFullAccess ? C.green : isNone ? C.red : '#92400e' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 14px', borderRadius: 10, marginBottom: 14, background: isFullAccess ? '#E8F8F2' : isNone ? '#FCEBEB' : '#FDE2D2', border: `1px solid ${isFullAccess ? '#A9E4CF' : isNone ? '#F1B2B2' : '#FBC3A3'}` }}>
+              <span style={{ fontSize: 13, fontWeight: 700, fontFamily: 'inherit', color: isFullAccess ? C.green : isNone ? C.red : '#7F310E' }}>
                 {isFullAccess ? 'وصول كامل' : isNone ? 'بدون أي صلاحية' : `${totalSelected} من ${allKeys.length} صلاحية مفعّلة`}
               </span>
               <div style={{ display: 'flex', gap: 6 }}>
-                <button onClick={() => setSelected(new Set(allKeys))} style={{ padding: '4px 13px', borderRadius: 7, border: `1.5px solid ${C.teal}`, background: 'white', color: C.teal, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>منح الكل</button>
+                <button onClick={() => setSelected(new Set(allKeys))} style={{ padding: '4px 13px', borderRadius: 7, border: `1.5px solid ${C.primary}`, background: 'white', color: C.primary, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>منح الكل</button>
                 <button onClick={() => setSelected(new Set())} style={{ padding: '4px 13px', borderRadius: 7, border: `1.5px solid ${C.grayBorder}`, background: 'white', color: C.gray, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>سحب الكل</button>
               </div>
             </div>
@@ -151,36 +152,36 @@ const PermissionsModal = ({ user, onClose, onSaved }) => {
               {modules.map(mod => {
                 const status  = moduleStatus(mod);
                 const modKeys = mod.actions.map(a => `${mod.module}.${a.key}`);
-                const borderColor = status === 'all' ? C.teal : status === 'partial' ? '#f59e0b' : C.grayBorder;
-                const bgColor     = status === 'all' ? `${C.teal}07` : status === 'partial' ? '#fffbeb' : 'white';
+                const borderColor = status === 'all' ? C.primary : status === 'partial' ? '#A33F12' : C.grayBorder;
+                const bgColor     = status === 'all' ? `${C.primary}07` : status === 'partial' ? '#FEF3EC' : 'white';
                 return (
                   <div key={mod.module} style={{ borderRadius: 12, border: `1.5px solid ${borderColor}`, background: bgColor, overflow: 'hidden' }}>
                     {/* Module header */}
                     <div onClick={() => toggleModule(mod)}
                       style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', cursor: 'pointer', userSelect: 'none' }}>
                       {/* Module checkbox */}
-                      <div style={{ width: 20, height: 20, borderRadius: 5, border: `2px solid ${status === 'all' ? C.teal : status === 'partial' ? '#f59e0b' : C.grayBorder}`, background: status === 'all' ? C.teal : status === 'partial' ? '#f59e0b' : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <div style={{ width: 20, height: 20, borderRadius: 5, border: `2px solid ${status === 'all' ? C.primary : status === 'partial' ? '#E05A1F' : C.grayBorder}`, background: status === 'all' ? C.primary : status === 'partial' ? '#EF6A2C' : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         {status === 'all'     && <span style={{ color: 'white', fontSize: 12, fontWeight: 700, lineHeight: 1 }}>✓</span>}
                         {status === 'partial' && <span style={{ color: 'white', fontSize: 12, fontWeight: 700, lineHeight: 1 }}>−</span>}
                       </div>
-                      <span style={{ fontSize: 18, flexShrink: 0 }}>{mod.icon}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, flex: 1 }}>{mod.label}</span>
+                      <span style={{ flexShrink: 0, display: "flex", color: "#235D7F" }}><DfIcon name={mod.icon} size={18} /></span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: C.ink, flex: 1 }}>{mod.label}</span>
                       <span style={{ fontSize: 10, color: C.gray, flexShrink: 0 }}>
                         {modKeys.filter(k => selected.has(k)).length}/{modKeys.length}
                       </span>
                     </div>
                     {/* Actions grid */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, padding: '0 14px 12px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-3)', gap: 6, padding: '0 14px 12px' }}>
                       {mod.actions.map(action => {
                         const key    = `${mod.module}.${action.key}`;
                         const active = selected.has(key);
                         return (
                           <div key={key} onClick={() => toggleKey(key)}
-                            style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 10px', borderRadius: 8, border: `1.5px solid ${active ? C.teal : C.grayBorder}`, background: active ? `${C.teal}10` : '#fafafa', cursor: 'pointer', userSelect: 'none', transition: 'all 0.12s' }}>
-                            <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${active ? C.teal : C.grayBorder}`, background: active ? C.teal : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 10px', borderRadius: 8, border: `1.5px solid ${active ? C.primary : C.grayBorder}`, background: active ? `${C.primary}10` : '#FBF9F5', cursor: 'pointer', userSelect: 'none', transition: 'all 0.12s' }}>
+                            <div style={{ width: 16, height: 16, borderRadius: 4, border: `2px solid ${active ? C.primary : C.grayBorder}`, background: active ? C.primary : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                               {active && <span style={{ color: 'white', fontSize: 10, fontWeight: 700, lineHeight: 1 }}>✓</span>}
                             </div>
-                            <span style={{ fontSize: 11, fontWeight: 600, color: active ? C.tealDark : C.gray, lineHeight: 1.3 }}>{action.label}</span>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: active ? C.ink : C.gray, lineHeight: 1.3 }}>{action.label}</span>
                           </div>
                         );
                       })}
@@ -192,12 +193,12 @@ const PermissionsModal = ({ user, onClose, onSaved }) => {
           </>
         )}
 
-        {saveError && <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 8, background: '#FEF2F2', color: C.red, fontSize: 13, fontWeight: 600, fontFamily: 'inherit' }}>{saveError}</div>}
+        {saveError && <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 8, background: '#FCEBEB', color: C.red, fontSize: 13, fontWeight: 600, fontFamily: 'inherit' }}>{saveError}</div>}
 
         <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
           <button onClick={onClose} style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: `1.5px solid ${C.grayBorder}`, background: 'white', color: C.gray, fontSize: 14, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>إلغاء</button>
           <button onClick={handleSave} disabled={saving}
-            style={{ flex: 2, padding: '11px 0', borderRadius: 12, border: 'none', background: saving ? C.grayLight : C.teal, color: saving ? C.gray : 'white', fontSize: 14, fontWeight: 700, fontFamily: 'inherit', cursor: saving ? 'not-allowed' : 'pointer', boxShadow: saving ? 'none' : `0 4px 14px ${C.teal}40` }}>
+            style={{ flex: 2, padding: '11px 0', borderRadius: 12, border: 'none', background: saving ? C.grayLight : C.primary, color: saving ? C.gray : 'white', fontSize: 14, fontWeight: 700, fontFamily: 'inherit', cursor: saving ? 'not-allowed' : 'pointer', boxShadow: saving ? 'none' : `0 4px 14px ${C.primary}40` }}>
             {saving ? 'جارٍ الحفظ...' : 'حفظ الصلاحيات'}
           </button>
         </div>
@@ -275,12 +276,12 @@ const UserModal = ({ mode, user, onClose, onSaved }) => {
 
   const Field = ({ label, name, type = 'text', placeholder, required }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-      <label style={{ fontSize: 12, fontWeight: 600, color: C.tealDark }}>{label}{required && <span style={{ color: C.red }}> *</span>}</label>
+      <label style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>{label}{required && <span style={{ color: C.red }}> *</span>}</label>
       <input
         type={type} name={name} value={form[name]} onChange={handleChange}
         placeholder={placeholder || label}
         style={{ padding: '9px 12px', borderRadius: 10, border: `1.5px solid ${errors[name] ? C.red : C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', outline: 'none' }}
-        onFocus={e => e.target.style.borderColor = C.teal}
+        onFocus={e => e.target.style.borderColor = C.primary}
         onBlur={e => e.target.style.borderColor = errors[name] ? C.red : C.grayBorder}
       />
       {errors[name] && <div style={{ fontSize: 11, color: C.red }}>• {errors[name][0]}</div>}
@@ -291,26 +292,26 @@ const UserModal = ({ mode, user, onClose, onSaved }) => {
   const initials   = (form.rep_name || '?')[0];
 
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)' }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 20, padding: 28, width: 500, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(0,0,0,0.2)', animation: 'modalIn 0.22s ease-out both' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(14,42,61,0.45)', backdropFilter: 'blur(4px)' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 20, padding: 28, width: 500, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 64px rgba(14,42,61,0.2)', animation: 'modalIn 0.22s ease-out both' }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
-          <div style={{ fontSize: 17, fontWeight: 800, color: C.tealDark }}>{isEdit ? '✏️ تعديل المستخدم' : '➕ إضافة مستخدم جديد'}</div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: C.ink }}>{isEdit ? 'تعديل المستخدم' : '➕ إضافة مستخدم جديد'}</div>
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, border: 'none', background: C.grayLight, cursor: 'pointer', fontSize: 16 }}>✕</button>
         </div>
 
         {formError && (
-          <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FEF2F2', border: `1px solid #fecaca`, color: C.red, fontSize: 12, fontWeight: 600, marginBottom: 14 }}>
-            ⚠️ {formError}
+          <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FCEBEB', border: `1px solid #F1B2B2`, color: C.red, fontSize: 12, fontWeight: 600, marginBottom: 14 }}>
+            <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />{formError}
           </div>
         )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* Avatar upload */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <label style={{ fontSize: 12, fontWeight: 600, color: C.tealDark }}>الصورة الشخصية (اختياري)</label>
+            <label style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>الصورة الشخصية (اختياري)</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 64, height: 64, minWidth: 64, minHeight: 64, borderRadius: '50%', overflow: 'hidden', border: `2px solid ${C.grayBorder}`, background: `linear-gradient(135deg, ${C.teal}, ${C.tealDark})`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div style={{ width: 64, height: 64, minWidth: 64, minHeight: 64, borderRadius: '50%', overflow: 'hidden', border: `2px solid ${C.grayBorder}`, background: `linear-gradient(135deg, ${C.primary}, ${C.ink})`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {previewSrc ? (
                   <img src={previewSrc} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 ) : (
@@ -320,7 +321,7 @@ const UserModal = ({ mode, user, onClose, onSaved }) => {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarChange} />
                 <button type="button" onClick={() => fileInputRef.current?.click()}
-                  style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${C.grayBorder}`, background: 'white', color: C.teal, fontSize: 12, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
+                  style={{ padding: '6px 14px', borderRadius: 8, border: `1.5px solid ${C.grayBorder}`, background: 'white', color: C.primary, fontSize: 12, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
                   {previewSrc ? 'تغيير الصورة' : 'اختر صورة'}
                 </button>
                 {avatarFile && (
@@ -330,17 +331,17 @@ const UserModal = ({ mode, user, onClose, onSaved }) => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 12 }}>
             <Field label="الاسم الكامل" name="rep_name" required />
             <Field label="البريد الإلكتروني" name="email" type="email" required />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 12 }}>
             <Field label="رقم الجوال" name="phone" type="tel" placeholder="05xxxxxxxx" />
             <Field label="اسم المنظمة" name="org_name" placeholder="اختياري للمستشار/المدير" />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <label style={{ fontSize: 12, fontWeight: 600, color: C.tealDark }}>الدور <span style={{ color: C.red }}>*</span></label>
+            <label style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>الدور <span style={{ color: C.red }}>*</span></label>
             <select name="role" value={form.role} onChange={handleChange}
               style={{ padding: '9px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', background: 'white' }}>
               <option value="client">عميل</option>
@@ -361,7 +362,7 @@ const UserModal = ({ mode, user, onClose, onSaved }) => {
         <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
           <button onClick={onClose} style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: `1.5px solid ${C.grayBorder}`, background: 'white', color: C.gray, fontSize: 14, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>إلغاء</button>
           <button onClick={handleSubmit} disabled={saving}
-            style={{ flex: 2, padding: '11px 0', borderRadius: 12, border: 'none', background: saving ? C.grayLight : C.teal, color: saving ? C.gray : 'white', fontSize: 14, fontWeight: 700, fontFamily: 'inherit', cursor: saving ? 'not-allowed' : 'pointer', boxShadow: saving ? 'none' : `0 4px 14px ${C.teal}40` }}>
+            style={{ flex: 2, padding: '11px 0', borderRadius: 12, border: 'none', background: saving ? C.grayLight : C.primary, color: saving ? C.gray : 'white', fontSize: 14, fontWeight: 700, fontFamily: 'inherit', cursor: saving ? 'not-allowed' : 'pointer', boxShadow: saving ? 'none' : `0 4px 14px ${C.primary}40` }}>
             {saving ? 'جارٍ الحفظ...' : (isEdit ? 'حفظ التعديلات' : 'إضافة المستخدم')}
           </button>
         </div>
@@ -480,23 +481,23 @@ export default function AdminUsers() {
       )}
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: C.tealDark, margin: 0 }}>إدارة المستخدمين</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink, margin: 0 }}>إدارة المستخدمين</h2>
         {can('admin.users.add') && (
           <button onClick={() => setModal({ mode: 'add' })}
-            style={{ padding: '9px 20px', borderRadius: 12, border: 'none', background: C.orange, color: 'white', fontWeight: 700, fontSize: 13, fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, boxShadow: `0 3px 10px ${C.orange}40` }}>
+            style={{ padding: '9px 20px', borderRadius: 12, border: 'none', background: C.amber, color: '#0E2A3D', fontWeight: 700, fontSize: 13, fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, boxShadow: `0 3px 10px ${C.amberLine}40` }}>
             + إضافة مستخدم
           </button>
         )}
       </div>
 
       {/* Tabs + Search */}
-      <div style={{ background: 'white', borderRadius: 14, padding: '14px 18px', marginBottom: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+      <div style={{ background: 'white', borderRadius: 14, padding: '14px 18px', marginBottom: 16, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
         <div style={{ display: 'flex', gap: 4, background: C.grayLight, borderRadius: 12, padding: 3 }}>
           {ROLES.map(r => (
             <button key={r.key} onClick={() => setRoleFilter(r.key)}
-              style={{ padding: '7px 16px', borderRadius: 10, border: 'none', background: roleFilter === r.key ? 'white' : 'transparent', color: roleFilter === r.key ? C.teal : C.gray, fontWeight: roleFilter === r.key ? 700 : 400, fontSize: 13, fontFamily: 'inherit', cursor: 'pointer', transition: 'all 0.2s', boxShadow: roleFilter === r.key ? '0 1px 3px rgba(0,0,0,0.08)' : 'none', whiteSpace: 'nowrap' }}>
+              style={{ padding: '7px 16px', borderRadius: 10, border: 'none', background: roleFilter === r.key ? 'white' : 'transparent', color: roleFilter === r.key ? C.primary : C.gray, fontWeight: roleFilter === r.key ? 700 : 400, fontSize: 13, fontFamily: 'inherit', cursor: 'pointer', transition: 'all 0.2s', boxShadow: roleFilter === r.key ? '0 1px 3px rgba(14,42,61,0.08)' : 'none', whiteSpace: 'nowrap' }}>
               {r.label}
-              <span style={{ marginRight: 4, padding: '0 6px', borderRadius: 10, background: roleFilter === r.key ? `${C.teal}15` : 'transparent', color: roleFilter === r.key ? C.teal : C.gray, fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}>
+              <span style={{ marginRight: 4, padding: '0 6px', borderRadius: 10, background: roleFilter === r.key ? `${C.primary}15` : 'transparent', color: roleFilter === r.key ? C.primary : C.gray, fontSize: 12, fontWeight: 700, fontFamily: 'inherit' }}>
                 {counts[r.key] || 0}
               </span>
             </button>
@@ -505,21 +506,21 @@ export default function AdminUsers() {
         <div style={{ position: 'relative' }}>
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث بالاسم أو الإيميل..."
             style={{ padding: '8px 14px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', width: 240 }}
-            onFocus={e => e.target.style.borderColor = C.teal}
+            onFocus={e => e.target.style.borderColor = C.primary}
             onBlur={e => e.target.style.borderColor = C.grayBorder}
           />
         </div>
       </div>
 
       {/* Table */}
-      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
+      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', overflow: 'hidden' }}>
         {loading ? (
           <div style={{ padding: 60, textAlign: 'center', color: C.gray, fontFamily: 'inherit', fontSize: 13 }}>جارٍ التحميل...</div>
         ) : error ? (
-          <div style={{ padding: 40, textAlign: 'center', color: C.red, fontFamily: 'inherit', fontSize: 13 }}>{error} <button onClick={() => load(false)} style={{ marginRight: 12, padding: '6px 14px', borderRadius: 8, border: 'none', background: C.teal, color: 'white', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13 }}>إعادة المحاولة</button></div>
+          <div style={{ padding: 40, textAlign: 'center', color: C.red, fontFamily: 'inherit', fontSize: 13 }}>{error} <button onClick={() => load(false)} style={{ marginRight: 12, padding: '6px 14px', borderRadius: 8, border: 'none', background: C.primary, color: 'white', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13 }}>إعادة المحاولة</button></div>
         ) : users.length === 0 ? (
           <div style={{ padding: 60, textAlign: 'center', color: C.gray }}>
-            <div style={{ fontSize: 36, marginBottom: 8 }}>👤</div>
+            <div style={{ fontSize: 36, marginBottom: 8 }}><DfIcon name="user" size={36} /></div>
             <div style={{ fontSize: 14 }}>{search ? 'لا توجد نتائج للبحث' : 'لا يوجد مستخدمون'}</div>
           </div>
         ) : (
@@ -536,14 +537,14 @@ export default function AdminUsers() {
                 {users.map((u, i) => {
                   const rm = ROLE_META[u.role] || ROLE_META.client;
                   return (
-                    <tr key={u.id} style={{ borderBottom: `1px solid ${C.grayBorder}`, background: i % 2 === 0 ? 'white' : '#FAFAFA', transition: 'background 0.15s' }}
-                      onMouseEnter={e => e.currentTarget.style.background = `${C.teal}05`}
-                      onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? 'white' : '#FAFAFA'}
+                    <tr key={u.id} style={{ borderBottom: `1px solid ${C.grayBorder}`, background: i % 2 === 0 ? 'white' : '#FBF9F5', transition: 'background 0.15s' }}
+                      onMouseEnter={e => e.currentTarget.style.background = `${C.primary}05`}
+                      onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? 'white' : '#FBF9F5'}
                     >
                       {/* Avatar + Name */}
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <div style={{ width: 36, height: 36, minWidth: 36, minHeight: 36, borderRadius: '50%', overflow: 'hidden', background: `linear-gradient(135deg, ${C.teal}, ${C.tealDark})`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: `2px solid ${C.grayBorder}` }}>
+                          <div style={{ width: 36, height: 36, minWidth: 36, minHeight: 36, borderRadius: '50%', overflow: 'hidden', background: `linear-gradient(135deg, ${C.primary}, ${C.ink})`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: `2px solid ${C.grayBorder}` }}>
                             {u.avatar_url ? (
                               <img src={u.avatar_url} alt={u.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                             ) : (
@@ -551,7 +552,7 @@ export default function AdminUsers() {
                             )}
                           </div>
                           <div>
-                            <div style={{ fontSize: 13, fontWeight: 600, color: C.tealDark }}>{u.name}</div>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{u.name}</div>
                             {u.org_name && u.org_name !== u.rep_name && (
                               <div style={{ fontSize: 11, color: C.gray }}>{u.org_name}</div>
                             )}
@@ -567,11 +568,11 @@ export default function AdminUsers() {
                       <td style={{ padding: '12px 14px' }}>
                         {can('admin.users.toggle') ? (
                           <button onClick={() => handleToggle(u)}
-                            style={{ padding: '3px 10px', borderRadius: 20, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', border: 'none', cursor: 'pointer', background: u.is_active ? '#F0FDF4' : '#FEF2F2', color: u.is_active ? C.green : C.red, transition: 'all 0.2s' }}>
+                            style={{ padding: '3px 10px', borderRadius: 20, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', border: 'none', cursor: 'pointer', background: u.is_active ? '#E8F8F2' : '#FCEBEB', color: u.is_active ? C.green : C.red, transition: 'all 0.2s' }}>
                             {u.is_active ? 'نشط' : 'معلق'}
                           </button>
                         ) : (
-                          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', background: u.is_active ? '#F0FDF4' : '#FEF2F2', color: u.is_active ? C.green : C.red }}>
+                          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', background: u.is_active ? '#E8F8F2' : '#FCEBEB', color: u.is_active ? C.green : C.red }}>
                             {u.is_active ? 'نشط' : 'معلق'}
                           </span>
                         )}
@@ -580,8 +581,8 @@ export default function AdminUsers() {
                         <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
                           {can('admin.users.edit') && (
                             <button onClick={() => setModal({ mode: 'edit', user: u })}
-                              style={{ padding: '5px 12px', borderRadius: 8, border: `1px solid ${C.grayBorder}`, background: 'white', color: C.teal, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                              ✏️ تعديل
+                              style={{ padding: '5px 12px', borderRadius: 8, border: `1px solid ${C.grayBorder}`, background: 'white', color: C.primary, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <DfIcon name="pencil" size={18} style={{ marginInlineEnd: 6 }} />تعديل
                             </button>
                           )}
                           {can('admin.users.permissions') && (() => {
@@ -591,15 +592,15 @@ export default function AdminUsers() {
                             const full    = granted === total;
                             return (
                               <button onClick={() => setPermissionsUser(u)}
-                                style={{ padding: '5px 12px', borderRadius: 8, border: `1px solid ${full ? '#bbf7d0' : '#fde68a'}`, background: full ? '#F0FDF4' : '#FFFBEB', color: full ? C.green : '#92400e', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                🔐 {full ? 'كامل' : `${granted}/${total}`}
+                                style={{ padding: '5px 12px', borderRadius: 8, border: `1px solid ${full ? '#A9E4CF' : '#FBC3A3'}`, background: full ? '#E8F8F2' : '#FEF3EC', color: full ? C.green : '#7F310E', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <DfIcon name="lock" size={18} style={{ marginInlineEnd: 6 }} />{full ? 'كامل' : `${granted}/${total}`}
                               </button>
                             );
                           })()}
                           {can('admin.users.delete') && (
                             <button onClick={() => setDeleteUser(u)}
-                              style={{ padding: '5px 10px', borderRadius: 8, border: `1px solid #fecaca`, background: '#FEF2F2', color: C.red, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
-                              🗑️
+                              style={{ padding: '5px 10px', borderRadius: 8, border: `1px solid #F1B2B2`, background: '#FCEBEB', color: C.red, fontSize: 13, fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer' }}>
+                              <DfIcon name="trash" size={18} style={{ marginInlineEnd: 6 }} />
                             </button>
                           )}
                         </div>

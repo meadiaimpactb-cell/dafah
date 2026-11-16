@@ -108,7 +108,7 @@ function GanttEditor({ block, onChange }) {
     <div>
       <div style={{ marginBottom: 14 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: C.tealDark }}>الأشهر (أعمدة المخطط بالترتيب)</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: C.ink }}>الأشهر (أعمدة المخطط بالترتيب)</span>
           <SmallBtn onClick={addMonth}>+ شهر</SmallBtn>
         </div>
         {months.map((m, i) => (
@@ -125,7 +125,7 @@ function GanttEditor({ block, onChange }) {
         render={(r, set) => (
           <>
             <Field label="اسم النشاط" value={r.label} onChange={v => set({ ...r, label: v })} />
-            <div style={{ fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 6 }}>أشهر التنفيذ</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 6 }}>أشهر التنفيذ</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
               {months.map((m, j) => (
                 <label key={j} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, cursor: 'pointer' }}>
@@ -145,7 +145,7 @@ function BlockEditor({ block, onChange }) {
   return (
     <div>
       <label style={{ display: 'block', marginBottom: 10 }}>
-        <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 5 }}>نوع الكتلة</span>
+        <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 5 }}>نوع الكتلة</span>
         <select value={b.type || 'paragraph'} onChange={e => { if (window.confirm('تغيير النوع يمسح محتوى هذه الكتلة. متابعة؟')) onChange(newBlock(e.target.value)); }} style={{ ...inputStyle, cursor: 'pointer' }}>
           {BLOCK_TYPES.map(t => <option key={t.key} value={t.key}>{t.label}</option>)}
         </select>
@@ -154,7 +154,7 @@ function BlockEditor({ block, onChange }) {
       {b.type === 'heading' && <Field label="العنوان" value={b.text} onChange={v => onChange({ ...b, text: v })} />}
       {b.type === 'list' && (
         <>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 10, cursor: 'pointer' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 10, cursor: 'pointer' }}>
             <input type="checkbox" checked={b.ordered !== false} onChange={e => onChange({ ...b, ordered: e.target.checked })} />
             قائمة مرقّمة (١، ٢، ٣) — ألغِ التحديد لقائمة نقطية
           </label>
@@ -264,7 +264,7 @@ function FormTab({ content, setContent, unit }) {
           render={(t, set) => (
             <>
               <label style={{ display: 'block', marginBottom: 12 }}>
-                <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 5 }}>عنوان الحقل</span>
+                <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 5 }}>عنوان الحقل</span>
                 <input type="text" list={listId} value={t.label ?? ''} onChange={e => set({ ...t, label: e.target.value })} style={inputStyle} />
                 {norm(t.label) && suggestions.length > 0 && !suggestions.some(s => norm(s) === norm(t.label)) && (
                   <span style={{ display: 'block', fontSize: 11, color: C.orange, marginTop: 4 }}>لا يطابق عنوانًا في هذا النموذج — لن تظهر ⓘ حتى يطابق العنوان.</span>
@@ -373,7 +373,7 @@ export default function OperationalContentEditor({ unit: initialUnit, initialTab
       <div style={{ background: '#f8fafb', borderRadius: width > 700 ? 14 : 0, width: '100%', maxWidth: 1500, display: 'flex', flexDirection: 'column', direction: 'rtl', fontFamily: FONT, overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,.25)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '12px 18px', background: '#fff', borderBottom: `1px solid ${C.grayBorder}`, flexWrap: 'wrap' }}>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: C.tealDark }}>تعديل محتوى الوحدة {unit.unit_number}: {draft.name}</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>تعديل محتوى الوحدة {unit.unit_number}: {draft.name}</div>
             <div style={{ fontSize: 11.5, color: dirty ? C.orange : C.gray, marginTop: 2 }}>{dirty ? '● تغييرات غير محفوظة' : 'كل التغييرات محفوظة ومنشورة'}</div>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -381,7 +381,7 @@ export default function OperationalContentEditor({ unit: initialUnit, initialTab
             <SmallBtn tone="gray" onClick={() => setShowPreview(p => !p)}>{showPreview ? 'إخفاء المعاينة' : 'إظهار المعاينة'}</SmallBtn>
             <button type="button" onClick={close} style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid ${C.grayBorder}`, background: '#fff', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 600, color: C.dark }}>إغلاق</button>
             <button type="button" onClick={save} disabled={!dirty || saving}
-              style={{ padding: '7px 18px', borderRadius: 8, border: 'none', background: C.teal, color: '#fff', cursor: !dirty || saving ? 'not-allowed' : 'pointer', opacity: !dirty || saving ? 0.55 : 1, fontFamily: 'inherit', fontSize: 13, fontWeight: 700 }}>
+              style={{ padding: '7px 18px', borderRadius: 8, border: 'none', background: C.primary, color: '#fff', cursor: !dirty || saving ? 'not-allowed' : 'pointer', opacity: !dirty || saving ? 0.55 : 1, fontFamily: 'inherit', fontSize: 13, fontWeight: 700 }}>
               {saving ? 'جارٍ الحفظ...' : 'حفظ التغييرات'}
             </button>
           </div>
@@ -390,7 +390,7 @@ export default function OperationalContentEditor({ unit: initialUnit, initialTab
         <div style={{ display: 'flex', gap: 4, padding: '8px 18px', background: '#fff', borderBottom: `1px solid ${C.grayBorder}`, overflowX: 'auto' }}>
           {TABS.map(t => (
             <button key={t.key} type="button" onClick={() => setTab(t.key)} aria-pressed={tab === t.key}
-              style={{ padding: '7px 16px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: tab === t.key ? 800 : 500, background: tab === t.key ? C.teal : C.grayLight, color: tab === t.key ? '#fff' : C.gray, whiteSpace: 'nowrap' }}>
+              style={{ padding: '7px 16px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: tab === t.key ? 800 : 500, background: tab === t.key ? C.primary : C.grayLight, color: tab === t.key ? '#fff' : C.gray, whiteSpace: 'nowrap' }}>
               {t.label}
             </button>
           ))}

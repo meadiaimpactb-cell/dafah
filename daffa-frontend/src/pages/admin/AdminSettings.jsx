@@ -2,11 +2,11 @@ import React, { useState, useEffect, useCallback } from "react";
 import api from "../../api/axios";
 
 const colors = {
-  teal: "#1A6B7C", tealDark: "#145A68",
-  orange: "#E8713A",
+  primary: "#235D7F", ink: "#0E2A3D",
+  orange: "#EF6A2C", amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F',
   white: "#FFFFFF",
-  gray: "#6B7280", grayLight: "#F3F4F6", grayBorder: "#E5E7EB",
-  green: "#10B981",
+  gray: "#5E6B78", grayLight: "#F3EFE8", grayBorder: "#E8E3DA",
+  green: "#0E9F74",
 };
 
 const TABS = ["الإعدادات العامة", "البريد الإلكتروني", "الدفع", "الأمان", "النسخ الاحتياطي", "API"];
@@ -67,7 +67,7 @@ export default function AdminSettings() {
   };
 
   if (loading) return (
-    <div style={{ padding: 60, textAlign: "center", color: colors.gray, fontFamily: "'Cairo',sans-serif" }}>
+    <div style={{ padding: 60, textAlign: "center", color: colors.gray, fontFamily: "inherit" }}>
       جارٍ التحميل…
     </div>
   );
@@ -77,7 +77,7 @@ export default function AdminSettings() {
   const hasFields = items.length > 0;
 
   return (
-    <div style={{ fontFamily: "'Cairo', sans-serif", direction: "rtl" }}>
+    <div style={{ fontFamily: "inherit", direction: "rtl" }}>
 
       {/* Tab bar — same visual as App.jsx Tab component */}
       <div style={{ display: "flex", gap: 2, background: colors.grayLight, borderRadius: 12, padding: 3, overflowX: "auto", marginBottom: 16 }}>
@@ -87,11 +87,11 @@ export default function AdminSettings() {
             onClick={() => { setActive(i); setSaved(false); }}
             style={{
               padding: "8px 18px", borderRadius: 10, fontSize: 13,
-              fontWeight: active === i ? 700 : 500, fontFamily: "'Cairo', sans-serif",
+              fontWeight: active === i ? 700 : 500, fontFamily: "inherit",
               background: active === i ? "white" : "transparent",
-              color: active === i ? colors.teal : colors.gray,
+              color: active === i ? colors.primary : colors.gray,
               border: "none", cursor: "pointer", transition: "all 0.2s",
-              boxShadow: active === i ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
+              boxShadow: active === i ? "0 1px 3px rgba(14,42,61,0.08)" : "none",
               whiteSpace: "nowrap",
             }}
           >
@@ -101,13 +101,13 @@ export default function AdminSettings() {
       </div>
 
       {/* Card */}
-      <div style={{ background: "white", borderRadius: 14, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+      <div style={{ background: "white", borderRadius: 14, padding: 20, boxShadow: "0 1px 4px rgba(14,42,61,0.06)" }}>
         {hasFields ? (
           <>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 16 }}>
               {items.map(item => (
                 <div key={item.key} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  <label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark }}>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: colors.ink }}>
                     {item.label}
                   </label>
                   <input
@@ -117,7 +117,7 @@ export default function AdminSettings() {
                     style={{
                       padding: "10px 14px", borderRadius: 10,
                       border: `1.5px solid ${colors.grayBorder}`,
-                      fontSize: 13, fontFamily: "'Cairo', sans-serif",
+                      fontSize: 13, fontFamily: "inherit",
                       direction: "rtl", outline: "none",
                       background: colors.white,
                     }}
@@ -131,10 +131,10 @@ export default function AdminSettings() {
                   disabled={saving}
                   style={{
                     padding: "11px 32px", borderRadius: 10, fontSize: 13, fontWeight: 700,
-                    fontFamily: "'Cairo', sans-serif", cursor: saving ? "default" : "pointer",
+                    fontFamily: "inherit", cursor: saving ? "default" : "pointer",
                     border: "none",
-                    background: saved ? colors.green : colors.orange,
-                    color: "white", transition: "background 0.3s",
+                    background: saved ? colors.green : colors.amber,
+                    color: "#0E2A3D", transition: "background 0.3s",
                   }}
                 >
                   {saving ? "جارٍ الحفظ…" : saved ? "✓ تم الحفظ" : "حفظ الإعدادات"}

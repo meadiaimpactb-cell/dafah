@@ -1,8 +1,9 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useEffect, useMemo, useId } from 'react';
 import { formGuide, GuideBlocks, GuideExamples, LabelWithTip, InfoTip } from './UnitContent';
 import { buildOrgTree, OrgNode } from './OrgChart';
 
-const colors = { teal: '#1A6B7C', tealDark: '#14505E', orange: '#E8620A' };
+const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
 
 export default function TemplateRenderer({ unit, formData, setFormData, disabled, context }) {
   const set = (key, value) => setFormData(prev => ({ ...prev, [key]: value }));
@@ -28,7 +29,7 @@ export default function TemplateRenderer({ unit, formData, setFormData, disabled
 
 /* ─────────────── مكونات مشتركة ─────────────── */
 const SectionTitle = ({ children }) => (
-  <div style={{ fontSize: 14, fontWeight: 700, color: colors.teal, marginBottom: 10, marginTop: 20 }}>{children}</div>
+  <div style={{ fontSize: 14, fontWeight: 700, color: colors.primary, marginBottom: 10, marginTop: 20 }}>{children}</div>
 );
 
 const TaInput = ({ value, onChange, placeholder, rows = 3, disabled, id }) => (
@@ -40,10 +41,10 @@ const TaInput = ({ value, onChange, placeholder, rows = 3, disabled, id }) => (
     rows={rows}
     disabled={disabled}
     style={{
-      width: '100%', padding: '8px 10px', border: `1px solid ${disabled ? '#f3f4f6' : '#e5e7eb'}`,
-      borderRadius: 6, fontSize: 12, fontFamily: "'Cairo', sans-serif",
+      width: '100%', padding: '8px 10px', border: `1px solid ${disabled ? '#F3EFE8' : '#E8E3DA'}`,
+      borderRadius: 6, fontSize: 12, fontFamily: "inherit",
       resize: 'vertical', direction: 'rtl', boxSizing: 'border-box', lineHeight: 1.7,
-      background: disabled ? '#f9fafb' : '#fff',
+      background: disabled ? '#FBF9F5' : '#fff',
     }}
   />
 );
@@ -56,10 +57,10 @@ const TextInput = ({ value, onChange, placeholder, disabled }) => (
     placeholder={placeholder}
     disabled={disabled}
     style={{
-      width: '100%', padding: '7px 10px', border: `1px solid ${disabled ? '#f3f4f6' : '#e5e7eb'}`,
-      borderRadius: 6, fontSize: 12, fontFamily: "'Cairo', sans-serif",
+      width: '100%', padding: '7px 10px', border: `1px solid ${disabled ? '#F3EFE8' : '#E8E3DA'}`,
+      borderRadius: 6, fontSize: 12, fontFamily: "inherit",
       direction: 'rtl', boxSizing: 'border-box',
-      background: disabled ? '#f9fafb' : '#fff',
+      background: disabled ? '#FBF9F5' : '#fff',
     }}
   />
 );
@@ -70,10 +71,10 @@ const SelectInput = ({ value, onChange, options, disabled }) => (
     onChange={e => onChange(e.target.value)}
     disabled={disabled}
     style={{
-      width: '100%', padding: '7px 10px', border: `1px solid ${disabled ? '#f3f4f6' : '#e5e7eb'}`,
-      borderRadius: 6, fontSize: 12, fontFamily: "'Cairo', sans-serif",
+      width: '100%', padding: '7px 10px', border: `1px solid ${disabled ? '#F3EFE8' : '#E8E3DA'}`,
+      borderRadius: 6, fontSize: 12, fontFamily: "inherit",
       direction: 'rtl', boxSizing: 'border-box',
-      background: disabled ? '#f9fafb' : '#fff', cursor: disabled ? 'default' : 'pointer',
+      background: disabled ? '#FBF9F5' : '#fff', cursor: disabled ? 'default' : 'pointer',
     }}
   >
     {options.map(o => <option key={o} value={o}>{o}</option>)}
@@ -82,11 +83,11 @@ const SelectInput = ({ value, onChange, options, disabled }) => (
 
 /** عنوان خانة إدخال مرتبط بها (الضغط عليه ينقل المؤشر إلى الخانة) */
 const FieldLabel = ({ htmlFor, children }) => (
-  <label htmlFor={htmlFor} style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#374151', marginBottom: 6 }}>{children}</label>
+  <label htmlFor={htmlFor} style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#334452', marginBottom: 6 }}>{children}</label>
 );
 
 const thStyle = {
-  padding: '9px 10px', background: colors.teal, color: '#fff',
+  padding: '9px 10px', background: colors.primary, color: '#fff',
   fontSize: 12, fontWeight: 600, textAlign: 'right', whiteSpace: 'nowrap',
 };
 
@@ -116,12 +117,12 @@ const SectionTitleTip = ({ guide, anchor, label }) => (
 );
 
 const addBtnStyle = {
-  padding: '7px 16px', background: 'transparent', border: `1.5px dashed ${colors.teal}`, color: colors.teal,
-  borderRadius: 7, fontSize: 12, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", fontWeight: 600,
+  padding: '7px 16px', background: 'transparent', border: `1.5px dashed ${colors.primary}`, color: colors.primary,
+  borderRadius: 7, fontSize: 12, cursor: 'pointer', fontFamily: "inherit", fontWeight: 600,
 };
 const norm = s => (s || '').replace(/\s+/g, ' ').trim();
-const tdStyle = { padding: '6px 6px', borderBottom: '1px solid #f3f4f6', verticalAlign: 'middle' };
-const tdLabelStyle = { ...tdStyle, padding: '8px 10px', fontSize: 12, fontWeight: 600, background: '#f8fafb', whiteSpace: 'nowrap' };
+const tdStyle = { padding: '6px 6px', borderBottom: '1px solid #F3EFE8', verticalAlign: 'middle' };
+const tdLabelStyle = { ...tdStyle, padding: '8px 10px', fontSize: 12, fontWeight: 600, background: '#FBF9F5', whiteSpace: 'nowrap' };
 
 /* ─────────────── 1. SWOT ─────────────── */
 // نقاط القوة/الضعف في الملخص تُجمع تلقائيًا من الجدول بترتيب المجالات، مع تجاهل الخانات الفارغة
@@ -152,10 +153,10 @@ function SwotTemplate({ formData, set, setFormData, disabled, unit, guide }) {
 
   const summaryTip = resolveTip(guide, 'summary', SWOT_SUMMARY_TITLE);
   const autoBox = (points, empty) => (
-    <div style={{ minHeight: 88, padding: '8px 12px', fontSize: 12, lineHeight: 1.9, color: '#374151', background: '#fafafa' }}>
+    <div style={{ minHeight: 88, padding: '8px 12px', fontSize: 12, lineHeight: 1.9, color: '#334452', background: '#FBF9F5' }}>
       {points.length > 0
         ? <ul style={{ margin: 0, paddingRight: 16 }}>{points.map((p, i) => <li key={i}>{p}</li>)}</ul>
-        : <span style={{ color: '#9ca3af' }}>{empty}</span>}
+        : <span style={{ color: '#8C97A3' }}>{empty}</span>}
     </div>
   );
 
@@ -187,24 +188,24 @@ function SwotTemplate({ formData, set, setFormData, disabled, unit, guide }) {
       </div>
 
       <div style={{ marginTop: 20, marginBottom: 10 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: colors.teal, display: 'flex', alignItems: 'center', gap: 2 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: colors.primary, display: 'flex', alignItems: 'center', gap: 2 }}>
           {SWOT_SUMMARY_TITLE}
           {summaryTip && <InfoTip text={summaryTip.text} example={summaryTip.example} title={summaryTip.example?.title} label={SWOT_SUMMARY_TITLE} />}
         </div>
-        <div style={{ fontSize: 11.5, color: '#6b7280', marginTop: 2 }}>مكيّف للتركيز على البيئة الداخلية للمنظمة</div>
+        <div style={{ fontSize: 11.5, color: '#5E6B78', marginTop: 2 }}>مكيّف للتركيز على البيئة الداخلية للمنظمة</div>
       </div>
       <GuideBlocks guide={guide} anchor="summary" />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 8 }}>
         {[
-          { key: 'strengths',    label: 'نقاط القوة',       code: 'S', color: '#16a34a', bg: '#f0fdf4', auto: strengths },
-          { key: 'weaknesses',   label: 'نقاط الضعف',       code: 'W', color: '#dc2626', bg: '#fef2f2', auto: weaknesses },
-          { key: 'opportunities',label: 'فرص التحسين',      code: 'O', color: '#2563eb', bg: '#eff6ff' },
-          { key: 'threats',      label: 'المخاطر الداخلية', code: 'T', color: '#d97706', bg: '#fffbeb' },
+          { key: 'strengths',    label: 'نقاط القوة',       code: 'S', color: '#0B7F5D', bg: '#E8F8F2', auto: strengths },
+          { key: 'weaknesses',   label: 'نقاط الضعف',       code: 'W', color: '#C53A3A', bg: '#FCEBEB', auto: weaknesses },
+          { key: 'opportunities',label: 'فرص التحسين',      code: 'O', color: '#1F74C4', bg: '#EAF4FD' },
+          { key: 'threats',      label: 'المخاطر الداخلية', code: 'T', color: '#A33F12', bg: '#FEF3EC' },
         ].map(q => (
           <div key={q.key} style={{ border: `2px solid ${q.color}25`, borderRadius: 10, overflow: 'hidden' }}>
             <div style={{ padding: '7px 12px', background: q.bg, fontSize: 13, fontWeight: 600, color: q.color, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span><Lbl guide={guide} anchor="summary" label={q.label} suffix={` (${q.code})`} /> ({q.code})</span>
-              {q.auto && <span style={{ fontSize: 10.5, fontWeight: 500, color: '#6b7280' }}>تظهر تلقائيًا من الجدول</span>}
+              {q.auto && <span style={{ fontSize: 10.5, fontWeight: 500, color: '#5E6B78' }}>تظهر تلقائيًا من الجدول</span>}
             </div>
             {q.auto
               ? autoBox(q.auto, `تظهر هنا ${q.label} المسجّلة في الجدول أعلاه`)
@@ -345,9 +346,9 @@ function NeedsTemplate({ formData, setFormData, set, disabled, unit, guide }) {
           <tbody>
             {items.map((it, i) => (
               <tr key={i}>
-                <td style={{ ...tdStyle, minWidth: 150, background: '#f8fafb' }}>
+                <td style={{ ...tdStyle, minWidth: 150, background: '#FBF9F5' }}>
                   <TextInput value={it.name} onChange={v => update(i, 'name', v)} placeholder="اسم الاحتياج..." disabled={disabled} />
-                  {dup(it.name) && <div style={{ fontSize: 10.5, color: '#dc2626', marginTop: 2 }}>اسم الاحتياج مكرر، يُرجى تمييزه.</div>}
+                  {dup(it.name) && <div style={{ fontSize: 10.5, color: '#C53A3A', marginTop: 2 }}>اسم الاحتياج مكرر، يُرجى تمييزه.</div>}
                 </td>
                 <td style={tdStyle}><TextInput value={it.desc}   onChange={v => update(i, 'desc',   v)} placeholder="وصف الاحتياج..." disabled={disabled} /></td>
                 <td style={{ ...tdStyle, minWidth: 90 }}><SelectInput value={it.priority} onChange={v => update(i, 'priority', v)} options={['عالية', 'متوسطة', 'منخفضة']} disabled={disabled} /></td>
@@ -356,7 +357,7 @@ function NeedsTemplate({ formData, setFormData, set, disabled, unit, guide }) {
                   <td style={{ ...tdStyle, textAlign: 'center' }}>
                     {items.length > 1 && (
                       <button type="button" onClick={() => removeRow(i)} title="حذف الصف"
-                        style={{ background: 'none', border: '1px solid #fecaca', borderRadius: 6, color: '#dc2626', cursor: 'pointer', fontSize: 11, padding: '3px 8px', fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap' }}>
+                        style={{ background: 'none', border: '1px solid #F1B2B2', borderRadius: 6, color: '#C53A3A', cursor: 'pointer', fontSize: 11, padding: '3px 8px', fontFamily: "inherit", whiteSpace: 'nowrap' }}>
                         حذف الصف
                       </button>
                     )}
@@ -383,17 +384,17 @@ function TowsTemplate({ formData, set, disabled, guide }) {
   const update = (k, v) => set('tows', { ...tows, [k]: v });
 
   const cells = [
-    { key: 'so', title: 'SO — استراتيجيات القوة والفرص',       sub: 'كيف نستخدم نقاط القوة لاستثمار الفرص؟',       color: '#16a34a', bg: '#f0fdf4' },
-    { key: 'wo', title: 'WO — استراتيجيات الضعف والفرص',       sub: 'كيف نعالج نقاط الضعف لاستثمار الفرص؟',        color: '#2563eb', bg: '#eff6ff' },
-    { key: 'st', title: 'ST — استراتيجيات القوة والتهديدات',    sub: 'كيف نستخدم نقاط القوة لمواجهة التهديدات؟',    color: '#d97706', bg: '#fffbeb' },
-    { key: 'wt', title: 'WT — استراتيجيات الضعف والتهديدات',   sub: 'كيف نتجنب التهديدات في ظل نقاط الضعف؟',       color: '#dc2626', bg: '#fef2f2' },
+    { key: 'so', title: 'SO — استراتيجيات القوة والفرص',       sub: 'كيف نستخدم نقاط القوة لاستثمار الفرص؟',       color: '#0B7F5D', bg: '#E8F8F2' },
+    { key: 'wo', title: 'WO — استراتيجيات الضعف والفرص',       sub: 'كيف نعالج نقاط الضعف لاستثمار الفرص؟',        color: '#1F74C4', bg: '#EAF4FD' },
+    { key: 'st', title: 'ST — استراتيجيات القوة والتهديدات',    sub: 'كيف نستخدم نقاط القوة لمواجهة التهديدات؟',    color: '#A33F12', bg: '#FEF3EC' },
+    { key: 'wt', title: 'WT — استراتيجيات الضعف والتهديدات',   sub: 'كيف نتجنب التهديدات في ظل نقاط الضعف؟',       color: '#C53A3A', bg: '#FCEBEB' },
   ];
 
   return (
     <div>
       <SectionTitle>مصفوفة TOWS (التحليل المتقاطع)</SectionTitle>
       <GuideBlocks guide={guide} anchor="top" sectionTitle="مصفوفة TOWS (التحليل المتقاطع) التحليل الاستراتيجي" />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 10 }}>
         {cells.map(c => {
           const tip = resolveTip(guide, c.key, c.key.toUpperCase());
           return (
@@ -403,7 +404,7 @@ function TowsTemplate({ formData, set, disabled, guide }) {
                 {c.title}
                 {tip && <InfoTip text={tip.text} example={tip.example} title={tip.example?.title} label={c.key.toUpperCase()} />}
               </div>
-              <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{c.sub}</div>
+              <div style={{ fontSize: 11, color: '#8C97A3', marginTop: 2 }}>{c.sub}</div>
             </div>
             <TaInput value={tows[c.key]} onChange={v => update(c.key, v)} placeholder="اكتب الاستراتيجيات هنا..." rows={5} disabled={disabled} />
           </div>
@@ -438,7 +439,7 @@ function InitiativesTemplate({ formData, set, disabled, guide }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <SectionTitle style={{ margin: 0 }}>المبادرات الاستراتيجية</SectionTitle>
         {!disabled && (
-          <button onClick={addRow} style={{ padding: '6px 14px', background: colors.teal, color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+          <button onClick={addRow} style={{ padding: '6px 14px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}>
             + إضافة مبادرة
           </button>
         )}
@@ -446,14 +447,14 @@ function InitiativesTemplate({ formData, set, disabled, guide }) {
       <GuideBlocks guide={guide} anchor="top" sectionTitle="المبادرات الاستراتيجية" />
 
       {init.map((row, i) => (
-        <div key={i} style={{ background: '#f8fafb', border: `1.5px solid ${colors.teal}20`, borderRadius: 10, padding: 16, marginBottom: 14 }}>
+        <div key={i} style={{ background: '#FBF9F5', border: `1.5px solid ${colors.primary}20`, borderRadius: 10, padding: 16, marginBottom: 14 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: colors.teal }}>مبادرة {i + 1}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: colors.primary }}>مبادرة {i + 1}</div>
             {!disabled && init.length > 1 && (
-              <button onClick={() => removeRow(i)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: 18, lineHeight: 1 }}>✕</button>
+              <button onClick={() => removeRow(i)} style={{ background: 'none', border: 'none', color: '#C53A3A', cursor: 'pointer', fontSize: 18, lineHeight: 1 }}>✕</button>
             )}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 10 }}>
             <FieldBox {...fb} label="اسم المبادرة">
               <TextInput value={row.name} onChange={v => updateRow(i, 'name', v)} placeholder="اسم المبادرة" disabled={disabled} />
             </FieldBox>
@@ -471,11 +472,11 @@ function InitiativesTemplate({ formData, set, disabled, guide }) {
             </FieldBox>
             <FieldBox {...fb} label="تاريخ البداية">
               <input type="date" value={row.start_date || ''} onChange={e => updateRow(i, 'start_date', e.target.value)} disabled={disabled}
-                style={{ width: '100%', padding: '7px 10px', border: `1px solid ${disabled ? '#f3f4f6' : '#e5e7eb'}`, borderRadius: 6, fontSize: 12, fontFamily: "'Cairo', sans-serif", direction: 'rtl', boxSizing: 'border-box', background: disabled ? '#f9fafb' : '#fff' }} />
+                style={{ width: '100%', padding: '7px 10px', border: `1px solid ${disabled ? '#F3EFE8' : '#E8E3DA'}`, borderRadius: 6, fontSize: 12, fontFamily: "inherit", direction: 'rtl', boxSizing: 'border-box', background: disabled ? '#FBF9F5' : '#fff' }} />
             </FieldBox>
             <FieldBox {...fb} label="تاريخ النهاية">
               <input type="date" value={row.end_date || ''} onChange={e => updateRow(i, 'end_date', e.target.value)} disabled={disabled}
-                style={{ width: '100%', padding: '7px 10px', border: `1px solid ${disabled ? '#f3f4f6' : '#e5e7eb'}`, borderRadius: 6, fontSize: 12, fontFamily: "'Cairo', sans-serif", direction: 'rtl', boxSizing: 'border-box', background: disabled ? '#f9fafb' : '#fff' }} />
+                style={{ width: '100%', padding: '7px 10px', border: `1px solid ${disabled ? '#F3EFE8' : '#E8E3DA'}`, borderRadius: 6, fontSize: 12, fontFamily: "inherit", direction: 'rtl', boxSizing: 'border-box', background: disabled ? '#FBF9F5' : '#fff' }} />
             </FieldBox>
             <FieldBox {...fb} label="المسؤول">
               <TextInput value={row.owner} onChange={v => updateRow(i, 'owner', v)} placeholder="اسم المسؤول..." disabled={disabled} />
@@ -518,34 +519,34 @@ function DirectionsTemplate({ formData, set, disabled, guide }) {
       <GuideBlocks guide={guide} anchor="values" />
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
         {values.map((val, i) => (
-          <span key={i} style={{ padding: '5px 14px', borderRadius: 20, background: '#fff7ed', color: colors.orange, fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, border: '1px solid #fed7aa' }}>
+          <span key={i} style={{ padding: '5px 14px', borderRadius: 20, background: '#FEF3EC', color: colors.amberText, fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, border: '1px solid #FBC3A3' }}>
             {val}
-            {!disabled && <button onClick={() => removeValue(i)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: 14, lineHeight: 1, padding: 0 }}>✕</button>}
+            {!disabled && <button onClick={() => removeValue(i)} style={{ background: 'none', border: 'none', color: '#C53A3A', cursor: 'pointer', fontSize: 14, lineHeight: 1, padding: 0 }}>✕</button>}
           </span>
         ))}
         {!disabled && (
-          <button onClick={addValue} style={{ padding: '5px 14px', borderRadius: 20, background: '#f3f4f6', color: '#6b7280', fontSize: 13, border: 'none', cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+          <button onClick={addValue} style={{ padding: '5px 14px', borderRadius: 20, background: '#F3EFE8', color: '#5E6B78', fontSize: 13, border: 'none', cursor: 'pointer', fontFamily: "inherit" }}>
             + إضافة قيمة
           </button>
         )}
       </div>
-      {values.length === 0 && <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: 8 }}>مثال: الشفافية، الإتقان، العمل الجماعي، الابتكار</div>}
+      {values.length === 0 && <div style={{ fontSize: 12, color: '#8C97A3', marginBottom: 8 }}>مثال: الشفافية، الإتقان، العمل الجماعي، الابتكار</div>}
 
       <SectionTitleTip guide={guide} anchor="goals" label="الأهداف الاستراتيجية" />
       <GuideBlocks guide={guide} anchor="goals" />
       {goals.map((g, i) => (
         <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center' }}>
-          <div style={{ width: 28, height: 28, borderRadius: 7, background: colors.teal, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>{i + 1}</div>
+          <div style={{ width: 28, height: 28, borderRadius: 7, background: colors.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>{i + 1}</div>
           <div style={{ flex: 1 }}>
             <TextInput value={g} onChange={v => updateGoal(i, v)} placeholder="اكتب الهدف الاستراتيجي..." disabled={disabled} />
           </div>
           {!disabled && goals.length > 1 && (
-            <button onClick={() => removeGoal(i)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: 18, flexShrink: 0 }}>✕</button>
+            <button onClick={() => removeGoal(i)} style={{ background: 'none', border: 'none', color: '#C53A3A', cursor: 'pointer', fontSize: 18, flexShrink: 0 }}>✕</button>
           )}
         </div>
       ))}
       {!disabled && (
-        <button onClick={addGoal} style={{ padding: '7px 16px', background: 'transparent', border: `1.5px dashed ${colors.teal}`, color: colors.teal, borderRadius: 7, fontSize: 12, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", fontWeight: 600 }}>
+        <button onClick={addGoal} style={{ padding: '7px 16px', background: 'transparent', border: `1.5px dashed ${colors.primary}`, color: colors.primary, borderRadius: 7, fontSize: 12, cursor: 'pointer', fontFamily: "inherit", fontWeight: 600 }}>
           + إضافة هدف
         </button>
       )}
@@ -559,11 +560,11 @@ function TocTemplate({ formData, set, disabled, guide }) {
   const update = (k, v) => set('toc', { ...t, [k]: v });
 
   const stages = [
-    { key: 'inputs',     title: 'المدخلات',  color: '#6366f1', placeholder: 'الموارد البشرية\nالموارد المالية\nالبنية التحتية' },
-    { key: 'activities', title: 'الأنشطة',   color: colors.teal,  placeholder: 'برامج تدريب\nحملات توعية\nخدمات مباشرة' },
-    { key: 'outputs',    title: 'المخرجات',  color: '#2563eb', placeholder: 'عدد المستفيدين\nبرامج منفذة\nمواد منشورة' },
-    { key: 'outcomes',   title: 'النتائج',   color: colors.orange, placeholder: 'تحسن المعرفة\nتغير السلوك\nزيادة الوعي' },
-    { key: 'impact',     title: 'الأثر',     color: '#16a34a', placeholder: 'تحسن نوعية الحياة\nتمكين المجتمع' },
+    { key: 'inputs',     title: 'المدخلات',  color: '#33769C', placeholder: 'الموارد البشرية\nالموارد المالية\nالبنية التحتية' },
+    { key: 'activities', title: 'الأنشطة',   color: colors.primary,  placeholder: 'برامج تدريب\nحملات توعية\nخدمات مباشرة' },
+    { key: 'outputs',    title: 'المخرجات',  color: '#1F74C4', placeholder: 'عدد المستفيدين\nبرامج منفذة\nمواد منشورة' },
+    { key: 'outcomes',   title: 'النتائج',   color: colors.amberText, placeholder: 'تحسن المعرفة\nتغير السلوك\nزيادة الوعي' },
+    { key: 'impact',     title: 'الأثر',     color: '#0B7F5D', placeholder: 'تحسن نوعية الحياة\nتمكين المجتمع' },
   ];
 
   return (
@@ -579,7 +580,7 @@ function TocTemplate({ formData, set, disabled, guide }) {
               <TaInput value={t[s.key]} onChange={v => update(s.key, v)} placeholder={s.placeholder} rows={5} disabled={disabled} />
             </div>
             {i < stages.length - 1 && (
-              <div style={{ display: 'flex', alignItems: 'center', fontSize: 22, color: colors.orange, fontWeight: 700, flexShrink: 0, paddingBottom: 8 }}>←</div>
+              <div style={{ display: 'flex', alignItems: 'center', fontSize: 22, color: colors.amberText, fontWeight: 700, flexShrink: 0, paddingBottom: 8 }}>←</div>
             )}
           </React.Fragment>
         ))}
@@ -595,8 +596,8 @@ function TocTemplate({ formData, set, disabled, guide }) {
 /* BmcCell مُعرَّف خارج BmcTemplate تماماً لمنع إعادة الإنشاء عند كل render */
 function BmcCell({ block, accent, value, onChange, disabled, guide }) {
   return (
-    <div style={{ border: '1.5px solid #e5e7eb', borderRadius: 8, overflow: 'hidden' }}>
-      <div style={{ padding: '5px 8px', background: accent ? colors.orange : colors.teal, color: '#fff', fontSize: 11, fontWeight: 600, textAlign: 'center' }}>
+    <div style={{ border: '1.5px solid #E8E3DA', borderRadius: 8, overflow: 'hidden' }}>
+      <div style={{ padding: '5px 8px', background: accent ? colors.amber : colors.primary, color: '#0E2A3D', fontSize: 11, fontWeight: 600, textAlign: 'center' }}>
         {guide ? <Lbl guide={guide} anchor="top" label={block.t} /> : block.t}
       </div>
       <TaInput value={value} onChange={onChange} placeholder={block.p} rows={3} disabled={disabled} />
@@ -629,17 +630,17 @@ function BmcTemplate({ formData, set, disabled, guide }) {
     <div>
       <SectionTitle>نموذج عمل المنظمة (Business Model Canvas)</SectionTitle>
       <GuideBlocks guide={guide} anchor="top" sectionTitle="نموذج عمل المنظمة (Business Model Canvas)" />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 6, marginBottom: 6 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-5)', gap: 6, marginBottom: 6 }}>
         {BMC_ROW1.map(bl => (
           <BmcCell key={bl.key} guide={guide} block={bl} value={b[bl.key]} onChange={v => update(bl.key, v)} disabled={disabled} />
         ))}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 6 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 6, marginBottom: 6 }}>
         {BMC_ROW2.map(bl => (
           <BmcCell key={bl.key} guide={guide} block={bl} value={b[bl.key]} onChange={v => update(bl.key, v)} disabled={disabled} />
         ))}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 6 }}>
         {BMC_ROW3.map(bl => (
           <BmcCell key={bl.key} guide={guide} block={bl} accent value={b[bl.key]} onChange={v => update(bl.key, v)} disabled={disabled} />
         ))}
@@ -665,7 +666,7 @@ function KpisTemplate({ formData, set, disabled, unit, guide }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <SectionTitle style={{ margin: 0 }}>جدول مؤشرات الأداء</SectionTitle>
         {!disabled && (
-          <button onClick={addRow} style={{ padding: '6px 14px', background: colors.teal, color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+          <button onClick={addRow} style={{ padding: '6px 14px', background: colors.primary, color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}>
             + إضافة مؤشر
           </button>
         )}
@@ -686,7 +687,7 @@ function KpisTemplate({ formData, set, disabled, unit, guide }) {
           </thead>
           <tbody>
             {kpis.map((row, i) => (
-              <tr key={i} style={{ borderBottom: '1px solid #f3f4f6' }}>
+              <tr key={i} style={{ borderBottom: '1px solid #F3EFE8' }}>
                 <td style={tdStyle}><TextInput value={row.name}        onChange={v => updateRow(i, 'name',        v)} placeholder="اسم المؤشر"         disabled={disabled} /></td>
                 <td style={tdStyle}><TextInput value={row.goal}        onChange={v => updateRow(i, 'goal',        v)} placeholder="الهدف المرتبط"       disabled={disabled} /></td>
                 <td style={tdStyle}><TextInput value={row.target}      onChange={v => updateRow(i, 'target',      v)} placeholder="الهدف الرقمي"        disabled={disabled} /></td>
@@ -695,7 +696,7 @@ function KpisTemplate({ formData, set, disabled, unit, guide }) {
                 <td style={tdStyle}><TextInput value={row.owner}       onChange={v => updateRow(i, 'owner',       v)} placeholder="المسؤول"             disabled={disabled} /></td>
                 {!disabled && (
                   <td style={tdStyle}>
-                    {kpis.length > 1 && <button onClick={() => removeRow(i)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: 16 }}>✕</button>}
+                    {kpis.length > 1 && <button onClick={() => removeRow(i)} style={{ background: 'none', border: 'none', color: '#C53A3A', cursor: 'pointer', fontSize: 16 }}>✕</button>}
                   </td>
                 )}
               </tr>
@@ -725,17 +726,17 @@ function OrgchartTemplate({ formData, set, disabled, guide }) {
       <GuideBlocks guide={guide} anchor="top" sectionTitle="الهيكل التنظيمي" />
 
       {/* الخريطة التنظيمية — تُشتق من الجدول وتتحدّث مع كل تعديل */}
-      <div style={{ background: '#f8fafb', borderRadius: 10, padding: '18px 10px', marginBottom: 16, overflowX: 'auto' }}>
+      <div style={{ background: '#FBF9F5', borderRadius: 10, padding: '18px 10px', marginBottom: 16, overflowX: 'auto' }}>
         {roots.length > 0 ? (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', gap: 18, minWidth: 'fit-content', margin: '0 auto' }}>
             {roots.map(r => <OrgNode key={r.key} node={r} />)}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', fontSize: 12, color: '#9ca3af' }}>أضف الوظائف في الجدول لتظهر الخريطة التنظيمية.</div>
+          <div style={{ textAlign: 'center', fontSize: 12, color: '#8C97A3' }}>أضف الوظائف في الجدول لتظهر الخريطة التنظيمية.</div>
         )}
         {issueCount > 0 && (
-          <div style={{ marginTop: 12, fontSize: 11.5, color: '#b45309', textAlign: 'center' }}>
-            ⚠️ {issueCount === 1 ? 'وظيفة واحدة لم تُرسم' : `${issueCount} وظائف لم تُرسم`} لعدم وضوح التبعية — راجع التنبيه عند الصف في الجدول.
+          <div style={{ marginTop: 12, fontSize: 11.5, color: '#7F310E', textAlign: 'center' }}>
+            <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />{issueCount === 1 ? 'وظيفة واحدة لم تُرسم' : `${issueCount} وظائف لم تُرسم`} لعدم وضوح التبعية — راجع التنبيه عند الصف في الجدول.
           </div>
         )}
       </div>
@@ -753,16 +754,16 @@ function OrgchartTemplate({ formData, set, disabled, guide }) {
           </thead>
           <tbody>
             {positions.map((p, i) => (
-              <tr key={i} style={{ borderBottom: '1px solid #f3f4f6' }}>
+              <tr key={i} style={{ borderBottom: '1px solid #F3EFE8' }}>
                 <td style={tdStyle}><TextInput value={p.title}     onChange={v => updatePos(i, 'title',     v)} placeholder="المسمى الوظيفي" disabled={disabled} /></td>
                 <td style={tdStyle}><TextInput value={p.dept}      onChange={v => updatePos(i, 'dept',      v)} placeholder="اسم القسم"       disabled={disabled} /></td>
                 <td style={tdStyle}>
                   <TextInput value={p.reports_to} onChange={v => updatePos(i, 'reports_to', v)} placeholder="يتبع لـ..." disabled={disabled} />
-                  {issues[i] && <div style={{ fontSize: 10.5, color: '#b45309', marginTop: 3, lineHeight: 1.6 }}>⚠️ {issues[i]}</div>}
+                  {issues[i] && <div style={{ fontSize: 10.5, color: '#7F310E', marginTop: 3, lineHeight: 1.6 }}><DfIcon name="warning" size={14} style={{ marginInlineEnd: 6 }} />{issues[i]}</div>}
                 </td>
                 {!disabled && (
                   <td style={tdStyle}>
-                    {positions.length > 1 && <button onClick={() => removePos(i)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', fontSize: 16 }}>✕</button>}
+                    {positions.length > 1 && <button onClick={() => removePos(i)} style={{ background: 'none', border: 'none', color: '#C53A3A', cursor: 'pointer', fontSize: 16 }}>✕</button>}
                   </td>
                 )}
               </tr>
@@ -771,7 +772,7 @@ function OrgchartTemplate({ formData, set, disabled, guide }) {
         </table>
       </div>
       {!disabled && (
-        <button onClick={addPos} style={{ padding: '7px 16px', background: 'transparent', border: `1.5px dashed ${colors.teal}`, color: colors.teal, borderRadius: 7, fontSize: 12, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", fontWeight: 600 }}>
+        <button onClick={addPos} style={{ padding: '7px 16px', background: 'transparent', border: `1.5px dashed ${colors.primary}`, color: colors.primary, borderRadius: 7, fontSize: 12, cursor: 'pointer', fontFamily: "inherit", fontWeight: 600 }}>
           + إضافة وظيفة
         </button>
       )}
@@ -805,8 +806,8 @@ function DocumentTemplate({ formData, set, disabled, guide, context }) {
   return (
     <div>
       {/* معاينة */}
-      <div style={{ border: `2px solid #e5e7eb`, borderRadius: 12, overflow: 'hidden', marginBottom: 20 }}>
-        <div style={{ padding: '20px 24px', background: `linear-gradient(135deg, ${colors.teal}, ${colors.tealDark})`, color: '#fff', textAlign: 'center' }}>
+      <div style={{ border: `2px solid #E8E3DA`, borderRadius: 12, overflow: 'hidden', marginBottom: 20 }}>
+        <div style={{ padding: '20px 24px', background: `linear-gradient(135deg, ${colors.primary}, ${colors.ink})`, color: '#fff', textAlign: 'center' }}>
           <div style={{ fontSize: 11, opacity: 0.7, marginBottom: 4 }}>خطة استراتيجية</div>
           <div style={{ fontSize: 18, fontWeight: 800 }}>
             الخطة الاستراتيجية
@@ -821,9 +822,9 @@ function DocumentTemplate({ formData, set, disabled, guide, context }) {
           </div>
           {!period && <div style={{ fontSize: 10.5, opacity: 0.75, marginTop: 4 }}>تظهر فترة الخطة من تواريخ البداية والنهاية في المبادرات الاستراتيجية</div>}
         </div>
-        <div style={{ padding: '14px 20px', background: '#f8fafb', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ padding: '14px 20px', background: '#FBF9F5', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {DOCUMENT_STAGES.map((s, i) => (
-            <span key={i} style={{ fontSize: 11, color: colors.teal, padding: '3px 8px', background: '#e0f2fe', borderRadius: 4 }}>
+            <span key={i} style={{ fontSize: 11, color: colors.primary, padding: '3px 8px', background: '#CFE5FA', borderRadius: 4 }}>
               {i > 0 ? `${i}. ` : ''}{s}
             </span>
           ))}
@@ -835,9 +836,9 @@ function DocumentTemplate({ formData, set, disabled, guide, context }) {
       {/* حقول الإدخال */}
       {sections.map(s => (
         <div key={s.key} style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, marginBottom: 6 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>
             <Lbl guide={guide} anchor="top" label={s.label} />
-            {s.key === 'closing_notes' && <span style={{ fontSize: 11, fontWeight: 400, color: '#9ca3af' }}> (اختياري)</span>}
+            {s.key === 'closing_notes' && <span style={{ fontSize: 11, fontWeight: 400, color: '#8C97A3' }}> (اختياري)</span>}
           </div>
           <TaInput value={doc[s.key]} onChange={v => update(s.key, v)} placeholder={s.placeholder} rows={4} disabled={disabled} />
         </div>
@@ -850,7 +851,7 @@ function DocumentTemplate({ formData, set, disabled, guide, context }) {
 function GenericTemplate({ formData, set, disabled }) {
   return (
     <div>
-      <div style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, marginBottom: 6 }}>محتوى الوحدة</div>
+      <div style={{ fontSize: 13, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>محتوى الوحدة</div>
       <TaInput value={formData.content} onChange={v => set('content', v)} placeholder="اكتب محتوى العمل هنا..." rows={10} disabled={disabled} />
     </div>
   );
@@ -859,14 +860,14 @@ function GenericTemplate({ formData, set, disabled }) {
 /* ─── Helper components ─── */
 const FieldBox = ({ label, children, style }) => (
   <div style={style}>
-    <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}>{label}</div>
+    <div style={{ fontSize: 12, fontWeight: 600, color: '#334452', marginBottom: 4 }}>{label}</div>
     {children}
   </div>
 );
 
 const FieldBoxTip = ({ guide, anchor, label, children, style }) => (
   <div style={style}>
-    <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4 }}><Lbl guide={guide} anchor={anchor} label={label} /></div>
+    <div style={{ fontSize: 12, fontWeight: 600, color: '#334452', marginBottom: 4 }}><Lbl guide={guide} anchor={anchor} label={label} /></div>
     {children}
   </div>
 );

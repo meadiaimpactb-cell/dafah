@@ -1,3 +1,4 @@
+import DfIcon from './components/ui/DfIcon';
 import React, { useState, useEffect, useRef } from "react";
 import { cleanupLegacyPermissions, usePermissions } from "./utils/permissions";
 import { IcClock, IcUpload, IcSearch, IcCheckCircle, IcArrowPath, IcXMark, IcCheck, IcStar, IcSparkles, IcPalette, IcTarget, IcBuilding, IcBuildingLib, IcUser, IcBriefcase, IcMail, IcPhone, IcDownload, IcDocument, IcClipboard, IcShield, IcLock, IcKey, IcWarning, IcChat, IcLightbulb, IcCog, IcBeaker, IcChartBar, IcTrash, IcPencil, IcPlus, IcSave, IcMapPin, IcCalendar, IcCreditCard, IcFolder, IcBell, IcMoney, IcBars } from "./utils/icons";
@@ -26,6 +27,16 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSiteContent from "./pages/admin/AdminSiteContent";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminPolicyDesigns from "./pages/admin/AdminPolicyDesigns";
+import AdminOutputs from "./pages/admin/AdminOutputs";
+import BrandLogo, { LogoMark, RosetteShape } from "./components/brand/Logo";
+import { colors as themeColors, systems } from "./theme/tokens";
+import { Badge, ProgressBar, Btn, Card, Input, MetricCard, Tab, StatusBar, Modal, BarChart, DonutChart, LineChart, GenericPage, EmptyState, Loading, SectionTitle } from "./components/ui/kit";
+import { Help, TipLayer } from "./components/ui/Help";
+import AppShell from "./components/shell/AppShell";
+import { PublicNav as PublicNavBar, PublicFooter as PublicFooterBar } from "./pages/public/PublicLayout";
+import Landing from "./pages/public/Landing";
+import GlossaryDrawer from "./components/onboarding/GlossaryDrawer";
+import OnboardingTour from "./components/onboarding/OnboardingTour";
 
 // ============== ICONS ==============
 const Icons = {
@@ -81,7 +92,7 @@ const Icons = {
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
   ),
   star: (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="#F1C40F" stroke="#F1C40F" strokeWidth="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
   ),
   menu: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -101,262 +112,40 @@ const Icons = {
   content: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
   ),
+  outputs: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+  ),
+  building: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h.01M15 9h.01M9 13h.01M15 13h.01M10 21v-4h4v4"/></svg>
+  ),
+  key: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 21 2M16 7l3 3M18.5 4.5l2 2"/></svg>
+  ),
+  palette: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22a10 10 0 1 1 10-10c0 2.8-2.2 4-4 4h-2a2 2 0 0 0-1.5 3.3A2 2 0 0 1 12 22z"/><circle cx="7.5" cy="10.5" r="1"/><circle cx="12" cy="7" r="1"/><circle cx="16.5" cy="10.5" r="1"/></svg>
+  ),
+  globe: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+  ),
+  user: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+  ),
   log: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="12 8 12 12 14 14"/><circle cx="12" cy="12" r="10"/></svg>
   ),
 };
 
-const Rosette = ({ size = 40, white }) => (
-  <img src="/logo.png" alt="دفة" style={{ width: size, height: size, objectFit: "contain", filter: white ? "brightness(0) invert(1)" : "none" }} />
-);
-
+const Rosette = ({ size = 40, white }) => <LogoMark size={size} tone={white ? "dark" : "light"} />;
 const Logo = ({ size = "md", white }) => {
-  const s = size === "lg" ? 90 : size === "md" ? 64 : 44;
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <img src="/logo.png" alt="دفة" style={{ width: s, height: s, objectFit: "contain", filter: white ? "brightness(0) invert(1)" : "none" }} />
-    </div>
-  );
+  const s = size === "lg" ? 72 : size === "md" ? 52 : 40;
+  return <BrandLogo variant="stacked" tone={white ? "dark" : "light"} size={s} />;
 };
 
 // ============== STYLES ==============
-const colors = {
-  teal: "#1A6B7C",
-  tealDark: "#145A68",
-  tealCard: "#1E5E6E",
-  orange: "#E8713A",
-  orangeLight: "#FDF0E8",
-  bg: "#F8FAFB",
-  white: "#FFFFFF",
-  gray: "#6B7280",
-  grayLight: "#F3F4F6",
-  grayBorder: "#E5E7EB",
-  green: "#10B981",
-  greenLight: "#D1FAE5",
-  blue: "#3B82F6",
-  blueLight: "#DBEAFE",
-  yellow: "#F59E0B",
-  yellowLight: "#FEF3C7",
-  red: "#EF4444",
-  redLight: "#FEE2E2",
-};
+const colors = themeColors;
 
-const css = `
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+// ============== SHARED COMPONENTS (src/components/ui/kit.jsx) ==============
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body, #root { width: 100%; height: 100%; font-family: 'Cairo', sans-serif; direction: rtl; background: ${colors.bg}; }
-
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: ${colors.teal}33; border-radius: 10px; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-@keyframes navBar { from { transform: scaleX(0); opacity: 1; } 80% { transform: scaleX(1); opacity: 1; } to { transform: scaleX(1); opacity: 0; } }
-@keyframes pageIn { from { opacity: 0; } to { opacity: 1; } }
-
-.animate-in { animation: fadeIn 0.4s ease-out forwards; }
-.slide-in { animation: slideIn 0.3s ease-out forwards; }
-.page-in { animation: pageIn 0.18s ease-out forwards; }
-
-.geo-bg {
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231A6B7C' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-}
-`;
-
-// ============== SHARED COMPONENTS ==============
-const Badge = ({ text, color = "gray", small }) => {
-  const map = {
-    green: { bg: colors.greenLight, text: colors.green },
-    orange: { bg: colors.orangeLight, text: colors.orange },
-    blue: { bg: colors.blueLight, text: colors.blue },
-    yellow: { bg: colors.yellowLight, text: colors.yellow },
-    red: { bg: colors.redLight, text: colors.red },
-    gray: { bg: colors.grayLight, text: colors.gray },
-    teal: { bg: "#E0F2F5", text: colors.teal },
-  };
-  const c = map[color] || map.gray;
-  return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: small ? "1px 8px" : "3px 12px", borderRadius: 20, fontSize: small ? 10 : 11, fontWeight: 600, background: c.bg, color: c.text, whiteSpace: "nowrap" }}>
-      {text}
-    </span>
-  );
-};
-
-const ProgressBar = ({ percent, height = 8 }) => (
-  <div style={{ width: "100%", height, background: colors.grayLight, borderRadius: height, overflow: "hidden" }}>
-    <div style={{ width: `${percent}%`, height: "100%", background: `linear-gradient(90deg, ${colors.teal}, ${colors.orange})`, borderRadius: height, transition: "width 0.8s ease" }} />
-  </div>
-);
-
-const Btn = ({ children, variant = "primary", onClick, disabled, small, full, icon }) => {
-  const styles = {
-    primary: { bg: colors.orange, color: "white", border: "none", hover: "#D4612E" },
-    secondary: { bg: "transparent", color: colors.teal, border: `2px solid ${colors.teal}`, hover: "#E0F2F5" },
-    ghost: { bg: "transparent", color: colors.teal, border: "none", hover: "#E0F2F5" },
-    success: { bg: colors.green, color: "white", border: "none" },
-    danger: { bg: colors.red, color: "white", border: "none" },
-  };
-  const s = styles[variant];
-  return (
-    <button onClick={onClick} disabled={disabled} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: small ? "6px 14px" : "10px 24px", borderRadius: 10, fontSize: small ? 12 : 14, fontWeight: 600, fontFamily: "'Cairo', sans-serif", background: disabled ? colors.grayLight : s.bg, color: disabled ? colors.gray : s.color, border: s.border || "none", cursor: disabled ? "not-allowed" : "pointer", width: full ? "100%" : "auto", transition: "all 0.2s", opacity: disabled ? 0.6 : 1 }}>
-      {icon && <span style={{ display: "flex" }}>{icon}</span>}
-      {children}
-    </button>
-  );
-};
-
-const Card = ({ children, accent, onClick, style, hover }) => (
-  <div onClick={onClick} style={{ background: "white", borderRadius: 14, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.06)", borderBottom: accent ? `3px solid ${colors.orange}` : "none", cursor: onClick ? "pointer" : "default", transition: "all 0.2s", ...style }}>
-    {children}
-  </div>
-);
-
-const Input = ({ label, placeholder, type = "text", value, onChange, textarea, icon }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-    {label && <label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark }}>{label}</label>}
-    {textarea ? (
-      <textarea placeholder={placeholder} value={value} onChange={onChange} rows={4} style={{ padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif", resize: "vertical", outline: "none", transition: "border 0.2s" }} onFocus={e => e.target.style.borderColor = colors.teal} onBlur={e => e.target.style.borderColor = colors.grayBorder} />
-    ) : (
-      <div style={{ position: "relative" }}>
-        <input type={type} placeholder={placeholder} value={value} onChange={onChange} style={{ width: "100%", padding: "10px 14px", paddingLeft: icon ? 36 : 14, borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif", outline: "none", transition: "border 0.2s" }} onFocus={e => e.target.style.borderColor = colors.teal} onBlur={e => e.target.style.borderColor = colors.grayBorder} />
-        {icon && <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", opacity: 0.4 }}>{icon}</span>}
-      </div>
-    )}
-  </div>
-);
-
-const MetricCard = ({ title, value, icon, color = colors.teal, sub }) => (
-  <Card style={{ display: "flex", alignItems: "center", gap: 14 }}>
-    <div style={{ width: 48, height: 48, borderRadius: 12, background: `${color}15`, display: "flex", alignItems: "center", justifyContent: "center", color, flexShrink: 0 }}>{icon}</div>
-    <div>
-      <div style={{ fontSize: 24, fontWeight: 800, color: colors.tealDark }}>{value}</div>
-      <div style={{ fontSize: 12, color: colors.gray }}>{title}</div>
-      {sub && <div style={{ fontSize: 11, color: colors.green, marginTop: 2 }}>{sub}</div>}
-    </div>
-  </Card>
-);
-
-const Tab = ({ tabs, active, onChange }) => (
-  <div style={{ display: "flex", gap: 2, background: colors.grayLight, borderRadius: 12, padding: 3, overflowX: "auto" }}>
-    {tabs.map((t, i) => (
-      <button key={i} onClick={() => onChange(i)} style={{ padding: "8px 18px", borderRadius: 10, fontSize: 13, fontWeight: active === i ? 700 : 500, fontFamily: "'Cairo', sans-serif", background: active === i ? "white" : "transparent", color: active === i ? colors.teal : colors.gray, border: "none", cursor: "pointer", transition: "all 0.2s", boxShadow: active === i ? "0 1px 3px rgba(0,0,0,0.08)" : "none", whiteSpace: "nowrap" }}>
-        {t}
-      </button>
-    ))}
-  </div>
-);
-
-const STATUS_ICONS = {
-  not_submitted: <IcClock width={18} height={18} />,
-  submitted:     <IcUpload width={18} height={18} />,
-  reviewing:     <IcSearch width={18} height={18} />,
-  approved:      <IcCheckCircle width={18} height={18} />,
-  revision:      <IcArrowPath width={18} height={18} />,
-};
-const StatusBar = ({ status }) => {
-  const map = {
-    "not_submitted": { bg: colors.grayLight, color: colors.gray, text: "لم يُرسل بعد" },
-    "submitted":     { bg: colors.blueLight, color: colors.blue, text: "تم الإرسال للمراجعة — بانتظار المستشار" },
-    "reviewing":     { bg: colors.blueLight, color: colors.blue, text: "قيد المراجعة" },
-    "approved":      { bg: colors.greenLight, color: colors.green, text: "معتمد — يمكنك الانتقال للوحدة التالية" },
-    "revision":      { bg: colors.orangeLight, color: colors.orange, text: "يحتاج تعديل — راجع ملاحظات المستشار" },
-  };
-  const s = map[status] || map.not_submitted;
-  return (
-    <div style={{ padding: "12px 20px", borderRadius: 12, background: s.bg, display: "flex", alignItems: "center", gap: 10, fontSize: 14, fontWeight: 600, color: s.color }}>
-      {STATUS_ICONS[status] || STATUS_ICONS.not_submitted}
-      {s.text}
-    </div>
-  );
-};
-
-// ============== MODAL COMPONENT ==============
-const Modal = ({ open, onClose, title, children, wide }) => {
-  if (!open) return null;
-  return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, animation: "fadeIn 0.2s ease" }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "white", borderRadius: 16, width: wide ? 700 : 500, maxHeight: "85vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 24px", borderBottom: `1px solid ${colors.grayBorder}` }}>
-          <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark }}>{title}</h3>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: colors.gray, display: "flex" }}><IcXMark width={20} height={20} /></button>
-        </div>
-        <div style={{ padding: 24 }}>{children}</div>
-      </div>
-    </div>
-  );
-};
-
-// ============== CHART COMPONENTS ==============
-const BarChart = ({ data, height = 200, colorFn }) => (
-  <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height, padding: "10px 0" }}>
-    {data.map((d, i) => (
-      <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-        <span style={{ fontSize: 9, color: colors.gray, fontWeight: 600 }}>{d.value}</span>
-        <div style={{ width: "100%", height: `${(d.value / Math.max(...data.map(x => x.value))) * 100}%`, background: colorFn ? colorFn(i) : `linear-gradient(180deg, ${colors.teal}, ${colors.teal}90)`, borderRadius: "6px 6px 0 0", minHeight: 4, transition: "height 0.6s ease" }} />
-        <span style={{ fontSize: 8, color: colors.gray, whiteSpace: "nowrap" }}>{d.label}</span>
-      </div>
-    ))}
-  </div>
-);
-
-const DonutChart = ({ segments, size = 120, label }) => {
-  let cum = 0;
-  const gradient = segments.map(s => { const start = cum; cum += s.percent; return `${s.color} ${start}% ${cum}%`; }).join(", ");
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-      <div style={{ width: size, height: size, borderRadius: "50%", background: `conic-gradient(${gradient})`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        <div style={{ width: size * 0.55, height: size * 0.55, borderRadius: "50%", background: "white", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-          {label && <span style={{ fontSize: 14, fontWeight: 800, color: colors.tealDark }}>{label}</span>}
-        </div>
-      </div>
-      <div>{segments.map((s, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-          <div style={{ width: 12, height: 12, borderRadius: 3, background: s.color, flexShrink: 0 }} />
-          <span style={{ fontSize: 12, color: colors.gray }}>{s.label} ({s.percent}%)</span>
-        </div>
-      ))}</div>
-    </div>
-  );
-};
-
-const LineChart = ({ data, height = 180 }) => {
-  const max = data && data.length > 0 ? Math.max(...data.map(d => d.value)) : 0;
-  if (!data || data.length < 2 || max === 0) {
-    return (
-      <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ fontSize: 12, color: colors.gray }}>لا توجد بيانات بعد</span>
-      </div>
-    );
-  }
-  const points = data.map((d, i) => `${(i / (data.length - 1)) * 100},${100 - (d.value / max) * 85}`).join(" ");
-  return (
-    <div style={{ height, position: "relative" }}>
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: "100%", height: "100%" }}>
-        <defs><linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={colors.teal} stopOpacity="0.3"/><stop offset="100%" stopColor={colors.teal} stopOpacity="0.02"/></linearGradient></defs>
-        <polygon points={`0,100 ${points} 100,100`} fill="url(#lineGrad)" />
-        <polyline points={points} fill="none" stroke={colors.teal} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        {data.map((d, i) => <circle key={i} cx={(i / (data.length - 1)) * 100} cy={100 - (d.value / max) * 85} r="1.5" fill={colors.orange} />)}
-      </svg>
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
-        {data.map((d, i) => <span key={i} style={{ fontSize: 8, color: colors.gray }}>{d.label}</span>)}
-      </div>
-    </div>
-  );
-};
-
-// ============== GENERIC PAGE (module-level so sub-components can use it) ==============
-const GenericPage = ({ title, children }) => (
-  <div className="animate-in">
-    <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 20 }}>{title}</h2>
-    {children}
-  </div>
-);
-
-// ============== ADMIN NOTIFICATIONS PAGE (isolated component — no App re-render on typing) ==============
 const AdminNotificationsPage = () => {
   const [activeTab,     setActiveTab]     = useState(0);
   const [notifTarget,   setNotifTarget]   = useState('all');
@@ -416,7 +205,7 @@ const AdminNotificationsPage = () => {
     { value: 'consultants', label: 'المستشارين فقط' },
     { value: 'user',        label: 'مستخدم محدد' },
   ];
-  const TARGET_COLORS = { all: 'blue', clients: 'teal', consultants: 'orange', user: 'gray' };
+  const TARGET_COLORS = { all: 'blue', clients: 'primary', consultants: 'orange', user: 'gray' };
 
   return (
     <GenericPage title="إدارة الإشعارات">
@@ -428,11 +217,11 @@ const AdminNotificationsPage = () => {
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             {/* الجمهور */}
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, marginBottom: 10 }}>إرسال إلى:</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: colors.ink, marginBottom: 10 }}>إرسال إلى:</div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {TARGET_OPTIONS.map(opt => (
-                  <label key={opt.value} style={{ display: "flex", alignItems: "center", gap: 7, padding: "8px 14px", borderRadius: 10, border: `1.5px solid ${notifTarget === opt.value ? colors.teal : colors.grayBorder}`, background: notifTarget === opt.value ? colors.teal + "10" : colors.white, cursor: "pointer", fontSize: 13, fontWeight: notifTarget === opt.value ? 700 : 400, color: notifTarget === opt.value ? colors.teal : colors.gray, transition: "all .15s" }}>
-                    <input type="radio" name="notifTo" value={opt.value} checked={notifTarget === opt.value} onChange={() => { setNotifTarget(opt.value); setResult(null); setNotifUserId(''); }} style={{ accentColor: colors.teal }} />
+                  <label key={opt.value} style={{ display: "flex", alignItems: "center", gap: 7, padding: "8px 14px", borderRadius: 10, border: `1.5px solid ${notifTarget === opt.value ? colors.primary : colors.grayBorder}`, background: notifTarget === opt.value ? colors.primary + "10" : colors.white, cursor: "pointer", fontSize: 13, fontWeight: notifTarget === opt.value ? 700 : 400, color: notifTarget === opt.value ? colors.primary : colors.gray, transition: "all .15s" }}>
+                    <input type="radio" name="notifTo" value={opt.value} checked={notifTarget === opt.value} onChange={() => { setNotifTarget(opt.value); setResult(null); setNotifUserId(''); }} style={{ accentColor: colors.primary }} />
                     {opt.label}
                   </label>
                 ))}
@@ -444,7 +233,7 @@ const AdminNotificationsPage = () => {
               const selectedUser = users.find(u => String(u.id) === String(notifUserId));
               return (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <label style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark }}>اختر المستخدم</label>
+                <label style={{ fontSize: 13, fontWeight: 700, color: colors.ink }}>اختر المستخدم</label>
                 {usersLoading ? (
                   <div style={{ fontSize: 12, color: colors.gray, padding: "8px 0" }}>جارٍ تحميل المستخدمين...</div>
                 ) : usersLoaded && users.length === 0 ? (
@@ -454,7 +243,7 @@ const AdminNotificationsPage = () => {
                     <select
                       value={notifUserId}
                       onChange={e => setNotifUserId(e.target.value)}
-                      style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${notifUserId ? colors.teal : colors.grayBorder}`, fontSize: 13, fontFamily: "'Cairo',sans-serif", color: notifUserId ? colors.tealDark : colors.gray, outline: "none", background: colors.white }}
+                      style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${notifUserId ? colors.primary : colors.grayBorder}`, fontSize: 13, fontFamily: "inherit", color: notifUserId ? colors.ink : colors.gray, outline: "none", background: colors.white }}
                     >
                       <option value="">— اختر مستخدماً —</option>
                       <optgroup label="المستشارون">
@@ -475,14 +264,14 @@ const AdminNotificationsPage = () => {
 
                     {/* بطاقة معلومات المستخدم المختار */}
                     {selectedUser && (
-                      <div style={{ padding: "14px 16px", borderRadius: 10, border: `1.5px solid ${selectedUser.role === 'consultant' ? colors.orange : colors.teal}`, background: selectedUser.role === 'consultant' ? `${colors.orange}08` : `${colors.teal}08`, display: "flex", gap: 14, alignItems: "flex-start" }}>
-                        <div style={{ width: 44, height: 44, borderRadius: "50%", background: selectedUser.role === 'consultant' ? colors.orange : colors.teal, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: 18, flexShrink: 0 }}>
+                      <div style={{ padding: "14px 16px", borderRadius: 10, border: `1.5px solid ${selectedUser.role === 'consultant' ? colors.amberLine : colors.primary}`, background: selectedUser.role === 'consultant' ? `${colors.amber}08` : `${colors.primary}08`, display: "flex", gap: 14, alignItems: "flex-start" }}>
+                        <div style={{ width: 44, height: 44, borderRadius: "50%", background: selectedUser.role === 'consultant' ? colors.amber : colors.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "#0E2A3D", fontWeight: 700, fontSize: 18, flexShrink: 0 }}>
                           {selectedUser.display_name?.[0] || "?"}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                            <span style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark }}>{selectedUser.display_name}</span>
-                            <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, fontWeight: 700, background: selectedUser.role === 'consultant' ? `${colors.orange}20` : `${colors.teal}20`, color: selectedUser.role === 'consultant' ? colors.orange : colors.teal }}>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: colors.ink }}>{selectedUser.display_name}</span>
+                            <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, fontWeight: 700, background: selectedUser.role === 'consultant' ? `${colors.amber}20` : `${colors.primary}20`, color: selectedUser.role === 'consultant' ? colors.amberText : colors.primary }}>
                               {selectedUser.role === 'consultant' ? 'مستشار' : 'عميل'}
                             </span>
                             {!selectedUser.is_active && <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, fontWeight: 700, background: `${colors.red}20`, color: colors.red }}>غير نشط</span>}
@@ -505,24 +294,24 @@ const AdminNotificationsPage = () => {
 
             {/* العنوان */}
             <div>
-              <label style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, display: "block", marginBottom: 6 }}>عنوان الإشعار <span style={{ color: colors.red }}>*</span></label>
+              <label style={{ fontSize: 13, fontWeight: 700, color: colors.ink, display: "block", marginBottom: 6 }}>عنوان الإشعار <span style={{ color: colors.red }}>*</span></label>
               <input
                 value={notifTitle}
                 onChange={e => { setNotifTitle(e.target.value); setResult(null); }}
                 placeholder="عنوان واضح ومختصر..."
-                style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "'Cairo',sans-serif", outline: "none", boxSizing: "border-box" }}
+                style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }}
               />
             </div>
 
             {/* النص */}
             <div>
-              <label style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, display: "block", marginBottom: 6 }}>نص الإشعار <span style={{ fontSize: 11, color: colors.gray, fontWeight: 400 }}>(اختياري)</span></label>
+              <label style={{ fontSize: 13, fontWeight: 700, color: colors.ink, display: "block", marginBottom: 6 }}>نص الإشعار <span style={{ fontSize: 11, color: colors.gray, fontWeight: 400 }}>(اختياري)</span></label>
               <textarea
                 value={notifBody}
                 onChange={e => setNotifBody(e.target.value)}
                 placeholder="محتوى الإشعار..."
                 rows={4}
-                style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "'Cairo',sans-serif", resize: "vertical", outline: "none", boxSizing: "border-box" }}
+                style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "inherit", resize: "vertical", outline: "none", boxSizing: "border-box" }}
               />
             </div>
 
@@ -542,7 +331,7 @@ const AdminNotificationsPage = () => {
 
             {/* ملاحظة */}
             <div style={{ padding: "10px 14px", borderRadius: 8, background: colors.grayLight, fontSize: 12, color: colors.gray, lineHeight: 1.8 }}>
-              <strong style={{ color: colors.tealDark }}>ملاحظة:</strong> سيصل الإشعار فوراً إلى المستخدمين المحددين ويظهر في قائمة إشعاراتهم.
+              <strong style={{ color: colors.ink }}>ملاحظة:</strong> سيصل الإشعار فوراً إلى المستخدمين المحددين ويظهر في قائمة إشعاراتهم.
             </div>
           </div>
         )}
@@ -568,15 +357,15 @@ const AdminNotificationsPage = () => {
                 </thead>
                 <tbody>
                   {log.map((row, i) => (
-                    <tr key={row.id} style={{ borderBottom: `1px solid ${colors.grayLight}`, background: i % 2 === 0 ? colors.white : "#fafbfc" }}>
-                      <td style={{ padding: "11px 12px", fontSize: 13, fontWeight: 600, color: colors.tealDark, maxWidth: 260 }}>
+                    <tr key={row.id} style={{ borderBottom: `1px solid ${colors.grayLight}`, background: i % 2 === 0 ? colors.white : "#FBF9F5" }}>
+                      <td style={{ padding: "11px 12px", fontSize: 13, fontWeight: 600, color: colors.ink, maxWidth: 260 }}>
                         <div>{row.title}</div>
                         {row.body && <div style={{ fontSize: 11, color: colors.gray, fontWeight: 400, marginTop: 2 }}>{row.body.length > 60 ? row.body.slice(0, 60) + '…' : row.body}</div>}
                       </td>
                       <td style={{ padding: "11px 12px" }}>
                         <Badge text={row.target_user ?? row.target_label} color={TARGET_COLORS[row.target_type] || 'gray'} small />
                       </td>
-                      <td style={{ padding: "11px 12px", fontSize: 12, color: colors.tealDark }}>{row.sent_by}</td>
+                      <td style={{ padding: "11px 12px", fontSize: 12, color: colors.ink }}>{row.sent_by}</td>
                       <td style={{ padding: "11px 12px", textAlign: "center" }}>
                         <span style={{ padding: "2px 10px", borderRadius: 12, background: colors.blueLight, color: colors.blue, fontWeight: 700, fontSize: 12 }}>{row.recipient_count}</span>
                       </td>
@@ -598,11 +387,11 @@ const AdminNotificationsPage = () => {
 
 // ============== ADMIN ACTIVITY LOG PAGE (isolated — no App re-render) ==============
 const ACTION_LABELS = {
-  'تسجيل دخول':                 { color: 'teal',   label: 'تسجيل دخول' },
+  'تسجيل دخول':                 { color: 'primary',   label: 'تسجيل دخول' },
   'تسجيل خروج':                 { color: 'gray',   label: 'تسجيل خروج' },
   'تسجيل حساب جديد':            { color: 'blue',   label: 'تسجيل جديد' },
-  'بدء التخطيط الاستراتيجي':   { color: 'teal',   label: 'بدء استراتيجي' },
-  'بدء التخطيط التشغيلي':       { color: 'teal',   label: 'بدء تشغيلي' },
+  'بدء التخطيط الاستراتيجي':   { color: 'primary',   label: 'بدء استراتيجي' },
+  'بدء التخطيط التشغيلي':       { color: 'primary',   label: 'بدء تشغيلي' },
   'اختيار مستشار — استراتيجي': { color: 'blue',   label: 'اختيار مستشار' },
   'دفع — استراتيجي':            { color: 'green',  label: 'دفع ناجح' },
   'دفع — تشغيلي':               { color: 'green',  label: 'دفع ناجح' },
@@ -618,7 +407,7 @@ const ACTION_LABELS = {
   'طلب تعديل — سياسة':         { color: 'orange', label: 'طلب تعديل' },
   'إرسال إشعار جماعي':          { color: 'blue',   label: 'إشعار جماعي' },
 };
-const ROLE_COLORS = { admin: 'red', consultant: 'teal', client: 'gray', system: 'blue' };
+const ROLE_COLORS = { admin: 'red', consultant: 'primary', client: 'gray', system: 'blue' };
 const CATEGORY_OPTIONS = [
   { value: '', label: 'جميع الفئات' },
   { value: 'auth',     label: 'المصادقة' },
@@ -689,17 +478,17 @@ const AdminActivityLogPage = () => {
           value={search}
           onChange={e => handleSearch(e.target.value)}
           placeholder="بحث بالاسم أو التفاصيل..."
-          style={{ flex: 1, minWidth: 180, padding: "9px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "'Cairo',sans-serif", outline: "none" }}
+          style={{ flex: 1, minWidth: 180, padding: "9px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: "none" }}
         />
         <select value={catFilter} onChange={e => handleFilter(e.target.value, roleFilter)}
-          style={{ padding: "9px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 12, fontFamily: "'Cairo',sans-serif" }}>
+          style={{ padding: "9px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 12, fontFamily: "inherit" }}>
           {CATEGORY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
         <select value={roleFilter} onChange={e => handleFilter(catFilter, e.target.value)}
-          style={{ padding: "9px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 12, fontFamily: "'Cairo',sans-serif" }}>
+          style={{ padding: "9px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 12, fontFamily: "inherit" }}>
           {ROLE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
-        <button onClick={exportCSV} style={{ padding: "9px 16px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, background: colors.white, fontSize: 12, fontFamily: "'Cairo',sans-serif", cursor: "pointer", fontWeight: 600, color: colors.tealDark }}>
+        <button onClick={exportCSV} style={{ padding: "9px 16px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, background: colors.white, fontSize: 12, fontFamily: "inherit", cursor: "pointer", fontWeight: 600, color: colors.ink }}>
           تصدير CSV
         </button>
       </div>
@@ -730,22 +519,22 @@ const AdminActivityLogPage = () => {
                   {logs.map((row, i) => {
                     const meta = actionMeta(row.action);
                     const badgeColors = {
-                      green: { bg: '#dcfce7', color: '#15803d' },
-                      teal:  { bg: '#ccfbf1', color: '#0f766e' },
-                      blue:  { bg: '#dbeafe', color: '#1d4ed8' },
-                      orange:{ bg: '#ffedd5', color: '#c2410c' },
-                      red:   { bg: '#fee2e2', color: '#dc2626' },
-                      gray:  { bg: '#f3f4f6', color: '#6b7280' },
+                      green: { bg: '#C9EFE1', color: '#086449' },
+                      primary:  { bg: '#C9EFE1', color: '#0B7F5D' },
+                      blue:  { bg: '#CFE5FA', color: '#1A65AD' },
+                      orange:{ bg: '#FDE2D2', color: '#A33F12' },
+                      red:   { bg: '#F8D3D3', color: '#C53A3A' },
+                      gray:  { bg: '#F3EFE8', color: '#5E6B78' },
                     };
                     const actionStyle = badgeColors[meta.color] || badgeColors.gray;
                     const roleStyle   = badgeColors[ROLE_COLORS[row.role] || 'gray'] || badgeColors.gray;
                     return (
-                      <tr key={row.id} style={{ borderBottom: `1px solid ${colors.grayLight}`, background: i % 2 === 0 ? colors.white : "#fafbfc" }}>
+                      <tr key={row.id} style={{ borderBottom: `1px solid ${colors.grayLight}`, background: i % 2 === 0 ? colors.white : "#FBF9F5" }}>
                         <td style={{ padding: "10px 10px", whiteSpace: "nowrap" }}>
-                          <div style={{ fontSize: 12, color: colors.tealDark, fontWeight: 500 }}>{row.created_at}</div>
+                          <div style={{ fontSize: 12, color: colors.ink, fontWeight: 500 }}>{row.created_at}</div>
                           <div style={{ fontSize: 10, color: colors.gray, marginTop: 2 }}>{row.time}</div>
                         </td>
-                        <td style={{ padding: "10px 10px", fontSize: 13, fontWeight: 600, color: colors.tealDark, whiteSpace: "nowrap" }}>{row.user_name}</td>
+                        <td style={{ padding: "10px 10px", fontSize: 13, fontWeight: 600, color: colors.ink, whiteSpace: "nowrap" }}>{row.user_name}</td>
                         <td style={{ padding: "10px 10px" }}>
                           <span style={{ padding: "3px 9px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: roleStyle.bg, color: roleStyle.color }}>
                             {row.role === 'admin' ? 'مدير' : row.role === 'consultant' ? 'مستشار' : row.role === 'client' ? 'عميل' : 'نظام'}
@@ -810,14 +599,14 @@ const ClientHelpPage = () => {
       ) : (
         Object.entries(filtered).map(([cat, items]) => (
           <Card key={cat} style={{ marginBottom: 10 }}>
-            <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 6 }}>{cat}</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>{cat}</h3>
             {items.map((faq, qi) => (
               <div key={faq.id} style={{ borderTop: qi > 0 ? `1px solid ${colors.grayLight}` : 'none' }}>
                 <div
                   onClick={() => toggle(faq.id)}
                   style={{ padding: '12px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', gap: 8 }}
                 >
-                  <span style={{ fontSize: 13, color: colors.tealDark, fontWeight: 600 }}>{faq.question}</span>
+                  <span style={{ fontSize: 13, color: colors.ink, fontWeight: 600 }}>{faq.question}</span>
                   <span style={{ color: colors.gray, flexShrink: 0, transition: 'transform 0.2s', display: 'inline-block', transform: expanded[faq.id] ? 'rotate(-90deg)' : 'rotate(90deg)' }}>›</span>
                 </div>
                 {expanded[faq.id] && (
@@ -831,7 +620,7 @@ const ClientHelpPage = () => {
         ))
       )}
       <Card style={{ marginTop: 16, textAlign: 'center', padding: 24 }}>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 8 }}>لم تجد إجابتك؟</h3>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>لم تجد إجابتك؟</h3>
         <p style={{ fontSize: 13, color: colors.gray, marginBottom: 12 }}>تواصل مع فريق الدعم عبر المحادثة المباشرة</p>
         <Btn small>تواصل معنا</Btn>
       </Card>
@@ -923,22 +712,22 @@ const AdminFaqsPage = () => {
                   <tr><td colSpan={5} style={{ textAlign: 'center', padding: 40, color: colors.gray }}>لا توجد أسئلة</td></tr>
                 ) : filtered.map(faq => (
                   <tr key={faq.id} style={{ borderBottom: `1px solid ${colors.grayLight}` }}>
-                    <td style={{ padding: '12px', color: colors.tealDark, fontWeight: 600, whiteSpace: 'nowrap' }}>{faq.category}</td>
+                    <td style={{ padding: '12px', color: colors.ink, fontWeight: 600, whiteSpace: 'nowrap' }}>{faq.category}</td>
                     <td style={{ padding: '12px', color: colors.dark, maxWidth: 260 }}>
                       <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{faq.question}</div>
                     </td>
                     <td style={{ padding: '12px', textAlign: 'center', color: colors.gray }}>{faq.sort_order}</td>
                     <td style={{ padding: '12px', textAlign: 'center' }}>
                       <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, fontWeight: 600,
-                        background: faq.is_active ? '#e8f5e9' : '#fef3f2',
-                        color: faq.is_active ? '#2e7d32' : colors.red }}>
+                        background: faq.is_active ? '#E8F8F2' : '#FCEBEB',
+                        color: faq.is_active ? '#0B7F5D' : colors.red }}>
                         {faq.is_active ? 'مفعّل' : 'معطّل'}
                       </span>
                     </td>
                     <td style={{ padding: '12px', textAlign: 'center' }}>
                       <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
                         <button onClick={() => openEdit(faq)}
-                          style={{ padding: '5px 10px', borderRadius: 8, border: `1px solid ${colors.teal}`, background: 'transparent', color: colors.teal, cursor: 'pointer', fontSize: 12 }}>تعديل</button>
+                          style={{ padding: '5px 10px', borderRadius: 8, border: `1px solid ${colors.primary}`, background: 'transparent', color: colors.primary, cursor: 'pointer', fontSize: 12 }}>تعديل</button>
                         <button onClick={() => toggleFaq(faq)}
                           style={{ padding: '5px 10px', borderRadius: 8, border: `1px solid ${colors.gray}`, background: 'transparent', color: colors.gray, cursor: 'pointer', fontSize: 12 }}>
                           {faq.is_active ? 'إيقاف' : 'تفعيل'}</button>
@@ -958,28 +747,28 @@ const AdminFaqsPage = () => {
         <Modal open title={modal.type === 'add' ? 'إضافة سؤال جديد' : 'تعديل السؤال'} onClose={() => setModal(null)}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div>
-              <label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, display: 'block', marginBottom: 6 }}>الفئة</label>
+              <label style={{ fontSize: 13, fontWeight: 600, color: colors.ink, display: 'block', marginBottom: 6 }}>الفئة</label>
               <input list="admin-faq-cats" value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
                 placeholder="مثال: أسئلة عامة"
-                style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif", boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit", boxSizing: 'border-box' }} />
               <datalist id="admin-faq-cats">{cats.map(c => <option key={c} value={c} />)}</datalist>
             </div>
             <div>
-              <label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, display: 'block', marginBottom: 6 }}>السؤال</label>
+              <label style={{ fontSize: 13, fontWeight: 600, color: colors.ink, display: 'block', marginBottom: 6 }}>السؤال</label>
               <input value={form.question} onChange={e => setForm(p => ({ ...p, question: e.target.value }))}
                 placeholder="اكتب السؤال هنا..."
-                style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif", boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit", boxSizing: 'border-box' }} />
             </div>
             <div>
-              <label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, display: 'block', marginBottom: 6 }}>الإجابة</label>
+              <label style={{ fontSize: 13, fontWeight: 600, color: colors.ink, display: 'block', marginBottom: 6 }}>الإجابة</label>
               <textarea value={form.answer} onChange={e => setForm(p => ({ ...p, answer: e.target.value }))}
                 placeholder="اكتب الإجابة هنا..." rows={4}
-                style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif", resize: 'vertical', boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit", resize: 'vertical', boxSizing: 'border-box' }} />
             </div>
             <div>
-              <label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, display: 'block', marginBottom: 6 }}>رقم الترتيب</label>
+              <label style={{ fontSize: 13, fontWeight: 600, color: colors.ink, display: 'block', marginBottom: 6 }}>رقم الترتيب</label>
               <input type="number" min="0" value={form.sort_order} onChange={e => setForm(p => ({ ...p, sort_order: parseInt(e.target.value) || 0 }))}
-                style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif", boxSizing: 'border-box' }} />
+                style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit", boxSizing: 'border-box' }} />
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <Btn outline small onClick={() => setModal(null)}>إلغاء</Btn>
@@ -1028,10 +817,10 @@ const ClientPaymentsPage = () => {
 
   return (
     <GenericPage title="المدفوعات والفواتير">
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-3)', gap: 14, marginBottom: 20 }}>
         <MetricCard title="إجمالي المدفوعات (ريال)" value={fmt(data.total_paid)} icon={Icons.payments} />
         <MetricCard title="مدفوعات معلقة" value={data.orders?.filter(o => o.payment_status === 'pending').length || 0} icon={Icons.payments} color={colors.green} />
-        <MetricCard title="آخر دفعة (ريال)" value={fmt(data.last_payment)} icon={Icons.payments} color={colors.orange} />
+        <MetricCard title="آخر دفعة (ريال)" value={fmt(data.last_payment)} icon={Icons.payments} color={colors.amberText} />
       </div>
       <Card>
         {!data.orders || data.orders.length === 0 ? (
@@ -1046,7 +835,7 @@ const ClientPaymentsPage = () => {
             <tbody>
               {data.orders.map(o => (
                 <tr key={o.id} style={{ borderBottom: `1px solid ${colors.grayLight}` }}>
-                  <td style={{ padding: '10px 8px', fontSize: 12, fontWeight: 600, color: colors.tealDark }}>{o.order_number}</td>
+                  <td style={{ padding: '10px 8px', fontSize: 12, fontWeight: 600, color: colors.ink }}>{o.order_number}</td>
                   <td style={{ padding: '10px 8px', fontSize: 12 }}>{o.date}</td>
                   <td style={{ padding: '10px 8px', fontSize: 12 }}>{serviceMap[o.service_type] || o.service_type}</td>
                   <td style={{ padding: '10px 8px', fontSize: 12, fontWeight: 700 }}>{fmt(o.total)}</td>
@@ -1058,8 +847,8 @@ const ClientPaymentsPage = () => {
                         disabled={downloading === o.id}
                         style={{
                           padding: '5px 12px', borderRadius: 8, fontSize: 11, fontWeight: 600,
-                          fontFamily: "'Cairo', sans-serif", cursor: downloading === o.id ? 'default' : 'pointer',
-                          border: `1.5px solid ${colors.teal}`, background: 'white', color: colors.teal,
+                          fontFamily: "inherit", cursor: downloading === o.id ? 'default' : 'pointer',
+                          border: `1.5px solid ${colors.primary}`, background: 'white', color: colors.primary,
                           display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap',
                           opacity: downloading === o.id ? 0.6 : 1,
                         }}
@@ -1091,7 +880,7 @@ const ConsultantEarningsPage = () => {
   }, []);
 
   const fmt = (n) => Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const serviceColors = { strategic: colors.teal, operational: colors.orange, policies: colors.blue };
+  const serviceColors = { strategic: colors.primary, operational: colors.amberText, policies: colors.blue };
 
   if (loading) return <div style={{ padding: 60, textAlign: 'center', color: colors.gray }}>جارٍ التحميل…</div>;
   if (!data) return <div style={{ padding: 60, textAlign: 'center', color: colors.gray, fontSize: 13 }}>تعذّر تحميل الأرباح</div>;
@@ -1103,21 +892,21 @@ const ConsultantEarningsPage = () => {
   return (
     <GenericPage title="الأرباح">
       {/* Summary cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-4)', gap: 14, marginBottom: 20 }}>
         <MetricCard title="إجمالي أرباحي (ريال)" value={fmt(data.total_earnings)} icon={Icons.payments} color={colors.green} />
         <MetricCard title="عدد الطلبات" value={data.orders_count} icon={Icons.content} />
-        <MetricCard title="نسبتي من كل طلب" value={`${data.commission_rate}%`} icon={Icons.chart} color={colors.teal} />
-        <MetricCard title="حصة المنصة" value={`${data.platform_rate}%`} icon={Icons.settings} color={colors.orange} />
+        <MetricCard title="نسبتي من كل طلب" value={`${data.commission_rate}%`} icon={Icons.chart} color={colors.primary} />
+        <MetricCard title="حصة المنصة" value={`${data.platform_rate}%`} icon={Icons.settings} color={colors.amberText} />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginBottom: 16 }}>
         {/* Monthly chart */}
         <Card>
-          <div style={{ fontWeight: 700, fontSize: 13, color: colors.tealDark, marginBottom: 14 }}>الأرباح الشهرية (ريال)</div>
+          <div style={{ fontWeight: 700, fontSize: 13, color: colors.ink, marginBottom: 14 }}>الأرباح الشهرية (ريال)</div>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, height: 120 }}>
             {months.map(([key, val]) => (
               <div key={key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                <div style={{ width: '100%', background: colors.teal, borderRadius: '4px 4px 0 0', height: `${Math.max((val / maxVal) * 100, val > 0 ? 4 : 2)}px`, minHeight: 2, transition: 'height 0.3s' }} />
+                <div style={{ width: '100%', background: colors.primary, borderRadius: '4px 4px 0 0', height: `${Math.max((val / maxVal) * 100, val > 0 ? 4 : 2)}px`, minHeight: 2, transition: 'height 0.3s' }} />
                 <div style={{ fontSize: 9, color: colors.gray, transform: 'rotate(-40deg)', whiteSpace: 'nowrap' }}>{MONTH_LABELS[key.split('-')[1]]}</div>
               </div>
             ))}
@@ -1126,7 +915,7 @@ const ConsultantEarningsPage = () => {
 
         {/* Commission breakdown */}
         <Card>
-          <div style={{ fontWeight: 700, fontSize: 13, color: colors.tealDark, marginBottom: 14 }}>توزيع الأرباح</div>
+          <div style={{ fontWeight: 700, fontSize: 13, color: colors.ink, marginBottom: 14 }}>توزيع الأرباح</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
@@ -1140,15 +929,15 @@ const ConsultantEarningsPage = () => {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
                 <span style={{ color: colors.gray }}>حصة المنصة</span>
-                <span style={{ fontWeight: 700, color: colors.orange }}>{data.platform_rate}%</span>
+                <span style={{ fontWeight: 700, color: colors.amberText }}>{data.platform_rate}%</span>
               </div>
               <div style={{ height: 10, background: colors.grayLight, borderRadius: 6, overflow: 'hidden' }}>
-                <div style={{ width: `${data.platform_rate}%`, height: '100%', background: colors.orange, borderRadius: 6 }} />
+                <div style={{ width: `${data.platform_rate}%`, height: '100%', background: colors.amber, borderRadius: 6 }} />
               </div>
             </div>
             <div style={{ marginTop: 8, padding: '10px 14px', background: colors.grayLight, borderRadius: 10 }}>
               <div style={{ fontSize: 11, color: colors.gray, marginBottom: 2 }}>إجمالي أرباحك المستحقة</div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: colors.tealDark }}>{fmt(data.total_earnings)} <span style={{ fontSize: 12, fontWeight: 400 }}>ريال</span></div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: colors.ink }}>{fmt(data.total_earnings)} <span style={{ fontSize: 12, fontWeight: 400 }}>ريال</span></div>
             </div>
           </div>
         </Card>
@@ -1156,7 +945,7 @@ const ConsultantEarningsPage = () => {
 
       {/* Orders table */}
       <Card>
-        <div style={{ fontWeight: 700, fontSize: 13, color: colors.tealDark, marginBottom: 14 }}>تفاصيل الأرباح لكل طلب</div>
+        <div style={{ fontWeight: 700, fontSize: 13, color: colors.ink, marginBottom: 14 }}>تفاصيل الأرباح لكل طلب</div>
         {!data.orders || data.orders.length === 0 ? (
           <div style={{ padding: 40, textAlign: 'center', color: colors.gray, fontSize: 13 }}>لا توجد طلبات بعد</div>
         ) : (
@@ -1169,9 +958,9 @@ const ConsultantEarningsPage = () => {
             <tbody>
               {data.orders.map(o => (
                 <tr key={o.id} style={{ borderBottom: `1px solid ${colors.grayLight}` }}>
-                  <td style={{ padding: '10px', fontWeight: 600, color: colors.tealDark }}>{o.order_number}</td>
+                  <td style={{ padding: '10px', fontWeight: 600, color: colors.ink }}>{o.order_number}</td>
                   <td style={{ padding: '10px' }}>{o.org_name || '—'}</td>
-                  <td style={{ padding: '10px' }}><Badge text={o.service_label} color={o.service_type === 'strategic' ? 'teal' : o.service_type === 'operational' ? 'orange' : 'blue'} small /></td>
+                  <td style={{ padding: '10px' }}><Badge text={o.service_label} color={o.service_type === 'strategic' ? 'primary' : o.service_type === 'operational' ? 'orange' : 'blue'} small /></td>
                   <td style={{ padding: '10px' }}>{fmt(o.total)} ريال</td>
                   <td style={{ padding: '10px', fontWeight: 700, color: colors.green }}>{fmt(o.consultant_share)} ريال</td>
                   <td style={{ padding: '10px', color: colors.gray }}>{o.date}</td>
@@ -1179,8 +968,8 @@ const ConsultantEarningsPage = () => {
               ))}
             </tbody>
             <tfoot>
-              <tr style={{ background: '#f0fdf4' }}>
-                <td colSpan={4} style={{ padding: '10px', fontWeight: 700, color: colors.tealDark }}>الإجمالي</td>
+              <tr style={{ background: '#E8F8F2' }}>
+                <td colSpan={4} style={{ padding: '10px', fontWeight: 700, color: colors.ink }}>الإجمالي</td>
                 <td style={{ padding: '10px', fontWeight: 800, color: colors.green, fontSize: 14 }}>{fmt(data.total_earnings)} ريال</td>
                 <td />
               </tr>
@@ -1215,15 +1004,15 @@ const ConsultantStatsPage = () => {
 
   return (
     <GenericPage title="إحصائياتي">
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-4)', gap: 14, marginBottom: 20 }}>
         <MetricCard title="إجمالي العملاء" value={data.total_clients} icon={Icons.users} />
         <MetricCard title="المراجعات المكتملة" value={data.total_completed} icon={Icons.content} color={colors.green} />
         <MetricCard title="متوسط وقت المراجعة" value={avgDays === '—' ? '—' : `${avgDays} يوم`} icon={Icons.log} color={colors.blue} />
-        <MetricCard title="التقييم العام" value={data.rating != null ? `${data.rating}/5` : '—'} icon={Icons.star} color={colors.yellow} />
+        <MetricCard title="التقييم العام" value={data.rating != null ? `${data.rating}/5` : '—'} icon={Icons.star} color={colors.amberText} />
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginBottom: 16 }}>
         <Card>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>المراجعات الشهرية</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>المراجعات الشهرية</h3>
           {maxVal <= 1 ? (
             <div style={{ padding: 30, textAlign: 'center', color: colors.gray, fontSize: 12 }}>لا توجد بيانات بعد</div>
           ) : (
@@ -1242,17 +1031,17 @@ const ConsultantStatsPage = () => {
           )}
         </Card>
         <Card>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>توزيع المراجعات حسب الخدمة</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>توزيع المراجعات حسب الخدمة</h3>
           {[
-            { label: 'استراتيجي', val: data.by_service?.strategic || 0, color: colors.teal },
-            { label: 'تشغيلي',   val: data.by_service?.operational || 0, color: colors.orange },
+            { label: 'استراتيجي', val: data.by_service?.strategic || 0, color: colors.primary },
+            { label: 'تشغيلي',   val: data.by_service?.operational || 0, color: colors.amberText },
             { label: 'سياسات',   val: data.by_service?.policy || 0, color: colors.green },
           ].map((s, i) => {
             const pct = data.total_completed > 0 ? Math.round(s.val / data.total_completed * 100) : 0;
             return (
               <div key={i} style={{ marginBottom: 14 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 13, color: colors.tealDark }}>{s.label}</span>
+                  <span style={{ fontSize: 13, color: colors.ink }}>{s.label}</span>
                   <span style={{ fontSize: 12, fontWeight: 700, color: s.color }}>{s.val} ({pct}%)</span>
                 </div>
                 <div style={{ height: 8, borderRadius: 4, background: colors.grayLight }}>
@@ -1291,15 +1080,15 @@ const AdminFinancePage = () => {
 
   return (
     <GenericPage title="الإدارة المالية">
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-3)', gap: 14, marginBottom: 20 }}>
         <MetricCard title="إجمالي الإيرادات (ريال)" value={fmt(data.total_revenue)} icon={Icons.payments} />
         <MetricCard title="إيرادات هذا الشهر (ريال)" value={fmt(data.month_revenue)} icon={Icons.payments} color={colors.green} />
-        <MetricCard title="مدفوعات معلقة (ريال)" value={fmt(data.pending_revenue)} icon={Icons.payments} color={colors.yellow} />
+        <MetricCard title="مدفوعات معلقة (ريال)" value={fmt(data.pending_revenue)} icon={Icons.payments} color={colors.amberText} />
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         {['المدفوعات الواردة', 'أداء المستشارين', 'الرسم البياني'].map((t, i) => (
-          <button key={i} onClick={() => setTab(i)} style={{ padding: '8px 18px', borderRadius: 20, border: 'none', background: tab === i ? colors.teal : colors.grayLight, color: tab === i ? 'white' : colors.gray, fontSize: 13, fontWeight: tab === i ? 700 : 400, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>{t}</button>
+          <button key={i} onClick={() => setTab(i)} style={{ padding: '8px 18px', borderRadius: 20, border: 'none', background: tab === i ? colors.primary : colors.grayLight, color: tab === i ? 'white' : colors.gray, fontSize: 13, fontWeight: tab === i ? 700 : 400, cursor: 'pointer', fontFamily: "inherit" }}>{t}</button>
         ))}
       </div>
 
@@ -1317,9 +1106,9 @@ const AdminFinancePage = () => {
               <tbody>
                 {data.transactions?.map(t => (
                   <tr key={t.id} style={{ borderBottom: `1px solid ${colors.grayLight}` }}>
-                    <td style={{ padding: '8px 8px', fontSize: 11, fontWeight: 600, color: colors.tealDark }}>{t.order_number}</td>
+                    <td style={{ padding: '8px 8px', fontSize: 11, fontWeight: 600, color: colors.ink }}>{t.order_number}</td>
                     <td style={{ padding: '8px 8px', fontSize: 12 }}>{t.org_name}</td>
-                    <td style={{ padding: '8px 8px' }}><Badge text={t.service} color="teal" small /></td>
+                    <td style={{ padding: '8px 8px' }}><Badge text={t.service} color="primary" small /></td>
                     <td style={{ padding: '8px 8px', fontSize: 12, fontWeight: 700 }}>{fmt(t.total)}</td>
                     <td style={{ padding: '8px 8px', fontSize: 11, color: colors.gray }}>{t.date}</td>
                   </tr>
@@ -1336,11 +1125,11 @@ const AdminFinancePage = () => {
               {data.consultants?.map((c, i) => (
                 <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: i < data.consultants.length - 1 ? `1px solid ${colors.grayLight}` : 'none' }}>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: colors.tealDark }}>{c.name}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: colors.ink }}>{c.name}</div>
                     <div style={{ fontSize: 11, color: colors.gray }}>{c.reviews} مراجعة مكتملة</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 12, color: colors.yellow, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3 }}><IcStar width={13} height={13} /> {c.rating}</span>
+                    <span style={{ fontSize: 12, color: colors.amberText, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3 }}><IcStar width={13} height={13} /> {c.rating}</span>
                   </div>
                 </div>
               ))}
@@ -1349,7 +1138,7 @@ const AdminFinancePage = () => {
         )}
         {tab === 2 && (
           <div>
-            <h4 style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>الإيرادات الشهرية (آخر 12 شهر)</h4>
+            <h4 style={{ fontSize: 13, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>الإيرادات الشهرية (آخر 12 شهر)</h4>
             {maxRev <= 1 ? (
               <div style={{ padding: 30, textAlign: 'center', color: colors.gray, fontSize: 12 }}>لا توجد بيانات بعد</div>
             ) : (
@@ -1359,7 +1148,7 @@ const AdminFinancePage = () => {
                   const h = Math.max(4, Math.round((val / maxRev) * 140));
                   return (
                     <div key={key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                      <div title={`${MONTH_LABELS[mIdx]}: ${fmt(val)} ريال`} style={{ width: '100%', height: h, background: `linear-gradient(180deg, ${colors.teal}, ${colors.teal}80)`, borderRadius: '4px 4px 0 0' }} />
+                      <div title={`${MONTH_LABELS[mIdx]}: ${fmt(val)} ريال`} style={{ width: '100%', height: h, background: `linear-gradient(180deg, ${colors.primary}, ${colors.primary}80)`, borderRadius: '4px 4px 0 0' }} />
                       <span style={{ fontSize: 7, color: colors.gray }}>{MONTH_LABELS[mIdx].slice(0,3)}</span>
                     </div>
                   );
@@ -1400,27 +1189,27 @@ const AdminReportsPage = () => {
 
   return (
     <GenericPage title="التقارير والتحليلات">
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-4)', gap: 14, marginBottom: 20 }}>
         <MetricCard title="معدل الإكمال"         value={`${m.completion_rate ?? 0}%`}           icon={Icons.chart} />
         <MetricCard title="متوسط مدة الإنجاز"    value={m.avg_days ? `${m.avg_days} يوم` : '—'} icon={Icons.log}      color={colors.blue} />
-        <MetricCard title="متوسط تقييم المستشارين" value={`${m.avg_rating ?? 0}/5`}             icon={Icons.star}     color={colors.yellow} />
+        <MetricCard title="متوسط تقييم المستشارين" value={`${m.avg_rating ?? 0}/5`}             icon={Icons.star}     color={colors.amberText} />
         <MetricCard title="إجمالي الإيرادات (ريال)" value={fmt(m.total_revenue)}                icon={Icons.payments} color={colors.green} />
       </div>
 
       <Tab tabs={['نظرة عامة', 'تقدم المنظمات', 'أداء المستشارين', 'تحليل الخدمات']} active={tab} onChange={setTab} />
 
       {tab === 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginTop: 16 }}>
           <Card>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>التسجيلات الشهرية (منظمات)</h4>
+            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>التسجيلات الشهرية (منظمات)</h4>
             <LineChart data={data.monthly_orgs || []} />
           </Card>
           <Card>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>الإيرادات الشهرية (ألف ريال)</h4>
+            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>الإيرادات الشهرية (ألف ريال)</h4>
             <BarChart data={data.monthly_revenue || []} />
           </Card>
           <Card>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>توزيع الخدمات</h4>
+            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>توزيع الخدمات</h4>
             {data.service_dist_total > 0 ? (
               <DonutChart size={130} label={String(data.service_dist_total)} segments={donutSegs} />
             ) : (
@@ -1428,15 +1217,15 @@ const AdminReportsPage = () => {
             )}
           </Card>
           <Card>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>معدل الإكمال حسب الخدمة</h4>
-            <BarChart height={160} data={data.completion_by_service || []} colorFn={i => [colors.teal, colors.orange, '#F1C40F'][i] || colors.teal} />
+            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>معدل الإكمال حسب الخدمة</h4>
+            <BarChart height={160} data={data.completion_by_service || []} colorFn={i => [colors.primary, colors.amberText, '#A33F12'][i] || colors.primary} />
           </Card>
         </div>
       )}
 
       {tab === 1 && (
         <Card style={{ marginTop: 16 }}>
-          <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>تقدم المنظمات</h4>
+          <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>تقدم المنظمات</h4>
           {!data.org_progress?.length ? (
             <div style={{ padding: 40, textAlign: 'center', color: colors.gray, fontSize: 13 }}>لا توجد مسارات نشطة</div>
           ) : (
@@ -1450,13 +1239,13 @@ const AdminReportsPage = () => {
                 {data.org_progress.map((r, i) => (
                   <tr key={i} style={{ borderBottom: `1px solid ${colors.grayLight}` }}>
                     <td style={{ padding: '10px 8px', fontSize: 13, fontWeight: 600 }}>{r.org}</td>
-                    <td style={{ padding: '10px 8px' }}><Badge text={r.service} color={r.service === 'استراتيجي' ? 'teal' : r.service === 'تشغيلي' ? 'orange' : 'blue'} small /></td>
+                    <td style={{ padding: '10px 8px' }}><Badge text={r.service} color={r.service === 'استراتيجي' ? 'primary' : r.service === 'تشغيلي' ? 'orange' : 'blue'} small /></td>
                     <td style={{ padding: '10px 8px', fontSize: 12 }}>{r.step}</td>
                     <td style={{ padding: '10px 8px', width: 130 }}>
                       <ProgressBar percent={r.progress} />
                       <span style={{ fontSize: 10, color: colors.gray }}>{r.progress}%</span>
                     </td>
-                    <td style={{ padding: '10px 8px', fontSize: 12, color: r.days > 30 ? colors.orange : colors.gray }}>{r.days} يوم</td>
+                    <td style={{ padding: '10px 8px', fontSize: 12, color: r.days > 30 ? colors.amberText : colors.gray }}>{r.days} يوم</td>
                   </tr>
                 ))}
               </tbody>
@@ -1468,20 +1257,20 @@ const AdminReportsPage = () => {
       {tab === 2 && (
         <div style={{ marginTop: 16 }}>
           <Card style={{ marginBottom: 16 }}>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>نسبة الاعتماد</h4>
+            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>نسبة الاعتماد</h4>
             {data.approval_stats && (
               <DonutChart size={120}
                 label={`${data.approval_stats.first_time}%`}
                 segments={[
                   { label: 'معتمد من المرة الأولى', color: colors.green,  percent: data.approval_stats.first_time },
-                  { label: 'معتمد بعد تعديل',       color: colors.yellow, percent: data.approval_stats.after_revision },
-                  { label: 'قيد التعديل',            color: colors.orange, percent: data.approval_stats.revision },
+                  { label: 'معتمد بعد تعديل',       color: colors.amberText, percent: data.approval_stats.after_revision },
+                  { label: 'قيد التعديل',            color: colors.amberText, percent: data.approval_stats.revision },
                 ]}
               />
             )}
           </Card>
           <Card>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>ترتيب المستشارين</h4>
+            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>ترتيب المستشارين</h4>
             {!data.consultants?.length ? (
               <div style={{ padding: 30, textAlign: 'center', color: colors.gray, fontSize: 13 }}>لا يوجد مستشارون</div>
             ) : (
@@ -1504,14 +1293,14 @@ const AdminReportsPage = () => {
       )}
 
       {tab === 3 && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginTop: 16 }}>
           <Card>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>الطلب على الخدمات</h4>
-            <BarChart height={160} data={(data.service_dist || []).map(s => ({ label: s.label, value: s.value }))} colorFn={i => [colors.teal, colors.orange, '#F1C40F'][i] || colors.teal} />
+            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>الطلب على الخدمات</h4>
+            <BarChart height={160} data={(data.service_dist || []).map(s => ({ label: s.label, value: s.value }))} colorFn={i => [colors.primary, colors.amberText, '#A33F12'][i] || colors.primary} />
           </Card>
           <Card>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>معدل الإكمال حسب الخدمة</h4>
-            <BarChart height={160} data={data.completion_by_service || []} colorFn={i => [colors.teal, colors.orange, '#F1C40F'][i] || colors.teal} />
+            <h4 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>معدل الإكمال حسب الخدمة</h4>
+            <BarChart height={160} data={data.completion_by_service || []} colorFn={i => [colors.primary, colors.amberText, '#A33F12'][i] || colors.primary} />
           </Card>
         </div>
       )}
@@ -1534,18 +1323,18 @@ const AdminDashboardPage = () => {
   const MONTH_LABELS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 
   const catColor = (cat) => {
-    const m = { auth:'#17A589', workflow:'#2980B9', payment:'#E67E22', review:'#8E44AD', admin:'#E74C3C', policy:'#27AE60', consultant:'#F39C12', general:'#7F8C8D' };
-    return m[cat] || '#7F8C8D';
+    const m = { auth:'#0E9F74', workflow:'#1F74C4', payment:'#A33F12', review:'#235D7F', admin:'#DC4A4A', policy:'#0E9F74', consultant:'#A33F12', general:'#5E6B78' };
+    return m[cat] || '#5E6B78';
   };
 
   const fmt = (n) => Number(n || 0).toLocaleString('en-US');
 
   if (loading) return (
-    <div style={{ padding: 60, textAlign: 'center', color: '#7F8C8D', fontSize: 13 }}>جارٍ تحميل لوحة التحكم…</div>
+    <div style={{ padding: 60, textAlign: 'center', color: '#5E6B78', fontSize: 13 }}>جارٍ تحميل لوحة التحكم…</div>
   );
 
   if (!data) return (
-    <div style={{ padding: 60, textAlign: 'center', color: '#E74C3C', fontSize: 13 }}>تعذّر تحميل البيانات. حاول مجدداً.</div>
+    <div style={{ padding: 60, textAlign: 'center', color: '#DC4A4A', fontSize: 13 }}>تعذّر تحميل البيانات. حاول مجدداً.</div>
   );
 
   const monthEntries = Object.entries(data.monthly_revenue);
@@ -1555,31 +1344,31 @@ const AdminDashboardPage = () => {
   const stPct  = Math.round(strategic   / distTotal * 100);
   const opPct  = Math.round(operational / distTotal * 100);
   const polPct = Math.round(policy      / distTotal * 100);
-  const conicBg = `conic-gradient(${colors.teal} 0% ${stPct}%, ${colors.orange} ${stPct}% ${stPct + polPct}%, #F1C40F ${stPct + polPct}% 100%)`;
+  const conicBg = `conic-gradient(${colors.primary} 0% ${stPct}%, ${colors.amberText} ${stPct}% ${stPct + polPct}%, #A33F12 ${stPct + polPct}% 100%)`;
 
   const roleLabel = { admin: 'أدمين', consultant: 'مستشار', client: 'عميل', system: 'نظام' };
 
   return (
     <div className="animate-in">
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 24 }}>لوحة تحكم الإدارة</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 24 }}>لوحة تحكم الإدارة</h2>
 
       {/* Row 1 metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 14 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-3)', gap: 14, marginBottom: 14 }}>
         <MetricCard title="إجمالي المنظمات" value={fmt(data.total_orgs)} icon={Icons.users} />
         <MetricCard title="اشتراكات نشطة" value={fmt(data.active_workflows)} icon={Icons.services} color={colors.green} />
-        <MetricCard title="الإيرادات (ريال)" value={fmt(data.total_revenue)} icon={Icons.payments} color={colors.orange} />
+        <MetricCard title="الإيرادات (ريال)" value={fmt(data.total_revenue)} icon={Icons.payments} color={colors.amberText} />
       </div>
       {/* Row 2 metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-3)', gap: 14, marginBottom: 24 }}>
         <MetricCard title="معدل الإكمال" value={data.completion_rate + '%'} icon={Icons.chart} />
-        <MetricCard title="المستشارين النشطين" value={fmt(data.active_consultants)} icon={Icons.users} color={colors.teal} />
-        <MetricCard title="عمليات مكتملة" value={fmt(data.total_completed ?? 0)} icon={Icons.star} color={colors.yellow} />
+        <MetricCard title="المستشارين النشطين" value={fmt(data.active_consultants)} icon={Icons.users} color={colors.primary} />
+        <MetricCard title="عمليات مكتملة" value={fmt(data.total_completed ?? 0)} icon={Icons.star} color={colors.amberText} />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginBottom: 16 }}>
         {/* Monthly Revenue Chart */}
         <Card>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>الإيرادات الشهرية (ريال)</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>الإيرادات الشهرية (ريال)</h3>
           {maxRev === 1 ? (
             <div style={{ padding: 40, textAlign: 'center', color: colors.gray, fontSize: 12 }}>لا توجد بيانات إيرادات بعد</div>
           ) : (
@@ -1591,7 +1380,7 @@ const AdminDashboardPage = () => {
                   <div key={key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                     <div
                       title={`${MONTH_LABELS[monthIdx]}: ${fmt(val)} ريال`}
-                      style={{ width: '100%', height: barH, background: `linear-gradient(180deg, ${colors.teal}, ${colors.teal}80)`, borderRadius: '4px 4px 0 0', transition: 'height 0.5s', cursor: 'default' }}
+                      style={{ width: '100%', height: barH, background: `linear-gradient(180deg, ${colors.primary}, ${colors.primary}80)`, borderRadius: '4px 4px 0 0', transition: 'height 0.5s', cursor: 'default' }}
                     />
                     <span style={{ fontSize: 7, color: colors.gray }}>{MONTH_LABELS[monthIdx].slice(0, 3)}</span>
                   </div>
@@ -1603,7 +1392,7 @@ const AdminDashboardPage = () => {
 
         {/* Service Distribution */}
         <Card>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>توزيع الخدمات</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>توزيع الخدمات</h3>
           {distTotal <= 0 || (strategic + operational + policy === 0) ? (
             <div style={{ padding: 40, textAlign: 'center', color: colors.gray, fontSize: 12 }}>لا توجد طلبات مدفوعة بعد</div>
           ) : (
@@ -1613,14 +1402,14 @@ const AdminDashboardPage = () => {
               </div>
               <div>
                 {[
-                  { label: 'تخطيط استراتيجي', color: colors.teal,   pct: stPct,  cnt: strategic   },
-                  { label: 'سياسات ولوائح',    color: colors.orange, pct: polPct, cnt: policy      },
-                  { label: 'تخطيط تشغيلي',     color: '#F1C40F',    pct: opPct,  cnt: operational },
+                  { label: 'تخطيط استراتيجي', color: colors.primary,   pct: stPct,  cnt: strategic   },
+                  { label: 'سياسات ولوائح',    color: colors.amberText, pct: polPct, cnt: policy      },
+                  { label: 'تخطيط تشغيلي',     color: '#A33F12',    pct: opPct,  cnt: operational },
                 ].map((l, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                     <div style={{ width: 12, height: 12, borderRadius: 3, background: l.color, flexShrink: 0 }} />
                     <span style={{ fontSize: 12, color: colors.gray }}>{l.label}</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: colors.tealDark, marginRight: 'auto' }}>{l.pct}%</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: colors.ink, marginRight: 'auto' }}>{l.pct}%</span>
                     <span style={{ fontSize: 11, color: colors.gray }}>({l.cnt})</span>
                   </div>
                 ))}
@@ -1632,7 +1421,7 @@ const AdminDashboardPage = () => {
 
       {/* Recent Activity */}
       <Card>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>آخر العمليات</h3>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>آخر العمليات</h3>
         {!data.recent_activity || data.recent_activity.length === 0 ? (
           <div style={{ padding: 30, textAlign: 'center', color: colors.gray, fontSize: 12 }}>لا توجد عمليات مسجّلة بعد</div>
         ) : (
@@ -1648,7 +1437,7 @@ const AdminDashboardPage = () => {
               {data.recent_activity.map((row) => (
                 <tr key={row.id} style={{ borderBottom: `1px solid ${colors.grayLight}` }}>
                   <td style={{ padding: '10px 12px', fontSize: 13 }}>{row.action}</td>
-                  <td style={{ padding: '10px 12px', fontSize: 13, fontWeight: 600, color: colors.tealDark }}>{row.user_name}</td>
+                  <td style={{ padding: '10px 12px', fontSize: 13, fontWeight: 600, color: colors.ink }}>{row.user_name}</td>
                   <td style={{ padding: '10px 12px' }}>
                     <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: `${catColor(row.category)}18`, color: catColor(row.category), fontWeight: 600 }}>
                       {roleLabel[row.role] || row.role}
@@ -1676,7 +1465,7 @@ const KA_VIEWS = new Set([
   'client-dash', 'con-dash', 'admin-dash',
   'client-payments', 'client-chat', 'con-chat',
   'con-clients', 'con-pending', 'con-completed', 'con-earnings', 'con-stats',
-  'admin-orgs', 'admin-consultants', 'admin-users', 'admin-questionnaires',
+  'admin-outputs', 'admin-orgs', 'admin-consultants', 'admin-users', 'admin-questionnaires',
   'admin-designs', 'admin-finance', 'admin-reports',
   'admin-services', 'admin-content', 'admin-site-content',
   'admin-notifications', 'admin-log', 'admin-settings', 'admin-faqs',
@@ -1779,6 +1568,15 @@ export default function DaffaPlatform() {
   const sc = (key, fallback = '') => siteContent[key] ?? fallback;
   const [publicPolicies, setPublicPolicies] = useState([]);
   const [sessionExpired, setSessionExpired] = useState(false);
+  const [glossaryOpen, setGlossaryOpen] = useState(false);
+  const [tourKey, setTourKey] = useState(0);
+
+  // ── قاموس المصطلحات يُفتح من أي زر «؟»
+  useEffect(() => {
+    const open = () => setGlossaryOpen(true);
+    window.addEventListener('df:glossary', open);
+    return () => window.removeEventListener('df:glossary', open);
+  }, []);
 
   // ── استمع لحدث انتهاء الجلسة المُرسَل من axios interceptor ──────────────
   useEffect(() => {
@@ -1951,7 +1749,12 @@ export default function DaffaPlatform() {
         polPhase = buildPhase('السياسات واللوائح', pct, approved, total || 7, 'سياسات', st, sc, () => navigate('policies-select'));
       }
 
-      setDashPhases([stPhase, opPhase, polPhase]);
+      const raw = (r) => (r.status === 'fulfilled' ? r.value.data : null);
+      setDashPhases([
+        { ...stPhase,  key: 'strategic',   raw: raw(stRes) },
+        { ...opPhase,  key: 'operational', raw: raw(opRes) },
+        { ...polPhase, key: 'policies',    raw: raw(polRes) },
+      ]);
     };
     load();
   }, [currentView]);
@@ -2029,383 +1832,113 @@ export default function DaffaPlatform() {
 
   // ============== SIDEBAR ==============
   const clientMenu = [
-    { id: "client-dash",         label: "لوحة التحكم",          icon: Icons.home },
-    { id: "strategic-roadmap",   label: "التخطيط الاستراتيجي",  icon: Icons.strategic,   permKey: "client.strategic.view"   },
-    { id: "operational-roadmap", label: "التخطيط التشغيلي",     icon: Icons.operational,  permKey: "client.operational.view" },
-    { id: "policies-select",     label: "السياسات واللوائح",    icon: Icons.policies,     permKey: "client.policies.view"    },
-    { id: "client-chat",         label: "المحادثات",             icon: Icons.chat,         permKey: "client.chat.view"        },
-    { id: "client-payments",     label: "المدفوعات",             icon: Icons.payments },
-    { id: "client-downloads",    label: "التحميلات",             icon: Icons.download },
-    { id: "client-notifications",label: "الإشعارات",             icon: Icons.bell },
-    { id: "client-help",         label: "المساعدة",              icon: Icons.help },
-    { id: "client-settings",     label: "الإعدادات",             icon: Icons.settings },
+    { id: "client-dash",         label: "لوحة التحكم",          icon: Icons.home,        group: "رحلتي", short: "الرئيسية" },
+    { id: "strategic-roadmap",   label: "التخطيط الاستراتيجي",  icon: Icons.strategic,   group: "رحلتي", short: "الاستراتيجي", permKey: "client.strategic.view"   },
+    { id: "operational-roadmap", label: "التخطيط التشغيلي",     icon: Icons.operational, group: "رحلتي", short: "التشغيلي", permKey: "client.operational.view" },
+    { id: "policies-select",     label: "السياسات واللوائح",    icon: Icons.policies,    group: "رحلتي", short: "السياسات", permKey: "client.policies.view"    },
+    { id: "client-chat",         label: "المحادثات",             icon: Icons.chat,        group: "التواصل", permKey: "client.chat.view" },
+    { id: "client-notifications",label: "الإشعارات",             icon: Icons.bell,        group: "التواصل" },
+    { id: "client-downloads",    label: "التحميلات",             icon: Icons.download,    group: "حسابي" },
+    { id: "client-payments",     label: "المدفوعات",             icon: Icons.payments,    group: "حسابي" },
+    { id: "client-help",         label: "المساعدة",              icon: Icons.help,        group: "حسابي" },
+    { id: "client-settings",     label: "الإعدادات",             icon: Icons.settings,    group: "حسابي" },
   ].filter(item => !item.permKey || can(item.permKey));
 
   const consultantMenu = [
-    { id: "con-dash", label: "لوحة التحكم", icon: Icons.home },
-    { id: "con-clients", label: "العملاء والمهام", icon: Icons.users },
-    { id: "con-pending", label: "المراجعات المعلقة", icon: Icons.content },
-    { id: "con-completed", label: "المراجعات المكتملة", icon: Icons.check },
-    { id: "con-chat", label: "المحادثات", icon: Icons.chat },
-    { id: "con-notifications", label: "الإشعارات", icon: Icons.bell },
-    { id: "con-earnings", label: "الأرباح", icon: Icons.payments },
-    { id: "con-stats", label: "إحصائياتي", icon: Icons.chart },
-    { id: "con-settings", label: "إعدادات الحساب", icon: Icons.settings },
+    { id: "con-dash",          label: "لوحة التحكم",        icon: Icons.home,     group: "العمل", short: "الرئيسية" },
+    { id: "con-pending",       label: "المراجعات المعلقة",  icon: Icons.content,  group: "العمل", short: "للمراجعة" },
+    { id: "con-clients",       label: "العملاء والمهام",     icon: Icons.users,    group: "العمل", short: "العملاء" },
+    { id: "con-completed",     label: "المراجعات المكتملة", icon: Icons.check,    group: "العمل" },
+    { id: "con-chat",          label: "المحادثات",           icon: Icons.chat,     group: "التواصل", short: "المحادثات" },
+    { id: "con-notifications", label: "الإشعارات",           icon: Icons.bell,     group: "التواصل" },
+    { id: "con-earnings",      label: "الأرباح",             icon: Icons.payments, group: "حسابي" },
+    { id: "con-stats",         label: "إحصائياتي",           icon: Icons.chart,    group: "حسابي" },
+    { id: "con-settings",      label: "إعدادات الحساب",      icon: Icons.settings, group: "حسابي" },
   ];
 
   const adminMenu = [
-    { id: "admin-dash", label: "لوحة التحكم", icon: Icons.home },
-    { id: "admin-orgs", label: "إدارة المنظمات", icon: Icons.users },
-    { id: "admin-consultants", label: "إدارة المستشارين", icon: Icons.users },
-    { id: "admin-users", label: "إدارة المستخدمين", icon: Icons.users },
-    { id: "admin-services", label: "إدارة الخدمات", icon: Icons.services },
-    { id: "admin-content", label: "إدارة المحتوى", icon: Icons.content },
-    { id: "admin-site-content", label: "محتوى الموقع", icon: Icons.content },
-    { id: "admin-faqs",         label: "الأسئلة الشائعة",  icon: Icons.help },
-    { id: "admin-questionnaires", label: "إدارة الاستبيانات", icon: Icons.policies },
-    { id: "admin-designs", label: "طلبات التصميم",   icon: Icons.policies },
-    { id: "admin-finance", label: "الإدارة المالية", icon: Icons.payments },
-    { id: "admin-reports", label: "التقارير", icon: Icons.chart },
-    { id: "admin-notifications", label: "الإشعارات", icon: Icons.bell },
-    { id: "admin-log",      label: "سجل العمليات",   icon: Icons.log },
-    { id: "admin-settings", label: "إعدادات النظام", icon: Icons.settings },
-    { id: "admin-profile",  label: "ملفي الشخصي",    icon: Icons.settings },
+    { id: "admin-dash",           label: "لوحة التحكم",       icon: Icons.home,     group: "نظرة عامة", short: "الرئيسية" },
+    { id: "admin-outputs",        label: "مركز المخرجات",     icon: Icons.outputs,  group: "نظرة عامة", short: "المخرجات" },
+    { id: "admin-reports",        label: "التقارير",          icon: Icons.chart,    group: "نظرة عامة" },
+    { id: "admin-orgs",           label: "المنظمات (العملاء)", icon: Icons.building, group: "الأشخاص", short: "المنظمات" },
+    { id: "admin-consultants",    label: "المستشارون",        icon: Icons.users,    group: "الأشخاص" },
+    { id: "admin-users",          label: "المستخدمون والصلاحيات", icon: Icons.key,  group: "الأشخاص" },
+    { id: "admin-finance",        label: "الإدارة المالية",   icon: Icons.payments, group: "المال", short: "المالية" },
+    { id: "admin-services",       label: "الخدمات والأسعار",  icon: Icons.services, group: "المحتوى والخدمات" },
+    { id: "admin-content",        label: "محتوى الوحدات",     icon: Icons.content,  group: "المحتوى والخدمات" },
+    { id: "admin-questionnaires", label: "استبيانات السياسات", icon: Icons.policies, group: "المحتوى والخدمات" },
+    { id: "admin-designs",        label: "طلبات التصميم",     icon: Icons.palette,  group: "المحتوى والخدمات" },
+    { id: "admin-site-content",   label: "محتوى الموقع",      icon: Icons.globe,    group: "المحتوى والخدمات" },
+    { id: "admin-faqs",           label: "الأسئلة الشائعة",   icon: Icons.help,     group: "المحتوى والخدمات" },
+    { id: "admin-notifications",  label: "إرسال الإشعارات",   icon: Icons.bell,     group: "النظام" },
+    { id: "admin-log",            label: "سجل العمليات",      icon: Icons.log,      group: "النظام" },
+    { id: "admin-settings",       label: "إعدادات النظام",    icon: Icons.settings, group: "النظام" },
+    { id: "admin-profile",        label: "ملفي الشخصي",       icon: Icons.user,     group: "النظام" },
   ];
 
   const menu = currentRole === "admin" ? adminMenu : currentRole === "consultant" ? consultantMenu : clientMenu;
   const isDashboard = !["landing", "about", "services", "pricing", "contact", "login", "register"].includes(currentView);
 
-  const Sidebar = () => (
-    <div style={{ width: sidebarOpen ? 240 : 64, height: "100vh", background: `linear-gradient(180deg, ${colors.teal} 0%, ${colors.tealDark} 100%)`, position: "fixed", right: 0, top: 0, zIndex: 100, transition: "width 0.3s", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      <div style={{ padding: sidebarOpen ? "20px 16px" : "20px 8px", display: "flex", alignItems: "center", justifyContent: "center", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-        {sidebarOpen ? <img src="/logo.png" alt="دفة" style={{ width: 50, height: 50, objectFit: "contain", filter: "brightness(0) invert(1)" }} /> : <img src="/logo.png" alt="دفة" style={{ width: 34, height: 34, objectFit: "contain", filter: "brightness(0) invert(1)" }} />}
-      </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "8px 8px" }}>
-        {menu.map((item) => {
-          const isNotif = item.id === 'client-notifications' || item.id === 'con-notifications';
-          const badge   = isNotif && unreadCount > 0 ? unreadCount : 0;
-          return (
-            <button key={item.id} onClick={() => navigate(item.id)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: sidebarOpen ? "10px 12px" : "10px 0", justifyContent: sidebarOpen ? "flex-end" : "center", direction: "ltr", borderRadius: 10, border: "none", background: currentView === item.id ? "rgba(255,255,255,0.15)" : "transparent", color: "white", cursor: "pointer", fontSize: 13, fontWeight: currentView === item.id ? 700 : 400, fontFamily: "'Cairo', sans-serif", marginBottom: 2, transition: "all 0.2s", position: "relative" }}>
-              {sidebarOpen && badge > 0 && <span style={{ marginRight: "auto", minWidth: 20, height: 20, borderRadius: 10, background: colors.orange, color: "white", fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 5px", flexShrink: 0 }}>{badge > 99 ? "99+" : badge}</span>}
-              {sidebarOpen && <span style={{ direction: "rtl" }}>{item.label}</span>}
-              <span style={{ display: "flex", opacity: 0.85, flexShrink: 0, position: "relative" }}>
-                {item.icon}
-                {badge > 0 && <span style={{ position: "absolute", top: -6, left: -6, minWidth: 16, height: 16, borderRadius: 8, background: colors.orange, color: "white", fontSize: 9, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 3px" }}>{badge > 99 ? "99+" : badge}</span>}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-      <div style={{ padding: "10px 12px", borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.orange, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: 14, flexShrink: 0, overflow: "hidden" }}>
-          {authUser?.logo_url ? (
-            <img src={authUser.logo_url} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
-          ) : (
-            currentRole === "admin"
-              ? (authUser?.rep_name?.[0] || authUser?.email?.[0]?.toUpperCase() || "م")
-              : currentRole === "consultant"
-              ? (authUser?.rep_name?.[0] || "خ")
-              : (authUser?.org_name?.[0] || "ج")
-          )}
-        </div>
-        {sidebarOpen && (
-          <div style={{ color: "white", overflow: "hidden", flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {currentRole === "admin"
-                ? (authUser?.rep_name || authUser?.email?.split('@')[0] || "مدير النظام")
-                : currentRole === "consultant"
-                ? (authUser?.rep_name || "المستشار")
-                : (authUser?.org_name || authUser?.rep_name || "المنظمة")}
-            </div>
-            {authUser?.email && (
-              <div style={{ fontSize: 10, opacity: 0.7, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                {authUser.email}
-              </div>
-            )}
-            <div style={{ fontSize: 10, opacity: 0.45, marginTop: 1 }}>
-              {currentRole === "admin" ? "مدير النظام" : currentRole === "consultant" ? "مستشار" : (authUser?.org_type || "عميل")}
-            </div>
-          </div>
-        )}
-        {sidebarOpen && (
-          <button
-            onClick={handleLogout}
-            title="تسجيل الخروج"
-            style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.08)", color: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.2s" }}
-            onMouseEnter={e => e.currentTarget.style.background = "rgba(220,38,38,0.5)"}
-            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.08)"}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-          </button>
-        )}
-      </div>
-    </div>
-  );
-
-  const TopBar = ({ title, breadcrumb }) => (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 24px", background: "white", borderBottom: `1px solid ${colors.grayBorder}`, position: "sticky", top: 0, zIndex: 50 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", color: colors.gray }}>{Icons.menu}</button>
-        <div>
-          {breadcrumb && <div style={{ fontSize: 11, color: colors.gray }}>{breadcrumb}</div>}
-          <div style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark }}>{title}</div>
-        </div>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ position: "relative", cursor: "pointer" }}>
-          <span style={{ color: colors.gray }}>{Icons.search}</span>
-        </div>
-        <div
-          onClick={() => currentRole === 'client' ? navigate('client-notifications') : currentRole === 'consultant' ? navigate('con-notifications') : navigate('admin-notifications')}
-          style={{ position: "relative", cursor: "pointer" }}
-        >
-          <span style={{ color: unreadCount > 0 ? colors.orange : colors.gray, transition: "color 0.2s" }}>{Icons.bell}</span>
-          {unreadCount > 0 && (
-            <span style={{ position: "absolute", top: -5, right: -5, minWidth: 16, height: 16, borderRadius: 8, background: colors.orange, color: "white", fontSize: 9, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 3px", boxShadow: "0 1px 4px rgba(0,0,0,0.2)" }}>
-              {unreadCount > 99 ? "99+" : unreadCount}
-            </span>
-          )}
-        </div>
-        {/* Preview Site button — admin + consultant + client */}
-        {(currentRole === "admin" || currentRole === "consultant" || currentRole === "client") && (
-          <button
-            onClick={() => window.open(window.location.origin + '?preview=1', '_blank')}
-            title="معاينة الموقع في تاب جديد"
-            style={{
-              display: "flex", alignItems: "center", gap: 6,
-              padding: "6px 12px", borderRadius: 8, border: `1.5px solid ${colors.teal}30`,
-              background: `${colors.teal}08`, color: colors.teal, cursor: "pointer",
-              fontSize: 12, fontWeight: 600, fontFamily: "'Cairo', sans-serif",
-              transition: "all 0.15s",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = `${colors.teal}18`; e.currentTarget.style.borderColor = colors.teal; }}
-            onMouseLeave={e => { e.currentTarget.style.background = `${colors.teal}08`; e.currentTarget.style.borderColor = `${colors.teal}30`; }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            معاينة الموقع
-          </button>
-        )}
-        {/* Role Badge */}
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
-          <div style={{ padding: "4px 12px", borderRadius: 20, fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", background: currentRole === "admin" ? "#FEF3C7" : currentRole === "consultant" ? "#E0F2F5" : colors.grayLight, color: currentRole === "admin" ? "#D97706" : currentRole === "consultant" ? colors.teal : colors.gray }}>
-            {currentRole === "admin" ? "مدير النظام" : currentRole === "consultant" ? "مستشار" : "عميل"}
-          </div>
-          {currentRole === "client" && authUser?.org_type && (
-            <div style={{ padding: "4px 12px", borderRadius: 20, fontSize: 11, fontWeight: 600, whiteSpace: "nowrap", background: colors.grayLight, color: colors.gray }}>
-              {authUser.org_type}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-
-  // ============== PUBLIC PAGES NAV ==============
-  const PublicNav = () => (
-    <div style={{ background: "rgba(255,255,255,0.97)", backdropFilter: "blur(10px)", borderBottom: `1px solid ${colors.grayBorder}`, position: "sticky", top: 0, zIndex: 100 }}>
-      <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 30px", maxWidth: 1300, margin: "0 auto" }}>
-        {/* Right: Logo only */}
-        <div onClick={() => navigate("landing")} style={{ cursor: "pointer", display: "flex", alignItems: "center", minWidth: 160 }}>
-          <img src="/logo.png" alt="دفة" style={{ width: 52, height: 52, objectFit: "contain" }} />
-        </div>
-
-        {/* Center: Menu Links */}
-        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-          {[{l:"الرئيسية",v:"landing"},{l:"عن دفة",v:"about"},{l:"الخدمات",v:"services"},{l:"الأسعار",v:"pricing"},{l:"تواصل معنا",v:"contact"}].map(n => (
-            <a key={n.v} onClick={() => navigate(n.v)} style={{ fontSize: 14, fontWeight: currentView === n.v ? 700 : 500, color: currentView === n.v ? colors.orange : colors.tealDark, cursor: "pointer", borderBottom: currentView === n.v ? `2px solid ${colors.orange}` : "2px solid transparent", paddingBottom: 6, transition: "all 0.2s" }}
-              onMouseEnter={e => { if (currentView !== n.v) e.target.style.color = colors.teal; }}
-              onMouseLeave={e => { if (currentView !== n.v) e.target.style.color = colors.tealDark; }}>
-              {n.l}
-            </a>
-          ))}
-        </div>
-
-        {/* Left: Auth Buttons */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 160, justifyContent: "flex-end" }}>
-          <Btn variant="secondary" small onClick={() => setAuthPage("login")}>تسجيل الدخول</Btn>
-          <Btn small onClick={() => setAuthPage("register")}>إنشاء حساب</Btn>
-        </div>
-      </nav>
-    </div>
-  );
-
-  const PublicFooter = () => (
-    <div>
-      <div style={{ padding: "50px 40px", background: colors.tealDark, color: "white" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 40 }}>
-          <div><Logo size="md" white /><p style={{ fontSize: 12, opacity: 0.7, marginTop: 12, lineHeight: 1.8 }}>{sc('footer_desc', 'منصة دفة للتخطيط الاستراتيجي وصناعة السياسات')}</p></div>
-          <div><h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>روابط سريعة</h4>{["الرئيسية", "عن دفة", "الخدمات", "الأسعار"].map((l, i) => <div key={i} style={{ fontSize: 12, opacity: 0.7, padding: "4px 0", cursor: "pointer" }}>{l}</div>)}</div>
-          <div><h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>الخدمات</h4>{["التخطيط الاستراتيجي", "التخطيط التشغيلي", "السياسات واللوائح"].map((l, i) => <div key={i} style={{ fontSize: 12, opacity: 0.7, padding: "4px 0" }}>{l}</div>)}</div>
-          <div><h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>تواصل معنا</h4>
-            <div style={{ fontSize: 12, opacity: 0.7, lineHeight: 2 }}>
-              {sc('contact_email', 'info@daffa.sa')}<br/>
-              {sc('contact_phone', '+966 55 XXX XXXX')}<br/>
-              {sc('contact_address', 'الرياض، المملكة العربية السعودية')}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div style={{ padding: "14px 40px", background: "#0A3842", textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.5)" }}>{sc('footer_copyright', 'جميع الحقوق محفوظة © 2026 منصة دفة')}</div>
-    </div>
-  );
-
-  // ============== LANDING PAGE ==============
-  const LandingPage = () => (
-    <div style={{ width: "100%", minHeight: "100vh" }} className="geo-bg">
-      <PublicNav />
-      {/* Hero */}
-      <div style={{ background: `linear-gradient(135deg, ${colors.teal} 0%, #0D4F5E 100%)`, padding: "80px 40px", textAlign: "center", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", inset: 0, background: "url(\"data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0L100 50L50 100L0 50Z' fill='rgba(255,255,255,0.02)'/%3E%3C/svg%3E\")" }} />
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <Logo size="lg" white />
-          <h1 style={{ color: "white", fontSize: 28, fontWeight: 300, marginTop: 24, lineHeight: 1.6 }}>{sc('hero_title', 'نظام البناء الاستراتيجي والتشغيلي للمنظمات غير الربحية')}</h1>
-          <h2 style={{ color: "white", fontSize: 40, fontWeight: 800, marginTop: 8 }}>{sc('hero_subtitle', 'فكرة النظام وآلية العمل')}</h2>
-          <div style={{ display: "flex", gap: 16, justifyContent: "center", marginTop: 32 }}>
-            <Btn onClick={() => navigate("register")}>ابدأ الآن</Btn>
-            <button onClick={() => navigate("about")} style={{ padding: "10px 24px", borderRadius: 10, fontSize: 14, fontWeight: 600, fontFamily: "'Cairo', sans-serif", background: "transparent", color: "white", border: "2px solid white", cursor: "pointer" }}>تعرّف أكثر</button>
-          </div>
-        </div>
-      </div>
-
-      {/* How it works */}
-      <div style={{ padding: "50px 40px", maxWidth: 1000, margin: "0 auto" }}>
-        <div style={{ padding: "20px 24px", border: `2px dashed ${colors.teal}40`, borderRadius: 14, textAlign: "center" }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: colors.tealDark, marginBottom: 10 }}>آلية العمل</h3>
-          <p style={{ fontSize: 14, color: colors.gray, lineHeight: 2 }}>{sc('how_it_works_desc', 'يعمل النظام بشكل شبه آلي، بحيث يوجد مستشار متخصص يراجع عن بعد مخرجات كل مرحلة.')}</p>
-        </div>
-      </div>
-
-      {/* 4 Steps */}
-      <div style={{ padding: "0 40px 50px", maxWidth: 1100, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-          {[
-            {icon:"1️⃣", t: sc('step1_title','اختر الخدمة'),          d: sc('step1_desc','التخطيط الاستراتيجي أو التشغيلي أو السياسات')},
-            {icon:"2️⃣", t: sc('step2_title','ادفع واختر المستشار'),  d: sc('step2_desc','أسعار مناسبة مع اختيار المستشار المناسب')},
-            {icon:"3️⃣", t: sc('step3_title',"تعلّم ونفّذ"),          d: sc('step3_desc','فيديوهات + شرح + إرشادات + نماذج عمل')},
-            {icon:"4️⃣", t: sc('step4_title','المستشار يراجع ويعتمد'),d: sc('step4_desc','مراجعة واعتماد من مستشار متخصص عن بعد')},
-          ].map((s,i) => (
-            <Card key={i} style={{ textAlign: "center", padding: 24 }}>
-              <div style={{ fontSize: 32, marginBottom: 12 }}>{s.icon}</div>
-              <h4 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 6 }}>{s.t}</h4>
-              <p style={{ fontSize: 12, color: colors.gray, lineHeight: 1.7 }}>{s.d}</p>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Components */}
-      <div style={{ padding: "60px 40px", background: "white" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "center", marginBottom: 40 }}>
-            <Rosette size={36} />
-            <h2 style={{ fontSize: 28, fontWeight: 800, color: colors.tealDark }}>مكونات النظام</h2>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
-            {[
-              { title: "نظام التخطيط الاستراتيجي", desc: sc('comp_strategic_desc','11 وحدة تخطيطية لبناء خطة استراتيجية متكاملة'), icon: <IcTarget width={28} height={28}/>, units: sc('comp_strategic_badge','11 وحدة') },
-              { title: "نظام التخطيط التشغيلي",    desc: sc('comp_operational_desc','5 وحدات لتحويل الاستراتيجية إلى خطة تنفيذية'), icon: <IcCog width={28} height={28}/>,    units: sc('comp_operational_badge','5 وحدات') },
-              { title: "نظام بناء السياسات واللوائح",desc: sc('comp_policies_desc','7 سياسات ولوائح تُبنى عبر استبيانات ذكية موجهة'), icon: <IcClipboard width={28} height={28}/>, units: sc('comp_policies_badge','7 سياسات') },
-            ].map((s, i) => (
-              <Card key={i} accent style={{ textAlign: "center", padding: 32 }}>
-                <div style={{ width: 64, height: 64, borderRadius: "50%", background: colors.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: colors.orange }}>{s.icon}</div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, color: colors.tealDark, marginBottom: 6 }}>{s.title}</h3>
-                <Badge text={s.units} color="teal" small />
-                <p style={{ fontSize: 13, color: colors.gray, lineHeight: 1.7, marginTop: 10 }}>{s.desc}</p>
-                <Btn small variant="secondary" style={{ marginTop: 14 }} onClick={() => navigate("services")}>تفاصيل أكثر</Btn>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Pricing */}
-      <div style={{ padding: "60px 40px" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "center", marginBottom: 40 }}>
-            <Rosette size={36} />
-            <h2 style={{ fontSize: 28, fontWeight: 800, color: colors.tealDark }}>آلية التسعير</h2>
-          </div>
-          {[
-            sc('pricing_point1','يتم وضع أسعار قليلة التكلفة وللجهة اختيار المستشار عن بعد من القائمة'),
-            sc('pricing_point2','يتاح اعتماد الخطة من احدى الجهات في النظام بتكلفة إضافية'),
-            sc('pricing_point3','يتم عرض أنظمة بناء السياسات واللوائح بأسعار مستقلة'),
-            sc('pricing_point4','يتاح خيار تحكيم السياسات واللوائح من احد المستشارين بتكلفة إضافية'),
-            sc('pricing_point5','يتم إتاحة تنزيل الملفات بشكل مصمم تلقائياً ويتاح خدمة التصميم بمقابل'),
-          ].map((t, i) => (
-            <div key={i} className="animate-in" style={{ animationDelay: `${i * 0.1}s`, display: "flex", alignItems: "center", gap: 16, padding: "16px 24px", marginBottom: 10, background: colors.tealCard, borderRadius: 12, color: "white", fontSize: 14, lineHeight: 1.7 }}>
-              <Rosette size={32} white /><span>{t}</span>
-            </div>
-          ))}
-          <div style={{ textAlign: "center", marginTop: 20 }}><Btn onClick={() => navigate("pricing")}>عرض الأسعار بالتفصيل</Btn></div>
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div style={{ padding: "50px 40px", background: `linear-gradient(135deg, ${colors.orange}, #D4612E)`, textAlign: "center" }}>
-        <h2 style={{ color: "white", fontSize: 26, fontWeight: 700, marginBottom: 20 }}>{sc('cta_title','ابدأ رحلة التخطيط الاستراتيجي لمنظمتك الآن')}</h2>
-        <button onClick={() => navigate("register")} style={{ padding: "12px 40px", borderRadius: 12, fontSize: 16, fontWeight: 700, fontFamily: "'Cairo', sans-serif", background: "white", color: colors.orange, border: "none", cursor: "pointer" }}>سجّل مجاناً</button>
-      </div>
-      <PublicFooter />
-    </div>
-  );
+  // ============== PUBLIC PAGES NAV / FOOTER / LANDING (src/pages/public) ==============
+  const PublicNav = () => <PublicNavBar current={currentView} navigate={navigate} onLogin={() => setAuthPage("login")} onRegister={() => setAuthPage("register")} />;
+  const PublicFooter = () => <PublicFooterBar sc={sc} navigate={navigate} />;
+  const LandingPage = () => <Landing sc={sc} navigate={navigate} onRegister={() => setAuthPage("register")} PublicNav={PublicNav} PublicFooter={PublicFooter} />;
 
   // ============== ABOUT PAGE ==============
   const AboutPage = () => (
     <div style={{ width: "100%", minHeight: "100vh" }} className="geo-bg">
       <PublicNav />
-      <div style={{ background: `linear-gradient(135deg, ${colors.teal}, #0D4F5E)`, padding: "50px 40px", textAlign: "center" }}>
+      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px 40px", textAlign: "center" }}>
         <h1 style={{ color: "white", fontSize: 32, fontWeight: 800 }}>عن منصة دفة</h1>
         <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginTop: 10 }}>{sc('about_hero_subtitle','للتخطيط الاستراتيجي وصناعة السياسات')}</p>
       </div>
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "50px 40px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, marginBottom: 50 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 40, marginBottom: 50 }}>
           <div>
-            <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>رؤيتنا</h2>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>رؤيتنا</h2>
             <p style={{ fontSize: 14, color: colors.gray, lineHeight: 2 }}>{sc('vision_text','أن نكون المنصة الرائدة في تمكين المنظمات غير الربحية.')}</p>
           </div>
           <div>
-            <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>رسالتنا</h2>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>رسالتنا</h2>
             <p style={{ fontSize: 14, color: colors.gray, lineHeight: 2 }}>{sc('mission_text','نقدم نظاماً شبه آلي يوفر أدوات تخطيط متكاملة مع إشراف مستشارين متخصصين.')}</p>
           </div>
         </div>
 
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.tealDark, marginBottom: 20, textAlign: "center" }}>كيف يعمل النظام</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 50 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.ink, marginBottom: 20, textAlign: "center" }}>كيف يعمل النظام</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-3)", gap: 16, marginBottom: 50 }}>
           {[
             {n:"1", t: sc('howworks1_title','نظام شبه آلي'),      d: sc('howworks1_desc','محتوى تعليمي مسجل مع نماذج عمل جاهزة')},
             {n:"2", t: sc('howworks2_title','إشراف المستشار'),    d: sc('howworks2_desc','مستشار متخصص يراجع عن بعد مخرجات كل مرحلة')},
             {n:"3", t: sc('howworks3_title','مخرجات احترافية'),   d: sc('howworks3_desc','وثائق نهائية مصممة تلقائياً')},
           ].map((s,i) => (
             <Card key={i} accent style={{ textAlign: "center", padding: 24 }}>
-              <div style={{ width: 40, height: 40, borderRadius: "50%", background: colors.orange, color: "white", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", fontWeight: 800, fontSize: 18 }}>{s.n}</div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark, marginBottom: 8 }}>{s.t}</h3>
+              <div style={{ width: 40, height: 40, borderRadius: "50%", background: colors.amber, color: "#0E2A3D", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", fontWeight: 800, fontSize: 18 }}>{s.n}</div>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>{s.t}</h3>
               <p style={{ fontSize: 13, color: colors.gray, lineHeight: 1.7 }}>{s.d}</p>
             </Card>
           ))}
         </div>
 
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.tealDark, marginBottom: 20, textAlign: "center" }}>فريق عمل النظام</h2>
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.ink, marginBottom: 20, textAlign: "center" }}>فريق عمل النظام</h2>
         <Card style={{ padding: 32 }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-            <div style={{ padding: "10px 28px", background: colors.tealCard, color: "white", borderRadius: 10, fontWeight: 700, fontSize: 14 }}>مشرف النظام</div>
+            <div style={{ padding: "10px 28px", background: colors.primaryDeep, color: "white", borderRadius: 10, fontWeight: 700, fontSize: 14 }}>مشرف النظام</div>
             <div style={{ width: 2, height: 20, background: colors.grayBorder }} />
-            <div style={{ padding: "10px 28px", background: colors.orange, color: "white", borderRadius: 10, fontWeight: 700, fontSize: 14 }}>المشرف الفني</div>
+            <div style={{ padding: "10px 28px", background: colors.amber, color: "#0E2A3D", borderRadius: 10, fontWeight: 700, fontSize: 14 }}>المشرف الفني</div>
             <div style={{ width: 2, height: 20, background: colors.grayBorder }} />
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
               {["إدارة التصميم", "المنسق الفني", "الدعم التقني", "الإدارة المالية"].map((d, i) => (
-                <div key={i} style={{ padding: "8px 20px", background: colors.tealCard, color: "white", borderRadius: 8, fontSize: 12, fontWeight: 500 }}>{d}</div>
+                <div key={i} style={{ padding: "8px 20px", background: colors.primaryDeep, color: "white", borderRadius: 8, fontSize: 12, fontWeight: 500 }}>{d}</div>
               ))}
             </div>
             <div style={{ width: 2, height: 20, background: colors.grayBorder }} />
-            <div style={{ padding: "8px 20px", background: colors.tealCard, color: "white", borderRadius: 8, fontSize: 12 }}>المستشارين</div>
+            <div style={{ padding: "8px 20px", background: colors.primaryDeep, color: "white", borderRadius: 8, fontSize: 12 }}>المستشارين</div>
             <div style={{ width: 2, height: 20, background: colors.grayBorder }} />
-            <div style={{ padding: "8px 20px", background: colors.tealCard, color: "white", borderRadius: 8, fontSize: 12 }}>الجهات الاستشارية</div>
+            <div style={{ padding: "8px 20px", background: colors.primaryDeep, color: "white", borderRadius: 8, fontSize: 12 }}>الجهات الاستشارية</div>
           </div>
         </Card>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginTop: 50 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-4)", gap: 16, marginTop: 50 }}>
           {[
             {n: sc('stat1_n','120+'), l: sc('stat1_l','منظمة مستفيدة')},
             {n: sc('stat2_n','50+'),  l: sc('stat2_l','خطة مكتملة')},
@@ -2413,7 +1946,7 @@ export default function DaffaPlatform() {
             {n: sc('stat4_n','200+'), l: sc('stat4_l','سياسة مبنية')},
           ].map((s,i) => (
             <Card key={i} style={{ textAlign: "center", padding: 24 }}>
-              <div style={{ fontSize: 32, fontWeight: 800, color: colors.teal }}>{s.n}</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: colors.primary }}>{s.n}</div>
               <div style={{ fontSize: 13, color: colors.gray, marginTop: 4 }}>{s.l}</div>
             </Card>
           ))}
@@ -2437,7 +1970,7 @@ export default function DaffaPlatform() {
   const ServicesPage = () => (
     <div style={{ width: "100%", minHeight: "100vh" }} className="geo-bg">
       <PublicNav />
-      <div style={{ background: `linear-gradient(135deg, ${colors.teal}, #0D4F5E)`, padding: "50px 40px", textAlign: "center" }}>
+      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px 40px", textAlign: "center" }}>
         <h1 style={{ color: "white", fontSize: 32, fontWeight: 800 }}>خدمات منصة دفة</h1>
         <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginTop: 10 }}>{sc('services_hero_subtitle','ثلاثة أنظمة متكاملة لبناء منظمتك')}</p>
       </div>
@@ -2445,15 +1978,15 @@ export default function DaffaPlatform() {
         {/* Service 1 */}
         <Card accent style={{ padding: 32, marginBottom: 24 }}>
           <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
-            <div style={{ width: 80, height: 80, borderRadius: 16, background: colors.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: colors.orange }}><IcTarget width={36} height={36}/></div>
+            <div style={{ width: 80, height: 80, borderRadius: 16, background: colors.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: colors.amberText }}><IcTarget width={36} height={36}/></div>
             <div style={{ flex: 1 }}>
-              <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.tealDark, marginBottom: 6 }}>نظام التخطيط الاستراتيجي</h2>
+              <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.ink, marginBottom: 6 }}>نظام التخطيط الاستراتيجي</h2>
               <p style={{ fontSize: 14, color: colors.gray, lineHeight: 1.8, marginBottom: 16 }}>{sc('strategic_service_desc','بناء الخطة الاستراتيجية الكاملة للمنظمة من خلال 11 وحدة تخطيطية متسلسلة.')}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
-                {strategicUnits.map(u => <Badge key={u.id} text={u.name} color="teal" small />)}
+                {strategicUnits.map(u => <Badge key={u.id} text={u.name} color="primary" small />)}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <span style={{ fontSize: 24, fontWeight: 800, color: colors.teal }}>{sc('strategic_service_price','5,000')} ريال</span>
+                <span style={{ fontSize: 24, fontWeight: 800, color: colors.primary }}>{sc('strategic_service_price','5,000')} ريال</span>
                 <Btn small onClick={() => navigate("register")}>ابدأ الآن</Btn>
               </div>
             </div>
@@ -2463,15 +1996,15 @@ export default function DaffaPlatform() {
         {/* Service 2 */}
         <Card accent style={{ padding: 32, marginBottom: 24 }}>
           <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
-            <div style={{ width: 80, height: 80, borderRadius: 16, background: colors.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: colors.orange }}><IcCog width={36} height={36}/></div>
+            <div style={{ width: 80, height: 80, borderRadius: 16, background: colors.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: colors.amberText }}><IcCog width={36} height={36}/></div>
             <div style={{ flex: 1 }}>
-              <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.tealDark, marginBottom: 6 }}>نظام التخطيط التشغيلي</h2>
+              <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.ink, marginBottom: 6 }}>نظام التخطيط التشغيلي</h2>
               <p style={{ fontSize: 14, color: colors.gray, lineHeight: 1.8, marginBottom: 16 }}>{sc('operational_service_desc','تحويل المبادرات الاستراتيجية إلى خطة تشغيلية مفصلة.')}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
-                {operationalUnits.map(u => <Badge key={u.id} text={u.name} color="teal" small />)}
+                {operationalUnits.map(u => <Badge key={u.id} text={u.name} color="primary" small />)}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <span style={{ fontSize: 24, fontWeight: 800, color: colors.teal }}>{sc('operational_service_price','3,500')} ريال</span>
+                <span style={{ fontSize: 24, fontWeight: 800, color: colors.primary }}>{sc('operational_service_price','3,500')} ريال</span>
                 <Btn small onClick={() => navigate("register")}>ابدأ الآن</Btn>
               </div>
             </div>
@@ -2481,16 +2014,16 @@ export default function DaffaPlatform() {
         {/* Service 3 */}
         <Card accent style={{ padding: 32, marginBottom: 24 }}>
           <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
-            <div style={{ width: 80, height: 80, borderRadius: 16, background: colors.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: colors.orange }}><IcClipboard width={36} height={36}/></div>
+            <div style={{ width: 80, height: 80, borderRadius: 16, background: colors.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: colors.amberText }}><IcClipboard width={36} height={36}/></div>
             <div style={{ flex: 1 }}>
-              <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.tealDark, marginBottom: 6 }}>نظام بناء السياسات واللوائح</h2>
+              <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.ink, marginBottom: 6 }}>نظام بناء السياسات واللوائح</h2>
               <p style={{ fontSize: 14, color: colors.gray, lineHeight: 1.8, marginBottom: 16 }}>{sc('policies_service_desc','بناء السياسات واللوائح الداخلية عبر استبيانات ذكية موجهة.')}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
-                {allPolicies.map(p => <Badge key={p.id} text={p.name} color="teal" small />)}
+                {allPolicies.map(p => <Badge key={p.id} text={p.name} color="primary" small />)}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                 <span style={{ fontSize: 14, color: colors.gray }}>تسعير مستقل لكل سياسة — يبدأ من</span>
-                <span style={{ fontSize: 24, fontWeight: 800, color: colors.teal }}>{sc('policies_min_price','1,000')} ريال</span>
+                <span style={{ fontSize: 24, fontWeight: 800, color: colors.primary }}>{sc('policies_min_price','1,000')} ريال</span>
                 <Btn small onClick={() => navigate("register")}>ابدأ الآن</Btn>
               </div>
             </div>
@@ -2499,11 +2032,11 @@ export default function DaffaPlatform() {
 
         {/* Unit Structure */}
         <Card style={{ padding: 32, textAlign: "center" }}>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 20 }}>هيكل الوحدة التخطيطية</h2>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 20 }}>هيكل الوحدة التخطيطية</h2>
           <p style={{ fontSize: 13, color: colors.gray, marginBottom: 20 }}>كل وحدة تخطيطية (في الأنظمة الثلاثة) تتكون من 6 مكونات + اعتماد المستشار</p>
           <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
             {["نبذة", "شرح مكتوب", "إرشادات", "فيديو", "خدمة الدردشة", "نماذج عمل", "اعتماد المستشار"].map((c, i) => (
-              <div key={i} style={{ padding: "10px 18px", borderRadius: 10, background: i === 6 ? colors.orange : colors.tealCard, color: "white", fontSize: 13, fontWeight: 600 }}>{c}</div>
+              <div key={i} style={{ padding: "10px 18px", borderRadius: 10, background: i === 6 ? colors.amber : colors.primaryDeep, color: "#0E2A3D", fontSize: 13, fontWeight: 600 }}>{c}</div>
             ))}
           </div>
         </Card>
@@ -2516,28 +2049,28 @@ export default function DaffaPlatform() {
   const PricingPage = () => (
     <div style={{ width: "100%", minHeight: "100vh" }} className="geo-bg">
       <PublicNav />
-      <div style={{ background: `linear-gradient(135deg, ${colors.teal}, #0D4F5E)`, padding: "50px 40px", textAlign: "center" }}>
+      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px 40px", textAlign: "center" }}>
         <h1 style={{ color: "white", fontSize: 32, fontWeight: 800 }}>الأسعار</h1>
         <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginTop: 10 }}>{sc('pricing_hero_subtitle','أسعار مناسبة لجميع المنظمات غير الربحية')}</p>
       </div>
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "50px 40px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, marginBottom: 40 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-3)", gap: 20, marginBottom: 40 }}>
           {[
             { title: "التخطيط الاستراتيجي", price: sc('strategic_price','5,000'),   icon: <IcTarget width={36} height={36}/>, features: ["11 وحدة تخطيطية", "فيديوهات تعليمية", "شرح مكتوب وإرشادات", "نماذج عمل تفاعلية", "دردشة مع المستشار", "مراجعة واعتماد المستشار", "وثيقة استراتيجية نهائية"], popular: true },
             { title: "التخطيط التشغيلي",    price: sc('operational_price','3,500'), icon: <IcCog width={36} height={36}/>,    features: ["5 وحدات تخطيطية", "استيراد من الخطة الاستراتيجية", "مخطط جانت 12 شهر", "تعيين المسؤولين", "ميزانية تفصيلية", "مراجعة واعتماد المستشار", "وثيقة تشغيلية نهائية"], popular: false },
             { title: "السياسات واللوائح",    price: `من ${sc('policies_min_price','1,000')}`, icon: <IcClipboard width={36} height={36}/>, features: ["7 سياسات متاحة", "استبيانات ذكية موجهة", "توليد تلقائي للسياسة", "فيديوهات تعليمية", "مراجعة مستشار", "تسعير مستقل لكل سياسة", "تحميل PDF / Word"], popular: false },
           ].map((p, i) => (
-            <Card key={i} style={{ padding: 28, border: p.popular ? `2px solid ${colors.orange}` : `1px solid ${colors.grayBorder}`, position: "relative", overflow: "visible" }}>
-              {p.popular && <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: colors.orange, color: "white", padding: "4px 16px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>الأكثر طلباً</div>}
+            <Card key={i} style={{ padding: 28, border: p.popular ? `2px solid ${colors.amberLine}` : `1px solid ${colors.grayBorder}`, position: "relative", overflow: "visible" }}>
+              {p.popular && <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: colors.amber, color: "#0E2A3D", padding: "4px 16px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>الأكثر طلباً</div>}
               <div style={{ textAlign: "center", marginBottom: 20 }}>
-                <span style={{ color: colors.teal }}>{p.icon}</span>
-                <h3 style={{ fontSize: 18, fontWeight: 800, color: colors.tealDark, marginTop: 8 }}>{p.title}</h3>
-                <div style={{ marginTop: 12 }}><span style={{ fontSize: 32, fontWeight: 800, color: colors.teal }}>{p.price}</span><span style={{ fontSize: 14, color: colors.gray }}> ريال</span></div>
+                <span style={{ color: colors.primary }}>{p.icon}</span>
+                <h3 style={{ fontSize: 18, fontWeight: 800, color: colors.ink, marginTop: 8 }}>{p.title}</h3>
+                <div style={{ marginTop: 12 }}><span style={{ fontSize: 32, fontWeight: 800, color: colors.primary }}>{p.price}</span><span style={{ fontSize: 14, color: colors.gray }}> ريال</span></div>
               </div>
               {p.features.map((f, fi) => (
                 <div key={fi} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0", borderBottom: fi < p.features.length - 1 ? `1px solid ${colors.grayLight}` : "none" }}>
                   <span style={{ color: colors.green, display: "flex" }}><IcCheck width={14} height={14} /></span>
-                  <span style={{ fontSize: 13, color: colors.tealDark }}>{f}</span>
+                  <span style={{ fontSize: 13, color: colors.ink }}>{f}</span>
                 </div>
               ))}
               <Btn full style={{ marginTop: 20 }} onClick={() => navigate("register")}>{p.popular ? "ابدأ الآن" : "اشترك"}</Btn>
@@ -2546,16 +2079,16 @@ export default function DaffaPlatform() {
         </div>
 
         <Card style={{ padding: 24, marginBottom: 20 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: colors.tealDark, marginBottom: 14, textAlign: "center" }}>الخدمات الإضافية</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: colors.ink, marginBottom: 14, textAlign: "center" }}>الخدمات الإضافية</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "var(--g-3)", gap: 16 }}>
             {[
               {t: sc('addon1_title','اعتماد الخطة من جهة استشارية'), p: sc('addon1_price','2,000'), d: sc('addon1_desc','اعتماد رسمي من جهة معتمدة')},
               {t: sc('addon2_title','تحكيم السياسات من مستشار'),      p: sc('addon2_price','2,000'), d: sc('addon2_desc','تحكيم ومراجعة متعمقة')},
               {t: sc('addon3_title','تصميم احترافي للوثائق'),          p: sc('addon3_price','1,500'), d: sc('addon3_desc','تصميم بهوية المنظمة')},
             ].map((a,i) => (
               <div key={i} style={{ padding: 16, background: colors.grayLight, borderRadius: 12, textAlign: "center" }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: colors.tealDark }}>{a.t}</div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: colors.orange, margin: "8px 0" }}>{a.p} ريال</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: colors.ink }}>{a.t}</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: colors.amberText, margin: "8px 0" }}>{a.p} ريال</div>
                 <div style={{ fontSize: 11, color: colors.gray }}>{a.d}</div>
               </div>
             ))}
@@ -2563,15 +2096,15 @@ export default function DaffaPlatform() {
         </Card>
 
         <Card style={{ padding: 24 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>تسعير السياسات واللوائح (مستقل)</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>تسعير السياسات واللوائح (مستقل)</h3>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead><tr>{["الرمز", "السياسة", "المجموعة", "السعر"].map(h => <th key={h} style={{ padding: "10px 12px", background: colors.tealCard, color: "white", fontSize: 12, textAlign: "right" }}>{h}</th>)}</tr></thead>
+            <thead><tr>{["الرمز", "السياسة", "المجموعة", "السعر"].map(h => <th key={h} style={{ padding: "10px 12px", background: colors.primaryDeep, color: "white", fontSize: 12, textAlign: "right" }}>{h}</th>)}</tr></thead>
             <tbody>{publicPolicies.map((p, i) => (
               <tr key={p.id ?? i} style={{ borderBottom: `1px solid ${colors.grayLight}` }}>
                 <td style={{ padding: "10px 12px", fontSize: 11, color: colors.gray, direction: "ltr", textAlign: "right", whiteSpace: "nowrap" }}>{p.code}</td>
                 <td style={{ padding: "10px 12px", fontSize: 13, fontWeight: 600 }}>{p.name}</td>
                 <td style={{ padding: "10px 12px", fontSize: 12, color: colors.gray }}>{p.group_name}</td>
-                <td style={{ padding: "10px 12px", fontSize: 14, fontWeight: 700, color: colors.teal, whiteSpace: "nowrap" }}>{Number(p.price).toLocaleString('en-US')} ريال</td>
+                <td style={{ padding: "10px 12px", fontSize: 14, fontWeight: 700, color: colors.primary, whiteSpace: "nowrap" }}>{Number(p.price).toLocaleString('en-US')} ريال</td>
               </tr>
             ))}</tbody>
           </table>
@@ -2585,24 +2118,24 @@ export default function DaffaPlatform() {
   const ContactPage = () => (
     <div style={{ width: "100%", minHeight: "100vh" }} className="geo-bg">
       <PublicNav />
-      <div style={{ background: `linear-gradient(135deg, ${colors.teal}, #0D4F5E)`, padding: "50px 40px", textAlign: "center" }}>
+      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px 40px", textAlign: "center" }}>
         <h1 style={{ color: "white", fontSize: 32, fontWeight: 800 }}>تواصل معنا</h1>
         <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginTop: 10 }}>{sc('contact_hero_subtitle','نسعد بتواصلكم والإجابة على استفساراتكم')}</p>
       </div>
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "50px 40px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 30 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 30 }}>
           <Card style={{ padding: 28 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 20 }}>أرسل رسالة</h2>
+            <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 20 }}>أرسل رسالة</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 14 }}>
                 <Input label="الاسم" placeholder="اسمك الكامل" />
                 <Input label="المنظمة" placeholder="اسم المنظمة" />
               </div>
               <Input label="البريد الإلكتروني" placeholder="email@example.com" type="email" />
               <Input label="رقم الجوال" placeholder="+966 5X XXX XXXX" />
               <div>
-                <label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, display: "block", marginBottom: 6 }}>الموضوع</label>
-                <select style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif" }}>
+                <label style={{ fontSize: 13, fontWeight: 600, color: colors.ink, display: "block", marginBottom: 6 }}>الموضوع</label>
+                <select style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit" }}>
                   <option>استفسار عام</option>
                   <option>استفسار عن الأسعار</option>
                   <option>طلب عرض تقديمي</option>
@@ -2618,7 +2151,7 @@ export default function DaffaPlatform() {
 
           <div>
             <Card style={{ padding: 24, marginBottom: 16 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>معلومات التواصل</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>معلومات التواصل</h3>
               {[
                 { icon: <IcMail width={20} height={20}/>,  title: "البريد الإلكتروني", value: sc('contact_email','info@daffa.sa') },
                 { icon: <IcPhone width={20} height={20}/>, title: "الهاتف",             value: sc('contact_phone','+966 55 XXX XXXX') },
@@ -2626,17 +2159,17 @@ export default function DaffaPlatform() {
                 { icon: <IcClock width={20} height={20}/>, title: "ساعات العمل",        value: sc('contact_hours','الأحد - الخميس: 8 ص - 5 م') },
               ].map((c, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 0", borderBottom: i < 3 ? `1px solid ${colors.grayLight}` : "none" }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 10, background: colors.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", color: colors.orange }}>{c.icon}</div>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: colors.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", color: colors.amberText }}>{c.icon}</div>
                   <div>
                     <div style={{ fontSize: 12, color: colors.gray }}>{c.title}</div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: colors.tealDark }}>{c.value}</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: colors.ink }}>{c.value}</div>
                   </div>
                 </div>
               ))}
             </Card>
 
             <Card style={{ padding: 24 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>تابعنا</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>تابعنا</h3>
               <div style={{ display: "flex", gap: 10 }}>
                 {[
                   { label: "𝕏 تويتر",  href: sc('social_twitter','') },
@@ -2644,14 +2177,14 @@ export default function DaffaPlatform() {
                   { label: "انستغرام", href: sc('social_instagram','') },
                 ].map((s, i) => (
                   s.href
-                    ? <a key={i} href={s.href} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: "12px 8px", background: colors.grayLight, borderRadius: 10, textAlign: "center", cursor: "pointer", fontSize: 12, fontWeight: 600, color: colors.tealDark, textDecoration: "none", display: "block" }}>{s.label}</a>
-                    : <div key={i} style={{ flex: 1, padding: "12px 8px", background: colors.grayLight, borderRadius: 10, textAlign: "center", fontSize: 12, fontWeight: 600, color: colors.tealDark }}>{s.label}</div>
+                    ? <a key={i} href={s.href} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: "12px 8px", background: colors.grayLight, borderRadius: 10, textAlign: "center", cursor: "pointer", fontSize: 12, fontWeight: 600, color: colors.ink, textDecoration: "none", display: "block" }}>{s.label}</a>
+                    : <div key={i} style={{ flex: 1, padding: "12px 8px", background: colors.grayLight, borderRadius: 10, textAlign: "center", fontSize: 12, fontWeight: 600, color: colors.ink }}>{s.label}</div>
                 ))}
               </div>
             </Card>
 
-            <Card style={{ padding: 24, marginTop: 16, background: `${colors.teal}08`, border: `1.5px solid ${colors.teal}20` }}>
-              <h3 style={{ fontSize: 14, fontWeight: 700, color: colors.teal, marginBottom: 8 }}>هل تريد عرض تقديمي؟</h3>
+            <Card style={{ padding: 24, marginTop: 16, background: `${colors.primary}08`, border: `1.5px solid ${colors.primary}20` }}>
+              <h3 style={{ fontSize: 14, fontWeight: 700, color: colors.primary, marginBottom: 8 }}>هل تريد عرض تقديمي؟</h3>
               <p style={{ fontSize: 12, color: colors.gray, lineHeight: 1.7 }}>يمكننا تقديم عرض تفصيلي عن المنصة لفريقكم. تواصلوا معنا لتحديد موعد مناسب.</p>
               <Btn small variant="secondary" style={{ marginTop: 10 }}>طلب عرض تقديمي</Btn>
             </Card>
@@ -2667,13 +2200,13 @@ export default function DaffaPlatform() {
     <div className="geo-bg" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <Card style={{ width: 420, padding: 40, textAlign: "center" }}>
         <Logo size="md" />
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.tealDark, margin: "24px 0" }}>تسجيل الدخول</h2>
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.ink, margin: "24px 0" }}>تسجيل الدخول</h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 16, textAlign: "right" }}>
           <Input label="البريد الإلكتروني" placeholder="example@org.sa" type="email" />
           <Input label="كلمة المرور" placeholder="••••••••" type="password" />
-          <div style={{ textAlign: "left" }}><a style={{ fontSize: 12, color: colors.orange, cursor: "pointer" }}>نسيت كلمة المرور؟</a></div>
+          <div style={{ textAlign: "left" }}><a style={{ fontSize: 12, color: colors.amberText, cursor: "pointer" }}>نسيت كلمة المرور؟</a></div>
           <Btn full onClick={() => navigate("client-dash", "client")}>دخول</Btn>
-          <p style={{ fontSize: 13, color: colors.gray, textAlign: "center" }}>ليس لديك حساب؟ <a onClick={() => navigate("register")} style={{ color: colors.teal, fontWeight: 600, cursor: "pointer" }}>سجل الآن</a></p>
+          <p style={{ fontSize: 13, color: colors.gray, textAlign: "center" }}>ليس لديك حساب؟ <a onClick={() => navigate("register")} style={{ color: colors.primary, fontWeight: 600, cursor: "pointer" }}>سجل الآن</a></p>
         </div>
       </Card>
     </div>
@@ -2695,8 +2228,8 @@ export default function DaffaPlatform() {
       <div className="geo-bg" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <Card style={{ width: 520, padding: 40 }}>
           <div style={{ textAlign: "center" }}><Logo size="md" /></div>
-          <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.tealDark, margin: "20px 0", textAlign: "center" }}>إنشاء حساب جديد</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.ink, margin: "20px 0", textAlign: "center" }}>إنشاء حساب جديد</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 14 }}>
             <Input label="اسم المنظمة" placeholder="جمعية أثر" />
             <Input label="نوع المنظمة" placeholder="غير ربحية" />
             <Input label="اسم الممثل" placeholder="الاسم الكامل" />
@@ -2708,11 +2241,11 @@ export default function DaffaPlatform() {
           </div>
           {/* شعار المنظمة */}
           <div style={{ margin: "14px 0", padding: "16px", background: colors.grayLight, borderRadius: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, marginBottom: 10 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: colors.ink, marginBottom: 10 }}>
               شعار المنظمة <span style={{ fontSize: 11, fontWeight: 400, color: colors.gray }}>(اختياري)</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{ flexShrink: 0, width: 52, height: 52, borderRadius: "50%", overflow: "hidden", border: `2px solid ${colors.grayBorder}`, background: `linear-gradient(135deg, ${colors.teal}, ${colors.tealDark})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ flexShrink: 0, width: 52, height: 52, borderRadius: "50%", overflow: "hidden", border: `2px solid ${colors.grayBorder}`, background: `linear-gradient(135deg, ${colors.primary}, ${colors.ink})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {regLogoPreview ? (
                   <img src={regLogoPreview} alt="شعار" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 ) : (
@@ -2721,19 +2254,19 @@ export default function DaffaPlatform() {
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 {regLogo ? (
-                  <div style={{ fontSize: 11, color: colors.green || "#16a34a", fontWeight: 600, marginBottom: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <div style={{ fontSize: 11, color: colors.green || "#0B7F5D", fontWeight: 600, marginBottom: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {regLogo.name}
                   </div>
                 ) : (
                   <div style={{ fontSize: 11, color: colors.gray, marginBottom: 8 }}>PNG / JPG / WebP — بحد أقصى 2 ميغابايت</div>
                 )}
                 <div style={{ display: "flex", gap: 8 }}>
-                  <label style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 14px", background: "#fff", border: `1.5px solid ${colors.grayBorder}`, borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", color: colors.tealDark, fontFamily: "'Cairo', sans-serif", flexShrink: 0 }}>
+                  <label style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 14px", background: "#fff", border: `1.5px solid ${colors.grayBorder}`, borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", color: colors.ink, fontFamily: "inherit", flexShrink: 0 }}>
                     {regLogo ? "تغيير الشعار" : "اختر شعاراً"}
                     <input type="file" accept="image/*" onChange={handleRegLogo} style={{ display: "none" }} />
                   </label>
                   {regLogo && (
-                    <button onClick={() => { setRegLogo(null); setRegLogoPreview(null); }} style={{ padding: "7px 12px", background: "#fef2f2", color: "#dc2626", border: "1px solid #fecaca", borderRadius: 8, fontSize: 12, cursor: "pointer", fontFamily: "'Cairo', sans-serif", flexShrink: 0 }}>
+                    <button onClick={() => { setRegLogo(null); setRegLogoPreview(null); }} style={{ padding: "7px 12px", background: "#FCEBEB", color: "#C53A3A", border: "1px solid #F1B2B2", borderRadius: 8, fontSize: 12, cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>
                       حذف
                     </button>
                   )}
@@ -2742,101 +2275,145 @@ export default function DaffaPlatform() {
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "4px 0 16px", fontSize: 12, color: colors.gray }}>
-            <input type="checkbox" style={{ accentColor: colors.teal }} />
+            <input type="checkbox" style={{ accentColor: colors.primary }} />
             <span>أوافق على الشروط والأحكام</span>
           </div>
           <Btn full onClick={() => navigate("client-dash", "client")}>تسجيل</Btn>
-          <p style={{ fontSize: 13, color: colors.gray, textAlign: "center", marginTop: 14 }}>لديك حساب؟ <a onClick={() => navigate("login")} style={{ color: colors.teal, fontWeight: 600, cursor: "pointer" }}>تسجيل الدخول</a></p>
+          <p style={{ fontSize: 13, color: colors.gray, textAlign: "center", marginTop: 14 }}>لديك حساب؟ <a onClick={() => navigate("login")} style={{ color: colors.primary, fontWeight: 600, cursor: "pointer" }}>تسجيل الدخول</a></p>
         </Card>
       </div>
     );
   };
 
   // ============== CLIENT DASHBOARD ==============
-  const ClientDashboard = () => (
-    <div className="animate-in">
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 24 }}>
-        مرحباً{authUser?.org_name ? `، ${authUser.org_name}` : authUser?.rep_name ? `، ${authUser.rep_name}` : ''}
-      </h2>
+  // ── «خطوتك التالية»: توصية واحدة واضحة لغير المتخصص ──
+  const nextStepFor = (phases, notifs) => {
+    if (!phases) return null;
+    const revision = (notifs || []).find(n => !n.read && /revision/.test(n.type || ''));
+    const view = (k) => systems[k].view;
+    if (revision) {
+      const k = /^op_/.test(revision.type) ? 'operational' : /^policy/.test(revision.type) ? 'policies' : 'strategic';
+      return { tone: 'amber', title: 'مستشارك طلب تعديلًا بسيطًا', text: `${revision.title}. اقرأ الملاحظات، عدّل المطلوب، ثم أعد الإرسال — التعديل جزء طبيعي من الرحلة.`, cta: 'افتح الملاحظات', go: view(k), sys: k };
+    }
+    for (const p of phases) {
+      const r = p.raw;
+      if (!r) continue;
+      const started = p.key === 'policies' ? !!r.workflow : true;
+      if (!started) continue;
+      const step = p.key === 'policies' ? r.workflow?.current_step : r.current_step;
+      const status = p.key === 'policies' ? r.workflow?.status : r.status;
+      if (status === 'completed') continue;
+      if (step && step < 3) return { tone: 'primary', title: `أكمل الاشتراك في ${systems[p.key].label}`, text: 'بقي اختيار مستشارك وإتمام الدفع، ثم تُفتح لك الوحدات مباشرة.', cta: 'أكمل الآن', go: view(p.key), sys: p.key };
+      return { tone: 'primary', title: `تابع ${systems[p.key].label}`, text: `أنجزت ${p.sub}. افتح الوحدة التالية واتبع الشرح والفيديو ثم عبّئ النموذج — يُحفظ عملك تلقائيًا.`, cta: 'تابع من حيث توقفت', go: view(p.key), sys: p.key };
+    }
+    const done = phases.filter(p => p.progress >= 100);
+    if (done.length) return { tone: 'green', title: 'وثائقك المعتمدة جاهزة', text: 'نزّل وثائقك بصيغة PDF من صفحة التحميلات، أو ابدأ خدمة أخرى متى شئت.', cta: 'اذهب إلى التحميلات', go: 'client-downloads' };
+    return { tone: 'primary', title: 'ابدأ أول خطوة لمنظمتك', text: 'لا تعرف من أين تبدأ؟ ننصح بالتخطيط الاستراتيجي: يرسم وجهة منظمتك للسنوات القادمة. والخدمات الثلاث مستقلة، فابدأ بما تحتاجه الآن.', cta: 'ابدأ التخطيط الاستراتيجي', go: 'strategic-roadmap', sys: 'strategic' };
+  };
 
-      {!dashPhases ? (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 }}>
-          {[0, 1, 2].map(i => (
-            <Card key={i} style={{ opacity: 0.5 }}>
-              <div style={{ height: 20, background: colors.grayLight, borderRadius: 6, marginBottom: 12 }} />
-              <div style={{ height: 8, background: colors.grayLight, borderRadius: 4, marginBottom: 10 }} />
-              <div style={{ height: 12, background: colors.grayLight, borderRadius: 4, width: "60%" }} />
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 }}>
-          {dashPhases.map((s, i) => (
-            <Card key={i} accent style={{ cursor: "pointer" }} onClick={s.onClick}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark }}>{s.title}</h3>
-                <Badge text={s.status} color={s.statusColor} small />
+  const ClientDashboard = () => {
+    const next = nextStepFor(dashPhases, notifications);
+    const firstName = authUser?.org_name || authUser?.rep_name || '';
+    const sysIcons = { strategic: Icons.strategic, operational: Icons.operational, policies: Icons.policies };
+    const sysDesc = {
+      strategic: 'وجهة منظمتك لسنوات: الرؤية والأهداف والمبادرات',
+      operational: 'خطة العمل السنوية: ماذا ومتى ومن وبكم',
+      policies: 'لوائح وسياسات جاهزة تنظّم العمل الداخلي',
+    };
+    const notifBadge = { unit_approved: { text: "معتمد", color: "green" }, unit_revision: { text: "تعديل", color: "amber" }, op_approved: { text: "معتمد", color: "green" }, op_revision: { text: "تعديل", color: "amber" }, policy_approved: { text: "معتمد", color: "green" }, policy_revision: { text: "تعديل", color: "amber" }, workflow_completed: { text: "مكتمل", color: "green" }, op_workflow_completed: { text: "مكتمل", color: "green" }, admin_message: { text: "من الإدارة", color: "blue" }, message: { text: "رسالة", color: "blue" }, payment: { text: "دفع", color: "primary" } };
+    return (
+      <div className="animate-in" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        {/* ترحيب + خطوتك التالية */}
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 24, background: `linear-gradient(135deg, ${colors.ink} 0%, ${colors.primaryDeep} 100%)`, color: '#fff', padding: 'clamp(20px, 4vw, 32px)' }}>
+          <RosetteShape size={300} color="#FFFFFF" opacity={0.07} style={{ position: 'absolute', left: -70, bottom: -110, animation: 'dfTurn 60s linear infinite' }} />
+          <RosetteShape size={34} color="#FFFFFF" hub={colors.amber} opacity={0.9} style={{ position: 'absolute', left: 26, top: 22 }} />
+          <div style={{ fontSize: 14, color: '#D6E4EE' }}>مرحبًا{firstName ? '،' : ''}</div>
+          <h2 style={{ color: '#fff', fontSize: 'clamp(20px, 3vw, 26px)', fontWeight: 700, margin: '2px 0 18px', maxWidth: '80%' }}>{firstName || 'بك في دفة'}</h2>
+          {next ? (
+            <div style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 18, padding: 18, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+              <div style={{ flex: '1 1 280px', minWidth: 0 }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: colors.ink, background: colors.amber, borderRadius: 999, padding: '3px 10px', marginBottom: 8 }}>خطوتك التالية</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{next.title}</div>
+                <div style={{ fontSize: 14, lineHeight: 1.9, color: '#D9E8F1' }}>{next.text}</div>
               </div>
-              <ProgressBar percent={s.progress} />
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10 }}>
-                <span style={{ fontSize: 12, color: colors.gray }}>{s.sub}</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: colors.teal }}>{s.progress}%</span>
-              </div>
-            </Card>
-          ))}
+              <Btn large onClick={() => navigate(next.go)} iconEnd={<span style={{ fontSize: 18 }}>←</span>}>{next.cta}</Btn>
+            </div>
+          ) : <Loading text="نجهّز لك خطوتك التالية…" pad={20} />}
         </div>
-      )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
-        <Card>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>آخر النشاطات</h3>
-          {!notifications ? (
-            <div style={{ padding: 20, textAlign: "center", color: colors.gray, fontSize: 12 }}>جارٍ التحميل…</div>
-          ) : notifications.length === 0 ? (
-            <div style={{ padding: 20, textAlign: "center", color: colors.gray, fontSize: 12 }}>لا توجد نشاطات بعد</div>
-          ) : (() => {
-            const notifBadge = { unit_approved: { text: "معتمد", color: "green" }, unit_revision: { text: "تعديل", color: "orange" }, op_approved: { text: "معتمد", color: "green" }, op_revision: { text: "تعديل", color: "orange" }, policy_approved: { text: "معتمد", color: "green" }, policy_revision: { text: "تعديل", color: "orange" }, workflow_completed: { text: "مكتمل", color: "green" }, op_workflow_completed: { text: "مكتمل", color: "green" }, admin_message: { text: "رسالة", color: "orange" }, message: { text: "رسالة", color: "blue" }, payment: { text: "دفع", color: "teal" } };
-            const recent = notifications.slice(0, 4);
-            return recent.map((n, i) => {
+        {/* الأنظمة الثلاثة */}
+        <div>
+          <SectionTitle help={<Help term="journey" />}>خدماتك</SectionTitle>
+          <div style={{ display: "grid", gridTemplateColumns: "var(--g-3)", gap: 16 }}>
+            {(dashPhases || [null, null, null]).map((s, i) => {
+              const key = s?.key || ['strategic', 'operational', 'policies'][i];
+              const sys = systems[key];
+              return (
+                <Card key={key} onClick={s ? s.onClick : undefined} style={{ padding: 20, borderTop: `4px solid ${sys.color}`, opacity: s ? 1 : 0.55, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                    <div style={{ width: 46, height: 46, borderRadius: 14, background: sys.soft, color: sys.text, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{sysIcons[key]}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, display: 'flex', alignItems: 'center' }}>{sys.label}<Help term={key === 'strategic' ? 'strategic_plan' : key === 'operational' ? 'operational_plan' : 'policies'} /></h3>
+                      <div style={{ fontSize: 13, color: colors.gray, lineHeight: 1.7 }}>{sysDesc[key]}</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ flex: 1 }}><ProgressBar percent={s?.progress || 0} color={sys.color} /></div>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: colors.ink }}>{s?.progress || 0}٪</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: 'center' }}>
+                    <span style={{ fontSize: 13, color: colors.gray }}>{s?.sub || '—'}</span>
+                    {s && <Badge text={s.status} color={s.statusColor === 'yellow' ? 'amber' : s.statusColor} small dot />}
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-2-1)", gap: 16 }}>
+          <Card>
+            <SectionTitle action={<Btn small variant="ghost" onClick={() => navigate('client-notifications')}>عرض الكل</Btn>}>آخر النشاطات</SectionTitle>
+            {!notifications ? <Loading pad={20} /> : notifications.length === 0 ? (
+              <div style={{ padding: 20, textAlign: "center", color: colors.gray, fontSize: 14 }}>لا توجد نشاطات بعد — ستظهر هنا اعتمادات المستشار ورسائله.</div>
+            ) : notifications.slice(0, 5).map((n, i, arr) => {
               const b = notifBadge[n.type] || { text: "إشعار", color: "gray" };
               return (
-                <div key={n.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: i < recent.length - 1 ? `1px solid ${colors.grayLight}` : "none" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-                    <Badge text={b.text} color={b.color} small />
-                    <span style={{ fontSize: 13, color: colors.tealDark, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.title}</span>
-                  </div>
-                  <span style={{ fontSize: 11, color: colors.gray, flexShrink: 0, marginRight: 8 }}>{n.time}</span>
+                <div key={n.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 0", borderBottom: i < arr.length - 1 ? `1px solid ${colors.grayBorder}` : "none" }}>
+                  <Badge text={b.text} color={b.color} small />
+                  <span style={{ flex: 1, minWidth: 0, fontSize: 14, color: colors.ink, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: n.read ? 400 : 600 }}>{n.title}</span>
+                  <span style={{ fontSize: 12, color: colors.gray, flexShrink: 0 }}>{n.time}</span>
                 </div>
               );
-            });
-          })()}
-        </Card>
+            })}
+          </Card>
 
-        <Card>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>المستشار المعيّن</h3>
-          {!dashConsultant ? (
-            <div style={{ padding: 20, textAlign: "center", color: colors.gray, fontSize: 12 }}>لم يتم تعيين مستشار بعد</div>
-          ) : (
-            <div style={{ textAlign: "center" }}>
-              {dashConsultant.avatar ? (
-                <img src={`${import.meta.env.VITE_STORAGE_URL || 'http://daffaback.test'}/storage/${dashConsultant.avatar}`} alt={dashConsultant.name} style={{ width: 64, height: 64, borderRadius: "50%", objectFit: "cover", margin: "0 auto 12px", display: "block" }} />
-              ) : (
-                <div style={{ width: 64, height: 64, borderRadius: "50%", background: `linear-gradient(135deg, ${colors.teal}, ${colors.orange})`, margin: "0 auto 12px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 24, fontWeight: 700 }}>
-                  {dashConsultant.avatar_initial || (dashConsultant.name || '').charAt(0)}
+          <Card>
+            <SectionTitle help={<Help term="consultant" />}>مستشارك</SectionTitle>
+            {!dashConsultant ? (
+              <div style={{ padding: '12px 0', color: colors.gray, fontSize: 14, lineHeight: 1.9 }}>ستختار مستشارك عند الاشتراك في أي خدمة، وسيظهر هنا للتواصل معه مباشرة.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: "center" }}>
+                {dashConsultant.avatar ? (
+                  <img src={`${import.meta.env.VITE_STORAGE_URL || ''}/storage/${dashConsultant.avatar}`} alt={dashConsultant.name} style={{ width: 72, height: 72, borderRadius: 22, objectFit: "cover", marginBottom: 12 }} />
+                ) : (
+                  <div style={{ width: 72, height: 72, borderRadius: 22, background: colors.primaryTint, color: colors.primary, marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 28 }}>
+                    {dashConsultant.avatar_initial || (dashConsultant.name || '').charAt(0)}
+                  </div>
+                )}
+                <h4 style={{ fontSize: 16, fontWeight: 700, color: colors.ink }}>{dashConsultant.name}</h4>
+                <p style={{ fontSize: 13, color: colors.gray, margin: "2px 0 8px" }}>{dashConsultant.specialty || 'مستشار معتمد'}</p>
+                <div style={{ display: "flex", justifyContent: "center", gap: 2, marginBottom: 14, color: colors.amber }} data-tip={`التقييم ${dashConsultant.rating || 0} من 5`}>
+                  {[1,2,3,4,5].map(s => <span key={s} style={{ opacity: s <= Math.round(dashConsultant.rating || 0) ? 1 : 0.25, display: 'flex' }}>{Icons.star}</span>)}
                 </div>
-              )}
-              <h4 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark }}>{dashConsultant.name}</h4>
-              <p style={{ fontSize: 12, color: colors.gray, margin: "4px 0 12px" }}>{dashConsultant.specialty || 'مستشار معتمد'}</p>
-              <div style={{ display: "flex", justifyContent: "center", gap: 2, marginBottom: 12 }}>
-                {[1,2,3,4,5].map(s => <span key={s} style={{ color: s <= Math.round(dashConsultant.rating || 0) ? colors.yellow : colors.grayLight }}>{Icons.star}</span>)}
+                <Btn variant="secondary" full onClick={() => navigate("client-chat")} icon={Icons.chat}>راسل مستشارك</Btn>
               </div>
-              <Btn small variant="secondary" full onClick={() => navigate("client-chat")}>محادثة</Btn>
-            </div>
-          )}
-        </Card>
+            )}
+          </Card>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // ============== STRATEGIC ROADMAP ==============
   // ============== STRATEGIC PLANNING DATA ==============
@@ -2959,10 +2536,10 @@ export default function DaffaPlatform() {
         {workflowSteps.map((ws, i) => (
           <React.Fragment key={i}>
             <div onClick={() => i <= strategicStep && setStrategicStep(i)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: i <= strategicStep ? "pointer" : "default", minWidth: 80, position: "relative" }}>
-              <div style={{ width: 40, height: 40, borderRadius: i === strategicStep ? 12 : "50%", background: i < strategicStep ? colors.green : i === strategicStep ? colors.orange : colors.grayLight, color: i <= strategicStep ? "white" : colors.gray, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, transition: "all 0.3s", boxShadow: i === strategicStep ? `0 4px 12px ${colors.orange}40` : "none" }}>
+              <div style={{ width: 40, height: 40, borderRadius: i === strategicStep ? 12 : "50%", background: i < strategicStep ? colors.green : i === strategicStep ? colors.amber : colors.grayLight, color: i <= strategicStep ? "#0E2A3D" : colors.gray, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, transition: "all 0.3s", boxShadow: i === strategicStep ? `0 4px 12px ${colors.amberLine}40` : "none" }}>
                 {i < strategicStep ? <IcCheck width={16} height={16}/> : ws.icon}
               </div>
-              <span style={{ fontSize: 10, fontWeight: i === strategicStep ? 700 : 500, color: i < strategicStep ? colors.green : i === strategicStep ? colors.orange : colors.gray, textAlign: "center", maxWidth: 90, lineHeight: 1.3 }}>{ws.label}</span>
+              <span style={{ fontSize: 10, fontWeight: i === strategicStep ? 700 : 500, color: i < strategicStep ? colors.green : i === strategicStep ? colors.amberText : colors.gray, textAlign: "center", maxWidth: 90, lineHeight: 1.3 }}>{ws.label}</span>
             </div>
             {i < workflowSteps.length - 1 && (
               <div style={{ flex: 1, height: 3, background: i < strategicStep ? colors.green : colors.grayBorder, borderRadius: 2, margin: "0 4px", marginBottom: 20, transition: "background 0.3s" }} />
@@ -2978,27 +2555,27 @@ export default function DaffaPlatform() {
     <div className="animate-in">
       <Card accent style={{ padding: 32, textAlign: "center", marginBottom: 20 }}>
         <Rosette size={56} />
-        <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.tealDark, marginTop: 16 }}>نظام التخطيط الاستراتيجي</h2>
+        <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.ink, marginTop: 16 }}>نظام التخطيط الاستراتيجي</h2>
         <p style={{ fontSize: 15, color: colors.gray, lineHeight: 1.8, maxWidth: 600, margin: "12px auto 0" }}>بناء الخطة الاستراتيجية الكاملة للمنظمة من خلال 11 وحدة تخطيطية متسلسلة مع مراجعة واعتماد من مستشار متخصص</p>
       </Card>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 16, marginBottom: 20 }}>
         <Card>
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>ما يشمله النظام</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>ما يشمله النظام</h3>
           {["11 وحدة تخطيطية متسلسلة", "فيديوهات تعليمية لكل وحدة", "شرح مكتوب وإرشادات مفصلة", "نماذج عمل جاهزة للتعبئة", "خدمة دردشة مع المستشار", "مراجعة واعتماد من مستشار متخصص", "وثيقة استراتيجية نهائية"].map((item, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: i < 6 ? `1px solid ${colors.grayLight}` : "none" }}>
               <span style={{ color: colors.green, display: "flex" }}><IcCheck width={14} height={14}/></span>
-              <span style={{ fontSize: 13, color: colors.tealDark }}>{item}</span>
+              <span style={{ fontSize: 13, color: colors.ink }}>{item}</span>
             </div>
           ))}
         </Card>
 
         <Card>
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>الوحدات التخطيطية الـ 11</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>الوحدات التخطيطية الـ 11</h3>
           {strategicUnits.map((u, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 0", borderBottom: i < 10 ? `1px solid ${colors.grayLight}` : "none" }}>
-              <span style={{ width: 24, height: 24, borderRadius: 6, background: colors.teal, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{u.id}</span>
-              <span style={{ fontSize: 12, color: colors.tealDark }}>{u.name}</span>
+              <span style={{ width: 24, height: 24, borderRadius: 6, background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{u.id}</span>
+              <span style={{ fontSize: 12, color: colors.ink }}>{u.name}</span>
             </div>
           ))}
         </Card>
@@ -3007,11 +2584,11 @@ export default function DaffaPlatform() {
       <Card style={{ marginBottom: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark }}>التكلفة</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink }}>التكلفة</h3>
             <p style={{ fontSize: 13, color: colors.gray, marginTop: 4 }}>تشمل جميع الوحدات + مراجعة المستشار + الوثيقة النهائية</p>
           </div>
           <div style={{ textAlign: "left" }}>
-            <div style={{ fontSize: 28, fontWeight: 800, color: colors.teal }}>5,000 <span style={{ fontSize: 14 }}>ريال</span></div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: colors.primary }}>5,000 <span style={{ fontSize: 14 }}>ريال</span></div>
             <div style={{ fontSize: 11, color: colors.gray }}>شامل الضريبة</div>
           </div>
         </div>
@@ -3033,21 +2610,21 @@ export default function DaffaPlatform() {
 
   const StepConsultantSelect = () => (
     <div className="animate-in">
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 6 }}>اختر المستشار</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>اختر المستشار</h2>
       <p style={{ fontSize: 13, color: colors.gray, marginBottom: 20 }}>سيقوم المستشار بمراجعة مخرجاتك في كل وحدة واعتمادها أو طلب تعديل</p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 16 }}>
         {consultants.map(c => (
-          <Card key={c.id} accent style={{ cursor: c.available ? "pointer" : "default", border: selectedConsultant === c.id ? `2px solid ${colors.orange}` : "2px solid transparent", opacity: c.available ? 1 : 0.5 }}
+          <Card key={c.id} accent style={{ cursor: c.available ? "pointer" : "default", border: selectedConsultant === c.id ? `2px solid ${colors.amberLine}` : "2px solid transparent", opacity: c.available ? 1 : 0.5 }}
             onClick={() => c.available && setSelectedConsultant(c.id)}>
             <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-              <div style={{ width: 64, height: 64, borderRadius: "50%", background: `linear-gradient(135deg, ${colors.teal}, ${colors.orange})`, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 24, fontWeight: 700, flexShrink: 0 }}>{c.name[0]}</div>
+              <div style={{ width: 64, height: 64, borderRadius: "50%", background: `linear-gradient(135deg, ${colors.primary}, ${colors.amber})`, display: "flex", alignItems: "center", justifyContent: "center", color: "#0E2A3D", fontSize: 24, fontWeight: 700, flexShrink: 0 }}>{c.name[0]}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark }}>{c.name}</h3>
-                  {selectedConsultant === c.id && <div style={{ width: 24, height: 24, borderRadius: "50%", background: colors.orange, display: "flex", alignItems: "center", justifyContent: "center" }}>{Icons.check}</div>}
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink }}>{c.name}</h3>
+                  {selectedConsultant === c.id && <div style={{ width: 24, height: 24, borderRadius: "50%", background: colors.amber, display: "flex", alignItems: "center", justifyContent: "center" }}>{Icons.check}</div>}
                 </div>
-                <Badge text={c.spec} color="teal" small />
+                <Badge text={c.spec} color="primary" small />
                 <p style={{ fontSize: 12, color: colors.gray, marginTop: 6, lineHeight: 1.6 }}>{c.bio}</p>
                 <div style={{ display: "flex", gap: 16, marginTop: 10, fontSize: 12, color: colors.gray }}>
                   <span style={{ display: "flex", alignItems: "center", gap: 3 }}><IcStar width={12} height={12}/> {c.rating}</span>
@@ -3073,11 +2650,11 @@ export default function DaffaPlatform() {
     const consultant = consultants.find(c => c.id === selectedConsultant);
     return (
       <div className="animate-in">
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 20 }}>إتمام الدفع</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 20 }}>إتمام الدفع</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 20 }}>
           {/* Order Summary */}
           <Card>
-            <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>ملخص الطلب</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>ملخص الطلب</h3>
             <div style={{ borderBottom: `1px solid ${colors.grayLight}`, paddingBottom: 10, marginBottom: 10 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, marginBottom: 6 }}>
                 <span>نظام التخطيط الاستراتيجي</span><span style={{ fontWeight: 600 }}>5,000 ريال</span>
@@ -3089,41 +2666,41 @@ export default function DaffaPlatform() {
                 <span>المستشار: {consultant?.name}</span><span style={{ color: colors.green, fontSize: 12 }}>مشمول</span>
               </div>
             </div>
-            <h4 style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, marginBottom: 8 }}>خدمات إضافية (اختيارية):</h4>
+            <h4 style={{ fontSize: 13, fontWeight: 600, color: colors.ink, marginBottom: 8 }}>خدمات إضافية (اختيارية):</h4>
             {[
               { name: "اعتماد الخطة من جهة استشارية", price: "2,000", checked: false },
               { name: "تصميم احترافي للوثيقة", price: "1,500", checked: false },
             ].map((addon, i) => (
               <label key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${colors.grayLight}`, cursor: "pointer" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <input type="checkbox" style={{ accentColor: colors.teal }} />
+                  <input type="checkbox" style={{ accentColor: colors.primary }} />
                   <span style={{ fontSize: 13 }}>{addon.name}</span>
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 600, color: colors.orange }}>{addon.price} ريال</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: colors.amberText }}>{addon.price} ريال</span>
               </label>
             ))}
             <div style={{ marginTop: 12, padding: "8px 0", display: "flex", justifyContent: "space-between" }}>
               <Input placeholder="كود خصم" />
               <Btn small variant="secondary" style={{ marginRight: 8 }}>تطبيق</Btn>
             </div>
-            <div style={{ marginTop: 14, padding: "12px 0", borderTop: `2px solid ${colors.tealDark}` }}>
+            <div style={{ marginTop: 14, padding: "12px 0", borderTop: `2px solid ${colors.ink}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 4 }}><span>المجموع الفرعي</span><span>5,000 ريال</span></div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 4 }}><span>ضريبة القيمة المضافة (15%)</span><span>750 ريال</span></div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 18, fontWeight: 800, color: colors.tealDark, marginTop: 8 }}><span>الإجمالي</span><span>5,750 ريال</span></div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 18, fontWeight: 800, color: colors.ink, marginTop: 8 }}><span>الإجمالي</span><span>5,750 ريال</span></div>
             </div>
           </Card>
 
           {/* Payment Form */}
           <Card>
-            <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>طريقة الدفع</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>طريقة الدفع</h3>
             <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
               {["بطاقة ائتمان", "مدى", "Apple Pay", "تحويل بنكي"].map((m, i) => (
-                <button key={i} style={{ flex: 1, padding: "10px 8px", borderRadius: 10, border: i === 0 ? `2px solid ${colors.teal}` : `1.5px solid ${colors.grayBorder}`, background: i === 0 ? `${colors.teal}08` : "white", fontSize: 12, fontWeight: i === 0 ? 600 : 400, fontFamily: "'Cairo', sans-serif", cursor: "pointer", color: i === 0 ? colors.teal : colors.gray }}>{m}</button>
+                <button key={i} style={{ flex: 1, padding: "10px 8px", borderRadius: 10, border: i === 0 ? `2px solid ${colors.primary}` : `1.5px solid ${colors.grayBorder}`, background: i === 0 ? `${colors.primary}08` : "white", fontSize: 12, fontWeight: i === 0 ? 600 : 400, fontFamily: "inherit", cursor: "pointer", color: i === 0 ? colors.primary : colors.gray }}>{m}</button>
               ))}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <Input label="رقم البطاقة" placeholder="XXXX XXXX XXXX XXXX" />
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 12 }}>
                 <Input label="تاريخ الانتهاء" placeholder="MM/YY" />
                 <Input label="CVV" placeholder="XXX" />
               </div>
@@ -3149,25 +2726,25 @@ export default function DaffaPlatform() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <Rosette size={36} />
-          <h2 style={{ fontSize: 20, fontWeight: 800, color: colors.tealDark }}>تعبئة النماذج ومشاهدة المواد</h2>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: colors.ink }}>تعبئة النماذج ومشاهدة المواد</h2>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, background: colors.grayLight, padding: "6px 12px", borderRadius: 8 }}>
-          <div style={{ width: 28, height: 28, borderRadius: "50%", background: colors.teal, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 11 }}>أ</div>
-          <span style={{ fontSize: 12, fontWeight: 600, color: colors.tealDark }}>المستشار: {consultants.find(c => c.id === selectedConsultant)?.name || "أحمد الشمري"}</span>
+          <div style={{ width: 28, height: 28, borderRadius: "50%", background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 11 }}>أ</div>
+          <span style={{ fontSize: 12, fontWeight: 600, color: colors.ink }}>المستشار: {consultants.find(c => c.id === selectedConsultant)?.name || "أحمد الشمري"}</span>
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
         <div style={{ flex: 1 }}><ProgressBar percent={progressPercent} height={10} /></div>
-        <span style={{ fontSize: 14, fontWeight: 700, color: colors.teal }}>{completedCount}/11 — {progressPercent}%</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: colors.primary }}>{completedCount}/11 — {progressPercent}%</span>
       </div>
 
       {/* Units Grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "var(--g-5)", gap: 12, marginBottom: 12 }}>
         {strategicUnits.slice(0, 5).map(u => {
           const s = statusMap[u.status];
           return (
-            <div key={u.id} onClick={() => setActiveUnit(u)} style={{ background: colors.tealCard, borderRadius: 12, padding: "20px 12px", textAlign: "center", borderBottom: `3px solid ${colors.orange}`, cursor: "pointer", transition: "transform 0.2s, box-shadow 0.2s" }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.15)"; }}
+            <div key={u.id} onClick={() => setActiveUnit(u)} style={{ background: colors.primaryDeep, borderRadius: 12, padding: "20px 12px", textAlign: "center", borderBottom: `3px solid ${colors.amberLine}`, cursor: "pointer", transition: "transform 0.2s, box-shadow 0.2s" }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(14,42,61,0.15)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
               <div style={{ color: "white", fontSize: 13, fontWeight: 600, marginBottom: 10, minHeight: 40 }}>{u.name}</div>
               <Badge text={s.badge} color={s.color} small />
@@ -3175,12 +2752,12 @@ export default function DaffaPlatform() {
           );
         })}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "var(--g-5)", gap: 12, marginBottom: 12 }}>
         {strategicUnits.slice(5, 10).map(u => {
           const s = statusMap[u.status];
           return (
-            <div key={u.id} onClick={() => setActiveUnit(u)} style={{ background: colors.tealCard, borderRadius: 12, padding: "20px 12px", textAlign: "center", borderBottom: `3px solid ${colors.orange}`, cursor: "pointer", transition: "transform 0.2s, box-shadow 0.2s" }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.15)"; }}
+            <div key={u.id} onClick={() => setActiveUnit(u)} style={{ background: colors.primaryDeep, borderRadius: 12, padding: "20px 12px", textAlign: "center", borderBottom: `3px solid ${colors.amberLine}`, cursor: "pointer", transition: "transform 0.2s, box-shadow 0.2s" }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(14,42,61,0.15)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
               <div style={{ color: "white", fontSize: 13, fontWeight: 600, marginBottom: 10, minHeight: 40 }}>{u.name}</div>
               <Badge text={s.badge} color={s.color} small />
@@ -3189,7 +2766,7 @@ export default function DaffaPlatform() {
         })}
       </div>
       <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-        <div onClick={() => setActiveUnit(strategicUnits[10])} style={{ background: colors.tealCard, borderRadius: 12, padding: "20px 40px", textAlign: "center", borderBottom: `3px solid ${colors.orange}`, cursor: "pointer", transition: "transform 0.2s" }}
+        <div onClick={() => setActiveUnit(strategicUnits[10])} style={{ background: colors.primaryDeep, borderRadius: 12, padding: "20px 40px", textAlign: "center", borderBottom: `3px solid ${colors.amberLine}`, cursor: "pointer", transition: "transform 0.2s" }}
           onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; }}
           onMouseLeave={e => { e.currentTarget.style.transform = ""; }}>
           <div style={{ color: "white", fontSize: 14, fontWeight: 600, marginBottom: 10 }}>الوثيقة الاستراتيجية</div>
@@ -3208,7 +2785,7 @@ export default function DaffaPlatform() {
   // ---- Step 4: Consultant Review ----
   const StepReview = () => (
     <div className="animate-in">
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 6 }}>مراجعة المستشار</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>مراجعة المستشار</h2>
       <p style={{ fontSize: 13, color: colors.gray, marginBottom: 20 }}>يقوم المستشار بمراجعة مخرجاتك واعتمادها أو طلب تعديل</p>
 
       <Card style={{ marginBottom: 16, padding: "16px 20px", background: colors.blueLight, borderRight: `4px solid ${colors.blue}` }}>
@@ -3224,8 +2801,8 @@ export default function DaffaPlatform() {
       {strategicUnits.map((u, i) => (
         <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: `1px solid ${colors.grayLight}`, background: "white", marginBottom: 2, borderRadius: i === 0 ? "10px 10px 0 0" : i === 10 ? "0 0 10px 10px" : 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 6, background: colors.tealCard, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700 }}>{u.id}</div>
-            <span style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark }}>{u.name}</span>
+            <div style={{ width: 28, height: 28, borderRadius: 6, background: colors.primaryDeep, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700 }}>{u.id}</div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: colors.ink }}>{u.name}</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <Badge text={statusMap[u.status].badge} color={statusMap[u.status].color} small />
@@ -3246,14 +2823,14 @@ export default function DaffaPlatform() {
     <div className="animate-in" style={{ textAlign: "center" }}>
       <div style={{ maxWidth: 500, margin: "0 auto" }}>
         <div style={{ width: 100, height: 100, borderRadius: "50%", background: colors.greenLight, margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center", color: colors.green }}><IcSparkles width={48} height={48}/></div>
-        <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.tealDark, marginBottom: 8 }}>تم اعتماد الخطة الاستراتيجية!</h2>
+        <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.ink, marginBottom: 8 }}>تم اعتماد الخطة الاستراتيجية!</h2>
         <p style={{ fontSize: 14, color: colors.gray, lineHeight: 1.8, marginBottom: 24 }}>تهانينا! تم اعتماد خطتك الاستراتيجية من المستشار. يمكنك الآن تحميل الوثيقة الاستراتيجية النهائية.</p>
         
         <Card accent style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.tealCard, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}><IcDocument width={24} height={24}/></div>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.primaryDeep, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}><IcDocument width={24} height={24}/></div>
             <div style={{ textAlign: "right", flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: colors.tealDark }}>الوثيقة الاستراتيجية — {authUser?.org_name || 'المنظمة'}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: colors.ink }}>الوثيقة الاستراتيجية — {authUser?.org_name || 'المنظمة'}</div>
               <div style={{ fontSize: 12, color: colors.gray }}>الخطة الاستراتيجية</div>
             </div>
             <Btn small>تحميل PDF</Btn>
@@ -3261,17 +2838,17 @@ export default function DaffaPlatform() {
         </Card>
 
         <Card style={{ marginBottom: 16 }}>
-          <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.tealDark, marginBottom: 10, textAlign: "right" }}>هل تود خدمات إضافية؟</h4>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.ink, marginBottom: 10, textAlign: "right" }}>هل تود خدمات إضافية؟</h4>
+          <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 10 }}>
             <div style={{ padding: 14, background: colors.grayLight, borderRadius: 10, textAlign: "center", cursor: "pointer" }}>
-              <div style={{ display: "flex", justifyContent: "center", marginBottom: 6, color: colors.orange }}><IcPalette width={24} height={24}/></div>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 6, color: colors.amberText }}><IcPalette width={24} height={24}/></div>
               <div style={{ fontSize: 12, fontWeight: 600 }}>تصميم احترافي للوثيقة</div>
-              <div style={{ fontSize: 11, color: colors.orange, marginTop: 4 }}>1,500 ريال</div>
+              <div style={{ fontSize: 11, color: colors.amberText, marginTop: 4 }}>1,500 ريال</div>
             </div>
             <div style={{ padding: 14, background: colors.grayLight, borderRadius: 10, textAlign: "center", cursor: "pointer" }}>
               <div style={{ display: "flex", justifyContent: "center", marginBottom: 6, color: colors.green }}><IcCheckCircle width={24} height={24}/></div>
               <div style={{ fontSize: 12, fontWeight: 600 }}>اعتماد من جهة استشارية</div>
-              <div style={{ fontSize: 11, color: colors.orange, marginTop: 4 }}>2,000 ريال</div>
+              <div style={{ fontSize: 11, color: colors.amberText, marginTop: 4 }}>2,000 ريال</div>
             </div>
           </div>
         </Card>
@@ -3300,15 +2877,15 @@ export default function DaffaPlatform() {
   // ============== UNIT-SPECIFIC TEMPLATE RENDERERS ==============
   const TemplateRenderer = ({ unit }) => {
     const tt = unit.templateType;
-    const inputStyle = { width: "100%", padding: "8px 10px", border: `1px solid ${colors.grayBorder}`, borderRadius: 6, fontSize: 12, fontFamily: "'Cairo', sans-serif" };
-    const taStyle = { width: "100%", minHeight: 70, padding: 10, border: `1px solid ${colors.grayBorder}`, borderRadius: 8, fontSize: 12, fontFamily: "'Cairo', sans-serif", resize: "vertical" };
+    const inputStyle = { width: "100%", padding: "8px 10px", border: `1px solid ${colors.grayBorder}`, borderRadius: 6, fontSize: 12, fontFamily: "inherit" };
+    const taStyle = { width: "100%", minHeight: 70, padding: 10, border: `1px solid ${colors.grayBorder}`, borderRadius: 8, fontSize: 12, fontFamily: "inherit", resize: "vertical" };
 
     if (tt === "swot") return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 10 }}>تحليل الموارد الداخلية</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 10 }}>تحليل الموارد الداخلية</h4>
         <div style={{ overflowX: "auto", marginBottom: 20 }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead><tr>{unit.tableHeaders.map(h => <th key={h} style={{ padding: "10px 12px", background: colors.tealCard, color: "white", fontSize: 12, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr></thead>
+            <thead><tr>{unit.tableHeaders.map(h => <th key={h} style={{ padding: "10px 12px", background: colors.primaryDeep, color: "white", fontSize: 12, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr></thead>
             <tbody>{unit.tableRows.map((r, i) => (
               <tr key={i} style={{ borderBottom: `1px solid ${colors.grayBorder}` }}>
                 <td style={{ padding: 10, fontSize: 13, fontWeight: 600, background: colors.grayLight }}>{r}</td>
@@ -3317,9 +2894,9 @@ export default function DaffaPlatform() {
             ))}</tbody>
           </table>
         </div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 10 }}>مصفوفة SWOT</h4>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-          {[{ title: "نقاط القوة (S)", color: colors.green }, { title: "نقاط الضعف (W)", color: colors.orange }, { title: "الفرص (O)", color: colors.blue }, { title: "التهديدات (T)", color: colors.red }].map((q, i) => (
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 10 }}>مصفوفة SWOT</h4>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 8 }}>
+          {[{ title: "نقاط القوة (S)", color: colors.green }, { title: "نقاط الضعف (W)", color: colors.amberText }, { title: "الفرص (O)", color: colors.blue }, { title: "التهديدات (T)", color: colors.red }].map((q, i) => (
             <div key={i} style={{ border: `2px solid ${q.color}20`, borderRadius: 10, overflow: "hidden" }}>
               <div style={{ padding: "8px 12px", background: `${q.color}10`, fontSize: 13, fontWeight: 600, color: q.color }}>{q.title}</div>
               <textarea style={{ ...taStyle, border: "none", minHeight: 80 }} placeholder="اكتب هنا..." />
@@ -3331,9 +2908,9 @@ export default function DaffaPlatform() {
 
     if (tt === "pestel") return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 10 }}>تحليل PESTEL</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 10 }}>تحليل PESTEL</h4>
         <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 20 }}>
-          <thead><tr>{unit.tableHeaders.map(h => <th key={h} style={{ padding: "10px 12px", background: colors.tealCard, color: "white", fontSize: 12, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr></thead>
+          <thead><tr>{unit.tableHeaders.map(h => <th key={h} style={{ padding: "10px 12px", background: colors.primaryDeep, color: "white", fontSize: 12, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr></thead>
           <tbody>{unit.tableRows.map((r, i) => (
             <tr key={i} style={{ borderBottom: `1px solid ${colors.grayBorder}` }}>
               <td style={{ padding: 10, fontSize: 13, fontWeight: 600, background: colors.grayLight }}>{r}</td>
@@ -3343,9 +2920,9 @@ export default function DaffaPlatform() {
             </tr>
           ))}</tbody>
         </table>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 10 }}>خريطة أصحاب المصلحة</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 10 }}>خريطة أصحاب المصلحة</h4>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead><tr>{["صاحب المصلحة", "مستوى التأثير", "مستوى الاهتمام", "استراتيجية التعامل"].map(h => <th key={h} style={{ padding: "10px 12px", background: colors.tealCard, color: "white", fontSize: 12, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr></thead>
+          <thead><tr>{["صاحب المصلحة", "مستوى التأثير", "مستوى الاهتمام", "استراتيجية التعامل"].map(h => <th key={h} style={{ padding: "10px 12px", background: colors.primaryDeep, color: "white", fontSize: 12, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr></thead>
           <tbody>{["الجهات الحكومية", "المانحون", "المستفيدون", "الموظفون", "الشركاء"].map((r, i) => (
             <tr key={i} style={{ borderBottom: `1px solid ${colors.grayBorder}` }}>
               <td style={{ padding: 10, fontSize: 13, fontWeight: 600, background: colors.grayLight }}>{r}</td>
@@ -3358,11 +2935,11 @@ export default function DaffaPlatform() {
 
     if (tt === "needs") return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 10 }}>تعريف المجتمع المستهدف</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 10 }}>تعريف المجتمع المستهدف</h4>
         <textarea style={{ ...taStyle, marginBottom: 16 }} placeholder="صف الفئة المستهدفة بدقة: من هم؟ أين يقعون؟ ما خصائصهم؟" />
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 10 }}>جدول الاحتياجات</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 10 }}>جدول الاحتياجات</h4>
         <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 16 }}>
-          <thead><tr>{unit.tableHeaders.map(h => <th key={h} style={{ padding: "10px 12px", background: colors.tealCard, color: "white", fontSize: 12, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr></thead>
+          <thead><tr>{unit.tableHeaders.map(h => <th key={h} style={{ padding: "10px 12px", background: colors.primaryDeep, color: "white", fontSize: 12, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr></thead>
           <tbody>{unit.tableRows.map((r, i) => (
             <tr key={i} style={{ borderBottom: `1px solid ${colors.grayBorder}` }}>
               <td style={{ padding: 10, fontSize: 13, fontWeight: 600, background: colors.grayLight }}>{r}</td>
@@ -3372,18 +2949,18 @@ export default function DaffaPlatform() {
             </tr>
           ))}</tbody>
         </table>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 10 }}>تحليل الفجوات</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 10 }}>تحليل الفجوات</h4>
         <textarea style={taStyle} placeholder="ما الفجوة بين الاحتياجات الفعلية والخدمات المتاحة حالياً؟" />
       </div>
     );
 
     if (tt === "tows") return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 10 }}>مصفوفة TOWS (التحليل المتقاطع)</h4>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 10 }}>مصفوفة TOWS (التحليل المتقاطع)</h4>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 10 }}>
           {[{ title: "SO — استراتيجيات القوة والفرص", sub: "كيف نستخدم نقاط القوة لاستثمار الفرص؟", color: colors.green },
             { title: "WO — استراتيجيات الضعف والفرص", sub: "كيف نعالج نقاط الضعف لاستثمار الفرص؟", color: colors.blue },
-            { title: "ST — استراتيجيات القوة والتهديدات", sub: "كيف نستخدم نقاط القوة لمواجهة التهديدات؟", color: colors.yellow },
+            { title: "ST — استراتيجيات القوة والتهديدات", sub: "كيف نستخدم نقاط القوة لمواجهة التهديدات؟", color: colors.amberText },
             { title: "WT — استراتيجيات الضعف والتهديدات", sub: "كيف نتجنب التهديدات في ظل نقاط الضعف؟", color: colors.red }
           ].map((q, i) => (
             <div key={i} style={{ border: `2px solid ${q.color}20`, borderRadius: 10, overflow: "hidden" }}>
@@ -3398,12 +2975,12 @@ export default function DaffaPlatform() {
     if (tt === "initiatives") return (
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal }}>المبادرات الاستراتيجية</h4>
+          <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary }}>المبادرات الاستراتيجية</h4>
           <Btn small>+ إضافة مبادرة</Btn>
         </div>
         {[{ name: "برنامج التعليم المجتمعي", goal: "تحسين التعليم" }, { name: "مشروع التأهيل المهني", goal: "تمكين الشباب" }, { name: "حملة التوعية الصحية", goal: "تعزيز الصحة" }].map((m, i) => (
           <Card key={i} accent style={{ marginBottom: 12, padding: 16 }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 12 }}>
               <Input label="اسم المبادرة" value={m.name} />
               <Input label="الهدف الاستراتيجي المرتبط" value={m.goal} />
               <div style={{ gridColumn: "1/-1" }}><Input label="وصف المبادرة" textarea placeholder="صف المبادرة بالتفصيل..." /></div>
@@ -3421,26 +2998,26 @@ export default function DaffaPlatform() {
     if (tt === "directions") return (
       <div>
         <div style={{ marginBottom: 20 }}>
-          <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 8 }}>الرؤية</h4>
+          <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 8 }}>الرؤية</h4>
           <textarea style={{ ...taStyle, minHeight: 50, fontSize: 16, fontWeight: 600, textAlign: "center" }} placeholder="أن نكون المنظمة الرائدة في..." />
         </div>
         <div style={{ marginBottom: 20 }}>
-          <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 8 }}>الرسالة</h4>
+          <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 8 }}>الرسالة</h4>
           <textarea style={{ ...taStyle, minHeight: 50, textAlign: "center" }} placeholder="نعمل على تقديم... لفئة... من خلال..." />
         </div>
         <div style={{ marginBottom: 20 }}>
-          <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 8 }}>القيم</h4>
+          <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 8 }}>القيم</h4>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {["الشفافية", "الإتقان", "العمل الجماعي", "الابتكار"].map((v, i) => (
-              <span key={i} style={{ padding: "6px 16px", borderRadius: 20, background: colors.orangeLight, color: colors.orange, fontSize: 13, fontWeight: 600 }}>{v}</span>
+              <span key={i} style={{ padding: "6px 16px", borderRadius: 20, background: colors.amberSoft, color: colors.amberText, fontSize: 13, fontWeight: 600 }}>{v}</span>
             ))}
             <button style={{ padding: "6px 16px", borderRadius: 20, background: colors.grayLight, color: colors.gray, fontSize: 13, border: "none", cursor: "pointer" }}>+ إضافة قيمة</button>
           </div>
         </div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 10 }}>الأهداف الاستراتيجية</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 10 }}>الأهداف الاستراتيجية</h4>
         {["تحسين جودة التعليم المجتمعي", "تمكين الشباب مهنياً واقتصادياً", "تعزيز الصحة المجتمعية"].map((g, i) => (
           <Card key={i} style={{ marginBottom: 8, padding: 12, display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: colors.teal, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14 }}>{i + 1}</div>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14 }}>{i + 1}</div>
             <input defaultValue={g} style={{ flex: 1, ...inputStyle }} />
           </Card>
         ))}
@@ -3450,12 +3027,12 @@ export default function DaffaPlatform() {
 
     if (tt === "toc") return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 16 }}>سلسلة نظرية التغيير</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 16 }}>سلسلة نظرية التغيير</h4>
         <div style={{ display: "flex", gap: 8, alignItems: "stretch", overflowX: "auto", paddingBottom: 8 }}>
-          {[{ title: "المدخلات", color: "#6366F1", placeholder: "الموارد البشرية\nالموارد المالية\nالبنية التحتية" },
-            { title: "الأنشطة", color: colors.teal, placeholder: "برامج تدريب\nحملات توعية\nخدمات مباشرة" },
+          {[{ title: "المدخلات", color: "#33769C", placeholder: "الموارد البشرية\nالموارد المالية\nالبنية التحتية" },
+            { title: "الأنشطة", color: colors.primary, placeholder: "برامج تدريب\nحملات توعية\nخدمات مباشرة" },
             { title: "المخرجات", color: colors.blue, placeholder: "عدد المستفيدين\nبرامج منفذة\nمواد منشورة" },
-            { title: "النتائج", color: colors.orange, placeholder: "تحسن المعرفة\nتغير السلوك\nزيادة الوعي" },
+            { title: "النتائج", color: colors.amberText, placeholder: "تحسن المعرفة\nتغير السلوك\nزيادة الوعي" },
             { title: "الأثر", color: colors.green, placeholder: "تحسن نوعية الحياة\nتمكين المجتمع\nتنمية مستدامة" }
           ].map((s, i) => (
             <React.Fragment key={i}>
@@ -3463,38 +3040,38 @@ export default function DaffaPlatform() {
                 <div style={{ padding: "8px 12px", background: `${s.color}15`, fontWeight: 700, fontSize: 13, color: s.color, textAlign: "center" }}>{s.title}</div>
                 <textarea style={{ ...taStyle, border: "none", minHeight: 120, fontSize: 11 }} placeholder={s.placeholder} />
               </div>
-              {i < 4 && <div style={{ display: "flex", alignItems: "center", fontSize: 24, color: colors.orange, fontWeight: 700 }}>←</div>}
+              {i < 4 && <div style={{ display: "flex", alignItems: "center", fontSize: 24, color: colors.amberText, fontWeight: 700 }}>←</div>}
             </React.Fragment>
           ))}
         </div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginTop: 20, marginBottom: 8 }}>الافتراضات الأساسية</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginTop: 20, marginBottom: 8 }}>الافتراضات الأساسية</h4>
         <textarea style={taStyle} placeholder="ما الشروط التي يجب توفرها لنجاح نظرية التغيير؟" />
       </div>
     );
 
     if (tt === "bmc") return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 12 }}>نموذج عمل المنظمة (Business Model Canvas)</h4>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6, marginBottom: 6 }}>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 12 }}>نموذج عمل المنظمة (Business Model Canvas)</h4>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-5)", gap: 6, marginBottom: 6 }}>
           {[{ t: "شرائح المستفيدين", p: "من هم المستفيدون؟" }, { t: "العلاقة مع المستفيدين", p: "كيف نتواصل معهم؟" }, { t: "القيم المقترحة", p: "ما القيمة المقدمة؟" }, { t: "الأنشطة الرئيسة", p: "ما الأنشطة الأساسية؟" }, { t: "الشراكات الرئيسة", p: "من الشركاء؟" }].map((s, i) => (
             <div key={i} style={{ border: `1.5px solid ${colors.grayBorder}`, borderRadius: 8, overflow: "hidden" }}>
-              <div style={{ padding: "6px 8px", background: colors.tealCard, color: "white", fontSize: 10, fontWeight: 600, textAlign: "center" }}>{s.t}</div>
+              <div style={{ padding: "6px 8px", background: colors.primaryDeep, color: "white", fontSize: 10, fontWeight: 600, textAlign: "center" }}>{s.t}</div>
               <textarea style={{ ...taStyle, border: "none", minHeight: 80, fontSize: 11 }} placeholder={s.p} />
             </div>
           ))}
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 6 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 6, marginBottom: 6 }}>
           {[{ t: "القنوات", p: "كيف نوصل الخدمات؟" }, { t: "الموارد الأساسية", p: "ما الموارد المطلوبة؟" }].map((s, i) => (
             <div key={i} style={{ border: `1.5px solid ${colors.grayBorder}`, borderRadius: 8, overflow: "hidden" }}>
-              <div style={{ padding: "6px 8px", background: colors.tealCard, color: "white", fontSize: 10, fontWeight: 600, textAlign: "center" }}>{s.t}</div>
+              <div style={{ padding: "6px 8px", background: colors.primaryDeep, color: "white", fontSize: 10, fontWeight: 600, textAlign: "center" }}>{s.t}</div>
               <textarea style={{ ...taStyle, border: "none", minHeight: 60, fontSize: 11 }} placeholder={s.p} />
             </div>
           ))}
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 6 }}>
           {[{ t: "مصادر الدخل", p: "تبرعات، منح، رسوم..." }, { t: "هيكل التكاليف", p: "رواتب، إيجار، برامج..." }].map((s, i) => (
             <div key={i} style={{ border: `1.5px solid ${colors.grayBorder}`, borderRadius: 8, overflow: "hidden" }}>
-              <div style={{ padding: "6px 8px", background: colors.orange, color: "white", fontSize: 10, fontWeight: 600, textAlign: "center" }}>{s.t}</div>
+              <div style={{ padding: "6px 8px", background: colors.amber, color: "#0E2A3D", fontSize: 10, fontWeight: 600, textAlign: "center" }}>{s.t}</div>
               <textarea style={{ ...taStyle, border: "none", minHeight: 60, fontSize: 11 }} placeholder={s.p} />
             </div>
           ))}
@@ -3505,18 +3082,18 @@ export default function DaffaPlatform() {
     if (tt === "kpis") return (
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal }}>جدول مؤشرات الأداء</h4>
+          <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary }}>جدول مؤشرات الأداء</h4>
           <Btn small>+ إضافة مؤشر</Btn>
         </div>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead><tr>{unit.tableHeaders.map(h => <th key={h} style={{ padding: "8px 6px", background: colors.tealCard, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr></thead>
+          <thead><tr>{unit.tableHeaders.map(h => <th key={h} style={{ padding: "8px 6px", background: colors.primaryDeep, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr></thead>
           <tbody>{[
             ["نسبة رضا المستفيدين", "تحسين الجودة", "85%", "استبيان", "ربعي", "مدير الجودة"],
             ["عدد المستفيدين", "التوسع", "500", "سجلات", "شهري", "مدير البرامج"],
             ["نسبة تنفيذ الميزانية", "الكفاءة المالية", "95%", "تقارير مالية", "ربعي", "المدير المالي"],
           ].map((r, i) => (
             <tr key={i} style={{ borderBottom: `1px solid ${colors.grayBorder}` }}>
-              {r.map((c, j) => <td key={j} style={{ padding: 6 }}><input style={{ width: "100%", padding: "6px 8px", border: `1px solid ${colors.grayBorder}`, borderRadius: 4, fontSize: 11, fontFamily: "'Cairo', sans-serif" }} defaultValue={c} /></td>)}
+              {r.map((c, j) => <td key={j} style={{ padding: 6 }}><input style={{ width: "100%", padding: "6px 8px", border: `1px solid ${colors.grayBorder}`, borderRadius: 4, fontSize: 11, fontFamily: "inherit" }} defaultValue={c} /></td>)}
             </tr>
           ))}</tbody>
         </table>
@@ -3525,25 +3102,25 @@ export default function DaffaPlatform() {
 
     if (tt === "orgchart") return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 16 }}>الهيكل التنظيمي</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 16 }}>الهيكل التنظيمي</h4>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-          <div style={{ padding: "10px 24px", background: colors.tealCard, color: "white", borderRadius: 8, fontWeight: 600, fontSize: 13 }}>المدير التنفيذي</div>
+          <div style={{ padding: "10px 24px", background: colors.primaryDeep, color: "white", borderRadius: 8, fontWeight: 600, fontSize: 13 }}>المدير التنفيذي</div>
           <div style={{ width: 2, height: 20, background: colors.grayBorder }} />
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
             {["مدير البرامج", "المدير المالي", "مدير الموارد البشرية", "مدير التواصل"].map((d, i) => (
-              <div key={i} style={{ padding: "8px 16px", background: colors.teal, color: "white", borderRadius: 8, fontSize: 12, fontWeight: 500 }}>{d}</div>
+              <div key={i} style={{ padding: "8px 16px", background: colors.primary, color: "white", borderRadius: 8, fontSize: 12, fontWeight: 500 }}>{d}</div>
             ))}
           </div>
           <div style={{ width: 2, height: 20, background: colors.grayBorder }} />
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
             {["منسق تعليم", "منسق صحة", "محاسب", "أخصائي HR", "مصمم"].map((d, i) => (
-              <div key={i} style={{ padding: "6px 12px", background: colors.grayLight, color: colors.tealDark, borderRadius: 6, fontSize: 11 }}>{d}</div>
+              <div key={i} style={{ padding: "6px 12px", background: colors.grayLight, color: colors.ink, borderRadius: 6, fontSize: 11 }}>{d}</div>
             ))}
           </div>
         </div>
         <div style={{ marginTop: 20, padding: 16, background: colors.grayLight, borderRadius: 10 }}>
-          <h4 style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, marginBottom: 10 }}>+ إضافة وظيفة جديدة</h4>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+          <h4 style={{ fontSize: 13, fontWeight: 600, color: colors.ink, marginBottom: 10 }}>+ إضافة وظيفة جديدة</h4>
+          <div style={{ display: "grid", gridTemplateColumns: "var(--g-3)", gap: 10 }}>
             <Input label="المسمى الوظيفي" placeholder="مدير قسم..." />
             <Input label="القسم" placeholder="البرامج..." />
             <Input label="يتبع لـ" placeholder="المدير التنفيذي..." />
@@ -3554,22 +3131,22 @@ export default function DaffaPlatform() {
 
     if (tt === "document") return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 16 }}>معاينة الوثيقة الاستراتيجية</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 16 }}>معاينة الوثيقة الاستراتيجية</h4>
         <div style={{ border: `2px solid ${colors.grayBorder}`, borderRadius: 12, overflow: "hidden" }}>
-          <div style={{ padding: "24px 30px", background: `linear-gradient(135deg, ${colors.teal}, ${colors.tealDark})`, color: "white", textAlign: "center" }}>
+          <div style={{ padding: "24px 30px", background: `linear-gradient(135deg, ${colors.primary}, ${colors.ink})`, color: "white", textAlign: "center" }}>
             <div style={{ fontSize: 12, opacity: 0.7 }}>{authUser?.org_name || 'المنظمة'}</div>
             <div style={{ fontSize: 22, fontWeight: 800, marginTop: 8 }}>الخطة الاستراتيجية</div>
           </div>
           <div style={{ padding: 24 }}>
             <div style={{ display: "flex", gap: 20 }}>
               <div style={{ width: 180, flexShrink: 0 }}>
-                <h4 style={{ fontSize: 12, fontWeight: 700, color: colors.tealDark, marginBottom: 10 }}>المحتويات</h4>
+                <h4 style={{ fontSize: 12, fontWeight: 700, color: colors.ink, marginBottom: 10 }}>المحتويات</h4>
                 {["الملخص التنفيذي", "تحليل البيئة الداخلية", "تحليل البيئة الخارجية", "دراسة الاحتياجات", "التحليل الاستراتيجي", "المبادرات", "التوجهات", "نظرية التغيير", "نموذج العمل", "مؤشرات الأداء", "الهيكل التنظيمي"].map((t, i) => (
-                  <div key={i} style={{ fontSize: 11, color: colors.teal, padding: "4px 0", cursor: "pointer", borderBottom: `1px solid ${colors.grayLight}` }}>← {t}</div>
+                  <div key={i} style={{ fontSize: 11, color: colors.primary, padding: "4px 0", cursor: "pointer", borderBottom: `1px solid ${colors.grayLight}` }}>← {t}</div>
                 ))}
               </div>
               <div style={{ flex: 1, fontSize: 13, color: colors.gray, lineHeight: 2 }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark, marginBottom: 8 }}>الملخص التنفيذي</h3>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>الملخص التنفيذي</h3>
                 <p>تسعى {authUser?.org_name || 'منظمتكم'} من خلال هذه الخطة الاستراتيجية إلى تحقيق نقلة نوعية في خدمة المجتمع المستهدف...</p>
                 <p style={{ marginTop: 8 }}>تتضمن الخطة 3 أهداف استراتيجية رئيسية و8 مبادرات تنفيذية...</p>
                 <div style={{ padding: 12, background: colors.grayLight, borderRadius: 8, marginTop: 12, textAlign: "center", fontSize: 12, color: colors.gray }}>... بقية الوثيقة تُولّد تلقائياً من البيانات المدخلة ...</div>
@@ -3600,9 +3177,9 @@ export default function DaffaPlatform() {
       <div className="animate-in">
         <div style={{ fontSize: 12, color: colors.gray, marginBottom: 4 }}>التخطيط الاستراتيجي {">"} {unit.name}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-          <button onClick={() => setActiveUnit(null)} style={{ background: "none", border: "none", cursor: "pointer", color: colors.teal, display: "flex" }}>{Icons.arrow}</button>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark }}>{unit.name}</h2>
-          <Badge text={`الوحدة ${unit.id} من 11`} color="teal" small />
+          <button onClick={() => setActiveUnit(null)} style={{ background: "none", border: "none", cursor: "pointer", color: colors.primary, display: "flex" }}>{Icons.arrow}</button>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink }}>{unit.name}</h2>
+          <Badge text={`الوحدة ${unit.id} من 11`} color="primary" small />
         </div>
 
         <StatusBar status={unit.status === "revision" ? "revision" : unit.status === "approved" ? "approved" : unit.status === "submitted" ? "submitted" : unit.status === "in_progress" ? "not_submitted" : "not_submitted"} />
@@ -3620,29 +3197,29 @@ export default function DaffaPlatform() {
         <Card>
           {tab === 0 && (
             <div>
-              <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>نبذة عن {unit.name}</h3>
+              <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>نبذة عن {unit.name}</h3>
               <p style={{ fontSize: 14, color: colors.gray, lineHeight: 2 }}>{unit.overview}</p>
               <p style={{ fontSize: 14, color: colors.gray, lineHeight: 2, marginTop: 12 }}>{unit.overview2}</p>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, padding: "8px 14px", background: colors.grayLight, borderRadius: 8, width: "fit-content", fontSize: 12, color: colors.gray }}>⏱ وقت القراءة: 5 دقائق</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16, padding: "8px 14px", background: colors.grayLight, borderRadius: 8, width: "fit-content", fontSize: 12, color: colors.gray }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />وقت القراءة: 5 دقائق</div>
             </div>
           )}
           {tab === 1 && (
             <div>
-              <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>شرح مكتوب: {unit.name}</h3>
+              <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>شرح مكتوب: {unit.name}</h3>
               <div style={{ display: "flex", gap: 24 }}>
                 <div style={{ flex: 1 }}>
                   {unit.topics.map((tp, i) => (
                     <div key={i} style={{ marginBottom: 16 }}>
-                      <h4 style={{ fontSize: 15, fontWeight: 600, color: colors.teal, marginBottom: 8 }}>{i + 1}. {tp.t}</h4>
+                      <h4 style={{ fontSize: 15, fontWeight: 600, color: colors.primary, marginBottom: 8 }}>{i + 1}. {tp.t}</h4>
                       <p style={{ fontSize: 13, color: colors.gray, lineHeight: 2 }}>{tp.d}</p>
                     </div>
                   ))}
                 </div>
                 <div style={{ width: 200, flexShrink: 0 }}>
                   <div style={{ background: colors.grayLight, borderRadius: 10, padding: 14 }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: colors.tealDark, marginBottom: 8 }}>المحتويات</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>المحتويات</div>
                     {unit.topics.map((tp, i) => (
-                      <div key={i} style={{ fontSize: 11, color: colors.teal, padding: "4px 0", cursor: "pointer" }}>← {tp.t}</div>
+                      <div key={i} style={{ fontSize: 11, color: colors.primary, padding: "4px 0", cursor: "pointer" }}>← {tp.t}</div>
                     ))}
                   </div>
                   <Btn small variant="secondary" full style={{ marginTop: 12 }}>تحميل PDF</Btn>
@@ -3652,26 +3229,26 @@ export default function DaffaPlatform() {
           )}
           {tab === 2 && (
             <div>
-              <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>إرشادات: {unit.name}</h3>
+              <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>إرشادات: {unit.name}</h3>
               {unit.steps.map((s, i) => (
                 <div key={i} style={{ display: "flex", gap: 14, marginBottom: 16 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.teal, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>{i + 1}</div>
-                  <div><h4 style={{ fontSize: 14, fontWeight: 600, color: colors.tealDark }}>{s.title}</h4><p style={{ fontSize: 13, color: colors.gray, lineHeight: 1.7 }}>{s.desc}</p></div>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>{i + 1}</div>
+                  <div><h4 style={{ fontSize: 14, fontWeight: 600, color: colors.ink }}>{s.title}</h4><p style={{ fontSize: 13, color: colors.gray, lineHeight: 1.7 }}>{s.desc}</p></div>
                 </div>
               ))}
-              <div style={{ padding: 14, background: colors.orangeLight, borderRadius: 10, borderRight: `3px solid ${colors.orange}`, marginTop: 16 }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: colors.orange, display: "inline-flex", alignItems: "center", gap: 4 }}><IcLightbulb width={13} height={13}/> نصيحة: </span>
+              <div style={{ padding: 14, background: colors.amberSoft, borderRadius: 10, borderRight: `3px solid ${colors.amberLine}`, marginTop: 16 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: colors.amberText, display: "inline-flex", alignItems: "center", gap: 4 }}><IcLightbulb width={13} height={13}/> نصيحة: </span>
                 <span style={{ fontSize: 13, color: colors.gray }}>{unit.tip}</span>
               </div>
             </div>
           )}
           {tab === 3 && (
             <div style={{ textAlign: "center" }}>
-              <div style={{ width: "100%", maxWidth: 600, margin: "0 auto", aspectRatio: "16/9", background: `linear-gradient(135deg, ${colors.tealCard}, #0D4F5E)`, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}>
+              <div style={{ width: "100%", maxWidth: 600, margin: "0 auto", aspectRatio: "16/9", background: `linear-gradient(135deg, ${colors.primaryDeep}, #123247)`, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}>
                 <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>{Icons.play}</div>
-                <div style={{ position: "absolute", bottom: 12, left: 12, background: "rgba(0,0,0,0.6)", padding: "4px 10px", borderRadius: 6, color: "white", fontSize: 12 }}>{unit.videoDuration}</div>
+                <div style={{ position: "absolute", bottom: 12, left: 12, background: "rgba(14,42,61,0.6)", padding: "4px 10px", borderRadius: 6, color: "white", fontSize: 12 }}>{unit.videoDuration}</div>
               </div>
-              <h4 style={{ fontSize: 15, fontWeight: 600, color: colors.tealDark, marginTop: 16 }}>شرح {unit.name}</h4>
+              <h4 style={{ fontSize: 15, fontWeight: 600, color: colors.ink, marginTop: 16 }}>شرح {unit.name}</h4>
               <p style={{ fontSize: 12, color: colors.gray }}>المدة: {unit.videoDuration} دقيقة</p>
               <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center", marginTop: 12, fontSize: 13, color: colors.gray }}>
                 <input type="checkbox" style={{ accentColor: colors.green }} />
@@ -3682,31 +3259,31 @@ export default function DaffaPlatform() {
           {tab === 4 && (
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, padding: "10px 14px", background: colors.grayLight, borderRadius: 10 }}>
-                <div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.teal, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14 }}>أ</div>
+                <div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14 }}>أ</div>
                 <div><div style={{ fontSize: 13, fontWeight: 600 }}>أحمد الشمري</div><div style={{ fontSize: 11, color: colors.green }}>● متصل</div></div>
               </div>
               <div style={{ height: 280, background: colors.grayLight, borderRadius: 12, padding: 16, overflowY: "auto", marginBottom: 12 }}>
                 <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: 12 }}>
-                  <div style={{ background: "#E5E7EB", padding: "10px 16px", borderRadius: "14px 14px 4px 14px", maxWidth: "70%", fontSize: 13 }}>مرحباً، كيف يمكنني مساعدتك في {unit.name}؟</div>
+                  <div style={{ background: "#E8E3DA", padding: "10px 16px", borderRadius: "14px 14px 4px 14px", maxWidth: "70%", fontSize: 13 }}>مرحباً، كيف يمكنني مساعدتك في {unit.name}؟</div>
                 </div>
                 <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
-                  <div style={{ background: colors.teal, color: "white", padding: "10px 16px", borderRadius: "14px 14px 14px 4px", maxWidth: "70%", fontSize: 13 }}>أستاذ أحمد، عندي سؤال عن هذه الوحدة</div>
+                  <div style={{ background: colors.primary, color: "white", padding: "10px 16px", borderRadius: "14px 14px 14px 4px", maxWidth: "70%", fontSize: 13 }}>أستاذ أحمد، عندي سؤال عن هذه الوحدة</div>
                 </div>
                 <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                  <div style={{ background: "#E5E7EB", padding: "10px 16px", borderRadius: "14px 14px 4px 14px", maxWidth: "70%", fontSize: 13 }}>تفضل، أنا جاهز لمساعدتك. اطرح سؤالك.</div>
+                  <div style={{ background: "#E8E3DA", padding: "10px 16px", borderRadius: "14px 14px 4px 14px", maxWidth: "70%", fontSize: 13 }}>تفضل، أنا جاهز لمساعدتك. اطرح سؤالك.</div>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button style={{ padding: 10, borderRadius: 10, border: `1px solid ${colors.grayBorder}`, background: "white", cursor: "pointer", display: "flex" }}>{Icons.clip}</button>
-                <input placeholder="اكتب رسالتك..." style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif", outline: "none" }} />
-                <button style={{ padding: "10px 16px", borderRadius: 10, background: colors.orange, border: "none", cursor: "pointer", display: "flex", color: "white" }}>{Icons.send}</button>
+                <input placeholder="اكتب رسالتك..." style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+                <button style={{ padding: "10px 16px", borderRadius: 10, background: colors.amber, border: "none", cursor: "pointer", display: "flex", color: "#0E2A3D" }}>{Icons.send}</button>
               </div>
             </div>
           )}
           {tab === 5 && (
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark }}>نماذج العمل: {unit.name}</h3>
+                <h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink }}>نماذج العمل: {unit.name}</h3>
                 <div style={{ fontSize: 11, color: colors.green, display: "flex", alignItems: "center", gap: 4 }}><IcSave width={12} height={12}/> تم الحفظ تلقائياً — 14:32</div>
               </div>
               <TemplateRenderer unit={unit} />
@@ -3782,10 +3359,10 @@ export default function DaffaPlatform() {
         {opWorkflowSteps.map((ws, i) => (
           <React.Fragment key={i}>
             <div onClick={() => i <= opStep && setOpStep(i)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: i <= opStep ? "pointer" : "default", minWidth: 70 }}>
-              <div style={{ width: 36, height: 36, borderRadius: ws.id === 5 ? 0 : i === opStep ? 10 : "50%", transform: ws.id === 5 ? "rotate(45deg)" : "none", background: i < opStep ? colors.green : i === opStep ? colors.orange : colors.grayLight, color: i <= opStep ? "white" : colors.gray, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, transition: "all 0.3s", boxShadow: i === opStep ? `0 4px 12px ${colors.orange}40` : "none" }}>
+              <div style={{ width: 36, height: 36, borderRadius: ws.id === 5 ? 0 : i === opStep ? 10 : "50%", transform: ws.id === 5 ? "rotate(45deg)" : "none", background: i < opStep ? colors.green : i === opStep ? colors.amber : colors.grayLight, color: i <= opStep ? "#0E2A3D" : colors.gray, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, transition: "all 0.3s", boxShadow: i === opStep ? `0 4px 12px ${colors.amberLine}40` : "none" }}>
                 <span style={{ transform: ws.id === 5 ? "rotate(-45deg)" : "none" }}>{i < opStep ? <IcCheck width={14} height={14}/> : ws.icon}</span>
               </div>
-              <span style={{ fontSize: 9, fontWeight: i === opStep ? 700 : 500, color: i < opStep ? colors.green : i === opStep ? colors.orange : colors.gray, textAlign: "center", maxWidth: 80, lineHeight: 1.3 }}>{ws.label}</span>
+              <span style={{ fontSize: 9, fontWeight: i === opStep ? 700 : 500, color: i < opStep ? colors.green : i === opStep ? colors.amberText : colors.gray, textAlign: "center", maxWidth: 80, lineHeight: 1.3 }}>{ws.label}</span>
             </div>
             {i < opWorkflowSteps.length - 1 && (
               <div style={{ flex: 1, height: 3, background: i < opStep ? colors.green : colors.grayBorder, borderRadius: 2, margin: "0 2px", marginBottom: 20 }} />
@@ -3800,10 +3377,10 @@ export default function DaffaPlatform() {
   const OpStepInfo = () => (
     <div className="animate-in">
       {strategicStep < 5 && (
-        <div style={{ padding: 16, background: colors.orangeLight, borderRadius: 12, borderRight: `4px solid ${colors.orange}`, marginBottom: 20, display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ color: colors.orange, display: "flex" }}><IcWarning width={24} height={24}/></span>
+        <div style={{ padding: 16, background: colors.amberSoft, borderRadius: 12, borderRight: `4px solid ${colors.amberLine}`, marginBottom: 20, display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ color: colors.amberText, display: "flex" }}><IcWarning width={24} height={24}/></span>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: colors.orange }}>يتطلب إكمال التخطيط الاستراتيجي أولاً</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: colors.amberText }}>يتطلب إكمال التخطيط الاستراتيجي أولاً</div>
             <div style={{ fontSize: 12, color: colors.gray }}>التخطيط الاستراتيجي مكتمل بنسبة {progressPercent}% — يجب اعتماده بالكامل قبل البدء بالتخطيط التشغيلي</div>
             <Btn small variant="secondary" style={{ marginTop: 8 }} onClick={() => navigate("strategic-roadmap")}>العودة للتخطيط الاستراتيجي</Btn>
           </div>
@@ -3811,32 +3388,32 @@ export default function DaffaPlatform() {
       )}
 
       <Card accent style={{ padding: 32, textAlign: "center", marginBottom: 20 }}>
-        <div style={{ width: 64, height: 64, borderRadius: "50%", background: colors.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: colors.orange }}><IcCog width={28} height={28}/></div>
-        <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.tealDark }}>نظام التخطيط التشغيلي</h2>
+        <div style={{ width: 64, height: 64, borderRadius: "50%", background: colors.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: colors.amberText }}><IcCog width={28} height={28}/></div>
+        <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.ink }}>نظام التخطيط التشغيلي</h2>
         <p style={{ fontSize: 14, color: colors.gray, lineHeight: 1.8, maxWidth: 600, margin: "12px auto 0" }}>تحويل المبادرات الاستراتيجية إلى خطة تشغيلية مفصلة بالأنشطة والجدول الزمني والمسؤوليات والتكاليف</p>
       </Card>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 16, marginBottom: 20 }}>
         <Card>
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>ما يشمله النظام</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>ما يشمله النظام</h3>
           {["استيراد المبادرات من الخطة الاستراتيجية", "تفكيك المبادرات إلى أنشطة تشغيلية", "مخطط جانت للجدول الزمني (12 شهر)", "تعيين المسؤولين عن كل نشاط", "تقدير التكلفة المالية والميزانية", "مراجعة واعتماد المستشار", "وثيقة تشغيلية نهائية"].map((item, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: i < 6 ? `1px solid ${colors.grayLight}` : "none" }}>
               <span style={{ color: colors.green, display: "flex" }}><IcCheck width={14} height={14}/></span>
-              <span style={{ fontSize: 13, color: colors.tealDark }}>{item}</span>
+              <span style={{ fontSize: 13, color: colors.ink }}>{item}</span>
             </div>
           ))}
         </Card>
         <Card>
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>الوحدات التخطيطية الـ 5</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>الوحدات التخطيطية الـ 5</h3>
           {operationalUnits.map((u, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: i < 4 ? `1px solid ${colors.grayLight}` : "none" }}>
-              <span style={{ width: 28, height: 28, borderRadius: 8, background: colors.teal, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{u.id}</span>
-              <span style={{ fontSize: 13, color: colors.tealDark }}>{u.name}</span>
+              <span style={{ width: 28, height: 28, borderRadius: 8, background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{u.id}</span>
+              <span style={{ fontSize: 13, color: colors.ink }}>{u.name}</span>
             </div>
           ))}
           <div style={{ marginTop: 16, padding: 12, background: colors.grayLight, borderRadius: 8, textAlign: "center" }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark }}>التكلفة: </span>
-            <span style={{ fontSize: 20, fontWeight: 800, color: colors.teal }}>3,500 ريال</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: colors.ink }}>التكلفة: </span>
+            <span style={{ fontSize: 20, fontWeight: 800, color: colors.primary }}>3,500 ريال</span>
           </div>
         </Card>
       </div>
@@ -3852,37 +3429,37 @@ export default function DaffaPlatform() {
   // ---- Op Step 1: Payment ----
   const OpStepPayment = () => (
     <div className="animate-in">
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 20 }}>إتمام الدفع — التخطيط التشغيلي</h2>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 20 }}>إتمام الدفع — التخطيط التشغيلي</h2>
+      <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 20 }}>
         <Card>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>ملخص الطلب</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>ملخص الطلب</h3>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, padding: "10px 0", borderBottom: `1px solid ${colors.grayLight}` }}>
             <span>نظام التخطيط التشغيلي (5 وحدات)</span><span style={{ fontWeight: 600 }}>3,500 ريال</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "8px 0", borderBottom: `1px solid ${colors.grayLight}` }}>
             <span>المستشار: {consultants.find(c => c.id === selectedConsultant)?.name || "أحمد الشمري"}</span><span style={{ color: colors.green, fontSize: 12 }}>مشمول</span>
           </div>
-          <h4 style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, marginTop: 12, marginBottom: 8 }}>خدمات إضافية:</h4>
+          <h4 style={{ fontSize: 13, fontWeight: 600, color: colors.ink, marginTop: 12, marginBottom: 8 }}>خدمات إضافية:</h4>
           <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", cursor: "pointer" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}><input type="checkbox" style={{ accentColor: colors.teal }} /><span style={{ fontSize: 13 }}>تحكيم واعتماد الخطة من جهة استشارية</span></div>
-            <span style={{ fontSize: 12, fontWeight: 600, color: colors.orange }}>2,500 ريال</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}><input type="checkbox" style={{ accentColor: colors.primary }} /><span style={{ fontSize: 13 }}>تحكيم واعتماد الخطة من جهة استشارية</span></div>
+            <span style={{ fontSize: 12, fontWeight: 600, color: colors.amberText }}>2,500 ريال</span>
           </label>
-          <div style={{ marginTop: 14, padding: "12px 0", borderTop: `2px solid ${colors.tealDark}` }}>
+          <div style={{ marginTop: 14, padding: "12px 0", borderTop: `2px solid ${colors.ink}` }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 4 }}><span>المجموع الفرعي</span><span>3,500 ريال</span></div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 4 }}><span>ضريبة القيمة المضافة (15%)</span><span>525 ريال</span></div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 18, fontWeight: 800, color: colors.tealDark, marginTop: 8 }}><span>الإجمالي</span><span>4,025 ريال</span></div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 18, fontWeight: 800, color: colors.ink, marginTop: 8 }}><span>الإجمالي</span><span>4,025 ريال</span></div>
           </div>
         </Card>
         <Card>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>طريقة الدفع</h3>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>طريقة الدفع</h3>
           <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
             {["بطاقة ائتمان", "مدى", "Apple Pay", "تحويل بنكي"].map((m, i) => (
-              <button key={i} style={{ flex: 1, padding: "10px 8px", borderRadius: 10, border: i === 0 ? `2px solid ${colors.teal}` : `1.5px solid ${colors.grayBorder}`, background: i === 0 ? `${colors.teal}08` : "white", fontSize: 12, fontWeight: i === 0 ? 600 : 400, fontFamily: "'Cairo', sans-serif", cursor: "pointer", color: i === 0 ? colors.teal : colors.gray }}>{m}</button>
+              <button key={i} style={{ flex: 1, padding: "10px 8px", borderRadius: 10, border: i === 0 ? `2px solid ${colors.primary}` : `1.5px solid ${colors.grayBorder}`, background: i === 0 ? `${colors.primary}08` : "white", fontSize: 12, fontWeight: i === 0 ? 600 : 400, fontFamily: "inherit", cursor: "pointer", color: i === 0 ? colors.primary : colors.gray }}>{m}</button>
             ))}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <Input label="رقم البطاقة" placeholder="XXXX XXXX XXXX XXXX" />
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 12 }}>
               <Input label="تاريخ الانتهاء" placeholder="MM/YY" />
               <Input label="CVV" placeholder="XXX" />
             </div>
@@ -3900,15 +3477,15 @@ export default function DaffaPlatform() {
 
   // ---- Op Step 2: Work — 5 Units ----
   const OpTemplateRenderer = ({ unit }) => {
-    const inputStyle = { width: "100%", padding: "8px 10px", border: `1px solid ${colors.grayBorder}`, borderRadius: 6, fontSize: 12, fontFamily: "'Cairo', sans-serif" };
+    const inputStyle = { width: "100%", padding: "8px 10px", border: `1px solid ${colors.grayBorder}`, borderRadius: 6, fontSize: 12, fontFamily: "inherit" };
 
     if (unit.templateType === "op_import") return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 12 }}>المبادرات المستوردة من الخطة الاستراتيجية</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 12 }}>المبادرات المستوردة من الخطة الاستراتيجية</h4>
         {["برنامج التعليم المجتمعي", "مشروع التأهيل المهني", "حملة التوعية الصحية"].map((m, i) => (
-          <Card key={i} style={{ marginBottom: 10, padding: 14, display: "flex", alignItems: "center", justifyContent: "space-between", borderRight: `3px solid ${colors.teal}` }}>
+          <Card key={i} style={{ marginBottom: 10, padding: 14, display: "flex", alignItems: "center", justifyContent: "space-between", borderRight: `3px solid ${colors.primary}` }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <input type="checkbox" defaultChecked style={{ accentColor: colors.teal }} />
+              <input type="checkbox" defaultChecked style={{ accentColor: colors.primary }} />
               <div><div style={{ fontSize: 14, fontWeight: 600 }}>{m}</div><div style={{ fontSize: 11, color: colors.gray }}>مستورد من الخطة الاستراتيجية — المبادرة {i + 1}</div></div>
             </div>
             <Badge text="معتمد" color="green" small />
@@ -3921,10 +3498,10 @@ export default function DaffaPlatform() {
       <div>
         {["برنامج التعليم المجتمعي", "مشروع التأهيل المهني"].map((m, mi) => (
           <div key={mi} style={{ marginBottom: 20, border: `1.5px solid ${colors.grayBorder}`, borderRadius: 12, overflow: "hidden" }}>
-            <div style={{ padding: "10px 16px", background: colors.tealCard, color: "white", fontWeight: 600, fontSize: 14 }}>المبادرة: {m}</div>
+            <div style={{ padding: "10px 16px", background: colors.primaryDeep, color: "white", fontWeight: 600, fontSize: 14 }}>المبادرة: {m}</div>
             <div style={{ padding: 16 }}>
               {[1, 2, 3].map(a => (
-                <div key={a} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 10, padding: 10, background: colors.grayLight, borderRadius: 8 }}>
+                <div key={a} style={{ display: "grid", gridTemplateColumns: "var(--g-3)", gap: 10, marginBottom: 10, padding: 10, background: colors.grayLight, borderRadius: 8 }}>
                   <Input label={`اسم النشاط ${a}`} placeholder="مثال: ورشة تدريبية..." />
                   <Input label="وصف النشاط" placeholder="ماذا يتضمن هذا النشاط؟" />
                   <Input label="المخرج المتوقع" placeholder="ما الناتج؟" />
@@ -3939,14 +3516,14 @@ export default function DaffaPlatform() {
 
     if (unit.templateType === "op_gantt") return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 12 }}>مخطط جانت — الجدول الزمني</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 12 }}>مخطط جانت — الجدول الزمني</h4>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900 }}>
             <thead>
               <tr>
-                <th style={{ padding: 8, background: colors.tealCard, color: "white", fontSize: 11, position: "sticky", right: 0, zIndex: 1, minWidth: 150 }}>النشاط</th>
+                <th style={{ padding: 8, background: colors.primaryDeep, color: "white", fontSize: 11, position: "sticky", right: 0, zIndex: 1, minWidth: 150 }}>النشاط</th>
                 {["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"].map(m => (
-                  <th key={m} style={{ padding: "8px 4px", background: colors.tealCard, color: "white", fontSize: 9, fontWeight: 500, textAlign: "center" }}>{m}</th>
+                  <th key={m} style={{ padding: "8px 4px", background: colors.primaryDeep, color: "white", fontSize: 9, fontWeight: 500, textAlign: "center" }}>{m}</th>
                 ))}
               </tr>
             </thead>
@@ -3956,7 +3533,7 @@ export default function DaffaPlatform() {
                   <td style={{ padding: 8, fontSize: 11, fontWeight: 600, background: "white", position: "sticky", right: 0 }}>{a}</td>
                   {Array.from({ length: 12 }, (_, mi) => {
                     const active = (ai === 0 && mi >= 0 && mi <= 2) || (ai === 1 && mi >= 1 && mi <= 3) || (ai === 2 && mi >= 3 && mi <= 8) || (ai === 3 && mi >= 2 && mi <= 5) || (ai === 4 && mi >= 6 && mi <= 9) || (ai === 5 && mi >= 4 && mi <= 7);
-                    const barColors = [colors.teal, colors.blue, colors.teal, colors.orange, colors.orange, colors.green];
+                    const barColors = [colors.primary, colors.blue, colors.primary, colors.amberText, colors.amberText, colors.green];
                     return <td key={mi} style={{ padding: 2, textAlign: "center" }}>
                       <div style={{ height: 20, borderRadius: 4, background: active ? barColors[ai] : "transparent", cursor: "pointer", opacity: active ? 0.8 : 1 }}
                         title={active ? "محدد" : "انقر للتحديد"} />
@@ -3972,14 +3549,14 @@ export default function DaffaPlatform() {
 
     if (unit.templateType === "op_responsible") return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 12 }}>تعيين المسؤولين</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 12 }}>تعيين المسؤولين</h4>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead><tr>{["النشاط", "المبادرة", "مسؤول التنفيذ", "القسم / الإدارة"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.tealCard, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr></thead>
+          <thead><tr>{["النشاط", "المبادرة", "مسؤول التنفيذ", "القسم / الإدارة"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.primaryDeep, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr></thead>
           <tbody>
             {[["ورشة تدريب المعلمين", "التعليم المجتمعي"], ["إعداد المناهج", "التعليم المجتمعي"], ["تأهيل مهني — المرحلة 1", "التأهيل المهني"], ["حملة التوعية", "التوعية الصحية"]].map((r, i) => (
               <tr key={i} style={{ borderBottom: `1px solid ${colors.grayBorder}` }}>
                 <td style={{ padding: 8, fontSize: 12, fontWeight: 600 }}>{r[0]}</td>
-                <td style={{ padding: 8 }}><Badge text={r[1]} color="teal" small /></td>
+                <td style={{ padding: 8 }}><Badge text={r[1]} color="primary" small /></td>
                 <td style={{ padding: 6 }}><input style={inputStyle} placeholder="اسم المسؤول..." /></td>
                 <td style={{ padding: 6 }}><input style={inputStyle} placeholder="القسم..." /></td>
               </tr>
@@ -3991,39 +3568,39 @@ export default function DaffaPlatform() {
 
     if (unit.templateType === "op_budget") return (
       <div>
-        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.teal, marginBottom: 12 }}>الميزانية التشغيلية</h4>
+        <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 12 }}>الميزانية التشغيلية</h4>
         <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 16 }}>
-          <thead><tr>{["النشاط", "بند التكلفة", "تكلفة الوحدة", "العدد", "الإجمالي"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.tealCard, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr></thead>
+          <thead><tr>{["النشاط", "بند التكلفة", "تكلفة الوحدة", "العدد", "الإجمالي"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.primaryDeep, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}>{h}</th>)}</tr></thead>
           <tbody>
             {[["ورشة تدريب المعلمين", "أتعاب المدربين", "5,000", "3", "15,000"], ["", "مواد تدريبية", "500", "30", "15,000"], ["إعداد المناهج", "تصميم وطباعة", "2,000", "5", "10,000"], ["تأهيل مهني", "معدات تدريبية", "10,000", "2", "20,000"], ["حملة التوعية", "تصميم ونشر", "3,000", "4", "12,000"]].map((r, i) => (
               <tr key={i} style={{ borderBottom: `1px solid ${colors.grayBorder}` }}>
                 {r.map((c, j) => <td key={j} style={{ padding: 6 }}><input style={{ ...inputStyle, fontWeight: j === 0 ? 600 : 400, textAlign: j >= 2 ? "center" : "right" }} defaultValue={c} /></td>)}
               </tr>
             ))}
-            <tr style={{ background: colors.tealCard }}>
+            <tr style={{ background: colors.primaryDeep }}>
               <td colSpan={4} style={{ padding: 10, color: "white", fontWeight: 700, fontSize: 14, textAlign: "center" }}>الإجمالي الكلي</td>
               <td style={{ padding: 10, color: "white", fontWeight: 800, fontSize: 16, textAlign: "center" }}>72,000 ريال</td>
             </tr>
           </tbody>
         </table>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 16 }}>
           <Card style={{ padding: 14 }}>
-            <h4 style={{ fontSize: 12, fontWeight: 600, color: colors.tealDark, marginBottom: 10 }}>التوزيع حسب المبادرة</h4>
+            <h4 style={{ fontSize: 12, fontWeight: 600, color: colors.ink, marginBottom: 10 }}>التوزيع حسب المبادرة</h4>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 80, height: 80, borderRadius: "50%", background: `conic-gradient(${colors.teal} 0% 42%, ${colors.orange} 42% 70%, ${colors.green} 70% 100%)`, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ width: 40, height: 40, borderRadius: "50%", background: "white" }} /></div>
+              <div style={{ width: 80, height: 80, borderRadius: "50%", background: `conic-gradient(${colors.primary} 0% 42%, ${colors.amber} 42% 70%, ${colors.green} 70% 100%)`, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ width: 40, height: 40, borderRadius: "50%", background: "white" }} /></div>
               <div style={{ fontSize: 11 }}>
-                {[{ l: "التعليم المجتمعي", c: colors.teal, p: "42%" }, { l: "التأهيل المهني", c: colors.orange, p: "28%" }, { l: "التوعية الصحية", c: colors.green, p: "30%" }].map((x, i) => (
+                {[{ l: "التعليم المجتمعي", c: colors.primary, p: "42%" }, { l: "التأهيل المهني", c: colors.amber, p: "28%" }, { l: "التوعية الصحية", c: colors.green, p: "30%" }].map((x, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}><div style={{ width: 10, height: 10, borderRadius: 2, background: x.c }} /><span>{x.l} ({x.p})</span></div>
                 ))}
               </div>
             </div>
           </Card>
           <Card style={{ padding: 14 }}>
-            <h4 style={{ fontSize: 12, fontWeight: 600, color: colors.tealDark, marginBottom: 10 }}>ملخص مالي</h4>
+            <h4 style={{ fontSize: 12, fontWeight: 600, color: colors.ink, marginBottom: 10 }}>ملخص مالي</h4>
             <div style={{ fontSize: 13, display: "flex", flexDirection: "column", gap: 6 }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}><span>إجمالي الميزانية</span><span style={{ fontWeight: 700 }}>72,000 ريال</span></div>
               <div style={{ display: "flex", justifyContent: "space-between" }}><span>احتياطي 10%</span><span style={{ fontWeight: 700 }}>7,200 ريال</span></div>
-              <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 6, borderTop: `2px solid ${colors.tealDark}`, fontWeight: 800, fontSize: 15 }}><span>الإجمالي</span><span style={{ color: colors.teal }}>79,200 ريال</span></div>
+              <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 6, borderTop: `2px solid ${colors.ink}`, fontWeight: 800, fontSize: 15 }}><span>الإجمالي</span><span style={{ color: colors.primary }}>79,200 ريال</span></div>
             </div>
           </Card>
         </div>
@@ -4036,18 +3613,18 @@ export default function DaffaPlatform() {
   const OpStepWork = () => (
     <div className="animate-in">
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-        <div style={{ width: 48, height: 48, borderRadius: "50%", background: colors.orangeLight, display: "flex", alignItems: "center", justifyContent: "center", color: colors.orange }}><IcCog width={22} height={22}/></div>
+        <div style={{ width: 48, height: 48, borderRadius: "50%", background: colors.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", color: colors.amberText }}><IcCog width={22} height={22}/></div>
         <div>
-          <h2 style={{ fontSize: 20, fontWeight: 800, color: colors.tealDark }}>تعبئة النماذج — التخطيط التشغيلي</h2>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: colors.ink }}>تعبئة النماذج — التخطيط التشغيلي</h2>
           <div style={{ fontSize: 12, color: colors.gray }}>5 وحدات تخطيطية — كل وحدة تتبع نفس هيكل الوحدة التخطيطية (6 مكونات + اعتماد المستشار)</div>
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "var(--g-5)", gap: 12, marginBottom: 20 }}>
         {operationalUnits.map(u => {
           const s = statusMap[u.status];
           return (
-            <div key={u.id} onClick={() => setActiveOpUnit(u)} style={{ background: colors.tealCard, borderRadius: 12, padding: "20px 12px", textAlign: "center", borderBottom: `3px solid ${colors.orange}`, cursor: "pointer", transition: "transform 0.2s, box-shadow 0.2s" }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.15)"; }}
+            <div key={u.id} onClick={() => setActiveOpUnit(u)} style={{ background: colors.primaryDeep, borderRadius: 12, padding: "20px 12px", textAlign: "center", borderBottom: `3px solid ${colors.amberLine}`, cursor: "pointer", transition: "transform 0.2s, box-shadow 0.2s" }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 6px 16px rgba(14,42,61,0.15)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
               <div style={{ color: "white", fontSize: 13, fontWeight: 600, marginBottom: 10, minHeight: 40 }}>{u.name}</div>
               <Badge text={s.badge} color={s.color} small />
@@ -4071,19 +3648,19 @@ export default function DaffaPlatform() {
       <div className="animate-in">
         <div style={{ fontSize: 12, color: colors.gray, marginBottom: 4 }}>التخطيط التشغيلي {">"} {unit.name}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-          <button onClick={() => setActiveOpUnit(null)} style={{ background: "none", border: "none", cursor: "pointer", color: colors.teal, display: "flex" }}>{Icons.arrow}</button>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark }}>{unit.name}</h2>
-          <Badge text={`الوحدة ${unit.id} من 5`} color="teal" small />
+          <button onClick={() => setActiveOpUnit(null)} style={{ background: "none", border: "none", cursor: "pointer", color: colors.primary, display: "flex" }}>{Icons.arrow}</button>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink }}>{unit.name}</h2>
+          <Badge text={`الوحدة ${unit.id} من 5`} color="primary" small />
         </div>
         <StatusBar status="not_submitted" />
         <div style={{ margin: "12px 0 16px" }}><Tab tabs={tabs} active={tab} onChange={setTab} /></div>
         <Card>
-          {tab === 0 && <div><h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>نبذة عن {unit.name}</h3><p style={{ fontSize: 14, color: colors.gray, lineHeight: 2 }}>{unit.overview}</p><p style={{ fontSize: 14, color: colors.gray, lineHeight: 2, marginTop: 12 }}>{unit.overview2}</p></div>}
-          {tab === 1 && <div><h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>شرح مكتوب: {unit.name}</h3>{unit.topics.map((tp, i) => <div key={i} style={{ marginBottom: 16 }}><h4 style={{ fontSize: 15, fontWeight: 600, color: colors.teal, marginBottom: 8 }}>{i + 1}. {tp.t}</h4><p style={{ fontSize: 13, color: colors.gray, lineHeight: 2 }}>{tp.d}</p></div>)}</div>}
-          {tab === 2 && <div><h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>إرشادات: {unit.name}</h3>{unit.steps.map((s, i) => <div key={i} style={{ display: "flex", gap: 14, marginBottom: 16 }}><div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.teal, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>{i + 1}</div><div><h4 style={{ fontSize: 14, fontWeight: 600, color: colors.tealDark }}>{s.title}</h4><p style={{ fontSize: 13, color: colors.gray }}>{s.desc}</p></div></div>)}<div style={{ padding: 14, background: colors.orangeLight, borderRadius: 10, borderRight: `3px solid ${colors.orange}` }}><span style={{ color: colors.orange, display: "inline-flex", alignItems: "center", marginLeft: 4 }}><IcLightbulb width={14} height={14}/></span><span style={{ fontSize: 13, color: colors.gray }}>{unit.tip}</span></div></div>}
-          {tab === 3 && <div style={{ textAlign: "center" }}><div style={{ width: "100%", maxWidth: 600, margin: "0 auto", aspectRatio: "16/9", background: `linear-gradient(135deg, ${colors.tealCard}, #0D4F5E)`, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}><div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>{Icons.play}</div><div style={{ position: "absolute", bottom: 12, left: 12, background: "rgba(0,0,0,0.6)", padding: "4px 10px", borderRadius: 6, color: "white", fontSize: 12 }}>{unit.videoDuration}</div></div><h4 style={{ fontSize: 15, fontWeight: 600, color: colors.tealDark, marginTop: 16 }}>شرح {unit.name}</h4></div>}
-          {tab === 4 && <div><div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, padding: "10px 14px", background: colors.grayLight, borderRadius: 10 }}><div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.teal, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14 }}>أ</div><div><div style={{ fontSize: 13, fontWeight: 600 }}>أحمد الشمري</div><div style={{ fontSize: 11, color: colors.green }}>● متصل</div></div></div><div style={{ height: 200, background: colors.grayLight, borderRadius: 12, padding: 16, display: "flex", alignItems: "center", justifyContent: "center", color: colors.gray }}>ابدأ المحادثة مع المستشار حول {unit.name}</div><div style={{ display: "flex", gap: 8, marginTop: 12 }}><button style={{ padding: 10, borderRadius: 10, border: `1px solid ${colors.grayBorder}`, background: "white", cursor: "pointer", display: "flex" }}>{Icons.clip}</button><input placeholder="اكتب رسالتك..." style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif", outline: "none" }} /><button style={{ padding: "10px 16px", borderRadius: 10, background: colors.orange, border: "none", cursor: "pointer", display: "flex", color: "white" }}>{Icons.send}</button></div></div>}
-          {tab === 5 && <div><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}><h3 style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark }}>نماذج العمل: {unit.name}</h3><span style={{ fontSize: 11, color: colors.green, display: "inline-flex", alignItems: "center", gap: 4 }}><IcSave width={12} height={12}/> تم الحفظ تلقائياً</span></div><OpTemplateRenderer unit={unit} /><div style={{ display: "flex", gap: 12, marginTop: 20 }}><Btn variant="secondary">حفظ كمسودة</Btn><Btn>إرسال للمراجعة</Btn></div></div>}
+          {tab === 0 && <div><h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>نبذة عن {unit.name}</h3><p style={{ fontSize: 14, color: colors.gray, lineHeight: 2 }}>{unit.overview}</p><p style={{ fontSize: 14, color: colors.gray, lineHeight: 2, marginTop: 12 }}>{unit.overview2}</p></div>}
+          {tab === 1 && <div><h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>شرح مكتوب: {unit.name}</h3>{unit.topics.map((tp, i) => <div key={i} style={{ marginBottom: 16 }}><h4 style={{ fontSize: 15, fontWeight: 600, color: colors.primary, marginBottom: 8 }}>{i + 1}. {tp.t}</h4><p style={{ fontSize: 13, color: colors.gray, lineHeight: 2 }}>{tp.d}</p></div>)}</div>}
+          {tab === 2 && <div><h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>إرشادات: {unit.name}</h3>{unit.steps.map((s, i) => <div key={i} style={{ display: "flex", gap: 14, marginBottom: 16 }}><div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>{i + 1}</div><div><h4 style={{ fontSize: 14, fontWeight: 600, color: colors.ink }}>{s.title}</h4><p style={{ fontSize: 13, color: colors.gray }}>{s.desc}</p></div></div>)}<div style={{ padding: 14, background: colors.amberSoft, borderRadius: 10, borderRight: `3px solid ${colors.amberLine}` }}><span style={{ color: colors.amberText, display: "inline-flex", alignItems: "center", marginLeft: 4 }}><IcLightbulb width={14} height={14}/></span><span style={{ fontSize: 13, color: colors.gray }}>{unit.tip}</span></div></div>}
+          {tab === 3 && <div style={{ textAlign: "center" }}><div style={{ width: "100%", maxWidth: 600, margin: "0 auto", aspectRatio: "16/9", background: `linear-gradient(135deg, ${colors.primaryDeep}, #123247)`, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}><div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>{Icons.play}</div><div style={{ position: "absolute", bottom: 12, left: 12, background: "rgba(14,42,61,0.6)", padding: "4px 10px", borderRadius: 6, color: "white", fontSize: 12 }}>{unit.videoDuration}</div></div><h4 style={{ fontSize: 15, fontWeight: 600, color: colors.ink, marginTop: 16 }}>شرح {unit.name}</h4></div>}
+          {tab === 4 && <div><div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, padding: "10px 14px", background: colors.grayLight, borderRadius: 10 }}><div style={{ width: 36, height: 36, borderRadius: "50%", background: colors.primary, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14 }}>أ</div><div><div style={{ fontSize: 13, fontWeight: 600 }}>أحمد الشمري</div><div style={{ fontSize: 11, color: colors.green }}>● متصل</div></div></div><div style={{ height: 200, background: colors.grayLight, borderRadius: 12, padding: 16, display: "flex", alignItems: "center", justifyContent: "center", color: colors.gray }}>ابدأ المحادثة مع المستشار حول {unit.name}</div><div style={{ display: "flex", gap: 8, marginTop: 12 }}><button style={{ padding: 10, borderRadius: 10, border: `1px solid ${colors.grayBorder}`, background: "white", cursor: "pointer", display: "flex" }}>{Icons.clip}</button><input placeholder="اكتب رسالتك..." style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit", outline: "none" }} /><button style={{ padding: "10px 16px", borderRadius: 10, background: colors.amber, border: "none", cursor: "pointer", display: "flex", color: "#0E2A3D" }}>{Icons.send}</button></div></div>}
+          {tab === 5 && <div><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}><h3 style={{ fontSize: 17, fontWeight: 700, color: colors.ink }}>نماذج العمل: {unit.name}</h3><span style={{ fontSize: 11, color: colors.green, display: "inline-flex", alignItems: "center", gap: 4 }}><IcSave width={12} height={12}/> تم الحفظ تلقائياً</span></div><OpTemplateRenderer unit={unit} /><div style={{ display: "flex", gap: 12, marginTop: 20 }}><Btn variant="secondary">حفظ كمسودة</Btn><Btn>إرسال للمراجعة</Btn></div></div>}
         </Card>
       </div>
     );
@@ -4092,7 +3669,7 @@ export default function DaffaPlatform() {
   // ---- Op Step 3: Review ----
   const OpStepReview = () => (
     <div className="animate-in">
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 6 }}>مراجعة المستشار — التخطيط التشغيلي</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>مراجعة المستشار — التخطيط التشغيلي</h2>
       <p style={{ fontSize: 13, color: colors.gray, marginBottom: 20 }}>يقوم المستشار بمراجعة مخرجاتك واعتمادها أو طلب تعديل</p>
       <Card style={{ marginBottom: 16, padding: "16px 20px", background: colors.blueLight, borderRight: `4px solid ${colors.blue}` }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}><span style={{ color: colors.blue }}><IcSearch width={24} height={24}/></span><div><div style={{ fontSize: 14, fontWeight: 700, color: colors.blue }}>جاري مراجعة الخطة التشغيلية</div><div style={{ fontSize: 12, color: colors.gray }}>المستشار يراجع الوحدات الخمس</div></div></div>
@@ -4100,7 +3677,7 @@ export default function DaffaPlatform() {
       {operationalUnits.map((u, i) => (
         <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: `1px solid ${colors.grayLight}`, background: "white" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 6, background: colors.tealCard, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700 }}>{u.id}</div>
+            <div style={{ width: 28, height: 28, borderRadius: 6, background: colors.primaryDeep, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700 }}>{u.id}</div>
             <span style={{ fontSize: 13, fontWeight: 600 }}>{u.name}</span>
           </div>
           <Badge text={statusMap[u.status].badge} color={statusMap[u.status].color} small />
@@ -4117,12 +3694,12 @@ export default function DaffaPlatform() {
   const OpStepApproval = () => (
     <div className="animate-in" style={{ textAlign: "center", maxWidth: 550, margin: "0 auto" }}>
       <div style={{ width: 80, height: 80, borderRadius: "50%", background: colors.greenLight, margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center", color: colors.green }}><IcCheckCircle width={36} height={36}/></div>
-      <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.tealDark, marginBottom: 8 }}>تم اعتماد الخطة التشغيلية!</h2>
+      <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.ink, marginBottom: 8 }}>تم اعتماد الخطة التشغيلية!</h2>
       <p style={{ fontSize: 14, color: colors.gray, lineHeight: 1.8, marginBottom: 24 }}>تهانينا! تم اعتماد خطتك التشغيلية. يمكنك تحميل الوثيقة التشغيلية.</p>
 
       <Card accent style={{ marginBottom: 16, textAlign: "right" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.tealCard, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}><IcDocument width={24} height={24}/></div>
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.primaryDeep, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}><IcDocument width={24} height={24}/></div>
           <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 600 }}>الوثيقة التشغيلية — {authUser?.org_name || 'المنظمة'}</div><div style={{ fontSize: 12, color: colors.gray }}>الخطة التشغيلية</div></div>
           <Btn small>تحميل PDF</Btn>
         </div>
@@ -4131,10 +3708,10 @@ export default function DaffaPlatform() {
       {/* Decision: تحكيم اعتماد؟ — matching the diamond in the flowchart */}
       <Card style={{ marginBottom: 16, padding: 20 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 14 }}>
-          <div style={{ width: 36, height: 36, background: colors.orange, transform: "rotate(45deg)", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 36, height: 36, background: colors.amber, transform: "rotate(45deg)", borderRadius: 4, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <span style={{ transform: "rotate(-45deg)", color: "white", fontWeight: 700, fontSize: 12 }}>؟</span>
           </div>
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark }}>هل تود تحكيم واعتماد الخطة من جهة استشارية؟</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink }}>هل تود تحكيم واعتماد الخطة من جهة استشارية؟</h3>
         </div>
         <p style={{ fontSize: 13, color: colors.gray, lineHeight: 1.7, marginBottom: 16 }}>يمكنك طلب تحكيم الخطة التشغيلية من جهة استشارية معتمدة لمزيد من المصداقية والجودة</p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
@@ -4148,18 +3725,18 @@ export default function DaffaPlatform() {
   // ---- Op Step 5: Arbitration Payment ----
   const OpStepArbitration = () => (
     <div className="animate-in" style={{ maxWidth: 600, margin: "0 auto" }}>
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 20, textAlign: "center" }}>التحكيم والدفع</h2>
+      <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 20, textAlign: "center" }}>التحكيم والدفع</h2>
       <Card style={{ marginBottom: 16 }}>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>ملخص التحكيم</h3>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>ملخص التحكيم</h3>
         <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: `1px solid ${colors.grayLight}`, fontSize: 14 }}><span>تحكيم الخطة التشغيلية من جهة استشارية</span><span style={{ fontWeight: 600 }}>2,500 ريال</span></div>
         <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: `1px solid ${colors.grayLight}`, fontSize: 13 }}><span>ضريبة 15%</span><span>375 ريال</span></div>
-        <div style={{ display: "flex", justifyContent: "space-between", padding: "12px 0", fontSize: 18, fontWeight: 800, color: colors.tealDark }}><span>الإجمالي</span><span>2,875 ريال</span></div>
+        <div style={{ display: "flex", justifyContent: "space-between", padding: "12px 0", fontSize: 18, fontWeight: 800, color: colors.ink }}><span>الإجمالي</span><span>2,875 ريال</span></div>
       </Card>
       <Card style={{ marginBottom: 16 }}>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark, marginBottom: 14 }}>اختر جهة التحكيم</h3>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>اختر جهة التحكيم</h3>
         {["شركة الاستشارات الاستراتيجية", "مركز التميز المؤسسي", "معهد التخطيط للقطاع الثالث"].map((j, i) => (
-          <label key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 8, marginBottom: 6, cursor: "pointer", border: `1.5px solid ${i === 0 ? colors.teal : colors.grayBorder}`, background: i === 0 ? `${colors.teal}08` : "white" }}>
-            <input type="radio" name="arbitrator" defaultChecked={i === 0} style={{ accentColor: colors.teal }} />
+          <label key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 8, marginBottom: 6, cursor: "pointer", border: `1.5px solid ${i === 0 ? colors.primary : colors.grayBorder}`, background: i === 0 ? `${colors.primary}08` : "white" }}>
+            <input type="radio" name="arbitrator" defaultChecked={i === 0} style={{ accentColor: colors.primary }} />
             <div><div style={{ fontSize: 13, fontWeight: 600 }}>{j}</div><div style={{ fontSize: 11, color: colors.gray }}>جهة استشارية معتمدة في التخطيط الاستراتيجي</div></div>
           </label>
         ))}
@@ -4175,11 +3752,11 @@ export default function DaffaPlatform() {
   const OpStepDone = () => (
     <div className="animate-in" style={{ textAlign: "center", maxWidth: 500, margin: "0 auto" }}>
       <div style={{ width: 100, height: 100, borderRadius: "50%", background: colors.greenLight, margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center", color: colors.green }}><IcSparkles width={48} height={48}/></div>
-      <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.tealDark, marginBottom: 8 }}>اكتمل التخطيط التشغيلي!</h2>
+      <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.ink, marginBottom: 8 }}>اكتمل التخطيط التشغيلي!</h2>
       <p style={{ fontSize: 14, color: colors.gray, lineHeight: 1.8, marginBottom: 24 }}>تم إنجاز خطتك التشغيلية بنجاح. يمكنك الآن الانتقال لبناء السياسات واللوائح.</p>
       <Card accent style={{ marginBottom: 20, textAlign: "right" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.tealCard, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}><IcDocument width={24} height={24}/></div>
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.primaryDeep, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}><IcDocument width={24} height={24}/></div>
           <div style={{ flex: 1 }}><div style={{ fontSize: 14, fontWeight: 600 }}>الوثيقة التشغيلية النهائية</div><div style={{ fontSize: 12, color: colors.gray }}>معتمدة ومحكّمة</div></div>
           <Btn small>تحميل</Btn>
         </div>
@@ -4315,22 +3892,22 @@ export default function DaffaPlatform() {
     };
 
     const activeSection = sections.find(s => s.id === activeId);
-    const inputS = { width: "100%", padding: "9px 12px", border: `1.5px solid ${colors.grayBorder}`, borderRadius: 8, fontSize: 13, fontFamily: "'Cairo',sans-serif", direction: "rtl", boxSizing: "border-box" };
+    const inputS = { width: "100%", padding: "9px 12px", border: `1.5px solid ${colors.grayBorder}`, borderRadius: 8, fontSize: 13, fontFamily: "inherit", direction: "rtl", boxSizing: "border-box" };
 
     return (
       <div className="animate-in">
         {/* Toast */}
         {toast && (
-          <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 9999, background: toast.ok ? colors.teal : colors.red, color: "#fff", padding: "10px 24px", borderRadius: 10, fontSize: 13, fontWeight: 600, boxShadow: "0 4px 20px rgba(0,0,0,0.2)" }}>{toast.msg}</div>
+          <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 9999, background: toast.ok ? colors.primary : colors.red, color: "#fff", padding: "10px 24px", borderRadius: 10, fontSize: 13, fontWeight: 600, boxShadow: "0 4px 20px rgba(14,42,61,0.2)" }}>{toast.msg}</div>
         )}
 
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>بناء الاستبيانات</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>بناء الاستبيانات</h2>
 
         {/* Policy Type Selector */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-          <label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark }}>السياسة:</label>
+          <label style={{ fontSize: 13, fontWeight: 600, color: colors.ink }}>السياسة:</label>
           <select value={activePolicyId || ""} onChange={e => setActivePolicyId(Number(e.target.value))}
-            style={{ minWidth: 320, padding: "8px 12px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "'Cairo',sans-serif", background: "#fff" }}>
+            style={{ minWidth: 320, padding: "8px 12px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "inherit", background: "#fff" }}>
             {Object.entries(policyGroups).map(([g, items]) => (
               <optgroup key={g} label={g}>
                 {items.map(p => <option key={p.id} value={p.id}>{p.code ? `${p.code} — ` : ""}{p.name}</option>)}
@@ -4340,12 +3917,12 @@ export default function DaffaPlatform() {
           {activePolicy?.active === false && <Badge text="إصدار سابق" color="orange" small />}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-240-main)", gap: 16 }}>
           {/* Sections sidebar */}
           <Card style={{ padding: 12 }}>
-            <h4 style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, marginBottom: 12 }}>أقسام {activePolicy?.name}</h4>
+            <h4 style={{ fontSize: 13, fontWeight: 700, color: colors.ink, marginBottom: 12 }}>أقسام {activePolicy?.name}</h4>
             {sections.map(s => (
-              <div key={s.id} onClick={() => setActiveId(s.id)} style={{ padding: "8px 10px", borderRadius: 8, marginBottom: 4, background: activeId === s.id ? `${colors.teal}10` : "transparent", borderRight: activeId === s.id ? `3px solid ${colors.teal}` : "3px solid transparent", fontSize: 12, fontWeight: activeId === s.id ? 600 : 400, cursor: "pointer", color: activeId === s.id ? colors.teal : colors.gray, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div key={s.id} onClick={() => setActiveId(s.id)} style={{ padding: "8px 10px", borderRadius: 8, marginBottom: 4, background: activeId === s.id ? `${colors.primary}10` : "transparent", borderRight: activeId === s.id ? `3px solid ${colors.primary}` : "3px solid transparent", fontSize: 12, fontWeight: activeId === s.id ? 600 : 400, cursor: "pointer", color: activeId === s.id ? colors.primary : colors.gray, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ display: "flex", alignItems: "center", gap: 6 }}><IcBars width={12} height={12}/> {s.name}</span>
                 <span style={{ display: "flex", gap: 4 }}>
                   <button onClick={e => { e.stopPropagation(); openEditSection(s); }} style={{ background: "none", border: "none", cursor: "pointer", color: colors.gray, padding: 2, display: "flex" }}><IcPencil width={11} height={11}/></button>
@@ -4353,7 +3930,7 @@ export default function DaffaPlatform() {
                 </span>
               </div>
             ))}
-            <button onClick={openAddSection} style={{ marginTop: 8, width: "100%", padding: "7px 0", background: "none", border: `1.5px dashed ${colors.teal}`, borderRadius: 8, color: colors.teal, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Cairo',sans-serif" }}>+ إضافة قسم</button>
+            <button onClick={openAddSection} style={{ marginTop: 8, width: "100%", padding: "7px 0", background: "none", border: `1.5px dashed ${colors.primary}`, borderRadius: 8, color: colors.primary, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>+ إضافة قسم</button>
           </Card>
 
           {/* Questions */}
@@ -4363,8 +3940,8 @@ export default function DaffaPlatform() {
             ) : (
               <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.tealDark }}>{activeSection.name} ({questions.length} أسئلة)</h3>
-                  <button onClick={openAddQ} style={{ padding: "7px 16px", background: colors.orange, color: "#fff", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'Cairo',sans-serif", display: "flex", alignItems: "center", gap: 6 }}><IcPlus width={13} height={13}/> إضافة سؤال</button>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: colors.ink }}>{activeSection.name} ({questions.length} أسئلة)</h3>
+                  <button onClick={openAddQ} style={{ padding: "7px 16px", background: colors.amber, color: "#0E2A3D", border: "none", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}><IcPlus width={13} height={13}/> إضافة سؤال</button>
                 </div>
 
                 {loadingQ ? (
@@ -4380,7 +3957,7 @@ export default function DaffaPlatform() {
                           <span style={{ fontSize: 13, fontWeight: 600 }}>{q.question}</span>
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <Badge text={TYPE_LABELS[q.type] || q.type} color="teal" small />
+                          <Badge text={TYPE_LABELS[q.type] || q.type} color="primary" small />
                           {q.required && <Badge text="مطلوب" color="red" small />}
                           <button onClick={() => openEditQ(q)} title="تعديل" style={{ background: "none", border: "none", cursor: "pointer", color: colors.gray, padding: 4, display: "flex", alignItems: "center", borderRadius: 6, transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = colors.grayLight} onMouseLeave={e => e.currentTarget.style.background = "none"}><IcPencil width={15} height={15}/></button>
                           <button onClick={() => deleteQuestion(q)} title="حذف" style={{ background: "none", border: "none", cursor: "pointer", color: colors.red, padding: 4, display: "flex", alignItems: "center", borderRadius: 6, transition: "background 0.15s" }} onMouseEnter={e => e.currentTarget.style.background = colors.redLight} onMouseLeave={e => e.currentTarget.style.background = "none"}><IcTrash width={15} height={15}/></button>
@@ -4404,14 +3981,14 @@ export default function DaffaPlatform() {
 
         {/* Section Modal */}
         {secModal && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ background: "#fff", borderRadius: 14, padding: 28, width: 380, direction: "rtl", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark, marginBottom: 16 }}>{secEdit ? "تعديل القسم" : "إضافة قسم جديد"}</h3>
-              <label style={{ fontSize: 12, fontWeight: 600, color: "#374151", display: "block", marginBottom: 6 }}>اسم القسم</label>
+          <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(14,42,61,0.45)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ background: "#fff", borderRadius: 14, padding: 28, width: 380, direction: "rtl", boxShadow: "0 20px 60px rgba(14,42,61,0.2)" }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>{secEdit ? "تعديل القسم" : "إضافة قسم جديد"}</h3>
+              <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>اسم القسم</label>
               <input value={secName} onChange={e => setSecName(e.target.value)} onKeyDown={e => e.key === "Enter" && saveSection()} placeholder="مثال: التوظيف" style={{ ...inputS, marginBottom: 20 }} autoFocus />
               <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-                <button onClick={() => setSecModal(false)} style={{ padding: "9px 20px", background: "#f3f4f6", border: "none", borderRadius: 8, fontSize: 13, cursor: "pointer", fontFamily: "'Cairo',sans-serif" }}>إلغاء</button>
-                <button onClick={saveSection} disabled={secSaving || !secName.trim()} style={{ padding: "9px 20px", background: colors.teal, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Cairo',sans-serif" }}>{secSaving ? "جارٍ الحفظ…" : "حفظ"}</button>
+                <button onClick={() => setSecModal(false)} style={{ padding: "9px 20px", background: "#F3EFE8", border: "none", borderRadius: 8, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>إلغاء</button>
+                <button onClick={saveSection} disabled={secSaving || !secName.trim()} style={{ padding: "9px 20px", background: colors.primary, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{secSaving ? "جارٍ الحفظ…" : "حفظ"}</button>
               </div>
             </div>
           </div>
@@ -4419,18 +3996,18 @@ export default function DaffaPlatform() {
 
         {/* Question Modal */}
         {qModal && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ background: "#fff", borderRadius: 14, padding: 28, width: 480, direction: "rtl", boxShadow: "0 20px 60px rgba(0,0,0,0.2)", maxHeight: "90vh", overflowY: "auto" }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark, marginBottom: 20 }}>{qEdit ? "تعديل السؤال" : "إضافة سؤال جديد"}</h3>
+          <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(14,42,61,0.45)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ background: "#fff", borderRadius: 14, padding: 28, width: 480, direction: "rtl", boxShadow: "0 20px 60px rgba(14,42,61,0.2)", maxHeight: "90vh", overflowY: "auto" }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 20 }}>{qEdit ? "تعديل السؤال" : "إضافة سؤال جديد"}</h3>
 
               <div style={{ marginBottom: 14 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "#374151", display: "block", marginBottom: 6 }}>نص السؤال *</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>نص السؤال *</label>
                 <textarea value={qForm.question} onChange={e => setQForm(f => ({ ...f, question: e.target.value }))} rows={2} placeholder="اكتب السؤال هنا…" style={{ ...inputS, resize: "vertical" }} />
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 12, marginBottom: 14 }}>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: "#374151", display: "block", marginBottom: 6 }}>نوع السؤال *</label>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>نوع السؤال *</label>
                   <select value={qForm.type} onChange={e => setQForm(f => ({ ...f, type: e.target.value }))} style={{ ...inputS }}>
                     {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                   </select>
@@ -4445,24 +4022,24 @@ export default function DaffaPlatform() {
 
               {["single","multiple"].includes(qForm.type) && (
                 <div style={{ marginBottom: 14 }}>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: "#374151", display: "block", marginBottom: 6 }}>الخيارات (سطر لكل خيار) *</label>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>الخيارات (سطر لكل خيار) *</label>
                   <textarea value={qForm.optionsText} onChange={e => setQForm(f => ({ ...f, optionsText: e.target.value }))} rows={4} placeholder={"خيار 1\nخيار 2\nخيار 3"} style={{ ...inputS, resize: "vertical" }} />
                 </div>
               )}
 
               <div style={{ marginBottom: 14 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "#374151", display: "block", marginBottom: 6 }}>تلميح (اختياري)</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>تلميح (اختياري)</label>
                 <input value={qForm.hint} onChange={e => setQForm(f => ({ ...f, hint: e.target.value }))} placeholder="نص مساعد يظهر للمستخدم" style={{ ...inputS }} />
               </div>
 
               <div style={{ marginBottom: 20 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "#374151", display: "block", marginBottom: 6 }}>شرط العرض (اختياري)</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>شرط العرض (اختياري)</label>
                 <input value={qForm.display_condition} onChange={e => setQForm(f => ({ ...f, display_condition: e.target.value }))} placeholder="مثال: إذا كانت إجابة السؤال السابق نعم" style={{ ...inputS }} />
               </div>
 
               <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-                <button onClick={() => setQModal(false)} style={{ padding: "9px 20px", background: "#f3f4f6", border: "none", borderRadius: 8, fontSize: 13, cursor: "pointer", fontFamily: "'Cairo',sans-serif" }}>إلغاء</button>
-                <button onClick={saveQuestion} disabled={qSaving || !qForm.question.trim()} style={{ padding: "9px 20px", background: colors.orange, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Cairo',sans-serif" }}>{qSaving ? "جارٍ الحفظ…" : "حفظ"}</button>
+                <button onClick={() => setQModal(false)} style={{ padding: "9px 20px", background: "#F3EFE8", border: "none", borderRadius: 8, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>إلغاء</button>
+                <button onClick={saveQuestion} disabled={qSaving || !qForm.question.trim()} style={{ padding: "9px 20px", background: colors.amber, color: "#0E2A3D", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>{qSaving ? "جارٍ الحفظ…" : "حفظ"}</button>
               </div>
             </div>
           </div>
@@ -4476,7 +4053,7 @@ export default function DaffaPlatform() {
   const AccessDenied = () => (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 320, gap: 14, color: colors.gray }}>
       <div style={{ color: colors.gray }}><IcLock width={48} height={48}/></div>
-      <div style={{ fontSize: 17, fontWeight: 700, color: colors.tealDark }}>غير مصرح بالوصول</div>
+      <div style={{ fontSize: 17, fontWeight: 700, color: colors.ink }}>غير مصرح بالوصول</div>
       <div style={{ fontSize: 13 }}>ليس لديك صلاحية لعرض هذه الصفحة</div>
     </div>
   );
@@ -4501,7 +4078,7 @@ export default function DaffaPlatform() {
       case "client-settings": case "con-settings": case "admin-profile":
       case "con-dash": case "con-clients":
       case "con-pending": case "con-completed": case "con-earnings": case "con-stats":
-      case "admin-dash": case "admin-orgs": case "admin-consultants":
+      case "admin-dash": case "admin-outputs": case "admin-orgs": case "admin-consultants":
       case "admin-questionnaires": case "admin-designs":
       case "admin-finance": case "admin-reports":
       case "admin-users": case "admin-services": case "admin-content": case "admin-site-content":
@@ -4531,22 +4108,22 @@ export default function DaffaPlatform() {
             </div>
           );
           const payment = () => (
-            <div style={{ width: 40, height: 40, borderRadius: "50%", background: `${colors.teal}18`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.teal} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            <div style={{ width: 40, height: 40, borderRadius: "50%", background: `${colors.primary}18`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.primary} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
             </div>
           );
           const adminMsg = () => (
-            <div style={{ width: 40, height: 40, borderRadius: "50%", background: `${colors.orange}18`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.orange} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
+            <div style={{ width: 40, height: 40, borderRadius: "50%", background: `${colors.amber}18`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={colors.amberText} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
             </div>
           );
           const map = {
             unit_approved: () => approved(colors.green),
-            unit_revision: () => revision(colors.orange),
+            unit_revision: () => revision(colors.amberText),
             op_approved:   () => approved(colors.green),
-            op_revision:   () => revision(colors.orange),
+            op_revision:   () => revision(colors.amberText),
             policy_approved: () => approved(colors.green),
-            policy_revision: () => revision(colors.orange),
+            policy_revision: () => revision(colors.amberText),
             workflow_completed: () => completed(colors.green),
             op_workflow_completed: () => completed(colors.green),
             admin_message: adminMsg,
@@ -4562,16 +4139,16 @@ export default function DaffaPlatform() {
         };
         const notifMeta = {
           unit_approved:         { border: colors.green  },
-          unit_revision:         { border: colors.orange },
+          unit_revision:         { border: colors.amberLine },
           op_approved:           { border: colors.green  },
-          op_revision:           { border: colors.orange },
+          op_revision:           { border: colors.amberLine },
           policy_approved:       { border: colors.green  },
-          policy_revision:       { border: colors.orange },
+          policy_revision:       { border: colors.amberLine },
           workflow_completed:    { border: colors.green  },
           op_workflow_completed: { border: colors.green  },
-          admin_message:         { border: colors.orange },
+          admin_message:         { border: colors.amberLine },
           message:               { border: colors.blue   },
-          payment:               { border: colors.teal   },
+          payment:               { border: colors.primary   },
         };
         return (
           <GenericPage title="الإشعارات">
@@ -4580,7 +4157,7 @@ export default function DaffaPlatform() {
             ) : notifications.length === 0 ? (
               <Card style={{ padding: 60, textAlign: "center" }}>
                 <div style={{ marginBottom: 12, color: colors.gray }}><IcBell width={40} height={40}/></div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: colors.tealDark, marginBottom: 6 }}>لا توجد إشعارات بعد</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: colors.ink, marginBottom: 6 }}>لا توجد إشعارات بعد</div>
                 <div style={{ fontSize: 12, color: colors.gray }}>ستظهر هنا إشعارات اعتماد الوحدات والرسائل والتحديثات</div>
               </Card>
             ) : (
@@ -4600,12 +4177,12 @@ export default function DaffaPlatform() {
                     >
                       <NotifIcon type={n.type} />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14, fontWeight: n.read ? 500 : 700, color: colors.tealDark }}>{n.title}</div>
+                        <div style={{ fontSize: 14, fontWeight: n.read ? 500 : 700, color: colors.ink }}>{n.title}</div>
                         {n.body && <div style={{ fontSize: 12, color: colors.gray, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.body}</div>}
                       </div>
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flexShrink: 0 }}>
                         <span style={{ fontSize: 11, color: colors.gray }}>{n.time}</span>
-                        {!n.read && <span style={{ width: 8, height: 8, borderRadius: "50%", background: colors.orange, display: "inline-block" }} />}
+                        {!n.read && <span style={{ width: 8, height: 8, borderRadius: "50%", background: colors.amber, display: "inline-block" }} />}
                       </div>
                     </Card>
                   );
@@ -4623,19 +4200,19 @@ export default function DaffaPlatform() {
           ) : downloadsData.length === 0 ? (
             <Card style={{ padding: 60, textAlign: "center" }}>
               <div style={{ marginBottom: 12, color: colors.gray }}><IcFolder width={40} height={40}/></div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: colors.tealDark, marginBottom: 6 }}>لا توجد وثائق متاحة بعد</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: colors.ink, marginBottom: 6 }}>لا توجد وثائق متاحة بعد</div>
               <div style={{ fontSize: 12, color: colors.gray }}>ستظهر وثائقك هنا بعد اعتماد كل مرحلة من مستشارك</div>
             </Card>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 14 }}>
               {downloadsData.map((d) => {
                 const dlIconMap = { target: <IcTarget width={24} height={24}/>, cog: <IcCog width={24} height={24}/>, clipboard: <IcClipboard width={24} height={24}/>, palette: <IcPalette width={24} height={24}/> };
                 return (
                 <Card key={d.id} accent style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                    <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.tealCard, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>{dlIconMap[d.icon] || <IcDocument width={24} height={24}/>}</div>
+                    <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.primaryDeep, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>{dlIconMap[d.icon] || <IcDocument width={24} height={24}/>}</div>
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: colors.tealDark }}>{d.name}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: colors.ink }}>{d.name}</div>
                       <div style={{ fontSize: 11, color: colors.gray }}>PDF • {d.date} • {d.consultant}</div>
                     </div>
                   </div>
@@ -4657,7 +4234,7 @@ export default function DaffaPlatform() {
           <Card>
             <div style={{ textAlign: "center", padding: 40, color: colors.gray }}>
               <div style={{ marginBottom: 16, color: colors.gray }}><IcDocument width={48} height={48}/></div>
-              <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.tealDark, marginBottom: 8 }}>محتوى الصفحة</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.ink, marginBottom: 8 }}>محتوى الصفحة</h3>
               <p style={{ fontSize: 13 }}>الصفحة غير موجودة</p>
             </div>
           </Card>
@@ -4673,15 +4250,15 @@ export default function DaffaPlatform() {
 
     if (modal.type === "add-org" || modal.type === "edit-org") return (
       <Modal open title={modal.type === "add-org" ? "إضافة منظمة جديدة" : `تعديل: ${modal.data?.name}`} onClose={close} wide>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 14 }}>
           <Input label="اسم المنظمة" placeholder="اسم المنظمة" value={modal.data?.name} />
-          <div><label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, display: "block", marginBottom: 6 }}>نوع المنظمة</label><select style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif" }}><option>جهة غير ربحية</option><option>مؤسسة وقفية</option><option>شركة اجتماعية</option></select></div>
+          <div><label style={{ fontSize: 13, fontWeight: 600, color: colors.ink, display: "block", marginBottom: 6 }}>نوع المنظمة</label><select style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit" }}><option>جهة غير ربحية</option><option>مؤسسة وقفية</option><option>شركة اجتماعية</option></select></div>
           <Input label="اسم الممثل" placeholder="الاسم الكامل" />
           <Input label="البريد الإلكتروني" placeholder="email@org.sa" type="email" />
           <Input label="رقم الجوال" placeholder="+966 5X XXX XXXX" />
-          <div><label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, display: "block", marginBottom: 6 }}>القطاع</label><select style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif" }}><option>تعليم</option><option>صحة</option><option>تنمية اجتماعية</option><option>بيئة</option><option>ثقافة</option></select></div>
-          <div><label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, display: "block", marginBottom: 6 }}>حجم المنظمة</label><select style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif" }}><option>أقل من 10</option><option>10-50</option><option>51-200</option><option>أكثر من 200</option></select></div>
-          <div><label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, display: "block", marginBottom: 6 }}>الحالة</label><select style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif" }}><option>نشط</option><option>معلق</option><option>موقوف</option></select></div>
+          <div><label style={{ fontSize: 13, fontWeight: 600, color: colors.ink, display: "block", marginBottom: 6 }}>القطاع</label><select style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit" }}><option>تعليم</option><option>صحة</option><option>تنمية اجتماعية</option><option>بيئة</option><option>ثقافة</option></select></div>
+          <div><label style={{ fontSize: 13, fontWeight: 600, color: colors.ink, display: "block", marginBottom: 6 }}>حجم المنظمة</label><select style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit" }}><option>أقل من 10</option><option>10-50</option><option>51-200</option><option>أكثر من 200</option></select></div>
+          <div><label style={{ fontSize: 13, fontWeight: 600, color: colors.ink, display: "block", marginBottom: 6 }}>الحالة</label><select style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit" }}><option>نشط</option><option>معلق</option><option>موقوف</option></select></div>
         </div>
         <div style={{ display: "flex", gap: 10, marginTop: 20, justifyContent: "flex-end" }}>
           <Btn variant="secondary" onClick={close}>إلغاء</Btn>
@@ -4692,11 +4269,11 @@ export default function DaffaPlatform() {
 
     if (modal.type === "view-org") return (
       <Modal open title={`تفاصيل: ${modal.data?.name}`} onClose={close} wide>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-3)", gap: 14, marginBottom: 20 }}>
           {[{l:"النوع",v:modal.data?.type},{l:"القطاع",v:modal.data?.sector},{l:"التسجيل",v:modal.data?.date},{l:"الخدمات",v:modal.data?.services},{l:"المستشار",v:modal.data?.consultant},{l:"الحالة",v:modal.data?.status}].map((f,i) => (
             <div key={i} style={{ padding: 12, background: colors.grayLight, borderRadius: 10 }}>
               <div style={{ fontSize: 11, color: colors.gray }}>{f.l}</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: colors.tealDark, marginTop: 4 }}>{f.v}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: colors.ink, marginTop: 4 }}>{f.v}</div>
             </div>
           ))}
         </div>
@@ -4710,16 +4287,16 @@ export default function DaffaPlatform() {
 
     if (modal.type === "add-consultant") return (
       <Modal open title="إضافة مستشار جديد" onClose={close} wide>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 14 }}>
           <Input label="اسم المستشار" placeholder="الاسم الكامل" />
           <Input label="البريد الإلكتروني" placeholder="email@example.com" type="email" />
           <Input label="رقم الجوال" placeholder="+966 5X XXX XXXX" />
           <Input label="سنوات الخبرة" placeholder="10" type="number" />
-          <div><label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, display: "block", marginBottom: 6 }}>التخصصات</label>
+          <div><label style={{ fontSize: 13, fontWeight: 600, color: colors.ink, display: "block", marginBottom: 6 }}>التخصصات</label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {["تخطيط استراتيجي", "تخطيط تشغيلي", "سياسات HR", "حوكمة", "سياسات مالية", "سياسات إعلامية"].map((s, i) => (
                 <label key={i} style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 10px", borderRadius: 6, border: `1px solid ${colors.grayBorder}`, cursor: "pointer", fontSize: 11 }}>
-                  <input type="checkbox" defaultChecked={i < 2} style={{ accentColor: colors.teal }} />{s}
+                  <input type="checkbox" defaultChecked={i < 2} style={{ accentColor: colors.primary }} />{s}
                 </label>
               ))}
             </div>
@@ -4740,7 +4317,7 @@ export default function DaffaPlatform() {
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <Input label="الاسم" placeholder="الاسم الكامل" />
           <Input label="البريد الإلكتروني" placeholder="email@example.com" type="email" />
-          <div><label style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, display: "block", marginBottom: 6 }}>الدور</label><select style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "'Cairo', sans-serif" }}><option>عميل</option><option>مستشار</option><option>مشرف فني</option><option>مدير نظام</option></select></div>
+          <div><label style={{ fontSize: 13, fontWeight: 600, color: colors.ink, display: "block", marginBottom: 6 }}>الدور</label><select style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit" }}><option>عميل</option><option>مستشار</option><option>مشرف فني</option><option>مدير نظام</option></select></div>
           <Input label="كلمة المرور" type="password" placeholder="••••••••" />
         </div>
         <div style={{ display: "flex", gap: 10, marginTop: 20, justifyContent: "flex-end" }}>
@@ -4754,7 +4331,7 @@ export default function DaffaPlatform() {
       <Modal open title="تأكيد الحذف" onClose={close}>
         <div style={{ textAlign: "center", padding: "20px 0" }}>
           <div style={{ width: 64, height: 64, borderRadius: "50%", background: colors.redLight, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: colors.red }}><IcWarning width={28} height={28}/></div>
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark, marginBottom: 8 }}>هل أنت متأكد من الحذف؟</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 8 }}>هل أنت متأكد من الحذف؟</h3>
           <p style={{ fontSize: 13, color: colors.gray }}>لا يمكن التراجع عن هذا الإجراء</p>
         </div>
         <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
@@ -4771,46 +4348,67 @@ export default function DaffaPlatform() {
   const sessionToastEl = !sessionExpired ? null : (
     <div style={{
       position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)',
-      background: '#1e293b', color: '#fff', borderRadius: 14,
+      background: '#0E2A3D', color: '#fff', borderRadius: 14,
       padding: '14px 28px', fontSize: 14, fontWeight: 600,
       display: 'flex', alignItems: 'center', gap: 12,
-      boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-      zIndex: 99999, direction: 'rtl', fontFamily: "'Cairo', sans-serif",
+      boxShadow: '0 8px 32px rgba(14,42,61,0.3)',
+      zIndex: 99999, direction: 'rtl', fontFamily: "inherit",
       animation: 'fadeInUp 0.35s ease',
       whiteSpace: 'nowrap',
     }}>
-      <span style={{ fontSize: 20 }}>🔒</span>
+      <span style={{ fontSize: 20 }}><DfIcon name="lock" size={20} /></span>
       <div>
         <div>انتهت جلستك — يرجى تسجيل الدخول مجدداً</div>
-        <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>تم تسجيل خروجك تلقائياً لحماية حسابك</div>
+        <div style={{ fontSize: 11, color: '#8C97A3', marginTop: 2 }}>تم تسجيل خروجك تلقائياً لحماية حسابك</div>
       </div>
       <button
         onClick={() => { setSessionExpired(false); setAuthPage('login'); }}
-        style={{ marginRight: 8, padding: '6px 16px', background: colors.orange, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+        style={{ marginRight: 8, padding: '6px 16px', background: colors.amber, color: '#0E2A3D', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
         دخول
       </button>
       <button onClick={() => setSessionExpired(false)}
-        style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
+        style={{ background: 'none', border: 'none', color: '#8C97A3', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: 0 }}>×</button>
     </div>
   );
 
-  if (!isDashboard) return <>{renderContent()}<ModalContent />{sessionToastEl}</>;
+  if (!isDashboard) return <>{renderContent()}<ModalContent /><TipLayer />{sessionToastEl}</>;
+
+  const bottomTabs = currentRole === "admin"
+    ? ["admin-dash", "admin-outputs", "admin-orgs", "admin-finance"]
+    : currentRole === "consultant"
+    ? ["con-dash", "con-pending", "con-clients", "con-chat"]
+    : ["client-dash", "strategic-roadmap", "operational-roadmap", "policies-select"];
+  const homeView = currentRole === "admin" ? "admin-dash" : currentRole === "consultant" ? "con-dash" : "client-dash";
+  const profileView = currentRole === "admin" ? "admin-profile" : currentRole === "consultant" ? "con-settings" : "client-settings";
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", direction: "rtl" }}>
-      <Sidebar />
-      <div style={{ flex: 1, marginRight: sidebarOpen ? 240 : 64, transition: "margin 0.3s", display: "flex", flexDirection: "column" }}>
-        <TopBar title={menu.find(m => m.id === currentView)?.label || activeUnit?.name || "لوحة التحكم"} breadcrumb={activeUnit ? "التخطيط الاستراتيجي" : undefined} />
-        <div className="geo-bg" style={{ flex: 1, padding: 24, overflowY: "auto", position: 'relative' }}>
-          {/* شريط التحميل العلوي — يظهر عند كل تنقل بدون أي اهتزاز في المحتوى */}
+    <>
+      <AppShell
+        role={currentRole}
+        authUser={authUser}
+        menu={menu}
+        currentView={currentView}
+        onNavigate={navigate}
+        onLogout={handleLogout}
+        onHome={homeView}
+        onProfile={profileView}
+        title={menu.find(m => m.id === currentView)?.label || activeUnit?.name || "لوحة التحكم"}
+        breadcrumb={activeUnit ? "التخطيط الاستراتيجي" : undefined}
+        unreadCount={unreadCount}
+        onNotifications={() => navigate(currentRole === 'client' ? 'client-notifications' : currentRole === 'consultant' ? 'con-notifications' : 'admin-notifications')}
+        onPreview={() => window.open(window.location.origin + '?preview=1', '_blank')}
+        onGlossary={() => setGlossaryOpen(true)}
+        onTour={() => setTourKey(k => k + 1)}
+        bottomTabs={bottomTabs.map(id => menu.find(m => m.id === id)).filter(Boolean)}
+      >
+          {/* شريط التحميل العلوي — يظهر عند كل تنقل */}
           <div
             key={`nav-${currentView}-${activeUnit?.id ?? 0}`}
             style={{
               position: 'absolute', top: 0, left: 0, right: 0, height: 3, zIndex: 20,
-              background: `linear-gradient(90deg, ${colors.teal}, ${colors.orange})`,
+              background: `linear-gradient(90deg, ${colors.primary}, ${colors.amber})`,
               transformOrigin: 'right',
               animation: 'navBar 0.55s cubic-bezier(0.4,0,0.2,1) forwards',
-              borderRadius: '0 0 2px 2px',
               pointerEvents: 'none',
             }}
           />
@@ -4876,6 +4474,9 @@ export default function DaffaPlatform() {
           </KeepAlive>
 
           {/* ── صفحات الأدمن ── */}
+          <KeepAlive active={currentView === 'admin-outputs'}>
+            <AdminOutputs />
+          </KeepAlive>
           <KeepAlive active={currentView === 'admin-orgs'}>
             <AdminOrgs />
           </KeepAlive>
@@ -4930,10 +4531,12 @@ export default function DaffaPlatform() {
               {renderContent()}
             </div>
           )}
-        </div>
-      </div>
+      </AppShell>
       <ModalContent />
+      <GlossaryDrawer open={glossaryOpen} onClose={() => setGlossaryOpen(false)} />
+      <OnboardingTour key={tourKey} role={currentRole} force={tourKey > 0} navigate={navigate} />
+      <TipLayer />
       {sessionToastEl}
-    </div>
+    </>
   );
 }

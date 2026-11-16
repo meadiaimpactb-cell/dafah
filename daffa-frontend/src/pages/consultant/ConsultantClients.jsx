@@ -1,34 +1,35 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useCallback } from 'react';
 import { consultantApi } from '../../api/consultant';
 
 const C = {
-  teal: '#1A6B7C', tealDark: '#14505E',
-  orange: '#E8620A', orangeLight: '#FDF0E8',
-  green: '#16a34a', greenLight: '#D1FAE5',
-  blue: '#3B82F6', blueLight: '#DBEAFE',
-  red: '#dc2626', redLight: '#FEE2E2',
-  yellow: '#F59E0B', yellowLight: '#FEF3C7',
-  gray: '#6B7280', grayLight: '#F3F4F6', grayBorder: '#E5E7EB',
+  primary: '#235D7F', ink: '#0E2A3D',
+  orange: '#EF6A2C', amberText: '#A33F12', amberSoft: '#FEF3EC',
+  green: '#0B7F5D', greenLight: '#C9EFE1',
+  blue: '#2E8FE6', blueLight: '#CFE5FA',
+  red: '#C53A3A', redLight: '#F8D3D3',
+  yellow: '#EF6A2C', yellowLight: '#FDE2D2',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
 };
 
 const SERVICE_CFG = {
-  strategic:   { label: 'استراتيجي', icon: '🎯', color: C.teal,    bg: '#E8F4F6'   },
-  operational: { label: 'تشغيلي',    icon: '⚙️', color: '#7c3aed', bg: '#ede9fe'   },
-  policies:    { label: 'سياسات',    icon: '📋', color: C.blue,    bg: C.blueLight },
+  strategic:   { label: 'استراتيجي', icon: <DfIcon name="target" size={20} />, color: C.primary,    bg: '#D9E8F1'   },
+  operational: { label: 'تشغيلي',    icon: <DfIcon name="gear" size={20} />, color: '#235D7F', bg: '#D9E8F1'   },
+  policies:    { label: 'سياسات',    icon: <DfIcon name="clipboard" size={20} />, color: C.blue,    bg: C.blueLight },
 };
 
 const STATUS_MAP = {
-  active:              { label: 'نشط',          color: C.teal,   bg: '#E8F4F6' },
-  review:              { label: 'قيد المراجعة',  color: '#7c3aed', bg: '#ede9fe' },
+  active:              { label: 'نشط',          color: C.primary,   bg: '#D9E8F1' },
+  review:              { label: 'قيد المراجعة',  color: '#235D7F', bg: '#D9E8F1' },
   completed:           { label: 'مكتمل',         color: C.green,  bg: C.greenLight },
   pending:             { label: 'معلق',          color: C.gray,   bg: C.grayLight },
-  design_in_progress:  { label: 'قيد التصميم',  color: C.orange, bg: C.orangeLight },
+  design_in_progress:  { label: 'قيد التصميم',  color: C.amberText, bg: C.amberSoft },
 };
 
 function MiniProgress({ value, color }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-      <div style={{ flex: 1, height: 5, borderRadius: 99, background: '#e5e7eb', overflow: 'hidden' }}>
+      <div style={{ flex: 1, height: 5, borderRadius: 99, background: '#E8E3DA', overflow: 'hidden' }}>
         <div style={{ height: '100%', borderRadius: 99, background: value >= 100 ? C.green : color, width: `${Math.min(value, 100)}%`, transition: 'width 0.4s' }} />
       </div>
       <span style={{ fontSize: 11, fontWeight: 700, color: value >= 100 ? C.green : color, minWidth: 28 }}>{value}%</span>
@@ -61,7 +62,7 @@ function ServiceCard({ type, data, navigate, userId, orgName }) {
         border: `1.5px solid ${needsWork ? cfg.color + '60' : isCompleted ? C.green + '40' : C.grayBorder}`,
         borderRadius: 10,
         padding: '10px 14px',
-        background: needsWork ? cfg.bg + '80' : isCompleted ? C.greenLight + '60' : '#fafafa',
+        background: needsWork ? cfg.bg + '80' : isCompleted ? C.greenLight + '60' : '#FBF9F5',
         transition: 'all 0.18s',
         position: 'relative',
         cursor: 'pointer',
@@ -71,12 +72,12 @@ function ServiceCard({ type, data, navigate, userId, orgName }) {
     >
       {/* Badge معلقة */}
       {hasPending > 0 && (
-        <div style={{ position: 'absolute', top: -8, left: 10, background: C.orange, color: '#fff', borderRadius: 20, padding: '1px 8px', fontSize: 10, fontWeight: 700 }}>
+        <div style={{ position: 'absolute', top: -8, left: 10, background: C.amber, color: '#0E2A3D', borderRadius: 20, padding: '1px 8px', fontSize: 10, fontWeight: 700 }}>
           {data.pending} معلقة
         </div>
       )}
       {hasRevision > 0 && !hasPending && (
-        <div style={{ position: 'absolute', top: -8, left: 10, background: C.yellow, color: '#fff', borderRadius: 20, padding: '1px 8px', fontSize: 10, fontWeight: 700 }}>
+        <div style={{ position: 'absolute', top: -8, left: 10, background: C.amber, color: '#0E2A3D', borderRadius: 20, padding: '1px 8px', fontSize: 10, fontWeight: 700 }}>
           {data.revision} تعديل
         </div>
       )}
@@ -104,13 +105,13 @@ function ServiceCard({ type, data, navigate, userId, orgName }) {
         {needsWork ? (
           <button
             onClick={e => { e.stopPropagation(); goTo('con-pending'); }}
-            style={{ flex: 1, padding: '5px 0', background: cfg.color, color: '#fff', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo',sans-serif" }}>
+            style={{ flex: 1, padding: '5px 0', background: cfg.color, color: '#fff', border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
             مراجعة الآن ←
           </button>
         ) : (
           <button
             onClick={e => { e.stopPropagation(); goTo('con-completed'); }}
-            style={{ flex: 1, padding: '5px 0', background: 'transparent', color: isCompleted ? C.green : cfg.color, border: `1px solid ${isCompleted ? C.green + '60' : cfg.color + '60'}`, borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo',sans-serif" }}>
+            style={{ flex: 1, padding: '5px 0', background: 'transparent', color: isCompleted ? C.green : cfg.color, border: `1px solid ${isCompleted ? C.green + '60' : cfg.color + '60'}`, borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit" }}>
             {isCompleted ? 'عرض المعتمدة ←' : 'عرض التفاصيل ←'}
           </button>
         )}
@@ -185,7 +186,7 @@ export default function ConsultantClients({ navigate }) {
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300, color: C.gray }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 32, marginBottom: 8 }}>⏳</div>
+        <div style={{ fontSize: 32, marginBottom: 8 }}><DfIcon name="hourglass" size={32} /></div>
         <div style={{ fontSize: 14 }}>جارٍ التحميل…</div>
       </div>
     </div>
@@ -196,10 +197,10 @@ export default function ConsultantClients({ navigate }) {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
         <div>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: C.tealDark, margin: 0 }}>العملاء والمهام</h2>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink, margin: 0 }}>العملاء والمهام</h2>
           <div style={{ fontSize: 11, color: C.gray, marginTop: 3 }}>
             {clients.length} عميل
-            {totalPendingAll > 0 && <span style={{ marginRight: 8, color: C.orange, fontWeight: 700 }}>• {totalPendingAll} مهمة معلقة</span>}
+            {totalPendingAll > 0 && <span style={{ marginRight: 8, color: C.amberText, fontWeight: 700 }}>• {totalPendingAll} مهمة معلقة</span>}
             {lastSync && <span style={{ marginRight: 8 }}>• آخر تحديث: {lastSync.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}</span>}
           </div>
         </div>
@@ -207,10 +208,10 @@ export default function ConsultantClients({ navigate }) {
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="🔍 بحث عن منظمة…"
-            style={{ padding: '7px 12px', borderRadius: 10, border: `1px solid ${C.grayBorder}`, fontFamily: "'Cairo', sans-serif", fontSize: 12, width: 180, outline: 'none' }}
+            placeholder="بحث عن منظمة…"
+            style={{ padding: '7px 12px', borderRadius: 10, border: `1px solid ${C.grayBorder}`, fontFamily: "inherit", fontSize: 12, width: 180, outline: 'none' }}
           />
-          <button onClick={() => load(false)} style={{ padding: '7px 14px', background: C.teal, color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, cursor: 'pointer', fontFamily: "'Cairo',sans-serif" }}>
+          <button onClick={() => load(false)} style={{ padding: '7px 14px', background: C.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, cursor: 'pointer', fontFamily: "inherit" }}>
             ↻ تحديث
           </button>
         </div>
@@ -220,13 +221,13 @@ export default function ConsultantClients({ navigate }) {
       <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
         {[
           { key: 'all',         label: `الكل (${clients.length})` },
-          { key: 'pending',     label: `⚡ معلقة (${clients.filter(c => c.total_pending > 0).length})`, urgent: true },
-          { key: 'strategic',   label: `🎯 استراتيجي (${clients.filter(c => c.strategic).length})` },
-          { key: 'operational', label: `⚙️ تشغيلي (${clients.filter(c => c.operational).length})` },
-          { key: 'policies',    label: `📋 سياسات (${clients.filter(c => c.policies).length})` },
+          { key: 'pending',     label: `معلقة (${clients.filter(c => c.total_pending > 0).length})`, urgent: true },
+          { key: 'strategic',   label: `استراتيجي (${clients.filter(c => c.strategic).length})` },
+          { key: 'operational', label: `تشغيلي (${clients.filter(c => c.operational).length})` },
+          { key: 'policies',    label: `سياسات (${clients.filter(c => c.policies).length})` },
         ].map(f => (
           <button key={f.key} onClick={() => setFilterSvc(f.key)}
-            style={{ padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: filterSvc === f.key ? 700 : 500, fontFamily: "'Cairo',sans-serif", cursor: 'pointer', background: filterSvc === f.key ? (f.urgent ? C.orange : C.teal) : '#fff', color: filterSvc === f.key ? '#fff' : C.gray, border: `1.5px solid ${filterSvc === f.key ? (f.urgent ? C.orange : C.teal) : C.grayBorder}` }}>
+            style={{ padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: filterSvc === f.key ? 700 : 500, fontFamily: "inherit", cursor: 'pointer', background: filterSvc === f.key ? (f.urgent ? C.amber : C.primary) : '#fff', color: filterSvc === f.key ? '#0E2A3D' : C.gray, border: `1.5px solid ${filterSvc === f.key ? (f.urgent ? C.amberLine : C.primary) : C.grayBorder}` }}>
             {f.label}
           </button>
         ))}
@@ -234,8 +235,8 @@ export default function ConsultantClients({ navigate }) {
 
       {/* Empty state */}
       {filtered.length === 0 && (
-        <div style={{ background: 'white', borderRadius: 14, padding: 60, textAlign: 'center', color: C.gray, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
-          <div style={{ fontSize: 32, marginBottom: 8 }}>👥</div>
+        <div style={{ background: 'white', borderRadius: 14, padding: 60, textAlign: 'center', color: C.gray, boxShadow: '0 1px 4px rgba(14,42,61,0.07)' }}>
+          <div style={{ fontSize: 32, marginBottom: 8 }}><DfIcon name="users" size={32} /></div>
           <div style={{ fontSize: 14 }}>{search ? 'لا توجد نتائج للبحث' : 'لا يوجد عملاء مُسنَدون إليك بعد'}</div>
         </div>
       )}
@@ -249,30 +250,30 @@ export default function ConsultantClients({ navigate }) {
 
           return (
             <div key={client.user_id}
-              style={{ background: 'white', borderRadius: 14, padding: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: `2px solid ${hasPending ? C.orange + '40' : 'transparent'}`, transition: 'border 0.2s' }}>
+              style={{ background: 'white', borderRadius: 14, padding: 20, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', border: `2px solid ${hasPending ? C.amberLine + '40' : 'transparent'}`, transition: 'border 0.2s' }}>
 
               {/* Top row: client identity */}
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flex: 1 }}>
-                  <div style={{ width: 44, height: 44, borderRadius: 12, background: hasPending ? C.orange : C.teal, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 18, flexShrink: 0 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: hasPending ? C.amber : C.primary, color: '#0E2A3D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 18, flexShrink: 0 }}>
                     {client.avatar}
                   </div>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 3 }}>
-                      <span style={{ fontSize: 15, fontWeight: 700, color: C.tealDark }}>{client.org_name}</span>
+                      <span style={{ fontSize: 15, fontWeight: 700, color: C.ink }}>{client.org_name}</span>
                       {client.org_type && <span style={{ fontSize: 10, color: C.gray, background: C.grayLight, padding: '1px 8px', borderRadius: 20 }}>{client.org_type}</span>}
                       {client.rep_name && <span style={{ fontSize: 11, color: C.gray }}>{client.rep_name}</span>}
                     </div>
                     {/* شارات الخدمات — تُبرز الخدمة المفلترة */}
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       {client.strategic   && (
-                        <span style={{ fontSize: 11, padding: '1px 8px', borderRadius: 20, fontWeight: vis.strategic ? 700 : 400, background: vis.strategic ? '#E8F4F6' : C.grayLight, color: vis.strategic ? C.teal : C.gray }}>🎯 استراتيجي</span>
+                        <span style={{ fontSize: 11, padding: '1px 8px', borderRadius: 20, fontWeight: vis.strategic ? 700 : 400, background: vis.strategic ? '#D9E8F1' : C.grayLight, color: vis.strategic ? C.primary : C.gray }}><DfIcon name="target" size={14} style={{ marginInlineEnd: 6 }} />استراتيجي</span>
                       )}
                       {client.operational && (
-                        <span style={{ fontSize: 11, padding: '1px 8px', borderRadius: 20, fontWeight: vis.operational ? 700 : 400, background: vis.operational ? '#ede9fe' : C.grayLight, color: vis.operational ? '#7c3aed' : C.gray }}>⚙️ تشغيلي</span>
+                        <span style={{ fontSize: 11, padding: '1px 8px', borderRadius: 20, fontWeight: vis.operational ? 700 : 400, background: vis.operational ? '#D9E8F1' : C.grayLight, color: vis.operational ? '#235D7F' : C.gray }}><DfIcon name="gear" size={14} style={{ marginInlineEnd: 6 }} />تشغيلي</span>
                       )}
                       {client.policies    && (
-                        <span style={{ fontSize: 11, padding: '1px 8px', borderRadius: 20, fontWeight: vis.policies ? 700 : 400, background: vis.policies ? C.blueLight : C.grayLight, color: vis.policies ? C.blue : C.gray }}>📋 سياسات</span>
+                        <span style={{ fontSize: 11, padding: '1px 8px', borderRadius: 20, fontWeight: vis.policies ? 700 : 400, background: vis.policies ? C.blueLight : C.grayLight, color: vis.policies ? C.blue : C.gray }}><DfIcon name="clipboard" size={14} style={{ marginInlineEnd: 6 }} />سياسات</span>
                       )}
                     </div>
                   </div>
@@ -280,13 +281,13 @@ export default function ConsultantClients({ navigate }) {
 
                 {/* Total pending badge */}
                 {hasPending ? (
-                  <div style={{ textAlign: 'center', background: C.orange, color: '#fff', borderRadius: 10, padding: '6px 14px', flexShrink: 0 }}>
+                  <div style={{ textAlign: 'center', background: C.amber, color: '#0E2A3D', borderRadius: 10, padding: '6px 14px', flexShrink: 0 }}>
                     <div style={{ fontSize: 20, fontWeight: 800, lineHeight: 1 }}>{client.total_pending}</div>
                     <div style={{ fontSize: 9, opacity: 0.85, marginTop: 2 }}>مهمة معلقة</div>
                   </div>
                 ) : (
                   <div style={{ textAlign: 'center', background: C.greenLight, color: C.green, borderRadius: 10, padding: '6px 14px', flexShrink: 0 }}>
-                    <div style={{ fontSize: 16 }}>✅</div>
+                    <div style={{ fontSize: 16 }}><DfIcon name="check" size={16} /></div>
                     <div style={{ fontSize: 9, marginTop: 2 }}>لا مهام</div>
                   </div>
                 )}

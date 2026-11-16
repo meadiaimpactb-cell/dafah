@@ -1,13 +1,14 @@
+import DfIcon from '../../../components/ui/DfIcon';
 import React, { useState } from 'react';
 import { strategicApi } from '../../../api/strategic';
 import { PayLogo, PaymentMethodPicker, ApplePayButton, SecurePaymentBadge } from '../../shared/PaymentBrand';
 
 const C = {
-  teal: '#1A6B7C', tealDark: '#14505E', tealLight: '#E8F4F6',
-  orange: '#E8620A', orangeLight: '#FEF0E8',
-  gray: '#6B7280', grayLight: '#F3F4F6', grayBorder: '#E5E7EB',
-  green: '#16A34A', greenLight: '#DCFCE7',
-  red: '#DC2626', redLight: '#FEE2E2',
+  primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
+  orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F', amberSoft: '#FEF3EC',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
+  green: '#0B7F5D', greenLight: '#C9EFE1',
+  red: '#C53A3A', redLight: '#F8D3D3',
 };
 
 // ── شعارات الشبكات الرسمية (public/payments) — بنفس الأسماء المستخدمة في الصفحات ──
@@ -16,13 +17,13 @@ export const IcMastercard = () => <PayLogo name="mastercard" height={22} />;
 export const IcMada = ({ height = 22 }) => <PayLogo name="mada" height={height} />;
 export const IcApplePay = () => <PayLogo name="apple_pay" height={22} />;
 export const IcBank = () => (
-  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke={C.teal} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke={C.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
     <polyline points="9 22 9 12 15 12 15 22"/>
   </svg>
 );
 export const IcCard = () => (
-  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke={C.teal} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke={C.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <rect x="1" y="4" width="22" height="16" rx="2"/>
     <line x1="1" y1="10" x2="23" y2="10"/>
   </svg>
@@ -89,7 +90,7 @@ export const CardPreview = ({ cardNum, name, expiry, brand }) => {
     ? 'linear-gradient(135deg,#eb001b,#f79e1b)'
     : brand === 'mada'
     ? 'linear-gradient(135deg,#00623b,#009e60)'
-    : `linear-gradient(135deg,${C.teal},${C.tealDark})`;
+    : `linear-gradient(135deg,${C.primary},${C.ink})`;
   return (
     <div style={{ background: grad, borderRadius: 14, padding: '22px 24px', marginBottom: 20, color: '#fff', position: 'relative', overflow: 'hidden', minHeight: 140 }}>
       <div style={{ position: 'absolute', top: -30, right: -30, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
@@ -98,7 +99,7 @@ export const CardPreview = ({ cardNum, name, expiry, brand }) => {
         <div style={{ fontSize: 11, opacity: 0.8, letterSpacing: 1 }}>بطاقة الدفع</div>
         <div>
           {brand && (
-            <div style={{ background: '#fff', borderRadius: 6, padding: '4px 8px', display: 'flex', alignItems: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>
+            <div style={{ background: '#fff', borderRadius: 6, padding: '4px 8px', display: 'flex', alignItems: 'center', boxShadow: '0 1px 4px rgba(14,42,61,0.15)' }}>
               {brand === 'visa' ? <IcVisa /> : brand === 'mc' ? <IcMastercard /> : <IcMada height={18} />}
             </div>
           )}
@@ -130,7 +131,7 @@ export const CopyBtn = ({ text }) => {
     setTimeout(() => setCopied(false), 1800);
   };
   return (
-    <button onClick={copy} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 9px', borderRadius: 6, border: `1px solid ${C.grayBorder}`, background: copied ? C.greenLight : '#fff', color: copied ? C.green : C.gray, fontSize: 11, cursor: 'pointer', fontFamily: "'Cairo',sans-serif", transition: 'all 0.2s' }}>
+    <button onClick={copy} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 9px', borderRadius: 6, border: `1px solid ${C.grayBorder}`, background: copied ? C.greenLight : '#fff', color: copied ? C.green : C.gray, fontSize: 11, cursor: 'pointer', fontFamily: "inherit", transition: 'all 0.2s' }}>
       {copied ? <IcCheck /> : <IcCopy />}
       {copied ? 'تم النسخ' : 'نسخ'}
     </button>
@@ -192,9 +193,9 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
     <div className="animate-in" style={{ maxWidth: 820, margin: '0 auto', direction: 'rtl' }}>
 
       {/* Header */}
-      <div style={{ background: '#fff', borderRadius: 14, padding: '20px 28px', marginBottom: 24, boxShadow: '0 1px 8px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: '#fff', borderRadius: 14, padding: '20px 28px', marginBottom: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h2 style={{ fontSize: 18, fontWeight: 800, color: C.tealDark, marginBottom: 3 }}>إتمام الدفع</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 800, color: C.ink, marginBottom: 3 }}>إتمام الدفع</h2>
           <p style={{ fontSize: 13, color: C.gray }}>أتمّ الدفع لبدء رحلة التخطيط الاستراتيجي</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: C.green, fontWeight: 600, background: C.greenLight, padding: '6px 14px', borderRadius: 20 }}>
@@ -202,13 +203,13 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-main-380)', gap: 20 }}>
 
         {/* ── طريقة الدفع ─────────────────────────────── */}
         <div>
           {/* أزرار طرق الدفع */}
-          <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(0,0,0,0.06)', marginBottom: 16 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: C.tealDark, marginBottom: 14 }}>اختر طريقة الدفع</div>
+          <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', marginBottom: 16 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginBottom: 14 }}>اختر طريقة الدفع</div>
             <PaymentMethodPicker
               value={method}
               columns={4}
@@ -218,11 +219,11 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
 
           {/* ── بطاقة ائتمان / مدى ── */}
           {(method === 'card' || method === 'mada') && (
-            <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
+            <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
               <CardPreview cardNum={cardNum} name={holder} expiry={expiry} brand={method === 'mada' ? 'mada' : brand} />
 
               {/* Test card hint */}
-              <div style={{ padding: '8px 12px', background: '#f0fdf4', borderRadius: 8, fontSize: 11, color: '#15803d', direction: 'rtl', lineHeight: 1.8, marginBottom: 14 }}>
+              <div style={{ padding: '8px 12px', background: '#E8F8F2', borderRadius: 8, fontSize: 11, color: '#086449', direction: 'rtl', lineHeight: 1.8, marginBottom: 14 }}>
                 بطاقة الاختبار: <strong>4111 1111 1111 1111</strong> | تاريخ: <strong>12/26</strong> | CVV: <strong>123</strong>
               </div>
 
@@ -248,7 +249,7 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
               </div>
 
               {/* تاريخ الانتهاء + CVV */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 12, marginBottom: 14 }}>
                 <div>
                   <label style={labelS}>تاريخ الانتهاء</label>
                   <input
@@ -295,7 +296,7 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
 
           {/* ── Apple Pay ── */}
           {method === 'apple_pay' && (
-            <div style={{ background: '#fff', borderRadius: 14, padding: 32, boxShadow: '0 1px 8px rgba(0,0,0,0.06)', textAlign: 'center' }}>
+            <div style={{ background: '#fff', borderRadius: 14, padding: 32, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', textAlign: 'center' }}>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}><PayLogo name="apple_pay" height={44} /></div>
               <p style={{ fontSize: 13, color: C.gray, maxWidth: 300, margin: '0 auto 22px', lineHeight: 1.8 }}>
                 ادفع بأمان باستخدام Apple Pay من جهازك — لا تحتاج إلى إدخال بيانات البطاقة
@@ -306,8 +307,8 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
 
           {/* ── تحويل بنكي ── */}
           {method === 'bank_transfer' && (
-            <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: C.tealDark, marginBottom: 16 }}>بيانات التحويل البنكي</div>
+            <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginBottom: 16 }}>بيانات التحويل البنكي</div>
 
               {[
                 { label: 'اسم المستفيد',    value: 'منصة دفة للاستشارات' },
@@ -318,13 +319,13 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
                 <div key={r.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: C.grayLight, borderRadius: 10, marginBottom: 8 }}>
                   <div>
                     <div style={{ fontSize: 11, color: C.gray, marginBottom: 2 }}>{r.label}</div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#111', fontFamily: r.label.includes('IBAN') || r.label.includes('SWIFT') ? "'Courier New',monospace" : "'Cairo',sans-serif", letterSpacing: r.label.includes('IBAN') || r.label.includes('SWIFT') ? 1 : 0 }}>{r.value}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#0E2A3D', fontFamily: r.label.includes('IBAN') || r.label.includes('SWIFT') ? "'Courier New',monospace" : "inherit", letterSpacing: r.label.includes('IBAN') || r.label.includes('SWIFT') ? 1 : 0 }}>{r.value}</div>
                   </div>
                   <CopyBtn text={r.value.replace(/\s/g,'')} />
                 </div>
               ))}
 
-              <div style={{ marginTop: 14, padding: '12px 16px', background: '#fffbeb', borderRadius: 10, border: '1px solid #fde68a', fontSize: 12, color: '#92400e', lineHeight: 1.7 }}>
+              <div style={{ marginTop: 14, padding: '12px 16px', background: '#FEF3EC', borderRadius: 10, border: '1px solid #FBC3A3', fontSize: 12, color: '#7F310E', lineHeight: 1.7 }}>
                 <strong>تعليمات التحويل:</strong> بعد إتمام التحويل، أرسل إيصال الدفع عبر المحادثة مع المستشار. سيتم تفعيل الخدمة خلال يوم عمل واحد من تأكيد الاستلام.
               </div>
             </div>
@@ -335,8 +336,8 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
 
         {/* ── ملخص الطلب ────────────────────────────── */}
         <div>
-          <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(0,0,0,0.06)', marginBottom: 16 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: C.tealDark, marginBottom: 16, paddingBottom: 12, borderBottom: `1px solid ${C.grayBorder}` }}>ملخص الطلب</div>
+          <div style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', marginBottom: 16 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginBottom: 16, paddingBottom: 12, borderBottom: `1px solid ${C.grayBorder}` }}>ملخص الطلب</div>
 
             <Row label="الخدمة"     value="التخطيط الاستراتيجي" />
             <Row label="المستشار"   value={workflow?.consultant?.name || '—'} />
@@ -348,15 +349,15 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
               <Row label={`ضريبة القيمة المضافة (${taxRate}%)`} value={`${tax.toLocaleString('en-US', { minimumFractionDigits: 2 })} ر.س`} />
             </div>
 
-            <div style={{ borderTop: `2px solid ${C.teal}22`, marginTop: 12, paddingTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 15, fontWeight: 800, color: C.tealDark }}>الإجمالي</span>
-              <span style={{ fontSize: 18, fontWeight: 800, color: C.orange }}>{total.toLocaleString('en-US', { minimumFractionDigits: 2 })} ر.س</span>
+            <div style={{ borderTop: `2px solid ${C.primary}22`, marginTop: 12, paddingTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>الإجمالي</span>
+              <span style={{ fontSize: 18, fontWeight: 800, color: C.amberText }}>{total.toLocaleString('en-US', { minimumFractionDigits: 2 })} ر.س</span>
             </div>
           </div>
 
           {/* كود الخصم */}
-          <div style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 1px 8px rgba(0,0,0,0.06)', marginBottom: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, marginBottom: 10 }}>كود الخصم</div>
+          <div style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 10 }}>كود الخصم</div>
             <div style={{ display: 'flex', gap: 8 }}>
               <input
                 value={discount}
@@ -370,7 +371,7 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
 
           {/* زر الدفع */}
           {error && (
-            <div style={{ background: C.redLight, color: C.red, border: `1px solid #fecaca`, borderRadius: 10, padding: '10px 14px', marginBottom: 12, textAlign: 'center', fontSize: 13 }}>
+            <div style={{ background: C.redLight, color: C.red, border: `1px solid #F1B2B2`, borderRadius: 10, padding: '10px 14px', marginBottom: 12, textAlign: 'center', fontSize: 13 }}>
               {error}
             </div>
           )}
@@ -380,10 +381,10 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
             disabled={loading}
             style={{
               width: '100%', padding: '16px 0',
-              background: loading ? '#9ca3af' : `linear-gradient(135deg,${C.orange},#d4550a)`,
-              color: '#fff', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800,
-              cursor: loading ? 'not-allowed' : 'pointer', fontFamily: "'Cairo',sans-serif",
-              boxShadow: loading ? 'none' : `0 6px 20px ${C.orange}50`,
+              background: loading ? '#8C97A3' : `linear-gradient(135deg,${C.amber},#EF6A2C)`,
+              color: '#0E2A3D', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 800,
+              cursor: loading ? 'not-allowed' : 'pointer', fontFamily: "inherit",
+              boxShadow: loading ? 'none' : `0 6px 20px ${C.amberLine}50`,
               transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             }}
           >
@@ -398,7 +399,7 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
             <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 6 }}>
               {[
                 { icon: <IcLock />, text: 'تشفير SSL' },
-                { icon: <span style={{ fontSize: 12 }}>🛡️</span>, text: 'دفع آمن' },
+                { icon: <span style={{ fontSize: 12 }}><DfIcon name="shield" size={14} /></span>, text: 'دفع آمن' },
                 { icon: <span style={{ fontSize: 12 }}>↩️</span>, text: 'استرداد مضمون' },
               ].map(b => (
                 <div key={b.text} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
@@ -417,14 +418,14 @@ export default function StepPayment({ workflow, setWorkflow, setStep, pricing, w
 const Row = ({ label, value }) => (
   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: C.gray, marginBottom: 8, alignItems: 'center' }}>
     <span>{label}</span>
-    <span style={{ color: '#374151', fontWeight: 600 }}>{value}</span>
+    <span style={{ color: '#334452', fontWeight: 600 }}>{value}</span>
   </div>
 );
 
 const RRow = ({ label, value, vc }) => (
   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: C.gray, alignItems: 'center' }}>
     <span>{label}</span>
-    <span style={{ color: vc || '#374151', fontWeight: 600 }}>{value}</span>
+    <span style={{ color: vc || '#334452', fontWeight: 600 }}>{value}</span>
   </div>
 );
 
@@ -444,13 +445,13 @@ export const PaymentReceipt = ({ workflow, serviceLabel, extraRows }) => {
 
   return (
     <div className="animate-in" style={{ maxWidth: 560, margin: '0 auto', direction: 'rtl' }}>
-      <div style={{ background: '#fff', borderRadius: 14, padding: 28, marginBottom: 16, boxShadow: '0 1px 8px rgba(0,0,0,0.06)', textAlign: 'center' }}>
+      <div style={{ background: '#fff', borderRadius: 14, padding: 28, marginBottom: 16, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', textAlign: 'center' }}>
         <div style={{ width: 68, height: 68, borderRadius: '50%', background: C.greenLight, margin: '0 auto 14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke={C.green} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="20 6 9 17 4 12" />
           </svg>
         </div>
-        <h2 style={{ fontSize: 20, fontWeight: 800, color: C.tealDark, marginBottom: 6 }}>تم الدفع بنجاح</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 800, color: C.ink, marginBottom: 6 }}>تم الدفع بنجاح</h2>
         <p style={{ fontSize: 13, color: C.gray, marginBottom: paidAt ? 12 : 0 }}>{serviceLabel}</p>
         {paidAt && (
           <span style={{ fontSize: 12, color: C.green, fontWeight: 600, background: C.greenLight, padding: '4px 14px', borderRadius: 20 }}>
@@ -459,38 +460,38 @@ export const PaymentReceipt = ({ workflow, serviceLabel, extraRows }) => {
         )}
       </div>
 
-      <div style={{ background: '#fff', borderRadius: 14, padding: 20, marginBottom: 16, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, marginBottom: 12 }}>طريقة الدفع المستخدمة</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: `${C.teal}08`, borderRadius: 10, border: `1.5px solid ${C.teal}25` }}>
-          <span style={{ color: C.teal, display: 'flex', alignItems: 'center' }}>{m.icon}</span>
-          <span style={{ fontSize: 15, fontWeight: 700, color: C.tealDark }}>{m.label}</span>
+      <div style={{ background: '#fff', borderRadius: 14, padding: 20, marginBottom: 16, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 12 }}>طريقة الدفع المستخدمة</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: `${C.primary}08`, borderRadius: 10, border: `1.5px solid ${C.primary}25` }}>
+          <span style={{ color: C.primary, display: 'flex', alignItems: 'center' }}>{m.icon}</span>
+          <span style={{ fontSize: 15, fontWeight: 700, color: C.ink }}>{m.label}</span>
           <span style={{ marginRight: 'auto', fontSize: 11, color: C.green, fontWeight: 700, background: C.greenLight, padding: '3px 10px', borderRadius: 20 }}>مدفوع ✓</span>
         </div>
       </div>
 
-      <div style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 1px 8px rgba(0,0,0,0.06)' }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, marginBottom: 12 }}>ملخص الطلب</div>
+      <div style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 12 }}>ملخص الطلب</div>
         {extraRows}
         <div style={{ borderTop: `1px dashed ${C.grayBorder}`, paddingTop: 12, marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
           <RRow label="المجموع الجزئي"       value={`${subtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })} ر.س`} />
           {discount > 0 && <RRow label={`خصم${workflow?.discount_code ? ` (${workflow.discount_code})` : ''}`} value={`- ${discount.toLocaleString('en-US', { minimumFractionDigits: 2 })} ر.س`} vc={C.green} />}
           <RRow label="ضريبة القيمة المضافة" value={`${tax.toLocaleString('en-US', { minimumFractionDigits: 2 })} ر.س`} />
         </div>
-        <div style={{ borderTop: `2px solid ${C.teal}22`, marginTop: 10, paddingTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 15, fontWeight: 800, color: C.tealDark }}>الإجمالي المدفوع</span>
-          <span style={{ fontSize: 18, fontWeight: 800, color: C.orange }}>{total.toLocaleString('en-US', { minimumFractionDigits: 2 })} ر.س</span>
+        <div style={{ borderTop: `2px solid ${C.primary}22`, marginTop: 10, paddingTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>الإجمالي المدفوع</span>
+          <span style={{ fontSize: 18, fontWeight: 800, color: C.amberText }}>{total.toLocaleString('en-US', { minimumFractionDigits: 2 })} ر.س</span>
         </div>
       </div>
     </div>
   );
 };
 
-const labelS = { fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 };
+const labelS = { fontSize: 12, fontWeight: 600, color: '#334452', display: 'block', marginBottom: 6 };
 
 const inputS = {
   width: '100%', padding: '11px 14px',
   border: `1.5px solid ${C.grayBorder}`, borderRadius: 10,
-  fontSize: 13, fontFamily: "'Cairo',sans-serif",
+  fontSize: 13, fontFamily: "inherit",
   direction: 'rtl', boxSizing: 'border-box',
   outline: 'none', transition: 'border-color 0.2s',
   background: '#fff',

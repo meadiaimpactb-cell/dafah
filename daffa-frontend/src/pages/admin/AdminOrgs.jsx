@@ -1,16 +1,17 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
 
 const C = {
-  teal:       '#1A6B7C',
-  tealDark:   '#14505E',
-  orange:     '#E8620A',
-  gray:       '#6b7280',
-  grayLight:  '#f3f4f6',
-  grayBorder: '#e5e7eb',
-  red:        '#dc2626',
-  green:      '#16a34a',
+  primary:       '#235D7F',
+  ink:   '#0E2A3D',
+  orange:     '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12',
+  gray:       '#5E6B78',
+  grayLight:  '#F3EFE8',
+  grayBorder: '#E8E3DA',
+  red:        '#C53A3A',
+  green:      '#0B7F5D',
 };
 
 const ORG_TYPES = ['غير ربحية', 'وقفية', 'اجتماعية', 'خيرية', 'تطوعية'];
@@ -25,7 +26,7 @@ const OrgAvatar = ({ org, size = 40 }) => (
     width: size, height: size, minWidth: size, minHeight: size,
     borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
     border: `2px solid ${C.grayBorder}`,
-    background: `linear-gradient(135deg, ${C.teal}, ${C.tealDark})`,
+    background: `linear-gradient(135deg, ${C.primary}, ${C.ink})`,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   }}>
     {org.logo_url ? (
@@ -48,11 +49,11 @@ const CACHE_KEY = 'admin_orgs_cache';
 const inp = {
   width: '100%', padding: '9px 12px', borderRadius: 10,
   border: `1.5px solid ${C.grayBorder}`, fontSize: 13,
-  fontFamily: "'Cairo', sans-serif", outline: 'none', boxSizing: 'border-box',
+  fontFamily: "inherit", outline: 'none', boxSizing: 'border-box',
 };
 
-const statusColor = (s) => s === 'نشط' ? C.green : s === 'معلق' ? C.orange : C.teal;
-const statusBg    = (s) => s === 'نشط' ? '#dcfce7' : s === 'معلق' ? '#fff7ed' : '#eff6ff';
+const statusColor = (s) => s === 'نشط' ? C.green : s === 'معلق' ? C.amberLine : C.primary;
+const statusBg    = (s) => s === 'نشط' ? '#C9EFE1' : s === 'معلق' ? '#FEF3EC' : '#EAF4FD';
 
 const Badge = ({ text }) => (
   <span style={{
@@ -64,7 +65,7 @@ const Badge = ({ text }) => (
 
 const Field = ({ label, children }) => (
   <div>
-    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: C.tealDark, marginBottom: 5 }}>{label}</label>
+    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: C.ink, marginBottom: 5 }}>{label}</label>
     {children}
   </div>
 );
@@ -74,7 +75,7 @@ const Overlay = ({ children, onClose, closeOnBackdrop = false }) =>
     <div
       onClick={closeOnBackdrop ? onClose : undefined}
       style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
+        position: 'fixed', inset: 0, background: 'rgba(14,42,61,0.45)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         zIndex: 9999, padding: 20,
       }}
@@ -88,10 +89,10 @@ const Toast = ({ toast }) =>
   toast ? ReactDOM.createPortal(
     <div style={{
       position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)',
-      background: toast.type === 'success' ? '#16a34a' : '#dc2626',
+      background: toast.type === 'success' ? '#0B7F5D' : '#C53A3A',
       color: '#fff', padding: '12px 28px', borderRadius: 12,
-      fontSize: 14, fontWeight: 700, zIndex: 99999, boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-      fontFamily: "'Cairo', sans-serif",
+      fontSize: 14, fontWeight: 700, zIndex: 99999, boxShadow: '0 4px 20px rgba(14,42,61,0.15)',
+      fontFamily: "inherit",
     }}>{toast.text}</div>,
     document.body,
   ) : null;
@@ -267,23 +268,23 @@ export default function AdminOrgs() {
   const selStyle = {
     padding: '9px 14px', borderRadius: 10,
     border: `1.5px solid ${C.grayBorder}`, fontSize: 13,
-    fontFamily: "'Cairo', sans-serif", background: '#fff', cursor: 'pointer',
+    fontFamily: "inherit", background: '#fff', cursor: 'pointer',
   };
 
   // ── loading / error states
   if (loading) return (
     <div style={{ textAlign: 'center', padding: 80 }}>
-      <div style={{ fontSize: 36, marginBottom: 12 }}>⏳</div>
-      <div style={{ fontSize: 15, color: C.teal, fontWeight: 600 }}>جاري تحميل المنظمات...</div>
+      <div style={{ fontSize: 36, marginBottom: 12 }}><DfIcon name="hourglass" size={36} /></div>
+      <div style={{ fontSize: 15, color: C.primary, fontWeight: 600 }}>جاري تحميل المنظمات...</div>
     </div>
   );
 
   if (loadError) return (
     <div style={{ textAlign: 'center', padding: 80, background: '#fff', borderRadius: 12 }}>
-      <div style={{ fontSize: 36, marginBottom: 12 }}>⚠️</div>
+      <div style={{ fontSize: 36, marginBottom: 12 }}><DfIcon name="warning" size={36} /></div>
       <div style={{ fontSize: 15, fontWeight: 700, color: C.red, marginBottom: 8 }}>فشل تحميل البيانات</div>
       <div style={{ fontSize: 13, color: C.gray, marginBottom: 20 }}>{loadError}</div>
-      <button onClick={() => load(false)} style={{ padding: '10px 28px', background: C.teal, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+      <button onClick={() => load(false)} style={{ padding: '10px 28px', background: C.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
         إعادة المحاولة
       </button>
     </div>
@@ -296,26 +297,26 @@ export default function AdminOrgs() {
       {/* ── Header ── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 800, color: C.tealDark }}>إدارة المنظمات</h2>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: C.ink }}>إدارة المنظمات</h2>
           {refreshing && (
-            <span style={{ fontSize: 11, color: '#9ca3af', padding: '3px 10px', background: '#f3f4f6', borderRadius: 20 }}>
+            <span style={{ fontSize: 11, color: '#8C97A3', padding: '3px 10px', background: '#F3EFE8', borderRadius: 20 }}>
               ↻ تحديث...
             </span>
           )}
         </div>
-        <button onClick={openAdd} style={{ padding: '10px 22px', background: C.orange, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+        <button onClick={openAdd} style={{ padding: '10px 22px', background: C.amber, color: '#0E2A3D', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
           + إضافة منظمة
         </button>
       </div>
 
       {/* ── Stats ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-3)', gap: 14, marginBottom: 20 }}>
         {[
-          { label: 'إجمالي المنظمات', value: orgs.length,                             icon: '🏢', color: C.teal },
-          { label: 'نشطة',            value: orgs.filter(o => o.status !== 'معلق').length, icon: '✅', color: C.green },
-          { label: 'معلقة',           value: orgs.filter(o => o.status === 'معلق').length, icon: '⏸', color: C.red },
+          { label: 'إجمالي المنظمات', value: orgs.length,                             icon: <DfIcon name="building" size={20} />, color: C.primary },
+          { label: 'نشطة',            value: orgs.filter(o => o.status !== 'معلق').length, icon: <DfIcon name="check" size={20} />, color: C.green },
+          { label: 'معلقة',           value: orgs.filter(o => o.status === 'معلق').length, icon: <DfIcon name="pause" size={20} />, color: C.red },
         ].map(s => (
-          <div key={s.label} style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 6px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div key={s.label} style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', boxShadow: '0 1px 6px rgba(14,42,61,0.06)', display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{ fontSize: 26 }}>{s.icon}</div>
             <div>
               <div style={{ fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
@@ -326,10 +327,10 @@ export default function AdminOrgs() {
       </div>
 
       {/* ── Search & Filters ── */}
-      <div style={{ background: '#fff', borderRadius: 12, padding: '14px 18px', marginBottom: 16, boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: '14px 18px', marginBottom: 16, boxShadow: '0 1px 6px rgba(14,42,61,0.06)' }}>
         <div style={{ display: 'flex', gap: 12 }}>
           <div style={{ flex: 1, position: 'relative' }}>
-            <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: C.gray, pointerEvents: 'none' }}>🔍</span>
+            <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: C.gray, pointerEvents: 'none' }}><DfIcon name="search" size={18} /></span>
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -350,10 +351,10 @@ export default function AdminOrgs() {
       </div>
 
       {/* ── Table ── */}
-      <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 6px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+      <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 6px rgba(14,42,61,0.06)', overflow: 'hidden' }}>
         {filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 60, color: C.gray }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🏢</div>
+            <div style={{ fontSize: 48, marginBottom: 12 }}><DfIcon name="building" size={48} /></div>
             <div style={{ fontSize: 15, fontWeight: 600 }}>{search || typeFilter !== 'all' || statusFilter !== 'all' ? 'لا توجد نتائج مطابقة' : 'لا توجد منظمات بعد'}</div>
           </div>
         ) : (
@@ -370,7 +371,7 @@ export default function AdminOrgs() {
                 <tr
                   key={o.id}
                   style={{ borderBottom: `1px solid ${C.grayLight}`, cursor: 'pointer', transition: 'background 0.15s' }}
-                  onMouseEnter={e => e.currentTarget.style.background = '#f9fafb'}
+                  onMouseEnter={e => e.currentTarget.style.background = '#FBF9F5'}
                   onMouseLeave={e => e.currentTarget.style.background = ''}
                   onClick={() => openView(o)}
                 >
@@ -378,7 +379,7 @@ export default function AdminOrgs() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <OrgAvatar org={o} size={36} />
                       <div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: C.tealDark }}>{o.org_name}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>{o.org_name}</div>
                         <div style={{ fontSize: 11, color: C.gray, marginTop: 2 }}>{o.rep_name}</div>
                       </div>
                     </div>
@@ -386,17 +387,17 @@ export default function AdminOrgs() {
                   <td style={{ padding: '11px 10px', fontSize: 12, color: C.gray }}>{o.org_type}</td>
                   <td style={{ padding: '11px 10px', fontSize: 12, color: C.gray }}>{o.sector}</td>
                   <td style={{ padding: '11px 10px', fontSize: 12, color: C.gray, whiteSpace: 'nowrap' }}>{o.created_at}</td>
-                  <td style={{ padding: '11px 10px', fontSize: 13, fontWeight: 700, color: C.tealDark, textAlign: 'center' }}>{o.services_count}</td>
+                  <td style={{ padding: '11px 10px', fontSize: 13, fontWeight: 700, color: C.ink, textAlign: 'center' }}>{o.services_count}</td>
                   <td style={{ padding: '11px 10px', fontSize: 12, color: C.gray, whiteSpace: 'nowrap' }}>{o.consultant}</td>
                   <td style={{ padding: '11px 10px' }}><Badge text={o.status} /></td>
                   <td style={{ padding: '11px 10px' }}>
                     <div style={{ display: 'flex', gap: 5 }} onClick={e => e.stopPropagation()}>
-                      <button onClick={() => openView(o)} style={btnStyle('#f0f9ff', C.teal, '#bae6fd')}>عرض</button>
-                      <button onClick={e => openEdit(o, e)} style={btnStyle('#fff7ed', C.orange, '#fed7aa')}>تعديل</button>
-                      <button onClick={e => handleToggle(o, e)} style={btnStyle(o.is_active ? '#fef2f2' : '#f0fdf4', o.is_active ? C.red : C.green, o.is_active ? '#fecaca' : '#86efac')}>
+                      <button onClick={() => openView(o)} style={btnStyle('#EAF4FD', C.primary, '#A9D2F5')}>عرض</button>
+                      <button onClick={e => openEdit(o, e)} style={btnStyle('#FEF3EC', C.amberText, '#FBC3A3')}>تعديل</button>
+                      <button onClick={e => handleToggle(o, e)} style={btnStyle(o.is_active ? '#FCEBEB' : '#E8F8F2', o.is_active ? C.red : C.green, o.is_active ? '#F1B2B2' : '#7FD3B5')}>
                         {o.is_active ? 'تعليق' : 'تفعيل'}
                       </button>
-                      <button onClick={e => openDelete(o, e)} style={btnStyle('#fef2f2', C.red, '#fecaca')}>🗑</button>
+                      <button onClick={e => openDelete(o, e)} style={btnStyle('#FCEBEB', C.red, '#F1B2B2')}><DfIcon name="trash" size={18} /></button>
                     </div>
                   </td>
                 </tr>
@@ -411,18 +412,18 @@ export default function AdminOrgs() {
         <Overlay onClose={() => setModal(null)} closeOnBackdrop>
           <div style={{ background: '#fff', borderRadius: 16, padding: 28, width: '100%', maxWidth: 520 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: C.tealDark }}>تفاصيل المنظمة</h3>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: C.ink }}>تفاصيل المنظمة</h3>
               <button onClick={() => setModal(null)} style={closeBtn}>✕</button>
             </div>
             {/* Logo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20, padding: '14px 16px', background: C.grayLight, borderRadius: 12 }}>
               <OrgAvatar org={selected} size={56} />
               <div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: C.tealDark }}>{selected.org_name}</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: C.ink }}>{selected.org_name}</div>
                 <div style={{ fontSize: 12, color: C.gray, marginTop: 2 }}>{selected.org_type}</div>
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16 }}>
               {[
                 ['اسم المنظمة',   selected.org_name],
                 ['نوع المنظمة',   selected.org_type],
@@ -437,15 +438,15 @@ export default function AdminOrgs() {
               ].map(([label, val]) => (
                 <div key={label}>
                   <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>{label}</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.tealDark }}>{val}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{val}</div>
                 </div>
               ))}
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
-              <button onClick={e => { setModal(null); openEdit(selected, e); }} style={{ flex: 1, padding: '10px 0', background: C.teal, color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+              <button onClick={e => { setModal(null); openEdit(selected, e); }} style={{ flex: 1, padding: '10px 0', background: C.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
                 تعديل
               </button>
-              <button onClick={() => setModal(null)} style={{ flex: 1, padding: '10px 0', background: C.grayLight, color: C.gray, border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+              <button onClick={() => setModal(null)} style={{ flex: 1, padding: '10px 0', background: C.grayLight, color: C.gray, border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
                 إغلاق
               </button>
             </div>
@@ -458,7 +459,7 @@ export default function AdminOrgs() {
         <Overlay onClose={() => setModal(null)}>
           <div style={{ background: '#fff', borderRadius: 16, padding: 28, width: '100%', maxWidth: 600, maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: C.tealDark }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: C.ink }}>
                 {modal === 'add' ? 'إضافة منظمة جديدة' : 'تعديل بيانات المنظمة'}
               </h3>
               <button onClick={() => setModal(null)} style={closeBtn}>✕</button>
@@ -466,13 +467,13 @@ export default function AdminOrgs() {
 
             {/* ── Logo Upload ── */}
             <div style={{ marginBottom: 20, padding: '16px', background: C.grayLight, borderRadius: 12 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: C.tealDark, marginBottom: 12 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.ink, marginBottom: 12 }}>
                 شعار المنظمة
                 <span style={{ fontSize: 11, fontWeight: 400, color: C.gray, marginRight: 6 }}>(اختياري)</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 {/* معاينة الشعار */}
-                <div style={{ flexShrink: 0, width: 56, height: 56, borderRadius: '50%', overflow: 'hidden', border: `2px solid ${C.grayBorder}`, background: `linear-gradient(135deg, ${C.teal}, ${C.tealDark})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ flexShrink: 0, width: 56, height: 56, borderRadius: '50%', overflow: 'hidden', border: `2px solid ${C.grayBorder}`, background: `linear-gradient(135deg, ${C.primary}, ${C.ink})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {(logoPreview || (modal === 'edit' && selected?.logo_url)) ? (
                     <img
                       src={logoPreview || selected.logo_url}
@@ -489,7 +490,7 @@ export default function AdminOrgs() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   {logoFile ? (
                     <div style={{ fontSize: 11, color: C.green, fontWeight: 600, marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      ✅ {logoFile.name}
+                      <DfIcon name="check" size={18} style={{ marginInlineEnd: 6 }} />{logoFile.name}
                     </div>
                   ) : (
                     <div style={{ fontSize: 11, color: C.gray, marginBottom: 8 }}>
@@ -497,14 +498,14 @@ export default function AdminOrgs() {
                     </div>
                   )}
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <label style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 14px', background: '#fff', border: `1.5px solid ${C.grayBorder}`, borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', color: C.tealDark, fontFamily: "'Cairo', sans-serif", flexShrink: 0 }}>
-                      📁 {logoFile || (modal === 'edit' && selected?.logo_url) ? 'تغيير الشعار' : 'اختر شعاراً'}
+                    <label style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 14px', background: '#fff', border: `1.5px solid ${C.grayBorder}`, borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', color: C.ink, fontFamily: "inherit", flexShrink: 0 }}>
+                      <DfIcon name="file" size={18} style={{ marginInlineEnd: 6 }} />{logoFile || (modal === 'edit' && selected?.logo_url) ? 'تغيير الشعار' : 'اختر شعاراً'}
                       <input type="file" accept="image/*" onChange={handleLogoChange} style={{ display: 'none' }} />
                     </label>
                     {(logoFile || (modal === 'edit' && selected?.logo_url)) && (
                       <button
                         onClick={() => { resetLogo(); if (modal === 'edit') setSelected(p => ({ ...p, logo_url: null })); }}
-                        style={{ padding: '7px 12px', background: '#fef2f2', color: C.red, border: `1px solid #fecaca`, borderRadius: 8, fontSize: 12, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", flexShrink: 0 }}
+                        style={{ padding: '7px 12px', background: '#FCEBEB', color: C.red, border: `1px solid #F1B2B2`, borderRadius: 8, fontSize: 12, cursor: 'pointer', fontFamily: "inherit", flexShrink: 0 }}
                       >
                         ✕ حذف
                       </button>
@@ -514,7 +515,7 @@ export default function AdminOrgs() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 14 }}>
               <Field label="اسم المنظمة *">
                 <input value={form.org_name} onChange={e => setF('org_name', e.target.value)} placeholder="مثال: جمعية أثر" style={inp} />
               </Field>
@@ -545,11 +546,11 @@ export default function AdminOrgs() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                style={{ flex: 1, padding: '11px 0', background: saving ? '#9ca3af' : C.teal, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: "'Cairo', sans-serif" }}
+                style={{ flex: 1, padding: '11px 0', background: saving ? '#8C97A3' : C.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: "inherit" }}
               >
                 {saving ? 'جاري الحفظ...' : modal === 'add' ? 'إضافة المنظمة' : 'حفظ التعديلات'}
               </button>
-              <button onClick={() => setModal(null)} style={{ flex: 1, padding: '11px 0', background: C.grayLight, color: C.gray, border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+              <button onClick={() => setModal(null)} style={{ flex: 1, padding: '11px 0', background: C.grayLight, color: C.gray, border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
                 إلغاء
               </button>
             </div>
@@ -561,8 +562,8 @@ export default function AdminOrgs() {
       {modal === 'delete' && selected && (
         <Overlay onClose={() => setModal(null)} closeOnBackdrop>
           <div style={{ background: '#fff', borderRadius: 16, padding: 28, width: '100%', maxWidth: 420, textAlign: 'center' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🗑️</div>
-            <h3 style={{ fontSize: 17, fontWeight: 700, color: C.tealDark, marginBottom: 8 }}>حذف المنظمة</h3>
+            <div style={{ fontSize: 48, marginBottom: 12 }}><DfIcon name="trash" size={48} /></div>
+            <h3 style={{ fontSize: 17, fontWeight: 700, color: C.ink, marginBottom: 8 }}>حذف المنظمة</h3>
             <p style={{ fontSize: 13, color: C.gray, marginBottom: 24 }}>
               هل أنت متأكد من حذف <strong>{selected.org_name}</strong>؟<br />
               لا يمكن التراجع عن هذا الإجراء.
@@ -571,11 +572,11 @@ export default function AdminOrgs() {
               <button
                 onClick={handleDelete}
                 disabled={saving}
-                style={{ flex: 1, padding: '11px 0', background: saving ? '#9ca3af' : C.red, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: "'Cairo', sans-serif" }}
+                style={{ flex: 1, padding: '11px 0', background: saving ? '#8C97A3' : C.red, color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: "inherit" }}
               >
                 {saving ? 'جاري الحذف...' : 'نعم، احذف'}
               </button>
-              <button onClick={() => setModal(null)} style={{ flex: 1, padding: '11px 0', background: C.grayLight, color: C.gray, border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+              <button onClick={() => setModal(null)} style={{ flex: 1, padding: '11px 0', background: C.grayLight, color: C.gray, border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "inherit" }}>
                 إلغاء
               </button>
             </div>
@@ -589,9 +590,9 @@ export default function AdminOrgs() {
 const btnStyle = (bg, color, border) => ({
   padding: '6px 10px', background: bg, color, border: `1px solid ${border}`,
   borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: 'pointer',
-  fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap',
+  fontFamily: "inherit", whiteSpace: 'nowrap',
 });
 
 const closeBtn = {
-  background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#9ca3af',
+  background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#8C97A3',
 };

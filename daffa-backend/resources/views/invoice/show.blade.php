@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>فاتورة ضريبية — {{ $order->order_number }}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif;
+    font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, Arial, sans-serif;
     direction: rtl;
-    color: #1f2937;
-    background: #d1d5db;
+    color: #0E2A3D;
+    background: #D9D3C7;
     font-size: 13px;
     line-height: 1.75;
 }
@@ -22,8 +22,8 @@ body {
 .print-bar {
     position: fixed;
     top: 0; left: 0; right: 0;
-    background: #0f3d48;
-    color: #e0f2f7;
+    background: #0E2A3D;
+    color: #D9E8F1;
     padding: 0 28px;
     height: 56px;
     display: flex;
@@ -34,21 +34,21 @@ body {
     gap: 16px;
 }
 .print-bar-brand { font-size: 15px; font-weight: 800; color: #fff; }
-.print-bar-title { font-size: 13px; color: #9ecfda; flex: 1; text-align: center; }
+.print-bar-title { font-size: 13px; color: #86B5D0; flex: 1; text-align: center; }
 .print-btn {
-    background: #E8620A;
-    color: #fff;
+    background: #EF6A2C;
+    color: #0E2A3D;
     border: none;
     padding: 10px 30px;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 800;
     cursor: pointer;
-    font-family: 'Cairo', sans-serif;
+    font-family: 'Alexandria', 'IBM Plex Sans Arabic', sans-serif;
     transition: background 0.2s;
     white-space: nowrap;
 }
-.print-btn:hover { background: #c75409; }
+.print-btn:hover { background: #A33F12; }
 
 /* ═══ DOCUMENT WRAPPER ═══ */
 .doc-wrap {
@@ -67,7 +67,7 @@ body {
 
 /* ═══ HEADER ═══ */
 .inv-header {
-    background: linear-gradient(145deg, #0f3d48 0%, #14505E 40%, #1A6B7C 100%);
+    background: linear-gradient(145deg, #0E2A3D 0%, #0E2A3D 40%, #235D7F 100%);
     color: #fff;
     padding: 32px 36px 28px;
     position: relative;
@@ -92,8 +92,8 @@ body {
 }
 .inv-brand { font-size: 22px; font-weight: 900; color: #fff; }
 .inv-badge {
-    background: #E8620A;
-    color: #fff;
+    background: #EF6A2C;
+    color: #0E2A3D;
     padding: 6px 20px;
     border-radius: 20px;
     font-size: 15px;
@@ -106,7 +106,7 @@ body {
     gap: 16px;
 }
 .inv-meta-item { }
-.inv-meta-label { font-size: 11px; color: #9ecfda; margin-bottom: 2px; }
+.inv-meta-label { font-size: 11px; color: #86B5D0; margin-bottom: 2px; }
 .inv-meta-value { font-size: 14px; font-weight: 700; color: #fff; }
 
 /* ═══ BODY ═══ */
@@ -122,36 +122,36 @@ body {
 
 /* ═══ INFO BOX ═══ */
 .info-box {
-    border: 1px solid #e5e7eb;
+    border: 1px solid #E8E3DA;
     border-radius: 10px;
     overflow: hidden;
 }
 .info-box-title {
-    background: #f8fafc;
+    background: #FBF9F5;
     padding: 9px 14px;
     font-size: 12px;
     font-weight: 800;
-    color: #14505E;
-    border-bottom: 1px solid #e5e7eb;
-    border-right: 3px solid #E8620A;
+    color: #0E2A3D;
+    border-bottom: 1px solid #E8E3DA;
+    border-right: 3px solid #E05A1F;
 }
 .info-row {
     display: flex;
     justify-content: space-between;
     padding: 7px 14px;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid #F3EFE8;
     font-size: 12px;
 }
 .info-row:last-child { border-bottom: none; }
-.info-label { color: #6b7280; }
-.info-value { color: #1e293b; font-weight: 600; text-align: left; }
+.info-label { color: #5E6B78; }
+.info-value { color: #0E2A3D; font-weight: 600; text-align: left; }
 
 /* ═══ SERVICE TABLE ═══ */
 .section-title {
     font-size: 13px;
     font-weight: 800;
-    color: #14505E;
-    border-right: 3px solid #E8620A;
+    color: #0E2A3D;
+    border-right: 3px solid #E05A1F;
     padding-right: 10px;
     margin-bottom: 12px;
 }
@@ -162,7 +162,7 @@ table.items {
     font-size: 12px;
 }
 table.items th {
-    background: #14505E;
+    background: #0E2A3D;
     color: #fff;
     padding: 10px 12px;
     text-align: right;
@@ -170,9 +170,9 @@ table.items th {
 }
 table.items td {
     padding: 10px 12px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid #E8E3DA;
 }
-table.items tr:nth-child(even) td { background: #f8fafc; }
+table.items tr:nth-child(even) td { background: #FBF9F5; }
 table.items .num { width: 40px; text-align: center; }
 table.items .amount { text-align: left; font-weight: 700; }
 
@@ -184,7 +184,7 @@ table.items .amount { text-align: left; font-weight: 700; }
 }
 .totals-box {
     width: 320px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #E8E3DA;
     border-radius: 10px;
     overflow: hidden;
 }
@@ -193,29 +193,29 @@ table.items .amount { text-align: left; font-weight: 700; }
     justify-content: space-between;
     padding: 8px 14px;
     font-size: 12px;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid #F3EFE8;
 }
 .totals-row:last-child {
     border-bottom: none;
-    background: #f0f9ff;
+    background: #EAF4FD;
     font-size: 14px;
     font-weight: 800;
-    color: #14505E;
+    color: #0E2A3D;
     padding: 12px 14px;
 }
-.totals-label { color: #6b7280; }
-.totals-value { font-weight: 700; color: #1e293b; }
-.totals-row:last-child .totals-value { color: #14505E; }
-.discount-value { color: #166534; font-weight: 700; }
+.totals-label { color: #5E6B78; }
+.totals-value { font-weight: 700; color: #0E2A3D; }
+.totals-row:last-child .totals-value { color: #0E2A3D; }
+.discount-value { color: #086449; font-weight: 700; }
 
 /* ═══ VAT NOTE ═══ */
 .vat-note {
-    background: #fffbeb;
-    border: 1px solid #fde68a;
+    background: #FEF3EC;
+    border: 1px solid #FBC3A3;
     border-radius: 8px;
     padding: 10px 14px;
     font-size: 11px;
-    color: #92400e;
+    color: #7F310E;
     margin-bottom: 20px;
 }
 
@@ -226,8 +226,8 @@ table.items .amount { text-align: left; font-weight: 700; }
     align-items: center;
 }
 .stamp {
-    border: 3px solid #16a34a;
-    color: #16a34a;
+    border: 3px solid #0B7F5D;
+    color: #0B7F5D;
     padding: 6px 20px;
     border-radius: 8px;
     font-size: 16px;
@@ -239,7 +239,7 @@ table.items .amount { text-align: left; font-weight: 700; }
 }
 .auto-note {
     font-size: 11px;
-    color: #9ca3af;
+    color: #8C97A3;
     text-align: left;
 }
 
@@ -282,7 +282,7 @@ table.items .amount { text-align: left; font-weight: 700; }
         </div>
         <div class="inv-meta-item">
           <div class="inv-meta-label">حالة الدفع</div>
-          <div class="inv-meta-value" style="color:#86efac;">مدفوعة ✓</div>
+          <div class="inv-meta-value" style="color:#7FD3B5;">مدفوعة ✓</div>
         </div>
       </div>
     </div>
@@ -336,14 +336,14 @@ table.items .amount { text-align: left; font-weight: 700; }
           <tr>
             <td class="num">1</td>
             <td>{{ $serviceLabel }}</td>
-            <td style="color:#6b7280;">{{ $serviceDesc }}</td>
+            <td style="color:#5E6B78;">{{ $serviceDesc }}</td>
             <td class="amount">{{ number_format($order->subtotal + ($order->discount_amount ?? 0), 2) }}</td>
           </tr>
           @if($order->discount_amount && $order->discount_amount > 0)
           <tr>
             <td class="num"></td>
-            <td colspan="2" style="color:#166534; font-size:11px;">خصم — {{ $order->discount_code }}</td>
-            <td class="amount" style="color:#166534;">- {{ number_format($order->discount_amount, 2) }}</td>
+            <td colspan="2" style="color:#086449; font-size:11px;">خصم — {{ $order->discount_code }}</td>
+            <td class="amount" style="color:#086449;">- {{ number_format($order->discount_amount, 2) }}</td>
           </tr>
           @endif
         </tbody>
@@ -389,9 +389,9 @@ table.items .amount { text-align: left; font-weight: 700; }
         </div>
       </div>
 
-      <div style="margin-top:28px; padding-top:16px; border-top:1px solid #e5e7eb; display:flex; justify-content:space-between; align-items:center;">
+      <div style="margin-top:28px; padding-top:16px; border-top:1px solid #E8E3DA; display:flex; justify-content:space-between; align-items:center;">
         <img src="/logo.png" alt="منصة دافة" style="height:38px; max-width:120px; object-fit:contain; opacity:0.85;" />
-        <div style="font-size:11px; color:#9ca3af; text-align:left;">
+        <div style="font-size:11px; color:#8C97A3; text-align:left;">
           منصة دافة للتخطيط الاستراتيجي والمؤسسي<br>
           {{ $supportEmail ?? '' }}
         </div>

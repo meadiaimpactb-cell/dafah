@@ -7,12 +7,12 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'dejavusans', 'DejaVu Sans', sans-serif;
+    font-family: 'plexarabic', 'dejavusans', sans-serif;
     direction: rtl;
-    color: #1f2937;
+    color: #0E2A3D;
     font-size: 12px;
     line-height: 1.7;
-    background: #e8edf2;
+    background: #E8E3DA;
 }
 
 @page {
@@ -37,7 +37,7 @@ body {
 
 /* ══ شريط طباعة ══ */
 .print-btn-bar {
-    background: #14505E;
+    background: #0E2A3D;
     padding: 10px 28px;
     display: flex;
     justify-content: space-between;
@@ -48,19 +48,19 @@ body {
 }
 
 .print-btn {
-    background: #E8620A;
-    color: #ffffff;
+    background: #EF6A2C;
+    color: #0E2A3D;
     border: none;
     padding: 8px 22px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: bold;
     cursor: pointer;
-    font-family: 'dejavusans', 'DejaVu Sans', sans-serif;
+    font-family: 'plexarabic', 'dejavusans', sans-serif;
     letter-spacing: 0.3px;
 }
 
-.print-btn:hover { background: #d45508; }
+.print-btn:hover { background: #F79D6C; }
 
 .print-bar-title {
     font-size: 13px;
@@ -70,7 +70,7 @@ body {
 
 /* ══ غلاف ══ */
 .cover {
-    background-color: #14505E;
+    background-color: #0E2A3D;
     color: #ffffff;
     padding: 28px 36px 32px;
 }
@@ -85,14 +85,14 @@ body {
 
 .cover-sub-text {
     font-size: 12px;
-    color: #b2d8df;
+    color: #B5D2E3;
     text-align: center;
     margin-bottom: 14px;
 }
 
 .cover-org-type-text {
     font-size: 11px;
-    color: #b2d8df;
+    color: #B5D2E3;
     text-align: center;
     margin-bottom: 6px;
 }
@@ -100,14 +100,14 @@ body {
 .cover-line-div {
     width: 50px;
     height: 3px;
-    background-color: #E8620A;
+    background-color: #EF6A2C;
     margin: 0 auto 20px;
     border-radius: 2px;
 }
 
 .cover-badge-span {
-    background-color: #E8620A;
-    color: #ffffff;
+    background-color: #EF6A2C;
+    color: #0E2A3D;
     padding: 4px 14px;
     border-radius: 20px;
     font-size: 10px;
@@ -115,23 +115,23 @@ body {
 }
 
 .cover-card-div {
-    border: 1px solid #3a7a8a;
+    border: 1px solid #1C4D6A;
     border-radius: 8px;
     padding: 10px 14px;
     text-align: center;
-    background-color: #1a6070;
+    background-color: #123247;
 }
 
-.cover-card-lbl { font-size: 9px; color: #9ecfda; margin-bottom: 4px; }
+.cover-card-lbl { font-size: 9px; color: #86B5D0; margin-bottom: 4px; }
 .cover-card-val { font-size: 11px; font-weight: bold; color: #ffffff; }
 
 .cover-footer-div {
     text-align: center;
     margin-top: 28px;
     padding-top: 14px;
-    border-top: 1px solid #3a7a8a;
+    border-top: 1px solid #1C4D6A;
     font-size: 10px;
-    color: #7fbdca;
+    color: #5592B6;
 }
 
 /* ══ منطقة المحتوى ══ */
@@ -141,7 +141,7 @@ body {
 
 /* ══ فهرس ══ */
 .toc-header-div {
-    background-color: #1A6B7C;
+    background-color: #235D7F;
     color: #ffffff;
     padding: 10px 16px;
     border-radius: 6px;
@@ -151,15 +151,15 @@ body {
 }
 
 .toc-item-td {
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
+    background-color: #FBF9F5;
+    border: 1px solid #E8E3DA;
     padding: 8px 12px;
     vertical-align: middle;
     width: 50%;
 }
 
 .toc-num-span {
-    background-color: #1A6B7C;
+    background-color: #235D7F;
     color: #ffffff;
     border-radius: 50%;
     display: inline-block;
@@ -176,13 +176,13 @@ body {
 .toc-name-span {
     font-size: 11px;
     font-weight: bold;
-    color: #374151;
+    color: #334452;
     vertical-align: middle;
 }
 
 /* ══ وحدات ══ */
 .unit-num-span {
-    background-color: #1A6B7C;
+    background-color: #235D7F;
     color: #ffffff;
     border-radius: 50%;
     display: inline-block;
@@ -198,19 +198,19 @@ body {
 .unit-title-span {
     font-size: 15px;
     font-weight: bold;
-    color: #14505E;
+    color: #0E2A3D;
     vertical-align: middle;
     padding-right: 10px;
 }
 
 /* ══ مبادرة فرعية ══ */
 .initiative-label {
-    background: #f0f9fb;
-    border-right: 3px solid #E8620A;
+    background: #EEF5F9;
+    border-right: 3px solid #E05A1F;
     padding: 7px 14px;
     font-size: 11px;
     font-weight: bold;
-    color: #1A6B7C;
+    color: #235D7F;
     margin: 12px 0 6px;
     border-radius: 0 4px 4px 0;
 }
@@ -222,36 +222,36 @@ body {
     border-spacing: 0;
     font-size: 10.5px;
     margin-top: 4px;
-    border: 1px solid #d1d5db;
+    border: 1px solid #D9D3C7;
     border-radius: 6px;
     overflow: hidden;
 }
 
 .data-table th {
-    background-color: #1A6B7C;
+    background-color: #235D7F;
     color: #ffffff;
     padding: 7px 10px;
     font-weight: bold;
     text-align: right;
-    border-left: 1px solid #15566a;
+    border-left: 1px solid #173F57;
 }
 
 .data-table td {
     padding: 6px 10px;
-    border-bottom: 1px solid #e5e7eb;
-    border-left: 1px solid #e5e7eb;
-    color: #374151;
+    border-bottom: 1px solid #E8E3DA;
+    border-left: 1px solid #E8E3DA;
+    color: #334452;
     text-align: right;
     vertical-align: top;
     line-height: 1.6;
 }
 
 .data-table tr:last-child td { border-bottom: none; }
-.data-table tr:nth-child(even) td { background-color: #f8fafc; }
+.data-table tr:nth-child(even) td { background-color: #FBF9F5; }
 
 /* ══ صف الإجمالي ══ */
 .budget-total td {
-    background-color: #14505E !important;
+    background-color: #0E2A3D !important;
     color: #ffffff !important;
     font-weight: bold;
     font-size: 11px;
@@ -263,17 +263,17 @@ body {
     border-collapse: collapse;
     font-size: 8.5px;
     margin-top: 4px;
-    border: 1px solid #d1d5db;
+    border: 1px solid #D9D3C7;
 }
 
 .gantt-table th {
-    background-color: #1A6B7C;
+    background-color: #235D7F;
     color: #ffffff;
     padding: 6px 3px;
     text-align: center;
     font-weight: bold;
     font-size: 8px;
-    border-left: 1px solid #15566a;
+    border-left: 1px solid #173F57;
 }
 
 .gantt-table th.name-th {
@@ -283,7 +283,7 @@ body {
 }
 
 .gantt-table td {
-    border: 1px solid #e5e7eb;
+    border: 1px solid #E8E3DA;
     padding: 4px 3px;
     text-align: center;
     font-size: 8px;
@@ -293,21 +293,21 @@ body {
 .gantt-table td.name-td {
     text-align: right;
     padding-right: 10px;
-    color: #374151;
+    color: #334452;
     font-size: 9.5px;
     border-left: none;
 }
 
-.gantt-table tr:nth-child(even) td { background-color: #f9fafb; }
-.gantt-table tr:nth-child(even) td.name-td { background-color: #f9fafb; }
+.gantt-table tr:nth-child(even) td { background-color: #FBF9F5; }
+.gantt-table tr:nth-child(even) td.name-td { background-color: #FBF9F5; }
 
 /* ══ شارات الحالة ══ */
-.pill-yes { display: inline-block; padding: 2px 10px; border-radius: 20px; background: #dcfce7; color: #16a34a; font-size: 10px; font-weight: bold; }
-.pill-no  { display: inline-block; padding: 2px 10px; border-radius: 20px; background: #f3f4f6; color: #9ca3af; font-size: 10px; }
+.pill-yes { display: inline-block; padding: 2px 10px; border-radius: 20px; background: #C9EFE1; color: #0B7F5D; font-size: 10px; font-weight: bold; }
+.pill-no  { display: inline-block; padding: 2px 10px; border-radius: 20px; background: #F3EFE8; color: #8C97A3; font-size: 10px; }
 
 /* ══ ختام ══ */
 .closing {
-    background-color: #14505E;
+    background-color: #0E2A3D;
     color: #ffffff;
     padding: 48px 36px;
     text-align: center;
@@ -316,22 +316,22 @@ body {
 }
 
 .closing-title { font-size: 18px; font-weight: bold; color: #ffffff; margin-bottom: 10px; }
-.closing-text  { font-size: 12px; color: #b2d8df; margin-bottom: 28px; line-height: 1.9; }
+.closing-text  { font-size: 12px; color: #B5D2E3; margin-bottom: 28px; line-height: 1.9; }
 
 .stamp-box {
-    border: 1px solid #3a7a8a;
+    border: 1px solid #1C4D6A;
     border-radius: 10px;
     padding: 14px 32px;
     display: inline-block;
-    background-color: #1a6070;
+    background-color: #123247;
 }
 
-.stamp-lbl  { font-size: 9px; color: #9ecfda; margin-bottom: 3px; }
+.stamp-lbl  { font-size: 9px; color: #86B5D0; margin-bottom: 3px; }
 .stamp-val  { font-size: 14px; font-weight: bold; color: #ffffff; margin-bottom: 8px; }
-.stamp-date { font-size: 11px; color: #b2d8df; }
+.stamp-date { font-size: 11px; color: #B5D2E3; }
 
-.empty-val  { color: #9ca3af; font-style: italic; }
-.empty      { padding: 16px; text-align: center; color: #9ca3af; font-size: 11px; font-style: italic; background: #f9fafb; border-radius: 6px; }
+.empty-val  { color: #8C97A3; font-style: italic; }
+.empty      { padding: 16px; text-align: center; color: #8C97A3; font-size: 11px; font-style: italic; background: #FBF9F5; border-radius: 6px; }
 .page-break { page-break-before: always; }
 .spacer     { height: 14px; }
 .unit-sep   { height: 32px; }
@@ -359,12 +359,12 @@ body {
 {{-- ════ شريط الطباعة (شاشة فقط) ════ --}}
 <div class="print-btn-bar">
     <span class="print-bar-title">الخطة التشغيلية — {{ $orgName }}</span>
-    <button class="print-btn" onclick="window.print()">&#128438; طباعة / حفظ PDF</button>
+    <button class="print-btn" onclick="window.print()">&#0B7F5D; طباعة / حفظ PDF</button>
 </div>
 
 {{-- ════ غلاف ════ --}}
 <div class="cover">
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid #3a7a8a;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid #1C4D6A;">
         <tr>
             <td style="vertical-align:middle;">
                 @if($logoWhiteB64)
@@ -462,7 +462,7 @@ body {
     <div class="page-break"></div>
     <div class="unit-sep"></div>
 
-    <table width="100%" cellpadding="0" cellspacing="0" style="border-bottom:2px solid #1A6B7C; margin-bottom:14px; padding-bottom:10px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-bottom:2px solid #235D7F; margin-bottom:14px; padding-bottom:10px;">
         <tr>
             <td width="40" style="vertical-align:middle;">
                 <span class="unit-num-span">{{ $submission->unit_number }}</span>
@@ -470,7 +470,7 @@ body {
             <td style="vertical-align:middle;">
                 <span class="unit-title-span">{{ $unitName }}</span>
                 @if($subtitle)
-                <div style="font-size:10px; color:#6b7280; padding-right:42px; margin-top:3px;">{{ $subtitle }}</div>
+                <div style="font-size:10px; color:#5E6B78; padding-right:42px; margin-top:3px;">{{ $subtitle }}</div>
                 @endif
             </td>
         </tr>
@@ -491,7 +491,7 @@ body {
             <tbody>
                 @foreach($formData['items'] as $i => $item)
                 <tr>
-                    <td style="text-align:center; color:#9ca3af;">{{ $i + 1 }}</td>
+                    <td style="text-align:center; color:#8C97A3;">{{ $i + 1 }}</td>
                     <td>{{ $item['name'] ?? '—' }}</td>
                     <td style="text-align:center;">
                         @if($item['checked'] ?? false)
@@ -525,10 +525,10 @@ body {
                 <tbody>
                     @foreach(collect($group['activities'] ?? [])->filter(fn ($a) => is_array($a) && trim(($a['name'] ?? '') . ($a['desc'] ?? '') . ($a['output'] ?? '')) !== '')->values() as $ai => $act)
                     <tr>
-                        <td style="text-align:center; color:#9ca3af;">{{ $ai + 1 }}</td>
-                        <td style="font-weight:bold; color:#14505E;">{{ $act['name'] ?? '—' }}</td>
+                        <td style="text-align:center; color:#8C97A3;">{{ $ai + 1 }}</td>
+                        <td style="font-weight:bold; color:#0E2A3D;">{{ $act['name'] ?? '—' }}</td>
                         <td>{{ $act['desc'] ?? '—' }}</td>
-                        <td style="color:#1A6B7C;">{{ $act['output'] ?? '—' }}</td>
+                        <td style="color:#235D7F;">{{ $act['output'] ?? '—' }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -557,9 +557,9 @@ body {
             <tbody>
                 @foreach($formData['activities'] as $act)
                 <tr>
-                    <td class="name-td">{{ $act['name'] ?? '—' }}@if(!empty($act['initiative']))<div style="font-size:8px; color:#6b7280; font-weight:normal;">{{ $act['initiative'] }}</div>@endif</td>
+                    <td class="name-td">{{ $act['name'] ?? '—' }}@if(!empty($act['initiative']))<div style="font-size:8px; color:#5E6B78; font-weight:normal;">{{ $act['initiative'] }}</div>@endif</td>
                     @foreach($act['months'] ?? array_fill(0, 12, false) as $active)
-                    <td style="padding:3px; background-color:{{ $active ? '#1A6B7C' : 'transparent' }};">
+                    <td style="padding:3px; background-color:{{ $active ? '#235D7F' : 'transparent' }};">
                         @if($active)<span style="color:rgba(255,255,255,0.9); font-size:9px;">&#9632;</span>@endif
                     </td>
                     @endforeach
@@ -567,11 +567,11 @@ body {
                 @endforeach
             </tbody>
         </table>
-        <div style="margin-top:10px; font-size:9px; color:#6b7280;">
-            <span style="display:inline-block; width:12px; height:12px; background:#1A6B7C; border-radius:2px; margin-left:4px; vertical-align:middle;"></span>
+        <div style="margin-top:10px; font-size:9px; color:#5E6B78;">
+            <span style="display:inline-block; width:12px; height:12px; background:#235D7F; border-radius:2px; margin-left:4px; vertical-align:middle;"></span>
             شهر تنفيذ
             &nbsp;&nbsp;
-            <span style="display:inline-block; width:12px; height:12px; background:#f3f4f6; border:1px solid #e5e7eb; border-radius:2px; margin-left:4px; vertical-align:middle;"></span>
+            <span style="display:inline-block; width:12px; height:12px; background:#F3EFE8; border:1px solid #E8E3DA; border-radius:2px; margin-left:4px; vertical-align:middle;"></span>
             غير مُجدوَل
         </div>
         @else
@@ -594,11 +594,11 @@ body {
             <tbody>
                 @foreach($formData['rows'] as $ri => $row)
                 <tr>
-                    <td style="text-align:center; color:#9ca3af;">{{ $ri + 1 }}</td>
-                    <td style="font-weight:bold; color:#14505E;">{{ ($row['activity'] ?? '') !== '' ? $row['activity'] : '—' }}</td>
+                    <td style="text-align:center; color:#8C97A3;">{{ $ri + 1 }}</td>
+                    <td style="font-weight:bold; color:#0E2A3D;">{{ ($row['activity'] ?? '') !== '' ? $row['activity'] : '—' }}</td>
                     <td>{{ ($row['initiative'] ?? '') !== '' ? $row['initiative'] : '—' }}</td>
-                    <td style="color:#1A6B7C;">{{ ($row['responsible'] ?? '') !== '' ? $row['responsible'] : '—' }}</td>
-                    <td style="color:#6b7280;">{{ ($row['department'] ?? '') !== '' ? $row['department'] : '—' }}</td>
+                    <td style="color:#235D7F;">{{ ($row['responsible'] ?? '') !== '' ? $row['responsible'] : '—' }}</td>
+                    <td style="color:#5E6B78;">{{ ($row['department'] ?? '') !== '' ? $row['department'] : '—' }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -634,12 +634,12 @@ body {
             <tbody>
                 @foreach($formData['rows'] as $bi => $row)
                 <tr>
-                    <td style="text-align:center; color:#9ca3af;">{{ $bi + 1 }}</td>
-                    <td style="color:#14505E;">{{ ($row['activity'] ?? '') !== '' ? $row['activity'] : '—' }}</td>
+                    <td style="text-align:center; color:#8C97A3;">{{ $bi + 1 }}</td>
+                    <td style="color:#0E2A3D;">{{ ($row['activity'] ?? '') !== '' ? $row['activity'] : '—' }}</td>
                     <td style="font-weight:bold;">{{ ($row['item'] ?? '') !== '' ? $row['item'] : '—' }}</td>
                     <td style="text-align:center;">{{ number_format($num($row['unitCost'] ?? 0)) }} ريال</td>
-                    <td style="text-align:center; color:#1A6B7C; font-weight:bold;">{{ ($row['count'] ?? '') !== '' ? $row['count'] : '—' }}</td>
-                    <td style="text-align:center; font-weight:bold; color:#14505E;">{{ number_format($rowTotal($row)) }} ريال</td>
+                    <td style="text-align:center; color:#235D7F; font-weight:bold;">{{ ($row['count'] ?? '') !== '' ? $row['count'] : '—' }}</td>
+                    <td style="text-align:center; font-weight:bold; color:#0E2A3D;">{{ number_format($rowTotal($row)) }} ريال</td>
                 </tr>
                 @endforeach
                 <tr class="budget-total">
@@ -649,11 +649,11 @@ body {
             </tbody>
         </table>
 
-        <div style="margin-top:14px; background:#f0f9fb; border-right:4px solid #1A6B7C; border-radius:0 6px 6px 0; padding:12px 16px;">
+        <div style="margin-top:14px; background:#EEF5F9; border-right:4px solid #235D7F; border-radius:0 6px 6px 0; padding:12px 16px;">
             <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                    <td style="font-size:12px; color:#1A6B7C; font-weight:bold;">إجمالي الميزانية التشغيلية</td>
-                    <td align="left" style="font-size:18px; font-weight:bold; color:#14505E;">{{ number_format($grandTotal) }} ريال</td>
+                    <td style="font-size:12px; color:#235D7F; font-weight:bold;">إجمالي الميزانية التشغيلية</td>
+                    <td align="left" style="font-size:18px; font-weight:bold; color:#0E2A3D;">{{ number_format($grandTotal) }} ريال</td>
                 </tr>
             </table>
         </div>

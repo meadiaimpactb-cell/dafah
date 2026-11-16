@@ -1,9 +1,10 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React from 'react';
 
 const colors = {
-  teal: '#1A6B7C', tealDark: '#14505E', tealLight: '#E8F4F6',
-  orange: '#E8620A', green: '#16a34a',
-  gray: '#6B7280', grayLight: '#F3F4F6', grayBorder: '#E5E7EB',
+  primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
+  orange: '#EF6A2C', green: '#0B7F5D',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
 };
 
 // ── ترجمة المفاتيح ─────────────────────────────────────────────────────────────
@@ -84,7 +85,7 @@ const safeStr = (v) => {
 
 // ── عارض قيمة نصية ────────────────────────────────────────────────────────────
 const TextValue = ({ value }) => (
-  <div style={{ fontSize: 13, color: '#374151', padding: '8px 12px', background: colors.grayLight, borderRadius: 6, lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+  <div style={{ fontSize: 13, color: '#334452', padding: '8px 12px', background: colors.grayLight, borderRadius: 6, lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
     {String(value ?? '')}
   </div>
 );
@@ -93,7 +94,7 @@ const TextValue = ({ value }) => (
 const ListValue = ({ items }) => (
   <ul style={{ margin: 0, paddingRight: 20 }}>
     {items.map((item, i) => (
-      <li key={i} style={{ fontSize: 13, color: '#374151', lineHeight: 1.9, padding: '2px 0' }}>{item}</li>
+      <li key={i} style={{ fontSize: 13, color: '#334452', lineHeight: 1.9, padding: '2px 0' }}>{item}</li>
     ))}
   </ul>
 );
@@ -105,15 +106,15 @@ const TableView = ({ headers, rows }) => (
       <thead>
         <tr>
           {headers.map((h, i) => (
-            <th key={i} style={{ padding: '8px 12px', background: colors.teal, color: 'white', textAlign: 'right', fontWeight: 600, whiteSpace: 'nowrap' }}>{h}</th>
+            <th key={i} style={{ padding: '8px 12px', background: colors.primary, color: 'white', textAlign: 'right', fontWeight: 600, whiteSpace: 'nowrap' }}>{h}</th>
           ))}
         </tr>
       </thead>
       <tbody>
         {rows.map((row, i) => (
-          <tr key={i} style={{ borderBottom: `1px solid ${colors.grayBorder}`, background: i % 2 === 0 ? 'white' : '#FAFAFA' }}>
+          <tr key={i} style={{ borderBottom: `1px solid ${colors.grayBorder}`, background: i % 2 === 0 ? 'white' : '#FBF9F5' }}>
             {row.map((cell, j) => (
-              <td key={j} style={{ padding: '8px 12px', color: '#374151', verticalAlign: 'top', lineHeight: 1.7 }}>{cell || '—'}</td>
+              <td key={j} style={{ padding: '8px 12px', color: '#334452', verticalAlign: 'top', lineHeight: 1.7 }}>{cell || '—'}</td>
             ))}
           </tr>
         ))}
@@ -167,22 +168,22 @@ const ObjectListViewer = ({ items, type }) => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {items.map((ini, i) => (
           <div key={i} style={{ border: `1px solid ${colors.grayBorder}`, borderRadius: 10, overflow: 'hidden' }}>
-            <div style={{ padding: '10px 14px', background: colors.tealLight, borderBottom: `1px solid ${colors.grayBorder}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <strong style={{ fontSize: 13, color: colors.tealDark }}>{ini.name}</strong>
-              {ini.budget && <span style={{ fontSize: 11, color: colors.teal, fontWeight: 600 }}>💰 {ini.budget} ريال</span>}
+            <div style={{ padding: '10px 14px', background: colors.primarySoft, borderBottom: `1px solid ${colors.grayBorder}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <strong style={{ fontSize: 13, color: colors.ink }}>{ini.name}</strong>
+              {ini.budget && <span style={{ fontSize: 11, color: colors.primary, fontWeight: 600 }}><DfIcon name="money" size={14} style={{ marginInlineEnd: 6 }} />{ini.budget} ريال</span>}
             </div>
-            <div style={{ padding: '10px 14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px' }}>
+            <div style={{ padding: '10px 14px', display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: '6px 16px' }}>
               {[
                 ['الهدف', ini.goal], ['المسؤول', ini.owner],
                 ['تاريخ البدء', ini.start_date], ['تاريخ الانتهاء', ini.end_date],
               ].map(([lbl, val]) => val ? (
                 <div key={lbl} style={{ fontSize: 12 }}>
                   <span style={{ color: colors.gray }}>{lbl}: </span>
-                  <span style={{ color: '#374151', fontWeight: 600 }}>{val}</span>
+                  <span style={{ color: '#334452', fontWeight: 600 }}>{val}</span>
                 </div>
               ) : null)}
               {ini.description && (
-                <div style={{ gridColumn: '1/-1', fontSize: 12, color: '#374151', lineHeight: 1.7 }}>
+                <div style={{ gridColumn: '1/-1', fontSize: 12, color: '#334452', lineHeight: 1.7 }}>
                   <span style={{ color: colors.gray }}>الوصف: </span>{ini.description}
                 </div>
               )}
@@ -201,7 +202,7 @@ const ObjectListViewer = ({ items, type }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {items.map((item, i) => (
-        <div key={i} style={{ padding: '8px 12px', background: colors.grayLight, borderRadius: 8, fontSize: 13, color: '#374151' }}>
+        <div key={i} style={{ padding: '8px 12px', background: colors.grayLight, borderRadius: 8, fontSize: 13, color: '#334452' }}>
           {typeof item === 'object' ? Object.entries(item).map(([k, v]) => (
             <div key={k} style={{ whiteSpace: 'pre-wrap', lineHeight: 1.7 }}>
               <strong>{label(k)}: </strong>{safeStr(v)}
@@ -216,15 +217,15 @@ const ObjectListViewer = ({ items, type }) => {
 // ── عارض TOC ──────────────────────────────────────────────────────────────────
 const TocViewer = ({ data }) => {
   const order = ['inputs', 'activities', 'outputs', 'outcomes', 'impact', 'assumptions'];
-  const icons = { inputs: '📥', activities: '⚙️', outputs: '📤', outcomes: '🎯', impact: '🌟', assumptions: '📋' };
+  const icons = { inputs: <DfIcon name="inbox" size={20} />, activities: <DfIcon name="gear" size={20} />, outputs: <DfIcon name="upload" size={20} />, outcomes: <DfIcon name="target" size={20} />, impact: <DfIcon name="star" size={20} />, assumptions: <DfIcon name="clipboard" size={20} /> };
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {order.map(k => data[k] ? (
         <div key={k} style={{ border: `1px solid ${colors.grayBorder}`, borderRadius: 10, overflow: 'hidden' }}>
-          <div style={{ padding: '8px 14px', background: colors.tealLight, fontSize: 13, fontWeight: 700, color: colors.tealDark }}>
+          <div style={{ padding: '8px 14px', background: colors.primarySoft, fontSize: 13, fontWeight: 700, color: colors.ink }}>
             {icons[k]} {LABELS[k] || k}
           </div>
-          <div style={{ padding: '10px 14px', fontSize: 13, color: '#374151', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{data[k]}</div>
+          <div style={{ padding: '10px 14px', fontSize: 13, color: '#334452', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{data[k]}</div>
         </div>
       ) : null)}
     </div>
@@ -234,18 +235,18 @@ const TocViewer = ({ data }) => {
 // ── عارض BMC ──────────────────────────────────────────────────────────────────
 const BmcViewer = ({ data }) => {
   const blocks = [
-    ['value_proposition', '💎'], ['customer_segments', '👥'], ['channels', '📡'],
-    ['relationships', '🤝'], ['key_activities', '⚙️'], ['key_resources', '🔧'],
-    ['partners', '🏛️'], ['revenue_streams', '💰'], ['cost_structure', '📊'],
+    ['value_proposition', <DfIcon name="gem" size={20} />], ['customer_segments', <DfIcon name="users" size={20} />], ['channels', <DfIcon name="signal" size={20} />],
+    ['relationships', <DfIcon name="handshake" size={20} />], ['key_activities', <DfIcon name="gear" size={20} />], ['key_resources', <DfIcon name="wrench" size={20} />],
+    ['partners', <DfIcon name="building" size={20} />], ['revenue_streams', <DfIcon name="money" size={20} />], ['cost_structure', <DfIcon name="chart" size={20} />],
   ];
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 10 }}>
       {blocks.map(([k, icon]) => data[k] ? (
         <div key={k} style={{ border: `1px solid ${colors.grayBorder}`, borderRadius: 10, overflow: 'hidden' }}>
-          <div style={{ padding: '7px 12px', background: colors.tealLight, fontSize: 12, fontWeight: 700, color: colors.tealDark }}>
+          <div style={{ padding: '7px 12px', background: colors.primarySoft, fontSize: 12, fontWeight: 700, color: colors.ink }}>
             {icon} {LABELS[k]}
           </div>
-          <div style={{ padding: '8px 12px', fontSize: 12, color: '#374151', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{data[k]}</div>
+          <div style={{ padding: '8px 12px', fontSize: 12, color: '#334452', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{data[k]}</div>
         </div>
       ) : null)}
     </div>
@@ -427,11 +428,11 @@ export default function FormDataViewer({ data, template }) {
       if ('so' in value || 'wo' in value) {
         return (
           <Section key={key} title={sectionLabel}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {[['so','#F0FDF4','#16a34a'], ['wo','#FFF7ED','#E8620A'], ['st','#EFF6FF','#1D4ED8'], ['wt','#FEF2F2','#dc2626']].map(([k, bg, clr]) => value[k] ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 10 }}>
+              {[['so','#E8F8F2','#0B7F5D'], ['wo','#FEF3EC','#A33F12'], ['st','#EAF4FD','#1A65AD'], ['wt','#FCEBEB','#C53A3A']].map(([k, bg, clr]) => value[k] ? (
                 <div key={k} style={{ padding: 12, background: bg, borderRadius: 10, border: `1px solid ${clr}30` }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: clr, marginBottom: 6 }}>{LABELS[k]}</div>
-                  <div style={{ fontSize: 12, color: '#374151', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{value[k]}</div>
+                  <div style={{ fontSize: 12, color: '#334452', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{value[k]}</div>
                 </div>
               ) : null)}
             </div>
@@ -444,9 +445,9 @@ export default function FormDataViewer({ data, template }) {
           <Section key={key} title={sectionLabel}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {['vision', 'mission'].map(k => value[k] ? (
-                <div key={k} style={{ padding: 12, background: colors.tealLight, borderRadius: 10, border: `1px solid ${colors.teal}30` }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: colors.tealDark, marginBottom: 4 }}>{LABELS[k]}</div>
-                  <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.8 }}>{value[k]}</div>
+                <div key={k} style={{ padding: 12, background: colors.primarySoft, borderRadius: 10, border: `1px solid ${colors.primary}30` }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: colors.ink, marginBottom: 4 }}>{LABELS[k]}</div>
+                  <div style={{ fontSize: 13, color: '#334452', lineHeight: 1.8 }}>{value[k]}</div>
                 </div>
               ) : null)}
             </div>
@@ -457,11 +458,11 @@ export default function FormDataViewer({ data, template }) {
       if ('strengths' in value || 'weaknesses' in value) {
         return (
           <Section key={key} title={sectionLabel}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {[['strengths','#F0FDF4','#16a34a','💪'], ['weaknesses','#FEF2F2','#dc2626','⚠️'], ['opportunities','#EFF6FF','#1D4ED8','🚀'], ['threats','#FFF7ED','#E8620A','🛡️']].map(([k, bg, clr, ico]) => value[k] ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 10 }}>
+              {[['strengths','#E8F8F2','#0B7F5D',<DfIcon name="muscle" size={20} />], ['weaknesses','#FCEBEB','#C53A3A',<DfIcon name="warning" size={20} />], ['opportunities','#EAF4FD','#1A65AD',<DfIcon name="rocket" size={20} />], ['threats','#FEF3EC','#A33F12',<DfIcon name="shield" size={20} />]].map(([k, bg, clr, ico]) => value[k] ? (
                 <div key={k} style={{ padding: 12, background: bg, borderRadius: 10, border: `1px solid ${clr}30` }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: clr, marginBottom: 6 }}>{ico} {LABELS[k]}</div>
-                  <div style={{ fontSize: 12, color: '#374151', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{value[k]}</div>
+                  <div style={{ fontSize: 12, color: '#334452', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{value[k]}</div>
                 </div>
               ) : null)}
             </div>
@@ -474,7 +475,7 @@ export default function FormDataViewer({ data, template }) {
           <Section key={key} title={sectionLabel}>
             {Object.entries(value).map(([k, v]) => (
               <div key={k} style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: colors.tealDark, marginBottom: 6 }}>{LABELS[k] || k}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>{LABELS[k] || k}</div>
                 <TextValue value={v} />
               </div>
             ))}
@@ -486,7 +487,7 @@ export default function FormDataViewer({ data, template }) {
         <Section key={key} title={sectionLabel}>
           {Object.entries(value).map(([k, v]) => (
             <div key={k} style={{ marginBottom: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 600, color: colors.teal, marginBottom: 4 }}>{LABELS[k] || k}</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: colors.primary, marginBottom: 4 }}>{LABELS[k] || k}</div>
               {Array.isArray(v)
                 ? (v.length > 0 && typeof v[0] === 'object'
                     ? <ObjectListViewer items={v} type="generic" />
@@ -503,7 +504,7 @@ export default function FormDataViewer({ data, template }) {
     // ── قيمة بسيطة ──
     return (
       <div key={key} style={{ marginBottom: 12 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, color: colors.teal, marginBottom: 4 }}>{sectionLabel}</div>
+        <div style={{ fontSize: 12, fontWeight: 600, color: colors.primary, marginBottom: 4 }}>{sectionLabel}</div>
         <TextValue value={value} />
       </div>
     );
@@ -520,7 +521,7 @@ export default function FormDataViewer({ data, template }) {
 // ── Section wrapper ────────────────────────────────────────────────────────────
 const Section = ({ title, children }) => (
   <div>
-    <div style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, marginBottom: 10, paddingBottom: 6, borderBottom: `2px solid ${colors.tealLight}`, display: 'flex', alignItems: 'center', gap: 6 }}>
+    <div style={{ fontSize: 13, fontWeight: 700, color: colors.ink, marginBottom: 10, paddingBottom: 6, borderBottom: `2px solid ${colors.primarySoft}`, display: 'flex', alignItems: 'center', gap: 6 }}>
       {title}
     </div>
     {children}

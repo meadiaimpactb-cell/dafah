@@ -10,11 +10,13 @@ import { InfoTip } from '../strategic/UnitContent';
  * والنص يقبل **عريض** وأسطرًا متعددة.
  */
 
+// ألوان هوية دفة (theme/tokens.js): أزرق الدفّة، الكحلي، والبرتقالي
 const C = {
-  teal: '#1A6B7C', tealDark: '#14505E', tealLight: '#E8F4F6', orange: '#E8620A',
-  gray: '#6b7280', text: '#374151', border: '#e5e7eb', blueBg: '#f0f9ff', blueBorder: '#bae6fd',
+  primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1', orange: '#EF6A2C',
+  gray: '#5E6B78', text: '#334452', border: '#E8E3DA', blueBg: '#EAF4FD', blueBorder: '#A9D2F5',
+  amberSoft: '#FEF3EC', amberBorder: '#FBC3A3', amberText: '#7F310E',
 };
-const FONT = "'Cairo', sans-serif";
+const FONT = 'inherit';
 
 const AR_DIGITS = '٠١٢٣٤٥٦٧٨٩';
 export const arNum = n => String(n).replace(/\d/g, d => AR_DIGITS[d]);
@@ -24,7 +26,7 @@ export function Rich({ text }) {
   if (text === null || text === undefined || text === '') return null;
   const parts = String(text).split(/(\*\*[^*\n]+\*\*)/g);
   return parts.map((p, i) => (p.length > 4 && p.startsWith('**') && p.endsWith('**')
-    ? <strong key={i} style={{ color: C.tealDark, fontWeight: 800 }}>{p.slice(2, -2)}</strong>
+    ? <strong key={i} style={{ color: C.ink, fontWeight: 800 }}>{p.slice(2, -2)}</strong>
     : <React.Fragment key={i}>{p}</React.Fragment>));
 }
 
@@ -50,9 +52,9 @@ export function ExampleGantt({ months = [], rows = [] }) {
       <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: Math.max(360, 140 + months.length * 72), fontSize: 12.5 }}>
         <thead>
           <tr>
-            <th style={{ textAlign: 'right', padding: '6px 8px', color: C.tealDark, fontWeight: 800, borderBottom: `1.5px solid ${C.border}` }}>النشاط</th>
+            <th style={{ textAlign: 'right', padding: '6px 8px', color: C.ink, fontWeight: 800, borderBottom: `1.5px solid ${C.border}` }}>النشاط</th>
             {months.map((m, i) => (
-              <th key={i} style={{ textAlign: 'center', padding: '6px 4px', color: C.tealDark, fontWeight: 700, borderBottom: `1.5px solid ${C.border}`, whiteSpace: 'nowrap' }}>{m}</th>
+              <th key={i} style={{ textAlign: 'center', padding: '6px 4px', color: C.ink, fontWeight: 700, borderBottom: `1.5px solid ${C.border}`, whiteSpace: 'nowrap' }}>{m}</th>
             ))}
           </tr>
         </thead>
@@ -62,7 +64,7 @@ export function ExampleGantt({ months = [], rows = [] }) {
               <td style={{ padding: '9px 8px', color: C.text, minWidth: 130 }}>{r.label}</td>
               {months.map((_, j) => (
                 <td key={j} style={{ padding: '9px 3px' }}>
-                  {r.marks?.[j] ? <div aria-label={`${r.label}: ${months[j]}`} style={{ height: 22, background: C.teal, borderRadius: 3 }} /> : null}
+                  {r.marks?.[j] ? <div aria-label={`${r.label}: ${months[j]}`} style={{ height: 22, background: C.primary, borderRadius: 3 }} /> : null}
                 </td>
               ))}
             </tr>
@@ -81,7 +83,7 @@ export function OpBlocks({ blocks }) {
       {(blocks || []).map((b, i) => {
         switch (b.type) {
           case 'heading':
-            return <div key={i} style={{ fontSize: 14, fontWeight: 800, color: C.tealDark, margin: i ? '14px 0 6px' : '0 0 6px' }}><Rich text={b.text} /></div>;
+            return <div key={i} style={{ fontSize: 14, fontWeight: 800, color: C.ink, margin: i ? '14px 0 6px' : '0 0 6px' }}><Rich text={b.text} /></div>;
           case 'list': {
             const L = b.ordered === false ? 'ul' : 'ol';
             return (
@@ -95,7 +97,7 @@ export function OpBlocks({ blocks }) {
             return (
               <div key={i} style={{ margin: '0 0 14px' }}>
                 {b.title
-                  ? <div style={{ fontWeight: 800, color: C.tealDark, marginBottom: 4 }}>{arNum(step)}. <Rich text={b.title} /></div>
+                  ? <div style={{ fontWeight: 800, color: C.ink, marginBottom: 4 }}>{arNum(step)}. <Rich text={b.title} /></div>
                   : null}
                 {b.title
                   ? <Paras text={b.text} />
@@ -110,20 +112,20 @@ export function OpBlocks({ blocks }) {
           }
           case 'tip':
             return (
-              <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: 10, padding: '12px 14px', margin: '6px 0 4px' }}>
+              <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', background: C.amberSoft, border: `1px solid ${C.amberBorder}`, borderRadius: 10, padding: '12px 14px', margin: '6px 0 4px' }}>
                 <span style={{ color: C.orange, flexShrink: 0, marginTop: 4 }}><LightbulbIcon /></span>
                 <div style={{ lineHeight: 1.95, whiteSpace: 'pre-line' }}>
-                  {b.label && <div style={{ fontWeight: 800, color: '#9a3412', marginBottom: 2 }}>{b.label}</div>}
+                  {b.label && <div style={{ fontWeight: 800, color: C.amberText, marginBottom: 2 }}>{b.label}</div>}
                   <Rich text={b.text} />
                 </div>
               </div>
             );
           case 'fields':
             return (
-              <div key={i} style={{ background: '#fff', border: `1px solid ${C.border}`, borderRight: `3px solid ${C.teal}`, borderRadius: 8, padding: '10px 14px', margin: '0 0 10px', lineHeight: 1.95 }}>
+              <div key={i} style={{ background: '#fff', border: `1px solid ${C.border}`, borderRight: `3px solid ${C.primary}`, borderRadius: 8, padding: '10px 14px', margin: '0 0 10px', lineHeight: 1.95 }}>
                 {(b.items || []).map((f, j) => (
                   <div key={j} style={{ whiteSpace: 'pre-line' }}>
-                    {f.label && <strong style={{ color: C.tealDark }}>{f.label}</strong>}
+                    {f.label && <strong style={{ color: C.ink }}>{f.label}</strong>}
                     {f.label && f.value ? ' — ' : ''}
                     <Rich text={f.value} />
                   </div>
@@ -136,11 +138,11 @@ export function OpBlocks({ blocks }) {
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                   {(b.headers || []).some(h => h) && (
                     <thead><tr>{b.headers.map((h, j) => (
-                      <th key={j} style={{ padding: '8px 10px', background: C.tealLight, color: C.tealDark, textAlign: 'right', fontWeight: 800, border: `1px solid ${C.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                      <th key={j} style={{ padding: '8px 10px', background: C.primarySoft, color: C.ink, textAlign: 'right', fontWeight: 800, border: `1px solid ${C.border}`, whiteSpace: 'nowrap' }}>{h}</th>
                     ))}</tr></thead>
                   )}
                   <tbody>{(b.rows || []).map((r, j) => (
-                    <tr key={j} style={{ background: j % 2 ? '#fafcfd' : '#fff' }}>{r.map((c, k) => (
+                    <tr key={j} style={{ background: j % 2 ? '#FBF9F5' : '#fff' }}>{r.map((c, k) => (
                       <td key={k} style={{ padding: '8px 10px', border: `1px solid ${C.border}`, verticalAlign: 'top', whiteSpace: 'pre-line' }}><Rich text={c} /></td>
                     ))}</tr>
                   ))}</tbody>
@@ -160,14 +162,14 @@ export function OpBlocks({ blocks }) {
 /** بطاقة واحدة بخلفية زرقاء فاتحة (النبذة، الشرح، الإرشادات، تعليمات النموذج) */
 export function OpCard({ title, heading, actions, children }) {
   return (
-    <div style={{ background: C.blueBg, border: `1px solid ${C.blueBorder}`, borderRight: `4px solid ${C.teal}`, borderRadius: 12, padding: '18px 22px', color: C.text, fontSize: 14, direction: 'rtl', textAlign: 'right' }}>
+    <div style={{ background: C.blueBg, border: `1px solid ${C.blueBorder}`, borderRight: `4px solid ${C.primary}`, borderRadius: 12, padding: '18px 22px', color: C.text, fontSize: 14, direction: 'rtl', textAlign: 'right' }}>
       {(title || actions) && (
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-          {title ? <h3 style={{ fontSize: 17, fontWeight: 800, color: C.tealDark, margin: 0, lineHeight: 1.6 }}>{title}</h3> : <span />}
+          {title ? <h3 style={{ fontSize: 17, fontWeight: 800, color: C.ink, margin: 0, lineHeight: 1.6 }}>{title}</h3> : <span />}
           {actions}
         </div>
       )}
-      {heading && <div style={{ fontSize: 14.5, fontWeight: 700, color: C.teal, marginTop: 4 }}>{heading}</div>}
+      {heading && <div style={{ fontSize: 14.5, fontWeight: 700, color: C.primary, marginTop: 4 }}>{heading}</div>}
       <div style={{ marginTop: title || heading ? 10 : 0 }}>{children}</div>
     </div>
   );
@@ -214,14 +216,14 @@ export function ExampleModal({ example, onClose }) {
       <div role="dialog" aria-modal="true" aria-labelledby={titleId}
         style={{ background: '#fff', borderRadius: 14, width: '100%', maxWidth: 820, maxHeight: 'calc(100vh - 32px)', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 60px rgba(0,0,0,0.25)', direction: 'rtl', fontFamily: FONT, color: C.text }}>
         <div style={{ padding: '16px 22px', borderBottom: `1px solid ${C.border}`, background: C.blueBg, borderRadius: '14px 14px 0 0' }}>
-          <h3 id={titleId} style={{ margin: 0, fontSize: 16.5, fontWeight: 800, color: C.tealDark, lineHeight: 1.6 }}>{example.title || 'مثال توضيحي'}</h3>
+          <h3 id={titleId} style={{ margin: 0, fontSize: 16.5, fontWeight: 800, color: C.ink, lineHeight: 1.6 }}>{example.title || 'مثال توضيحي'}</h3>
         </div>
         <div style={{ padding: '16px 22px', overflowY: 'auto', fontSize: 14 }}>
           <OpBlocks blocks={example.blocks} />
         </div>
         <div style={{ padding: '12px 22px', borderTop: `1px solid ${C.border}`, display: 'flex', justifyContent: 'flex-start' }}>
           <button ref={closeRef} type="button" onClick={onClose}
-            style={{ padding: '9px 28px', background: C.teal, color: '#fff', border: 'none', borderRadius: 9, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
+            style={{ padding: '9px 28px', background: C.primary, color: '#fff', border: 'none', borderRadius: 9, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
             إغلاق
           </button>
         </div>
@@ -242,7 +244,7 @@ export function OpFormIntro({ unit, actions }) {
         <OpBlocks blocks={f.blocks} />
         {f.example && (
           <button type="button" onClick={() => setOpen(true)} aria-haspopup="dialog"
-            style={{ marginTop: 4, padding: '8px 18px', background: '#fff', color: C.teal, border: `1.5px solid ${C.teal}`, borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
+            style={{ marginTop: 4, padding: '8px 18px', background: '#fff', color: C.primary, border: `1.5px solid ${C.primary}`, borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
             {f.example_button || 'عرض مثال توضيحي'}
           </button>
         )}

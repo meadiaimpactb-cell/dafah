@@ -1,3 +1,4 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import api from '../../api/axios';
@@ -8,17 +9,17 @@ import { usePermissions } from '../../utils/permissions';
 import { IcCheckCircle, IcArrowPath, IcWarning, IcXMark, IcSparkles, IcClipboard, IcCog, IcScroll, IcPalette, IcLock, IcUpload, IcEye, IcDocument } from '../../utils/icons';
 
 const colors = {
-  teal: '#1A6B7C', tealDark: '#14505E',
-  orange: '#E8620A', green: '#16a34a', red: '#dc2626',
-  gray: '#6B7280', grayLight: '#F3F4F6', grayBorder: '#E5E7EB',
+  primary: '#235D7F', ink: '#0E2A3D',
+  orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F', green: '#0B7F5D', red: '#C53A3A',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',
 };
 
 const StatusBadge = ({ status }) => {
   const map = {
-    submitted:  { label: 'مُرسَل',                  bg: '#EFF6FF', color: '#1D4ED8' },
-    reviewing:  { label: 'قيد المراجعة',            bg: '#FFF7ED', color: colors.orange },
-    approved:   { label: 'معتمد',                   bg: '#F0FDF4', color: colors.green },
-    revision:   { label: 'بانتظار تعديل العميل',    bg: '#FEF9C3', color: '#92400e' },
+    submitted:  { label: 'مُرسَل',                  bg: '#EAF4FD', color: '#1A65AD' },
+    reviewing:  { label: 'قيد المراجعة',            bg: '#FEF3EC', color: colors.amberText },
+    approved:   { label: 'معتمد',                   bg: '#E8F8F2', color: colors.green },
+    revision:   { label: 'بانتظار تعديل العميل',    bg: '#FDE2D2', color: '#7F310E' },
     not_started:{ label: 'لم يبدأ',                 bg: colors.grayLight, color: colors.gray },
   };
   const s = map[status] || { label: status, bg: colors.grayLight, color: colors.gray };
@@ -42,8 +43,8 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {/* Summary bar */}
-        <div style={{ padding: '8px 14px', background: '#E8F4F6', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: colors.tealDark }}>
+        <div style={{ padding: '8px 14px', background: '#D9E8F1', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: colors.ink }}>
             {questionnaireSections.length} أقسام — {answeredCount} إجابة
           </span>
         </div>
@@ -58,9 +59,9 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
           return (
             <div key={section.id} style={{ border: `1.5px solid ${colors.grayBorder}`, borderRadius: 10, overflow: 'hidden' }}>
               {/* Section header */}
-              <div style={{ padding: '10px 14px', background: '#E8F4F6', borderBottom: `1px solid ${colors.grayBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark }}>{section.name}</span>
-                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: answered.length === questions.length ? '#D1FAE5' : '#FEF3C7', color: answered.length === questions.length ? colors.green : '#92400e', fontWeight: 600 }}>
+              <div style={{ padding: '10px 14px', background: '#D9E8F1', borderBottom: `1px solid ${colors.grayBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: colors.ink }}>{section.name}</span>
+                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: answered.length === questions.length ? '#C9EFE1' : '#FDE2D2', color: answered.length === questions.length ? colors.green : '#7F310E', fontWeight: 600 }}>
                   {answered.length}/{questions.length} مكتمل
                 </span>
               </div>
@@ -75,8 +76,8 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
                     <div key={q.id} style={{ paddingBottom: qi < questions.length - 1 ? 10 : 0, borderBottom: qi < questions.length - 1 ? `1px dashed ${colors.grayBorder}` : 'none' }}>
                       {/* Question label */}
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 6 }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: colors.teal, marginTop: 1 }}>س{qi + 1}</span>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', flex: 1, lineHeight: 1.6 }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: colors.primary, marginTop: 1 }}>س{qi + 1}</span>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: '#334452', flex: 1, lineHeight: 1.6 }}>
                           {q.question}
                           {q.required && <span style={{ color: colors.red, marginRight: 3 }}>*</span>}
                         </div>
@@ -84,24 +85,24 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
 
                       {/* Answer */}
                       {isEmpty ? (
-                        <div style={{ fontSize: 12, color: colors.gray, fontStyle: 'italic', padding: '6px 10px', background: '#FFF7ED', borderRadius: 6, borderRight: `3px solid #FCD34D` }}>
+                        <div style={{ fontSize: 12, color: colors.gray, fontStyle: 'italic', padding: '6px 10px', background: '#FEF3EC', borderRadius: 6, borderRight: `3px solid #F79D6C` }}>
                           لم يتم الإجابة
                         </div>
                       ) : Array.isArray(answer) ? (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                           {answer.map((item, i) => (
-                            <span key={i} style={{ fontSize: 12, background: '#E8F4F6', color: colors.teal, borderRadius: 20, padding: '3px 12px', fontWeight: 600 }}>{item}</span>
+                            <span key={i} style={{ fontSize: 12, background: '#D9E8F1', color: colors.primary, borderRadius: 20, padding: '3px 12px', fontWeight: 600 }}>{item}</span>
                           ))}
                         </div>
                       ) : (
-                        <div style={{ fontSize: 13, color: '#1f2937', padding: '8px 12px', background: colors.grayLight, borderRadius: 6, lineHeight: 1.8, whiteSpace: 'pre-wrap', borderRight: `3px solid ${colors.teal}` }}>
+                        <div style={{ fontSize: 13, color: '#0E2A3D', padding: '8px 12px', background: colors.grayLight, borderRadius: 6, lineHeight: 1.8, whiteSpace: 'pre-wrap', borderRight: `3px solid ${colors.primary}` }}>
                           {String(answer)}
                         </div>
                       )}
 
                       {/* Hint */}
                       {q.hint && (
-                        <div style={{ fontSize: 11, color: colors.gray, marginTop: 4 }}>💡 {q.hint}</div>
+                        <div style={{ fontSize: 11, color: colors.gray, marginTop: 4 }}><DfIcon name="bulb" size={14} style={{ marginInlineEnd: 6 }} />{q.hint}</div>
                       )}
                     </div>
                   );
@@ -119,8 +120,8 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {Object.entries(formData).map(([key, value]) => (
         <div key={key} style={{ padding: '8px 12px', background: colors.grayLight, borderRadius: 6 }}>
-          <div style={{ fontSize: 11, color: colors.teal, fontWeight: 600, marginBottom: 4 }}>{key}</div>
-          <div style={{ fontSize: 13, color: '#374151' }}>
+          <div style={{ fontSize: 11, color: colors.primary, fontWeight: 600, marginBottom: 4 }}>{key}</div>
+          <div style={{ fontSize: 13, color: '#334452' }}>
             {Array.isArray(value) ? value.join('، ') : String(value ?? '—')}
           </div>
         </div>
@@ -133,16 +134,16 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
 const ConfirmModal = ({ type, unitName, orgName, onConfirm, onCancel }) => {
   const isApprove = type === 'approve';
   return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>
-      <div style={{ background: 'white', borderRadius: 20, padding: 32, width: 420, boxShadow: '0 24px 64px rgba(0,0,0,0.25)', textAlign: 'center', animation: 'modalIn 0.22s ease-out both' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(14,42,61,0.5)', backdropFilter: 'blur(4px)' }}>
+      <div style={{ background: 'white', borderRadius: 20, padding: 32, width: 420, boxShadow: '0 24px 64px rgba(14,42,61,0.25)', textAlign: 'center', animation: 'modalIn 0.22s ease-out both' }}>
         {/* Icon */}
-        <div style={{ width: 64, height: 64, borderRadius: '50%', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: isApprove ? '#F0FDF4' : '#FFF7ED', border: `2px solid ${isApprove ? '#bbf7d0' : '#fed7aa'}` }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: isApprove ? '#E8F8F2' : '#FEF3EC', border: `2px solid ${isApprove ? '#A9E4CF' : '#FBC3A3'}` }}>
           {isApprove ? (
-            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#0B7F5D" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="20 6 9 17 4 12"/>
             </svg>
           ) : (
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#E8620A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#A33F12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
             </svg>
@@ -150,26 +151,26 @@ const ConfirmModal = ({ type, unitName, orgName, onConfirm, onCancel }) => {
         </div>
 
         {/* Title */}
-        <div style={{ fontSize: 18, fontWeight: 800, color: colors.tealDark, marginBottom: 8 }}>
+        <div style={{ fontSize: 18, fontWeight: 800, color: colors.ink, marginBottom: 8 }}>
           {isApprove ? 'تأكيد اعتماد الوحدة' : 'تأكيد طلب التعديل'}
         </div>
 
         {/* Description */}
         <div style={{ fontSize: 13, color: colors.gray, lineHeight: 1.8, marginBottom: 24 }}>
           {isApprove
-            ? <>سيتم اعتماد وحدة <strong style={{ color: colors.tealDark }}>"{unitName}"</strong> للمنظمة <strong style={{ color: colors.tealDark }}>{orgName}</strong>، وسيتم إشعار العميل بذلك.</>
-            : <>سيتم إرسال طلب تعديل لوحدة <strong style={{ color: colors.tealDark }}>"{unitName}"</strong> إلى منظمة <strong style={{ color: colors.tealDark }}>{orgName}</strong> مع ملاحظاتك.</>
+            ? <>سيتم اعتماد وحدة <strong style={{ color: colors.ink }}>"{unitName}"</strong> للمنظمة <strong style={{ color: colors.ink }}>{orgName}</strong>، وسيتم إشعار العميل بذلك.</>
+            : <>سيتم إرسال طلب تعديل لوحدة <strong style={{ color: colors.ink }}>"{unitName}"</strong> إلى منظمة <strong style={{ color: colors.ink }}>{orgName}</strong> مع ملاحظاتك.</>
           }
         </div>
 
         {/* Buttons */}
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={onCancel}
-            style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: `1.5px solid ${colors.grayBorder}`, background: 'white', color: colors.gray, fontSize: 14, fontWeight: 600, fontFamily: "'Cairo', sans-serif", cursor: 'pointer' }}>
+            style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: `1.5px solid ${colors.grayBorder}`, background: 'white', color: colors.gray, fontSize: 14, fontWeight: 600, fontFamily: "inherit", cursor: 'pointer' }}>
             إلغاء
           </button>
           <button onClick={onConfirm}
-            style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: isApprove ? colors.green : colors.orange, color: 'white', fontSize: 14, fontWeight: 700, fontFamily: "'Cairo', sans-serif", cursor: 'pointer', boxShadow: `0 4px 14px ${isApprove ? '#16a34a40' : '#E8620A40'}` }}>
+            style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: isApprove ? colors.green : colors.amber, color: '#0E2A3D', fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: 'pointer', boxShadow: `0 4px 14px ${isApprove ? '#0E9F7440' : '#EF6A2C66'}` }}>
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
               {isApprove ? (
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -264,22 +265,22 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
   };
 
   return (
-    <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <div style={{ padding: '14px 20px', borderBottom: `1px solid ${colors.grayBorder}`, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0 }}>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: colors.tealDark }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: colors.ink }}>
             {sub ? isPol ? sub.policy_name : `${sub.unit_number}. ${sub.unit_name}` : '…'}
           </div>
           <div style={{ fontSize: 12, color: colors.gray, marginTop: 2 }}>
             {sub?.org_name}
-            {isOp && <span style={{ marginRight: 8, padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: '#FFF7ED', color: '#E8620A' }}>تشغيلي</span>}
-            {isPol && <span style={{ marginRight: 8, padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: '#F0FDF4', color: '#16a34a' }}>سياسة</span>}
+            {isOp && <span style={{ marginRight: 8, padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: '#FEF3EC', color: '#A33F12' }}>تشغيلي</span>}
+            {isPol && <span style={{ marginRight: 8, padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: '#E8F8F2', color: '#0B7F5D' }}>سياسة</span>}
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           {sub && <StatusBadge status={sub.status} />}
-          {sub?.is_late && <span style={{ padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: '#FEF2F2', color: colors.red, display: 'inline-flex', alignItems: 'center', gap: 4 }}><IcWarning width={12} height={12}/> متأخر</span>}
+          {sub?.is_late && <span style={{ padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: '#FCEBEB', color: colors.red, display: 'inline-flex', alignItems: 'center', gap: 4 }}><IcWarning width={12} height={12}/> متأخر</span>}
           <button onClick={onClose} style={{ width: 28, height: 28, borderRadius: 6, border: 'none', background: colors.grayLight, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: colors.gray }}><IcXMark width={14} height={14}/></button>
         </div>
       </div>
@@ -290,7 +291,7 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
         <div style={{ flex: 1, overflow: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* Form Data */}
           <div>
-            <h4 style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, margin: '0 0 12px' }}>{isPol ? 'إجابات استبيان السياسة' : 'عمل العميل'}</h4>
+            <h4 style={{ fontSize: 13, fontWeight: 700, color: colors.ink, margin: '0 0 12px' }}>{isPol ? 'إجابات استبيان السياسة' : 'عمل العميل'}</h4>
             {subLoading
               ? <div style={{ padding: 20, textAlign: 'center', color: colors.gray, fontSize: 13 }}>جارٍ تحميل بيانات العمل…</div>
               : isPol ? <PolicyFormViewer formData={sub.form_data} questionnaireSections={questionnaireSections} /> : <FormDataViewer data={sub.form_data} template={sub.unit_template} />
@@ -300,20 +301,20 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
           {/* Review tools */}
           {mode === 'pending' && (
             <div style={{ borderTop: `1px solid ${colors.grayBorder}`, paddingTop: 16 }}>
-              <h4 style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, margin: '0 0 10px' }}>المراجعة</h4>
+              <h4 style={{ fontSize: 13, fontWeight: 700, color: colors.ink, margin: '0 0 10px' }}>المراجعة</h4>
 
               {/* حالة: تم طلب التعديل — بانتظار العميل */}
               {sub.status === 'revision' ? (
                 <div>
                   {sub.consultant_notes && (
                     <div style={{ marginBottom: 12 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: colors.tealDark, marginBottom: 6 }}>الملاحظات المرسلة للعميل</div>
-                      <div style={{ padding: '10px 14px', background: '#FFFBEB', borderRadius: 8, border: `1px solid #FDE68A`, fontSize: 13, color: '#78350F', lineHeight: 1.8 }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: colors.ink, marginBottom: 6 }}>الملاحظات المرسلة للعميل</div>
+                      <div style={{ padding: '10px 14px', background: '#FEF3EC', borderRadius: 8, border: `1px solid #FBC3A3`, fontSize: 13, color: '#5E240A', lineHeight: 1.8 }}>
                         {sub.consultant_notes}
                       </div>
                     </div>
                   )}
-                  <div style={{ padding: '14px 16px', borderRadius: 10, background: '#FEF9C3', border: '1px solid #FDE68A', color: '#92400e', fontSize: 13, fontWeight: 600, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <div style={{ padding: '14px 16px', borderRadius: 10, background: '#FDE2D2', border: '1px solid #FBC3A3', color: '#7F310E', fontSize: 13, fontWeight: 600, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                     <IcArrowPath width={16} height={16}/>
                     بانتظار تعديل العميل وإعادة الإرسال
                   </div>
@@ -323,25 +324,25 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
                 </div>
               ) : sub.status === 'approved' ? (
                 /* حالة: معتمدة */
-                <div style={{ padding: 12, borderRadius: 10, background: '#F0FDF4', border: '1px solid #bbf7d0', color: colors.green, fontSize: 13, fontWeight: 600, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <div style={{ padding: 12, borderRadius: 10, background: '#E8F8F2', border: '1px solid #A9E4CF', color: colors.green, fontSize: 13, fontWeight: 600, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                   <IcCheckCircle width={16} height={16}/> {isPol ? 'تم اعتماد هذه السياسة' : 'تم اعتماد هذه الوحدة'}
                 </div>
               ) : (
                 /* حالة: submitted / reviewing — أدوات المراجعة */
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: colors.tealDark, display: 'block', marginBottom: 6 }}>الملاحظات</label>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: colors.ink, display: 'block', marginBottom: 6 }}>الملاحظات</label>
                   <textarea
                     value={notes}
                     onChange={e => setNotes(e.target.value)}
                     rows={4}
                     placeholder="اكتب ملاحظاتك هنا…"
-                    style={{ width: '100%', padding: 10, borderRadius: 8, border: `1px solid ${colors.grayBorder}`, fontFamily: "'Cairo', sans-serif", fontSize: 13, resize: 'vertical', boxSizing: 'border-box', marginBottom: 8 }}
+                    style={{ width: '100%', padding: 10, borderRadius: 8, border: `1px solid ${colors.grayBorder}`, fontFamily: "inherit", fontSize: 13, resize: 'vertical', boxSizing: 'border-box', marginBottom: 8 }}
                   />
 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 14 }}>
                     {['عمل ممتاز', 'يحتاج تفصيلاً أكثر', 'أضف مصادر ومراجع', 'راجع الأرقام', 'المحتوى غير مكتمل'].map(t => (
                       <button key={t} onClick={() => setNotes(n => n ? `${n}\n${t}` : t)}
-                        style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontFamily: "'Cairo', sans-serif", background: colors.grayLight, color: colors.gray, border: 'none', cursor: 'pointer' }}>
+                        style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontFamily: "inherit", background: colors.grayLight, color: colors.gray, border: 'none', cursor: 'pointer' }}>
                         {t}
                       </button>
                     ))}
@@ -349,11 +350,11 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
 
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button onClick={handleApprove} disabled={saving}
-                      style={{ flex: 1, padding: '11px 0', borderRadius: 10, border: 'none', background: colors.green, color: 'white', fontWeight: 700, fontSize: 13, fontFamily: "'Cairo', sans-serif", cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, boxShadow: '0 3px 10px #16a34a30', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                      style={{ flex: 1, padding: '11px 0', borderRadius: 10, border: 'none', background: colors.green, color: 'white', fontWeight: 700, fontSize: 13, fontFamily: "inherit", cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, boxShadow: '0 3px 10px #0E9F7430', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                       <IcCheckCircle width={16} height={16}/> اعتماد
                     </button>
                     <button onClick={handleRevision} disabled={saving}
-                      style={{ flex: 1, padding: '11px 0', borderRadius: 10, border: `1.5px solid ${colors.orange}`, background: 'white', color: colors.orange, fontWeight: 700, fontSize: 13, fontFamily: "'Cairo', sans-serif", cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                      style={{ flex: 1, padding: '11px 0', borderRadius: 10, border: `1.5px solid ${colors.amberLine}`, background: 'white', color: colors.amberText, fontWeight: 700, fontSize: 13, fontFamily: "inherit", cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                       <IcArrowPath width={16} height={16}/> طلب تعديل
                     </button>
                   </div>
@@ -364,8 +365,8 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
 
           {mode === 'completed' && sub.consultant_notes && (
             <div style={{ borderTop: `1px solid ${colors.grayBorder}`, paddingTop: 16 }}>
-              <h4 style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark, margin: '0 0 10px' }}>ملاحظاتك</h4>
-              <div style={{ padding: '10px 14px', background: '#F0FDF4', borderRadius: 8, fontSize: 13, color: '#166534', lineHeight: 1.8 }}>
+              <h4 style={{ fontSize: 13, fontWeight: 700, color: colors.ink, margin: '0 0 10px' }}>ملاحظاتك</h4>
+              <div style={{ padding: '10px 14px', background: '#E8F8F2', borderRadius: 8, fontSize: 13, color: '#086449', lineHeight: 1.8 }}>
                 {sub.consultant_notes}
               </div>
               <div style={{ marginTop: 8, fontSize: 11, color: colors.gray }}>تمت المراجعة: {sub.reviewed_at}</div>
@@ -390,7 +391,7 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
       )}
 
       {toast && ReactDOM.createPortal(
-        <div style={{ position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)', zIndex: 9999999, background: toast.type === 'success' ? '#065f46' : '#7f1d1d', color: 'white', padding: '12px 24px', borderRadius: 12, fontSize: 14, fontWeight: 600, fontFamily: "'Cairo', sans-serif", boxShadow: '0 4px 20px rgba(0,0,0,0.3)', whiteSpace: 'nowrap' }}>
+        <div style={{ position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)', zIndex: 9999999, background: toast.type === 'success' ? '#086449' : '#842525', color: 'white', padding: '12px 24px', borderRadius: 12, fontSize: 14, fontWeight: 600, fontFamily: "inherit", boxShadow: '0 4px 20px rgba(14,42,61,0.3)', whiteSpace: 'nowrap' }}>
           {toast.text}
         </div>, document.body
       )}
@@ -407,9 +408,9 @@ function DesignRequestsPanel() {
   const fileRef = useRef(null);
 
   const statusLabels = {
-    pending:            { label: 'في انتظار التصميم', bg: '#EFF6FF', color: '#1D4ED8' },
-    revision_requested: { label: 'طُلب تعديل',         bg: '#FFF7ED', color: colors.orange },
-    uploaded:           { label: 'تم الرفع',            bg: '#F0FDF4', color: colors.green },
+    pending:            { label: 'في انتظار التصميم', bg: '#EAF4FD', color: '#1A65AD' },
+    revision_requested: { label: 'طُلب تعديل',         bg: '#FEF3EC', color: colors.amberText },
+    uploaded:           { label: 'تم الرفع',            bg: '#E8F8F2', color: colors.green },
   };
 
   const load = () => {
@@ -452,16 +453,16 @@ function DesignRequestsPanel() {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 1fr' : '1fr', gap: 16, flex: 1, minHeight: 0 }}>
       {/* List */}
-      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
+      <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', overflow: 'hidden' }}>
         {items.map((w, i) => {
           const st = statusLabels[w.design_status] || statusLabels.pending;
           return (
             <div key={w.id} onClick={() => setSelected(selected?.id === w.id ? null : w)}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: i < items.length - 1 ? `1px solid ${colors.grayBorder}` : 'none', borderRight: selected?.id === w.id ? `3px solid ${colors.teal}` : '3px solid transparent', cursor: 'pointer', background: selected?.id === w.id ? `${colors.teal}08` : 'transparent' }}>
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: i < items.length - 1 ? `1px solid ${colors.grayBorder}` : 'none', borderRight: selected?.id === w.id ? `3px solid ${colors.primary}` : '3px solid transparent', cursor: 'pointer', background: selected?.id === w.id ? `${colors.primary}08` : 'transparent' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-                <div style={{ width: 38, height: 38, borderRadius: 10, background: colors.teal, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 15 }}>{w.avatar}</div>
+                <div style={{ width: 38, height: 38, borderRadius: 10, background: colors.primary, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 15 }}>{w.avatar}</div>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark }}>{w.org_name}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: colors.ink }}>{w.org_name}</div>
                   <div style={{ fontSize: 11, color: colors.gray }}>{w.org_type}</div>
                 </div>
               </div>
@@ -476,27 +477,27 @@ function DesignRequestsPanel() {
 
       {/* Upload Panel */}
       {selected && (
-        <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', padding: 24, overflowY: 'auto' }}>
+        <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', padding: 24, overflowY: 'auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: colors.tealDark }}>{selected.org_name}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: colors.ink }}>{selected.org_name}</div>
               <div style={{ fontSize: 12, color: colors.gray }}>{selected.org_type}</div>
             </div>
             <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: colors.gray, display: 'flex' }}><IcXMark width={20} height={20}/></button>
           </div>
 
           {selected.design_revision_notes && (
-            <div style={{ padding: '10px 14px', background: '#FFF7ED', borderRadius: 8, border: `1px solid ${colors.orange}30`, marginBottom: 16 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: colors.orange, marginBottom: 4 }}>ملاحظات التعديل من العميل:</div>
-              <div style={{ fontSize: 12, color: '#374151' }}>{selected.design_revision_notes}</div>
+            <div style={{ padding: '10px 14px', background: '#FEF3EC', borderRadius: 8, border: `1px solid ${colors.amberLine}30`, marginBottom: 16 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: colors.amberText, marginBottom: 4 }}>ملاحظات التعديل من العميل:</div>
+              <div style={{ fontSize: 12, color: '#334452' }}>{selected.design_revision_notes}</div>
             </div>
           )}
 
           {selected.design_file && (
-            <div style={{ padding: '10px 14px', background: '#F0FDF4', borderRadius: 8, border: `1px solid ${colors.green}30`, marginBottom: 16 }}>
+            <div style={{ padding: '10px 14px', background: '#E8F8F2', borderRadius: 8, border: `1px solid ${colors.green}30`, marginBottom: 16 }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: colors.green, marginBottom: 6 }}>آخر ملف تم رفعه:</div>
               <a href={selected.design_file} target="_blank" rel="noreferrer"
-                style={{ fontSize: 12, color: colors.teal, textDecoration: 'underline', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                style={{ fontSize: 12, color: colors.primary, textDecoration: 'underline', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                 <IcEye width={14} height={14}/> معاينة / تحميل
               </a>
             </div>
@@ -504,14 +505,14 @@ function DesignRequestsPanel() {
 
           <div style={{ border: `2px dashed ${colors.grayBorder}`, borderRadius: 12, padding: 32, textAlign: 'center', marginBottom: 16 }}>
             <div style={{ marginBottom: 8, color: colors.gray }}><IcDocument width={36} height={36}/></div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, marginBottom: 4 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: colors.ink, marginBottom: 4 }}>
               {selected.design_status === 'uploaded' ? 'رفع تصميم معدّل' : 'رفع ملف التصميم'}
             </div>
             <div style={{ fontSize: 11, color: colors.gray, marginBottom: 16 }}>PDF, JPG, PNG, ZIP — حد أقصى 20MB</div>
             <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.zip" style={{ display: 'none' }}
               onChange={e => { if (e.target.files[0]) handleUpload(selected.id, e.target.files[0]); e.target.value = ''; }} />
             <button onClick={() => fileRef.current?.click()} disabled={uploading === selected.id}
-              style={{ padding: '10px 28px', borderRadius: 10, background: uploading === selected.id ? colors.grayLight : colors.teal, color: uploading === selected.id ? colors.gray : 'white', border: 'none', fontFamily: "'Cairo', sans-serif", fontWeight: 700, fontSize: 13, cursor: uploading === selected.id ? 'not-allowed' : 'pointer' }}>
+              style={{ padding: '10px 28px', borderRadius: 10, background: uploading === selected.id ? colors.grayLight : colors.primary, color: uploading === selected.id ? colors.gray : 'white', border: 'none', fontFamily: "inherit", fontWeight: 700, fontSize: 13, cursor: uploading === selected.id ? 'not-allowed' : 'pointer' }}>
               {uploading === selected.id ? 'جارٍ الرفع...' : 'اختر الملف وارفعه'}
             </button>
           </div>
@@ -649,7 +650,7 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
   if (!isDesign && error) return (
     <div style={{ padding: 24, textAlign: 'center', color: colors.red }}>
       <div style={{ fontSize: 14, marginBottom: 12 }}>{error}</div>
-      <button onClick={() => load(false)} style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: colors.teal, color: 'white', cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>إعادة المحاولة</button>
+      <button onClick={() => load(false)} style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: colors.primary, color: 'white', cursor: 'pointer', fontFamily: "inherit" }}>إعادة المحاولة</button>
     </div>
   );
 
@@ -658,7 +659,7 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
   return (
     <div className="animate-in" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: colors.tealDark, margin: 0 }}>{title}</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: colors.ink, margin: 0 }}>{title}</h2>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <span style={{ fontSize: 12, color: colors.gray, background: colors.grayLight, padding: '3px 10px', borderRadius: 20 }}>
             {filtered.length} عنصر
@@ -667,16 +668,16 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="بحث…"
-            style={{ padding: '7px 14px', borderRadius: 10, border: `1px solid ${colors.grayBorder}`, fontFamily: "'Cairo', sans-serif", fontSize: 13, width: 180, outline: 'none' }}
+            style={{ padding: '7px 14px', borderRadius: 10, border: `1px solid ${colors.grayBorder}`, fontFamily: "inherit", fontSize: 13, width: 180, outline: 'none' }}
           />
         </div>
       </div>
 
       {/* Client filter banner */}
       {clientFilter && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, padding: '8px 14px', background: '#E8F4F6', borderRadius: 10, border: '1.5px solid #1A6B7C30' }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: colors.tealDark }}>
-            📋 عرض: {clientFilter.orgName}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, padding: '8px 14px', background: '#D9E8F1', borderRadius: 10, border: '1.5px solid #235D7F30' }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: colors.ink }}>
+            <DfIcon name="clipboard" size={18} style={{ marginInlineEnd: 6 }} />عرض: {clientFilter.orgName}
           </span>
           <button
             onClick={() => setClientFilter(null)}
@@ -692,7 +693,7 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
       <div style={{ display: 'flex', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
         {visibleTabs.map(t => (
           <button key={t.key} onClick={() => handleTabChange(t.key)}
-            style={{ padding: '7px 18px', borderRadius: 10, fontSize: 13, fontWeight: serviceType === t.key ? 700 : 500, fontFamily: "'Cairo', sans-serif", background: serviceType === t.key ? colors.teal : colors.grayLight, color: serviceType === t.key ? 'white' : colors.gray, border: 'none', cursor: 'pointer', transition: 'all 0.2s' }}>
+            style={{ padding: '7px 18px', borderRadius: 10, fontSize: 13, fontWeight: serviceType === t.key ? 700 : 500, fontFamily: "inherit", background: serviceType === t.key ? colors.primary : colors.grayLight, color: serviceType === t.key ? 'white' : colors.gray, border: 'none', cursor: 'pointer', transition: 'all 0.2s' }}>
             {t.label}
           </button>
         ))}
@@ -703,7 +704,7 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
 
       {!isDesign && <div style={{ display: 'grid', gridTemplateColumns: selectedId ? '1fr 1fr' : '1fr', gap: 16, flex: 1, minHeight: 0 }}>
         {/* List */}
-        <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           {filtered.length === 0 ? (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: colors.gray, padding: 40 }}>
               <div style={{ marginBottom: 8, color: colors.gray }}>{isPending ? <IcSparkles width={32} height={32}/> : <IcClipboard width={32} height={32}/>}</div>
@@ -721,9 +722,9 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     padding: '14px 18px',
                     borderBottom: i < filtered.length - 1 ? `1px solid ${colors.grayBorder}` : 'none',
-                    borderRight: selectedId === s.id ? `3px solid ${colors.teal}` : '3px solid transparent',
+                    borderRight: selectedId === s.id ? `3px solid ${colors.primary}` : '3px solid transparent',
                     cursor: 'pointer', transition: 'all 0.15s',
-                    background: selectedId === s.id ? `${colors.teal}08` : 'transparent',
+                    background: selectedId === s.id ? `${colors.primary}08` : 'transparent',
                   }}
                   onMouseEnter={e => {
                     if (selectedId !== s.id) e.currentTarget.style.background = colors.grayLight;
@@ -732,11 +733,11 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
                   onMouseLeave={e => { if (selectedId !== s.id) e.currentTarget.style.background = 'transparent'; }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: 10, background: colors.teal, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 15, flexShrink: 0 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: 10, background: colors.primary, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 15, flexShrink: 0 }}>
                       {s.avatar}
                     </div>
                     <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: colors.tealDark, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.org_name}</div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: colors.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.org_name}</div>
                       <div style={{ fontSize: 11, color: colors.gray, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {isPol ? s.policy_name : `${s.unit_number}. ${s.unit_name}`}
                       </div>

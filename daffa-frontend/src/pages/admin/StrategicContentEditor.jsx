@@ -15,10 +15,10 @@ import TemplateRenderer, { GUIDE_SPEC, guideFields, resolveTip } from '../strate
  */
 
 export const C = {
-  teal: '#1A6B7C', tealDark: '#14505E', tealLight: '#E8F4F6',
-  green: '#16A34A', greenLight: '#F0FDF4', orange: '#E8620A', orangeLight: '#FFF7ED',
-  gray: '#6B7280', grayLight: '#F3F4F6', grayBorder: '#E5E7EB', red: '#DC2626', redLight: '#FEF2F2',
-  white: '#FFFFFF', dark: '#111827', amberBg: '#fffbeb', amberBorder: '#fde68a', amberText: '#92400e',
+  primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
+  green: '#0B7F5D', greenLight: '#E8F8F2', orange: '#EF6A2C', amber: '#EF6A2C', amberLine: '#E05A1F', amberSoft: '#FEF3EC',
+  gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA', red: '#C53A3A', redLight: '#FCEBEB',
+  white: '#FFFFFF', dark: '#0E2A3D', amberBg: '#FEF3EC', amberBorder: '#FBC3A3', amberText: '#7F310E',
 };
 
 const TABS = [
@@ -63,7 +63,7 @@ export const inputStyle = {
 export function Field({ label, hint, value, onChange, multiline, rows = 3, placeholder, dir }) {
   return (
     <label style={{ display: 'block', marginBottom: 12 }}>
-      {label && <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 5 }}>{label}</span>}
+      {label && <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 5 }}>{label}</span>}
       {multiline ? (
         <textarea value={value ?? ''} onChange={e => onChange(e.target.value)} rows={rows} placeholder={placeholder} dir={dir}
           style={{ ...inputStyle, resize: 'vertical' }} />
@@ -75,12 +75,12 @@ export function Field({ label, hint, value, onChange, multiline, rows = 3, place
   );
 }
 
-export function SmallBtn({ children, onClick, tone = 'teal', title, disabled }) {
+export function SmallBtn({ children, onClick, tone = 'primary', title, disabled }) {
   const tones = {
-    teal:  { background: C.tealLight, color: C.tealDark, border: `1px solid ${C.teal}40` },
-    red:   { background: C.redLight, color: C.red, border: '1px solid #fecaca' },
+    primary:  { background: C.primarySoft, color: C.ink, border: `1px solid ${C.primary}40` },
+    red:   { background: C.redLight, color: C.red, border: '1px solid #F1B2B2' },
     gray:  { background: C.grayLight, color: C.gray, border: `1px solid ${C.grayBorder}` },
-    solid: { background: C.teal, color: '#fff', border: `1px solid ${C.teal}` },
+    solid: { background: C.primary, color: '#fff', border: `1px solid ${C.primary}` },
   };
   return (
     <button type="button" onClick={disabled ? undefined : onClick} title={title} disabled={disabled}
@@ -121,7 +121,7 @@ export function StrList({ label, hint, items, onChange, multiline = true, addLab
   return (
     <div style={{ marginBottom: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, gap: 8 }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: C.tealDark }}>{label}</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: C.ink }}>{label}</span>
         <SmallBtn onClick={() => ops.add('')}>{addLabel}</SmallBtn>
       </div>
       {hint && <div style={{ fontSize: 11, color: C.gray, marginBottom: 6 }}>{hint}</div>}
@@ -149,13 +149,13 @@ export function ObjList({ label, hint, items, onChange, newItem, addLabel = '+ �
   return (
     <div style={{ marginBottom: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, gap: 8 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 800, color: C.tealDark }}>{label}</span>
+        <span style={{ fontSize: 12.5, fontWeight: 800, color: C.ink }}>{label}</span>
         <SmallBtn onClick={() => ops.add(newItem())}>{addLabel}</SmallBtn>
       </div>
       {hint && <div style={{ fontSize: 11, color: C.gray, marginBottom: 6, lineHeight: 1.6 }}>{hint}</div>}
       {list.length === 0 && <div style={{ fontSize: 12, color: C.gray, padding: '8px 12px', background: C.grayLight, borderRadius: 8 }}>لا توجد عناصر.</div>}
       {list.map((item, i) => (
-        <div key={i} style={{ border: `1px solid ${C.grayBorder}`, borderRadius: 10, marginBottom: 8, background: '#fcfcfd' }}>
+        <div key={i} style={{ border: `1px solid ${C.grayBorder}`, borderRadius: 10, marginBottom: 8, background: '#FBF9F5' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderBottom: closed[i] ? 'none' : `1px solid ${C.grayBorder}` }}>
             <button type="button" onClick={() => setClosed(c => ({ ...c, [i]: !c[i] }))} aria-expanded={!closed[i]}
               style={{ flex: 1, minWidth: 0, textAlign: 'right', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 12.5, fontWeight: 700, color: C.dark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', padding: 0 }}>
@@ -174,8 +174,8 @@ export function ObjList({ label, hint, items, onChange, newItem, addLabel = '+ �
 export function Optional({ label, value, onChange, make, children, hint }) {
   const on = value !== null && value !== undefined;
   return (
-    <div style={{ border: `1px dashed ${on ? C.teal : C.grayBorder}`, borderRadius: 10, padding: '9px 12px', marginBottom: 12, background: on ? '#fff' : '#fafafa' }}>
-      <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 12.5, fontWeight: 700, color: on ? C.tealDark : C.gray }}>
+    <div style={{ border: `1px dashed ${on ? C.primary : C.grayBorder}`, borderRadius: 10, padding: '9px 12px', marginBottom: 12, background: on ? '#fff' : '#FBF9F5' }}>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 12.5, fontWeight: 700, color: on ? C.ink : C.gray }}>
         <input type="checkbox" checked={on} onChange={e => onChange(e.target.checked ? make() : null)} />
         {label}
         {!on && <span style={{ fontWeight: 400, fontSize: 11 }}>(غير ظاهر للمستخدم)</span>}
@@ -191,8 +191,8 @@ export function Section({ title, children, defaultOpen = true, badge }) {
   return (
     <div style={{ border: `1.5px solid ${C.grayBorder}`, borderRadius: 12, marginBottom: 14, background: '#fff' }}>
       <button type="button" onClick={() => setOpen(o => !o)} aria-expanded={open}
-        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '11px 14px', background: open ? C.tealLight : '#fff', border: 'none', borderRadius: open ? '12px 12px 0 0' : 12, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'right' }}>
-        <span style={{ fontSize: 13.5, fontWeight: 800, color: C.tealDark }}>{open ? '▾' : '◂'} {title}</span>
+        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '11px 14px', background: open ? C.primarySoft : '#fff', border: 'none', borderRadius: open ? '12px 12px 0 0' : 12, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'right' }}>
+        <span style={{ fontSize: 13.5, fontWeight: 800, color: C.ink }}>{open ? '▾' : '◂'} {title}</span>
         {badge}
       </button>
       {open && <div style={{ padding: '12px 14px 4px' }}>{children}</div>}
@@ -238,9 +238,9 @@ export function TableEditor({ headers, rows, onChange, fixedHeaders }) {
           <thead>
             <tr>
               {hs.map((h, k) => (
-                <th key={k} style={{ padding: 4, background: C.tealLight, verticalAlign: 'top' }}>
+                <th key={k} style={{ padding: 4, background: C.primarySoft, verticalAlign: 'top' }}>
                   {fixedHeaders
-                    ? <div style={{ fontSize: 11.5, color: C.tealDark, padding: '4px 6px', textAlign: 'right' }}>{h}</div>
+                    ? <div style={{ fontSize: 11.5, color: C.ink, padding: '4px 6px', textAlign: 'right' }}>{h}</div>
                     : (
                       <div style={{ display: 'flex', gap: 3 }}>
                         <input value={h} placeholder={`عنوان العمود ${k + 1}`} aria-label={`عنوان العمود ${k + 1}`} onChange={e => emit(hs.map((x, j) => (j === k ? e.target.value : x)), rs)} style={{ ...cell, fontWeight: 700 }} />
@@ -249,7 +249,7 @@ export function TableEditor({ headers, rows, onChange, fixedHeaders }) {
                     )}
                 </th>
               ))}
-              <th style={{ width: 40, background: C.tealLight }} />
+              <th style={{ width: 40, background: C.primarySoft }} />
             </tr>
           </thead>
           <tbody>
@@ -282,7 +282,7 @@ function ExampleBlockEditor({ block, onChange }) {
   return (
     <div>
       <label style={{ display: 'block', marginBottom: 10 }}>
-        <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 5 }}>نوع الكتلة</span>
+        <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 5 }}>نوع الكتلة</span>
         <select value={b.type || 'paragraph'} onChange={e => { if (window.confirm('تغيير النوع يمسح محتوى هذه الكتلة. متابعة؟')) changeType(e.target.value); }} style={{ ...inputStyle, cursor: 'pointer' }}>
           {BLOCK_TYPES.map(t => <option key={t.key} value={t.key}>{t.label}</option>)}
         </select>
@@ -292,7 +292,7 @@ function ExampleBlockEditor({ block, onChange }) {
       {b.type === 'fields' && (
         <>
           <label style={{ display: 'block', marginBottom: 10 }}>
-            <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.tealDark, marginBottom: 5 }}>طريقة العرض</span>
+            <span style={{ display: 'block', fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 5 }}>طريقة العرض</span>
             <select value={b.layout || ''} onChange={e => { const { layout, ...rest } = b; onChange(e.target.value ? { ...rest, layout: e.target.value } : rest); }} style={{ ...inputStyle, cursor: 'pointer' }}>
               {FIELD_LAYOUTS.map(l => <option key={l.key} value={l.key}>{l.label}</option>)}
             </select>
@@ -322,7 +322,7 @@ function ExampleEditor({ value, onChange }) {
   const ex = value || emptyExample();
   const [preview, setPreview] = useState(false);
   return (
-    <div style={{ background: '#fffdf7', border: '1px dashed #f5c38b', borderRadius: 10, padding: '10px 12px 4px' }}>
+    <div style={{ background: '#FEF3EC', border: '1px dashed #FBC3A3', borderRadius: 10, padding: '10px 12px 4px' }}>
       <Field label="عنوان المثال" value={ex.title} onChange={v => onChange({ ...ex, title: v })} />
       <ObjList label="محتوى المثال" items={ex.blocks} onChange={v => onChange({ ...ex, blocks: v })} newItem={() => newBlock('paragraph')} addLabel="+ كتلة"
         hint="يتكوّن المثال من كتل متتالية: فقرة، أو قائمة، أو عناوين وقيم، أو جدول، أو هيكل تنظيمي."
@@ -392,14 +392,14 @@ function PdfManager({ unit, kind, onUpdated, notify }) {
   };
 
   return (
-    <div style={{ background: C.orangeLight, border: '1px solid #fed7aa', borderRadius: 10, padding: '11px 13px', marginBottom: 14 }}>
-      <div style={{ fontSize: 12.5, fontWeight: 800, color: C.orange, marginBottom: 6 }}>ملف PDF — {PDF_KIND_LABEL[kind]}</div>
+    <div style={{ background: C.amberSoft, border: '1px solid #FBC3A3', borderRadius: 10, padding: '11px 13px', marginBottom: 14 }}>
+      <div style={{ fontSize: 12.5, fontWeight: 800, color: C.amberText, marginBottom: 6 }}>ملف PDF — {PDF_KIND_LABEL[kind]}</div>
       <div style={{ fontSize: 12, color: C.dark, marginBottom: 8, lineHeight: 1.7, wordBreak: 'break-word' }}>
         الملف الحالي: <strong>{fileName}</strong>
         <span style={{ color: C.gray }}> — {uploaded ? 'مرفوع من لوحة التحكم' : 'الملف المعتمد الافتراضي'}</span>
       </div>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-        <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11.5, fontWeight: 600, color: C.tealDark, background: '#fff', border: `1px solid ${C.grayBorder}`, borderRadius: 7, padding: '4px 10px', textDecoration: 'none' }}>فتح الملف</a>
+        <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11.5, fontWeight: 600, color: C.ink, background: '#fff', border: `1px solid ${C.grayBorder}`, borderRadius: 7, padding: '4px 10px', textDecoration: 'none' }}>فتح الملف</a>
         <SmallBtn tone="solid" onClick={() => inputRef.current?.click()} disabled={busy}>{busy ? `جارٍ الرفع ${progress}%` : (uploaded ? 'استبدال الملف' : 'رفع ملف جديد')}</SmallBtn>
         {uploaded && <SmallBtn tone="red" onClick={restore} disabled={busy}>استعادة الملف المعتمد</SmallBtn>}
         <input ref={inputRef} type="file" accept="application/pdf,.pdf" style={{ display: 'none' }} onChange={e => upload(e.target.files?.[0])} />
@@ -508,7 +508,7 @@ function GuideBlockEditor({ block, onChange }) {
       <Field label="العنوان (اختياري)" value={b.title} onChange={v => set({ title: v || null })} hint="يُخفى تلقائيًا إذا كان مطابقًا لعنوان القسم الظاهر فوقه." />
       <Field label="العنوان الفرعي (اختياري)" value={b.heading} onChange={v => set({ heading: v || null })} />
       <StrList label="التعليمات" items={b.items} onChange={v => set({ items: v })} addLabel="+ تعليمة" itemName="تعليمة" />
-      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: C.tealDark, fontWeight: 600, marginBottom: 12, cursor: 'pointer' }}>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: C.ink, fontWeight: 600, marginBottom: 12, cursor: 'pointer' }}>
         <input type="checkbox" checked={b.ordered !== false} onChange={e => set({ ordered: e.target.checked })} />
         ترقيم التعليمات (1، 2، 3) — عند الإلغاء تظهر كنقاط
       </label>
@@ -548,10 +548,10 @@ function FieldTipEditor({ field, content, setContent }) {
   };
 
   return (
-    <div style={{ border: `1px solid ${C.grayBorder}`, borderRadius: 10, padding: '9px 12px', marginBottom: 8, background: idx >= 0 ? '#fff' : '#fafafa' }}>
+    <div style={{ border: `1px solid ${C.grayBorder}`, borderRadius: 10, padding: '9px 12px', marginBottom: 8, background: idx >= 0 ? '#fff' : '#FBF9F5' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
         <span style={{ fontSize: 12.5, fontWeight: 800, color: C.dark }}>{field.title || shown}{field.suffix || ''}</span>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: idx >= 0 ? C.teal : C.gray, fontWeight: 700, cursor: 'pointer' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: idx >= 0 ? C.primary : C.gray, fontWeight: 700, cursor: 'pointer' }}>
           <input type="checkbox" checked={idx >= 0} onChange={e => toggleTip(e.target.checked)} />
           توضيح ⓘ
         </label>
@@ -631,7 +631,7 @@ function FormTab({ content, setContent, unit }) {
         </div>
         {fieldGroups.map(g => (
           <div key={g.anchor} style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: C.teal, margin: '4px 0 6px' }}>{spec.anchors[g.anchor] || g.items[0]?.title || g.anchor}</div>
+            <div style={{ fontSize: 12, fontWeight: 800, color: C.primary, margin: '4px 0 6px' }}>{spec.anchors[g.anchor] || g.items[0]?.title || g.anchor}</div>
             {g.items.map(f => <FieldTipEditor key={`${f.anchor}|${f.label}`} field={f} content={content} setContent={setContent} />)}
           </div>
         ))}
@@ -660,7 +660,7 @@ function FormTab({ content, setContent, unit }) {
 function Preview({ tab, unit }) {
   const [formData, setFormData] = useState({});
   return (
-    <div style={{ direction: 'rtl', fontFamily: "'Cairo', sans-serif" }}>
+    <div style={{ direction: 'rtl', fontFamily: "inherit" }}>
       {(tab === 'general' || tab === 'overview') && <OverviewContent unit={unit} />}
       {tab === 'explanation' && <ExplanationContent unit={unit} />}
       {tab === 'guidelines' && <GuidelinesContent unit={unit} />}
@@ -739,20 +739,20 @@ export default function StrategicContentEditor({ unit: initialUnit, initialTab =
 
   return ReactDOM.createPortal(
     <div role="dialog" aria-modal="true" aria-label={`تعديل محتوى ${draft.name}`}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', zIndex: 9000, display: 'flex', alignItems: 'stretch', justifyContent: 'center', padding: width > 700 ? 16 : 0 }}>
-      <div style={{ background: '#f8fafb', borderRadius: width > 700 ? 14 : 0, width: '100%', maxWidth: 1500, display: 'flex', flexDirection: 'column', direction: 'rtl', fontFamily: "'Cairo', sans-serif", overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,.25)' }}>
+      style={{ position: 'fixed', inset: 0, background: 'rgba(14,42,61,.5)', zIndex: 9000, display: 'flex', alignItems: 'stretch', justifyContent: 'center', padding: width > 700 ? 16 : 0 }}>
+      <div style={{ background: '#FBF9F5', borderRadius: width > 700 ? 14 : 0, width: '100%', maxWidth: 1500, display: 'flex', flexDirection: 'column', direction: 'rtl', fontFamily: "inherit", overflow: 'hidden', boxShadow: '0 24px 60px rgba(14,42,61,.25)' }}>
         {/* الرأس */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '12px 18px', background: '#fff', borderBottom: `1px solid ${C.grayBorder}`, flexWrap: 'wrap' }}>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: C.tealDark }}>تعديل محتوى الوحدة {unit.unit_number}: {draft.name}</div>
-            <div style={{ fontSize: 11.5, color: dirty ? C.orange : C.gray, marginTop: 2 }}>{dirty ? '● تغييرات غير محفوظة' : 'كل التغييرات محفوظة ومنشورة'}</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>تعديل محتوى الوحدة {unit.unit_number}: {draft.name}</div>
+            <div style={{ fontSize: 11.5, color: dirty ? C.amberText : C.gray, marginTop: 2 }}>{dirty ? '● تغييرات غير محفوظة' : 'كل التغييرات محفوظة ومنشورة'}</div>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {unit.has_default && <SmallBtn tone="gray" onClick={restoreDefault}>استعادة المحتوى المعتمد</SmallBtn>}
             <SmallBtn tone="gray" onClick={() => setShowPreview(p => !p)}>{showPreview ? 'إخفاء المعاينة' : 'إظهار المعاينة'}</SmallBtn>
             <button type="button" onClick={close} style={{ padding: '7px 16px', borderRadius: 8, border: `1px solid ${C.grayBorder}`, background: '#fff', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 600, color: C.dark }}>إغلاق</button>
             <button type="button" onClick={save} disabled={!dirty || saving}
-              style={{ padding: '7px 18px', borderRadius: 8, border: 'none', background: C.teal, color: '#fff', cursor: !dirty || saving ? 'not-allowed' : 'pointer', opacity: !dirty || saving ? 0.55 : 1, fontFamily: 'inherit', fontSize: 13, fontWeight: 700 }}>
+              style={{ padding: '7px 18px', borderRadius: 8, border: 'none', background: C.primary, color: '#fff', cursor: !dirty || saving ? 'not-allowed' : 'pointer', opacity: !dirty || saving ? 0.55 : 1, fontFamily: 'inherit', fontSize: 13, fontWeight: 700 }}>
               {saving ? 'جارٍ الحفظ...' : 'حفظ التغييرات'}
             </button>
           </div>
@@ -762,7 +762,7 @@ export default function StrategicContentEditor({ unit: initialUnit, initialTab =
         <div style={{ display: 'flex', gap: 4, padding: '8px 18px', background: '#fff', borderBottom: `1px solid ${C.grayBorder}`, overflowX: 'auto' }}>
           {TABS.map(t => (
             <button key={t.key} type="button" onClick={() => setTab(t.key)} aria-pressed={tab === t.key}
-              style={{ padding: '7px 16px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: tab === t.key ? 800 : 500, background: tab === t.key ? C.teal : C.grayLight, color: tab === t.key ? '#fff' : C.gray, whiteSpace: 'nowrap' }}>
+              style={{ padding: '7px 16px', borderRadius: 9, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: tab === t.key ? 800 : 500, background: tab === t.key ? C.primary : C.grayLight, color: tab === t.key ? '#fff' : C.gray, whiteSpace: 'nowrap' }}>
               {t.label}
             </button>
           ))}

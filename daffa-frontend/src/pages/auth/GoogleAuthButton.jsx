@@ -96,7 +96,7 @@ export default function GoogleAuthButton({ text = 'signin_with', onLogin, onErro
     <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
       <div ref={boxRef} aria-busy={loading}
         style={{ width: '100%', maxWidth: 400, minHeight: 44, display: 'flex', justifyContent: 'center', direction: 'ltr', opacity: loading ? 0.6 : 1, pointerEvents: loading ? 'none' : 'auto' }} />
-      {loading && <span style={{ fontSize: 12, color: '#6b7280' }} role="status">جارٍ الدخول عبر Google...</span>}
+      {loading && <span style={{ fontSize: 12, color: '#5E6B78' }} role="status">جارٍ الدخول عبر Google...</span>}
     </div>
   );
 }
@@ -104,8 +104,8 @@ export default function GoogleAuthButton({ text = 'signin_with', onLogin, onErro
 /** فاصل «أو» بين النموذج وزر Google */
 export const OrDivider = ({ label = 'أو' }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '18px 0 2px' }} aria-hidden="true">
-    <span style={{ flex: 1, height: 1, background: '#e5e7eb' }} />
-    <span style={{ fontSize: 12.5, color: '#9ca3af', fontWeight: 600 }}>{label}</span>
-    <span style={{ flex: 1, height: 1, background: '#e5e7eb' }} />
+    <span style={{ flex: 1, height: 1, background: '#E8E3DA' }} />
+    <span style={{ fontSize: 12.5, color: '#8C97A3', fontWeight: 600 }}>{label}</span>
+    <span style={{ flex: 1, height: 1, background: '#E8E3DA' }} />
   </div>
 );

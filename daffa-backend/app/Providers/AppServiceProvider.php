@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Carbon\Carbon;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\ServiceProvider;
@@ -12,6 +13,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // الأوقات النسبية بالعربية في كل الواجهات ("منذ ٥ دقائق" بدل "5 minutes ago")
+        Carbon::setLocale('ar');
+
         // توجيه رابط إعادة تعيين كلمة المرور إلى الواجهة الأمامية
         ResetPassword::createUrlUsing(fn ($user, string $token) => self::resetUrl($user, $token));
 

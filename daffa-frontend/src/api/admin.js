@@ -1,6 +1,12 @@
 import api from './axios';
 
 export const adminApi = {
+  // مركز المخرجات (قراءة فقط)
+  getOutputs:            (params)     => api.get('/admin/outputs', { params }),
+  getOutput:             (system, id) => api.get(`/admin/outputs/${system}/${id}`),
+  getOutputConsultants:  ()           => api.get('/admin/outputs/consultants'),
+  getConsultantReviews:  (id)         => api.get(`/admin/outputs/consultants/${id}/reviews`),
+
   // Consultants
   getConsultants:         ()           => api.get('/admin/consultants'),
   getConsultant:          (id)         => api.get(`/admin/consultants/${id}`),

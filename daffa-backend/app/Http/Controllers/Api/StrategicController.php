@@ -484,7 +484,7 @@ class StrategicController extends Controller
 
         set_error_handler(fn() => true, E_WARNING | E_NOTICE);
         try {
-            $mpdf = new Mpdf([
+            $mpdf = new Mpdf(\App\Support\PdfBrand::config([
                 'mode'              => 'utf-8',
                 'format'            => 'A4',
                 'default_font'      => 'dejavusans',
@@ -497,7 +497,7 @@ class StrategicController extends Controller
                 'autoScriptToLang'  => false,
                 'useSubstitutions'  => false,
                 'tempDir'           => storage_path('app/mpdf-tmp'),
-            ]);
+            ]));
 
             $mpdf->WriteHTML($html);
 

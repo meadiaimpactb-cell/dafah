@@ -1,4 +1,6 @@
+import DfIcon from '../../components/ui/DfIcon';
 import React, { useState } from 'react';
+import Logo from '../../components/brand/Logo';
 import api from '../../api/axios';
 import OtpVerification from './OtpVerification';
 import GoogleAuthButton, { GOOGLE_ENABLED, OrDivider } from './GoogleAuthButton';
@@ -121,12 +123,12 @@ function ForgotForm({ onBack }) {
   if (sent) {
     return (
       <div style={{ textAlign: 'center' }}>
-        <div style={S.mailIcon}>✉</div>
+        <div style={S.mailIcon}><DfIcon name="mail" size={18} /></div>
         <h2 style={{ ...S.title, marginBottom: 12 }}>تحقق من بريدك</h2>
         <p style={S.forgotText}>
           إذا كان البريد الإلكتروني مسجلاً، ستصلك رسالة تحتوي على رابط إعادة التعيين خلال دقائق.
         </p>
-        <button type="button" onClick={onBack} style={{ ...S.btn, background: '#1A6B7C' }}>
+        <button type="button" onClick={onBack} style={{ ...S.btn, background: '#235D7F' }}>
           العودة لتسجيل الدخول
         </button>
       </div>
@@ -174,8 +176,7 @@ export default function Login({ onLogin, onGoRegister }) {
     <div style={S.overlay}>
       <div style={S.card}>
         <div style={S.logo}>
-          <img src="/logo.png" alt="دفة" style={{ height: 60 }} onError={(e) => { e.target.style.display = 'none'; }} />
-          <div style={S.logoText}>دفة</div>
+          <Logo variant="stacked" size={92} descriptor />
         </div>
 
         {view === 'login' && (
@@ -207,22 +208,23 @@ export default function Login({ onLogin, onGoRegister }) {
 const S = {
   overlay: {
     minHeight: '100vh',
-    background: '#F8FAFB',
+    background: 'radial-gradient(rgba(35,93,127,0.08) 1.2px, transparent 1.3px) 0 0 / 22px 22px, #FBF9F5',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     direction: 'rtl',
-    fontFamily: "'Cairo', sans-serif",
+    fontFamily: "inherit",
     padding: '24px 16px',
   },
   card: {
     background: '#fff',
-    borderRadius: 16,
-    padding: '40px min(48px, 7vw)',
+    borderRadius: 24,
+    border: '1px solid #E8E3DA',
+    padding: '36px min(44px, 7vw)',
     width: '100%',
     maxWidth: 460,
     boxSizing: 'border-box',
-    boxShadow: '0 4px 32px rgba(0,0,0,0.08)',
+    boxShadow: '0 4px 32px rgba(14,42,61,0.08)',
   },
   logo: {
     display: 'flex',
@@ -230,59 +232,59 @@ const S = {
     alignItems: 'center',
     marginBottom: 24,
   },
-  logoText: { fontSize: 22, fontWeight: 700, color: '#1A6B7C', marginTop: 6 },
-  title: { textAlign: 'center', fontSize: 22, fontWeight: 700, color: '#1a1a2e', marginBottom: 28 },
+  logoText: { fontSize: 22, fontWeight: 700, color: '#235D7F', marginTop: 6 },
+  title: { textAlign: 'center', fontSize: 22, fontWeight: 700, color: '#0E2A3D', marginBottom: 28 },
   form: { display: 'flex', flexDirection: 'column', gap: 0 },
   field: { marginBottom: 16 },
-  label: { display: 'block', fontSize: 14, fontWeight: 600, color: '#374151', marginBottom: 6, textAlign: 'right' },
+  label: { display: 'block', fontSize: 14, fontWeight: 600, color: '#334452', marginBottom: 6, textAlign: 'right' },
   input: {
     width: '100%',
     padding: '10px 14px',
-    border: '1.5px solid #e5e7eb',
+    border: '1.5px solid #E8E3DA',
     borderRadius: 8,
     fontSize: 14,
-    color: '#1a1a2e',
-    background: '#fafafa',
+    color: '#0E2A3D',
+    background: '#FBF9F5',
     textAlign: 'right',
     direction: 'rtl',
     boxSizing: 'border-box',
     outline: 'none',
     transition: 'border-color 0.2s',
-    fontFamily: "'Cairo', sans-serif",
+    fontFamily: "inherit",
   },
   btn: {
     width: '100%',
     padding: '13px',
-    background: '#E8620A',
-    color: '#fff',
+    background: '#EF6A2C',
+    color: '#0E2A3D',
     border: 'none',
     borderRadius: 10,
     fontSize: 16,
     fontWeight: 700,
     cursor: 'pointer',
     marginTop: 4,
-    fontFamily: "'Cairo', sans-serif",
+    fontFamily: "inherit",
   },
   error: {
-    background: '#fef2f2',
-    color: '#dc2626',
-    border: '1px solid #fecaca',
+    background: '#FCEBEB',
+    color: '#C53A3A',
+    border: '1px solid #F1B2B2',
     borderRadius: 8,
     padding: '10px 14px',
     fontSize: 13,
     marginBottom: 12,
     textAlign: 'right',
   },
-  footer: { textAlign: 'center', fontSize: 14, color: '#6b7280', marginTop: 16 },
-  link: { color: '#1A6B7C', cursor: 'pointer', fontWeight: 600 },
+  footer: { textAlign: 'center', fontSize: 14, color: '#5E6B78', marginTop: 16 },
+  link: { color: '#235D7F', cursor: 'pointer', fontWeight: 600 },
   backBtn: {
     background: 'none',
     border: 'none',
-    color: '#1A6B7C',
+    color: '#235D7F',
     cursor: 'pointer',
     fontSize: 14,
     fontWeight: 600,
-    fontFamily: "'Cairo', sans-serif",
+    fontFamily: "inherit",
     padding: '0 0 16px 0',
     display: 'block',
   },
@@ -300,18 +302,18 @@ const S = {
   },
   dividerLine: {
     height: 1,
-    background: '#e5e7eb',
+    background: '#E8E3DA',
     flex: 1,
   },
   dividerText: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: '#8C97A3',
   },
   mailIcon: {
     width: 72,
     height: 72,
     borderRadius: '50%',
-    background: '#dcfce7',
+    background: '#C9EFE1',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -321,7 +323,7 @@ const S = {
   forgotText: {
     textAlign: 'center',
     fontSize: 14,
-    color: '#6b7280',
+    color: '#5E6B78',
     lineHeight: 1.8,
     marginBottom: 24,
   },

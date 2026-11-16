@@ -8,10 +8,10 @@ import { OrgChartView } from './OrgChart';
  */
 
 const C = {
-  teal: '#1A6B7C', tealDark: '#14505E', tealLight: '#E8F4F6', orange: '#E8620A',
-  gray: '#6b7280', grayText: '#374151', border: '#e5e7eb', blueBg: '#f0f9ff', blueBorder: '#bae6fd',
+  primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1', orange: '#EF6A2C', amber: '#EF6A2C',
+  gray: '#5E6B78', grayText: '#334452', border: '#E8E3DA', blueBg: '#EAF4FD', blueBorder: '#A9D2F5',
 };
-const FONT = "'Cairo', sans-serif";
+const FONT = "inherit";
 
 // ملفات PDF الخاصة بكل وحدة في public/guides/strategic — بالأسماء المحددة في المواصفات
 // («الشرح التفصيلي — اسم الوحدة.pdf» و«الإرشادات التفصيلية — اسم الوحدة.pdf») ليظهر الاسم نفسه عند التنزيل
@@ -141,12 +141,12 @@ export function InfoTip({ text, example, title, label, hover = true }) {
           aria-label={title || label || 'توضيح'}
           onMouseEnter={hoverIn}
           onMouseLeave={hoverOut}
-          style={{ position: 'fixed', top: pos.top, right: pos.right, width: pos.width, zIndex: 100000, background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, boxShadow: '0 12px 32px rgba(0,0,0,0.18)', padding: '12px 14px', direction: 'rtl', fontFamily: FONT, color: C.grayText, textAlign: 'right' }}
+          style={{ position: 'fixed', top: pos.top, right: pos.right, width: pos.width, zIndex: 100000, background: '#fff', border: `1px solid ${C.border}`, borderRadius: 10, boxShadow: '0 12px 32px rgba(14,42,61,0.18)', padding: '12px 14px', direction: 'rtl', fontFamily: FONT, color: C.grayText, textAlign: 'right' }}
         >
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.tealDark }}>{title || example?.title || label}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: C.ink }}>{title || example?.title || label}</div>
             <button type="button" onClick={() => { close(); btnRef.current?.focus(); }} aria-label="إغلاق"
-              style={{ background: '#f3f4f6', border: 'none', borderRadius: 6, width: 22, height: 22, cursor: 'pointer', fontSize: 13, lineHeight: '22px', flexShrink: 0, color: C.gray }}>✕</button>
+              style={{ background: '#F3EFE8', border: 'none', borderRadius: 6, width: 22, height: 22, cursor: 'pointer', fontSize: 13, lineHeight: '22px', flexShrink: 0, color: C.gray }}>✕</button>
           </div>
           {text && <div style={{ fontSize: 12.5, lineHeight: 1.8, marginTop: 6 }}>{text}</div>}
           {example && <div style={{ marginTop: 8 }}><ExampleBody example={example} compact /></div>}
@@ -167,13 +167,13 @@ export const LabelWithTip = ({ label, tip, style }) => (
 
 /* ─────────── عرض المثال ─────────── */
 const MiniCard = ({ label, value, accent }) => (
-  <div style={{ background: '#fff', border: `1px solid ${accent ? '#f5c38b' : C.border}`, borderTop: `3px solid ${accent ? C.orange : C.teal}`, borderRadius: 8, padding: '8px 10px', minWidth: 0 }}>
-    <div style={{ fontSize: 12, fontWeight: 800, color: accent ? C.orange : C.tealDark, marginBottom: 3 }}>{label}</div>
+  <div style={{ background: '#fff', border: `1px solid ${accent ? '#FBC3A3' : C.border}`, borderTop: `3px solid ${accent ? C.amberLine : C.primary}`, borderRadius: 8, padding: '8px 10px', minWidth: 0 }}>
+    <div style={{ fontSize: 12, fontWeight: 800, color: accent ? C.amberText : C.ink, marginBottom: 3 }}>{label}</div>
     <div style={{ fontSize: 12, lineHeight: 1.75, whiteSpace: 'pre-line' }}>{value}</div>
   </div>
 );
 const Arrow = ({ children }) => (
-  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.orange, fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{children}</div>
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.amberText, fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{children}</div>
 );
 
 // تخطيطات خاصة: سلسلة (نظرية التغيير)، تركيب عاملين ← خيار (TOWS)، لوحة 5/2/2 (نموذج العمل)
@@ -223,7 +223,7 @@ function FieldsLayout({ b }) {
     <div style={{ display: 'grid', gap: 6, marginBottom: 8 }}>
       {items.map((f, j) => (
         <div key={j}>
-          <span style={{ fontWeight: 700, color: C.tealDark }}>{f.label}</span>
+          <span style={{ fontWeight: 700, color: C.ink }}>{f.label}</span>
           {f.label && f.value ? ': ' : ''}
           <span style={{ whiteSpace: 'pre-line' }}>{f.value}</span>
         </div>
@@ -253,7 +253,7 @@ export function ExampleBody({ example, compact }) {
           <div key={i} style={{ display: 'grid', gap: 6, marginBottom: 8 }}>
             {(b.items || []).map((f, j) => (
               <div key={j}>
-                <span style={{ fontWeight: 700, color: C.tealDark }}>{f.label}</span>
+                <span style={{ fontWeight: 700, color: C.ink }}>{f.label}</span>
                 {f.label && f.value ? ': ' : ''}
                 <span style={{ whiteSpace: 'pre-line' }}>{f.value}</span>
               </div>
@@ -265,7 +265,7 @@ export function ExampleBody({ example, compact }) {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: fs - 0.5 }}>
               {b.headers?.length > 0 && (
                 <thead><tr>{b.headers.map((h, j) => (
-                  <th key={j} style={{ padding: '7px 9px', background: C.tealLight, color: C.tealDark, textAlign: 'right', fontWeight: 700, border: `1px solid ${C.border}`, whiteSpace: 'nowrap' }}>{h}</th>
+                  <th key={j} style={{ padding: '7px 9px', background: C.primarySoft, color: C.ink, textAlign: 'right', fontWeight: 700, border: `1px solid ${C.border}`, whiteSpace: 'nowrap' }}>{h}</th>
                 ))}</tr></thead>
               )}
               <tbody>{(b.rows || []).map((r, j) => (
@@ -290,14 +290,14 @@ export function ExampleToggle({ label, example, small }) {
   return (
     <div style={{ marginTop: small ? 8 : 0 }}>
       <button type="button" onClick={() => setOpen(o => !o)} aria-expanded={open}
-        style={{ padding: small ? '6px 14px' : '9px 18px', background: '#fff', color: C.teal, border: `1.5px solid ${C.teal}`, borderRadius: 9, fontSize: small ? 12 : 13, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
+        style={{ padding: small ? '6px 14px' : '9px 18px', background: '#fff', color: C.primary, border: `1.5px solid ${C.primary}`, borderRadius: 9, fontSize: small ? 12 : 13, fontWeight: 700, cursor: 'pointer', fontFamily: FONT }}>
         {open ? 'إخفاء المثال' : (label || 'عرض مثال')}
       </button>
       {open && (
-        <div style={{ marginTop: 10, background: '#fffdf7', border: '1.5px dashed #f5c38b', borderRadius: 10, padding: '14px 16px', position: 'relative' }}>
+        <div style={{ marginTop: 10, background: '#FEF3EC', border: '1.5px dashed #FBC3A3', borderRadius: 10, padding: '14px 16px', position: 'relative' }}>
           <button type="button" onClick={() => setOpen(false)} aria-label="إغلاق المثال"
             style={{ position: 'absolute', top: 8, left: 8, background: '#fff', border: `1px solid ${C.border}`, borderRadius: 6, width: 24, height: 24, cursor: 'pointer', color: C.gray }}>✕</button>
-          {example.title && <div style={{ fontSize: 13.5, fontWeight: 700, color: C.orange, marginBottom: 8 }}>{example.title}</div>}
+          {example.title && <div style={{ fontSize: 13.5, fontWeight: 700, color: C.amberText, marginBottom: 8 }}>{example.title}</div>}
           <ExampleBody example={example} />
         </div>
       )}
@@ -309,7 +309,7 @@ export function ExampleToggle({ label, example, small }) {
 export const PdfButton = ({ href, label, caption }) => (
   <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
     <a href={href} target="_blank" rel="noopener noreferrer"
-      style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '9px 18px', background: C.orange, color: '#fff', borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: 'none', fontFamily: FONT }}>
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '9px 18px', background: C.amber, color: '#0E2A3D', borderRadius: 9, fontSize: 13, fontWeight: 700, textDecoration: 'none', fontFamily: FONT }}>
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /><path d="M9 14h6M9 17h4" />
       </svg>
@@ -349,8 +349,8 @@ function GuidePart({ block, hideTitle, hideExamples }) {
   const List = block.ordered === false ? 'ul' : 'ol';
   return (
     <div style={{ marginBottom: 6 }}>
-      {block.title && !hideTitle && <div style={{ fontSize: 13.5, fontWeight: 800, color: C.tealDark, marginBottom: 4 }}>{block.title}</div>}
-      {block.heading && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.teal, marginBottom: 4 }}>{block.heading}</div>}
+      {block.title && !hideTitle && <div style={{ fontSize: 13.5, fontWeight: 800, color: C.ink, marginBottom: 4 }}>{block.title}</div>}
+      {block.heading && <div style={{ fontSize: 12.5, fontWeight: 700, color: C.primary, marginBottom: 4 }}>{block.heading}</div>}
       {items.length > 0 && (
         <List style={{ margin: 0, paddingRight: 20, fontSize: 12.5, lineHeight: 1.9, color: C.grayText, whiteSpace: 'pre-line' }}>
           {items.map((it, i) => <li key={i}>{it}</li>)}
@@ -401,8 +401,8 @@ export const GuideExamples = ({ guide, anchor }) => {
 /* ─────────── التبويبات ─────────── */
 
 const InfoBox = ({ label, value }) => (
-  <div style={{ background: '#f8fafb', borderRadius: 8, padding: '12px 16px' }}>
-    <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 4 }}>{label}</div>
+  <div style={{ background: '#FBF9F5', borderRadius: 8, padding: '12px 16px' }}>
+    <div style={{ fontSize: 11, color: '#8C97A3', marginBottom: 4 }}>{label}</div>
     <div style={{ fontSize: 14, fontWeight: 600, color: C.grayText }}>{value}</div>
   </div>
 );
@@ -412,8 +412,8 @@ export function OverviewContent({ unit }) {
   const o = unit.content?.overview || {};
   return (
     <div>
-      <div style={{ background: C.blueBg, border: `1px solid ${C.blueBorder}`, borderRight: `4px solid ${C.teal}`, borderRadius: 12, padding: '18px 22px', marginBottom: 16 }}>
-        <div style={{ fontSize: 16, fontWeight: 800, color: C.tealDark, marginBottom: 10 }}>{o.title || unit.name}</div>
+      <div style={{ background: C.blueBg, border: `1px solid ${C.blueBorder}`, borderRight: `4px solid ${C.primary}`, borderRadius: 12, padding: '18px 22px', marginBottom: 16 }}>
+        <div style={{ fontSize: 16, fontWeight: 800, color: C.ink, marginBottom: 10 }}>{o.title || unit.name}</div>
         {(o.paragraphs || []).map((p, i) => (
           <p key={i} style={{ fontSize: 14, color: C.grayText, lineHeight: 2, margin: i ? '10px 0 0' : 0 }}>{p}</p>
         ))}
@@ -426,13 +426,13 @@ export function OverviewContent({ unit }) {
 }
 
 const Card = ({ card }) => (
-  <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderTop: `3px solid ${C.teal}`, borderRadius: 10, padding: '14px 16px' }}>
-    <div style={{ fontSize: 14, fontWeight: 800, color: C.tealDark, marginBottom: 6 }}>{card.title}</div>
+  <div style={{ background: '#fff', border: `1px solid ${C.border}`, borderTop: `3px solid ${C.primary}`, borderRadius: 10, padding: '14px 16px' }}>
+    <div style={{ fontSize: 14, fontWeight: 800, color: C.ink, marginBottom: 6 }}>{card.title}</div>
     {(card.paragraphs || []).map((p, i) => (
-      <p key={i} style={{ fontSize: 13, color: '#4b5563', lineHeight: 1.9, margin: '0 0 6px' }}>{p}</p>
+      <p key={i} style={{ fontSize: 13, color: '#465564', lineHeight: 1.9, margin: '0 0 6px' }}>{p}</p>
     ))}
     {(card.bullets || []).length > 0 && (
-      <ul style={{ margin: 0, paddingRight: 18, fontSize: 13, color: '#4b5563', lineHeight: 1.9 }}>
+      <ul style={{ margin: 0, paddingRight: 18, fontSize: 13, color: '#465564', lineHeight: 1.9 }}>
         {card.bullets.map((b, i) => <li key={i}>{b}</li>)}
       </ul>
     )}
@@ -441,7 +441,7 @@ const Card = ({ card }) => (
 
 const PageTitle = ({ title, subtitle }) => (
   <div style={{ marginBottom: 14 }}>
-    <div style={{ fontSize: 17, fontWeight: 800, color: C.tealDark }}>{title}</div>
+    <div style={{ fontSize: 17, fontWeight: 800, color: C.ink }}>{title}</div>
     {subtitle && <div style={{ fontSize: 13, color: C.gray, marginTop: 4, lineHeight: 1.8 }}>{subtitle}</div>}
   </div>
 );
@@ -455,11 +455,11 @@ export function ExplanationContent({ unit }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(max(260px, calc(50% - 12px)), 1fr))', gap: 12 }}>
         {(e.cards || []).map((c, i) => <Card key={i} card={c} />)}
       </div>
-      <div style={{ marginTop: 16, background: '#f8fafb', border: `1px solid ${C.border}`, borderRadius: 10, padding: '14px 16px' }}>
+      <div style={{ marginTop: 16, background: '#FBF9F5', border: `1px solid ${C.border}`, borderRadius: 10, padding: '14px 16px' }}>
         {e.deep_dive && (
           <>
-            <div style={{ fontSize: 14, fontWeight: 800, color: C.tealDark, marginBottom: 4 }}>{e.deep_dive.title}</div>
-            <p style={{ fontSize: 13, color: '#4b5563', lineHeight: 1.9, margin: '0 0 12px' }}>{e.deep_dive.text}</p>
+            <div style={{ fontSize: 14, fontWeight: 800, color: C.ink, marginBottom: 4 }}>{e.deep_dive.title}</div>
+            <p style={{ fontSize: 13, color: '#465564', lineHeight: 1.9, margin: '0 0 12px' }}>{e.deep_dive.text}</p>
           </>
         )}
         {/* الترتيب وفق المواصفات: زر المثال أولًا، ثم زر الشرح التفصيلي */}
@@ -484,24 +484,24 @@ export function GuidelinesContent({ unit }) {
     <div>
       <PageTitle title={g.title || 'الإرشادات'} subtitle={g.subtitle} />
       {g.before && (
-        <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '12px 16px', marginBottom: 12 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: '#92400e', marginBottom: 4 }}>{g.before.title}</div>
-          <div style={{ fontSize: 13, color: '#78350f', lineHeight: 1.85 }}>{g.before.text}</div>
+        <div style={{ background: '#FEF3EC', border: '1px solid #FBC3A3', borderRadius: 10, padding: '12px 16px', marginBottom: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: '#7F310E', marginBottom: 4 }}>{g.before.title}</div>
+          <div style={{ fontSize: 13, color: '#5E240A', lineHeight: 1.85 }}>{g.before.text}</div>
         </div>
       )}
       {(g.steps || []).map((s, i) => (
-        <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 16px', background: '#f8fafb', borderRadius: 10, alignItems: 'flex-start', marginBottom: 10 }}>
-          <div style={{ width: 28, height: 28, borderRadius: '50%', background: C.teal, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
+        <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 16px', background: '#FBF9F5', borderRadius: 10, alignItems: 'flex-start', marginBottom: 10 }}>
+          <div style={{ width: 28, height: 28, borderRadius: '50%', background: C.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
           <div>
-            <div style={{ fontSize: 13.5, fontWeight: 800, color: C.tealDark, marginBottom: 3 }}>{s.title}</div>
-            <div style={{ fontSize: 13, color: '#4b5563', lineHeight: 1.85, whiteSpace: 'pre-line' }}>{s.text}</div>
+            <div style={{ fontSize: 13.5, fontWeight: 800, color: C.ink, marginBottom: 3 }}>{s.title}</div>
+            <div style={{ fontSize: 13, color: '#465564', lineHeight: 1.85, whiteSpace: 'pre-line' }}>{s.text}</div>
           </div>
         </div>
       ))}
       {g.after && (
-        <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '12px 16px', marginBottom: 12 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: '#166534', marginBottom: 4 }}>✓ {g.after.title}</div>
-          <div style={{ fontSize: 13, color: '#14532d', lineHeight: 1.85 }}>{g.after.text}</div>
+        <div style={{ background: '#E8F8F2', border: '1px solid #A9E4CF', borderRadius: 10, padding: '12px 16px', marginBottom: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: '#086449', marginBottom: 4 }}>✓ {g.after.title}</div>
+          <div style={{ fontSize: 13, color: '#064B37', lineHeight: 1.85 }}>{g.after.text}</div>
         </div>
       )}
       {g.example && <div style={{ marginBottom: 12 }}><ExampleToggle label={g.example_button} example={g.example} /></div>}
