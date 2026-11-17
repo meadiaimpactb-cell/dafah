@@ -1684,7 +1684,7 @@ export default function DaffaPlatform() {
   useEffect(() => {
     if (!['client-notifications', 'con-notifications', 'client-dash'].includes(currentView)) return;
     notificationsApi.getAll()
-      .then(r => setNotifications(r.data))
+      .then(r => setNotifications(Array.isArray(r.data) ? r.data : Array.isArray(r.data?.data) ? r.data.data : []))
       .catch(() => setNotifications([]));
   }, [currentView]);
 
@@ -2268,7 +2268,9 @@ export default function DaffaPlatform() {
   // ── «خطوتك التالية»: توصية واحدة واضحة لغير المتخصص ──
   const nextStepFor = (phases, notifs) => {
     if (!phases) return null;
-    const revision = (notifs || []).find(n => !n.read && /revision/.test(n.type || ''));
+    // الإشعارات قد تصل كمصفوفة أو كصفحة {data:[...]} أو لم تُحمَّل بعد — نطبّعها دائمًا إلى مصفوفة
+    const list = Array.isArray(notifs) ? notifs : Array.isArray(notifs?.data) ? notifs.data : [];
+    const revision = list.find(n => !n.read && /revision/.test(n.type || ''));
     const view = (k) => systems[k].view;
     if (revision) {
       const k = /^op_/.test(revision.type) ? 'operational' : /^policy/.test(revision.type) ? 'policies' : 'strategic';

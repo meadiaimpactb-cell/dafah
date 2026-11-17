@@ -42,7 +42,7 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
     </div>
   );
 
-  const hasActive = plans.some(p => p.status !== 'completed');
+  const hasActive = (Array.isArray(plans) ? plans : []).some(p => p.status !== 'completed');
 
   return (
     <div className="animate-in">
@@ -2072,7 +2072,9 @@ export default function OperationalRoadmap({ navigate, workflowId, onWorkflowSel
     if (!showPlansList) return;
     setPlansLoading(true);
     operationalApi.listWorkflows()
-      .then(res => setPlans(res.data))
+      // نطبّع دائمًا إلى مصفوفة: طلب ملغى أو استجابة غير متوقعة كانت تُسقط الصفحة بـ plans.some is not a function
+      .then(res => setPlans(Array.isArray(res.data) ? res.data : Array.isArray(res.data?.data) ? res.data.data : []))
+      .catch(() => setPlans([]))
       .finally(() => setPlansLoading(false));
   }, [showPlansList]);
 
