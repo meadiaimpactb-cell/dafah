@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useId } from 'react';
 import { formGuide, GuideBlocks, GuideExamples, LabelWithTip, InfoTip } from './UnitContent';
 import { buildOrgTree, OrgNode } from './OrgChart';
 
-const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
+const colors = { amber: '#EF6A2C', primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
 
 export default function TemplateRenderer({ unit, formData, setFormData, disabled, context }) {
   const set = (key, value) => setFormData(prev => ({ ...prev, [key]: value }));

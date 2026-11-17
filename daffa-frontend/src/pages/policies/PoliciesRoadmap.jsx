@@ -36,7 +36,7 @@ const fmtExpiry  = v => { const d = v.replace(/\D/g, '').slice(0, 4); return d.l
 const fmtCvv     = v => v.replace(/\D/g, '').slice(0, 3);
 
 // ── Design tokens (نفس ألوان المنصة) ──────────────────────────────────────────
-const C = {
+const C = { amber: '#EF6A2C', amberText: '#A33F12',
   primary: "#235D7F", ink: "#0E2A3D", primaryDeep: "#123247",
   orange: "#EF6A2C", amberLine: '#E05A1F', amberSoft: "#FEF3EC",
   bg: "#FBF9F5", white: "#FFFFFF",
@@ -285,9 +285,36 @@ const StepSelect = ({ policyTypes, workflow, onNext, onSave, loading }) => {
   const total  = selected.reduce((sum, id) => sum + (policyTypes.find(p => p.id === id)?.price || 0), 0);
 
   const handleNext = async () => {
-    await onSave(selected);
-    onNext();
+    const ok = await onSave(selected);
+    if (ok !== false) onNext();
   };
+
+  // بعد الدفع: عرض فقط — تغيير الاختيار كان يعيد الخطة للخطوة الأولى ويطلب الدفع مجددًا
+  if (workflow?.payment_status === 'paid') {
+    const paid = saved.map(Number).map(id => policyTypes.find(p => p.id === id)).filter(Boolean);
+    return (
+      <div className="animate-in">
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 6 }}>السياسات المختارة في هذه الخطة</h2>
+        <div style={{ margin: "10px 0 18px", padding: "12px 16px", background: C.greenLight, border: `1.5px solid ${C.green}40`, borderRadius: 12, fontSize: 13, color: "#086449", fontWeight: 600, display: "flex", alignItems: "flex-start", gap: 8, lineHeight: 1.8 }}>
+          <IcCheckCircle width={18} height={18} style={{ flexShrink: 0, marginTop: 2 }}/>
+          <span>تم الدفع لهذه السياسات، ولا يمكن تغيير الاختيار في هذه الخطة. لإضافة سياسات أخرى أنشئ خطة جديدة بعد اكتمال هذه الخطة.</span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))", gap: 14 }}>
+          {paid.map(p => (
+            <Card key={p.id} style={{ border: `2px solid ${C.green}40` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ width: 40, height: 40, borderRadius: "50%", background: C.greenLight, display: "flex", alignItems: "center", justifyContent: "center", color: C.green }}><IcDocument width={18} height={18}/></div>
+                <Badge text="مدفوعة" color="green" />
+              </div>
+              {p.code && <div style={{ fontSize: 10, color: C.primary, fontWeight: 700, marginTop: 10, direction: "ltr", textAlign: "right" }}>{p.code}</div>}
+              <h3 style={{ fontSize: 14, fontWeight: 700, color: C.ink, marginTop: 4 }}>{p.name}</h3>
+              <div style={{ fontSize: 11, color: C.gray, marginTop: 6 }}>{p.sections?.length || 0} أقسام</div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-in">
@@ -712,15 +739,34 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
       .finally(() => setLoadingQ(false));
   }, [policyType?.id]);
 
-  const setAns = (qId, value) => { setValidErr(false); setAnswers(prev => ({ ...prev, [`q${qId}`]: value })); };
+  // التمييز الأحمر يبقى على الأسئلة الناقصة فقط ويختفي عن كل سؤال فور الإجابة عنه
+  const setAns = (qId, value) => { setAnswers(prev => ({ ...prev, [`q${qId}`]: value })); };
   const getAns = (qId) => answers[`q${qId}`] ?? "";
 
   const autoSave = useCallback(async () => {
     await onSave(selection.id, answers).catch(() => {});
   }, [answers, selection?.id, onSave]);
 
+  // الأسئلة المطلوبة غير المُجابة في قسم معيّن (لتمييزها والتمرير إليها)
+  const missingIn = (idx) => (apiSections[idx]?.questions || []).filter(q => q.required && !(
+    q.type === "multiple" ? Array.isArray(answers[`q${q.id}`]) && answers[`q${q.id}`].length > 0
+      : answers[`q${q.id}`] !== undefined && answers[`q${q.id}`] !== null && String(answers[`q${q.id}`]).trim() !== ""));
+  const flagMissing = (idx = section) => {
+    setValidErr(true);
+    if (idx !== section) setSection(idx);
+    setTimeout(() => {
+      const first = missingIn(idx)[0];
+      document.getElementById(first ? `pq-${first.id}` : "pq-top")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 60);
+  };
+  const submitNow = () => {
+    const firstIncomplete = apiSections.findIndex((_, i) => !isSectionComplete(i, answers, apiSections));
+    if (firstIncomplete !== -1) { flagMissing(firstIncomplete); return; }
+    onSubmit(selection.id, answers);
+  };
+
   const handleNextSection = async () => {
-    if (!isSectionComplete(section, answers, apiSections)) { setValidErr(true); return; }
+    if (!isSectionComplete(section, answers, apiSections)) { flagMissing(); return; }
     setValidErr(false);
     await autoSave();
     setSection(s => s + 1);
@@ -740,7 +786,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
     // Going forward: every section from current up to target-1 must be complete
     for (let k = section; k < target; k++) {
       if (!isSectionComplete(k, answers, apiSections)) {
-        setValidErr(true);
+        flagMissing(k);
         return;
       }
     }
@@ -750,6 +796,11 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
   };
 
   const allSectionsComplete = apiSections.every((_, i) => isSectionComplete(i, answers, apiSections));
+  const allQuestions  = apiSections.flatMap(s => s.questions || []);
+  const answeredCount = allQuestions.filter(q => { const v = answers[`q${q.id}`]; return Array.isArray(v) ? v.length > 0 : v !== undefined && v !== null && String(v).trim() !== ""; }).length;
+  const isSent        = ["submitted", "reviewing"].includes(selection?.status);
+  const sentDate      = selection?.submitted_at ? new Date(selection.submitted_at).toLocaleDateString("ar-SA-u-ca-gregory", { day: "numeric", month: "long" }) : null;
+  const missingNow    = validErr ? missingIn(section).map(q => q.id) : [];
   const currentSection = apiSections[section];
 
   const renderQuestion = (q) => {
@@ -847,7 +898,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
 
       <div style={{ marginBottom: 16 }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-          <span style={{ fontSize: 12, color: C.gray }}>القسم {section + 1} من {apiSections.length}</span>
+          <span style={{ fontSize: 12, color: C.gray }}>القسم {section + 1} من {apiSections.length} · أجبت عن {answeredCount} من {allQuestions.length} سؤالًا</span>
           <span style={{ fontSize: 12, fontWeight: 600, color: C.primary }}>{Math.round(((section + 1) / apiSections.length) * 100)}%</span>
         </div>
         <ProgressBar percent={((section + 1) / apiSections.length) * 100} />
@@ -880,9 +931,18 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
 
       <PolicyInfoPanel policyType={policyType} />
 
-      {["submitted","reviewing"].includes(selection?.status) && (
-        <div style={{ marginBottom: 12, padding: "10px 14px", background: C.yellowLight, borderRadius: 8, fontSize: 12, color: "#7F310E", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
-          <IcWarning width={14} height={14}/> هذه الاستمارة مُرسَلة للمراجعة — يمكنك التعديل وإعادة الإرسال وستُحدَّث مراجعة المستشار تلقائياً
+      <div id="pq-top" />
+      {isSent && (
+        <div style={{ marginBottom: 12, padding: "12px 16px", background: C.blueLight, border: `1.5px solid ${C.blue}40`, borderRadius: 10, fontSize: 13, color: "#1B5E9E", fontWeight: 700, display: "flex", alignItems: "center", gap: 8, lineHeight: 1.8 }}>
+          <IcCheckCircle width={18} height={18}/> أُرسلت هذه السياسة للمستشار{sentDate ? ` في ${sentDate}` : ""} — بانتظار مراجعته، ولا يلزمك إدخالها مرة أخرى. يمكنك التعديل وإعادة الإرسال إن احتجت.
+        </div>
+      )}
+      {!readOnly && !isSent && selection?.status !== "approved" && allSectionsComplete && (
+        <div style={{ marginBottom: 12, padding: "12px 16px", background: C.greenLight, border: `1.5px solid ${C.green}50`, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 13, color: "#086449", fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
+            <IcCheckCircle width={18} height={18}/> أكملت جميع الأقسام — الخطوة الأخيرة: أرسل السياسة لمراجعة المستشار
+          </span>
+          <Btn onClick={submitNow} disabled={loading}>{loading ? "جارٍ الإرسال..." : selection?.status === "revision" ? "إعادة الإرسال الآن" : "إرسال هذه السياسة الآن"}</Btn>
         </div>
       )}
       {selection?.status === "revision" && (
@@ -890,9 +950,9 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
           <IcArrowPath width={14} height={14}/> طلب المستشار تعديلاً — عدّل الإجابات وأعد الإرسال
         </div>
       )}
-      {!readOnly && validErr && (
+      {!readOnly && validErr && missingNow.length > 0 && (
         <div style={{ marginBottom: 12, padding: "12px 16px", background: C.redLight, border: `1.5px solid ${C.red}40`, borderRadius: 10, fontSize: 13, color: C.red, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <IcWarning width={16} height={16}/> يرجى تعبئة جميع الحقول المطلوبة (*) في هذا القسم قبل الانتقال للقسم التالي
+          <IcWarning width={16} height={16}/> {missingNow.length > 0 ? `بقي ${missingNow.length} من الأسئلة المطلوبة (*) دون إجابة في هذا القسم — ميّزناها لك باللون الأحمر` : "يرجى تعبئة جميع الحقول المطلوبة (*) قبل المتابعة"}
         </div>
       )}
 
@@ -903,7 +963,12 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
         </p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 20, pointerEvents: readOnly ? 'none' : 'auto', opacity: readOnly ? 0.85 : 1 }}>
-          {(currentSection?.questions || []).map(q => renderQuestion(q))}
+          {(currentSection?.questions || []).map(q => (
+            <div key={q.id} id={`pq-${q.id}`} style={missingNow.includes(q.id) ? { border: `1.5px solid ${C.red}`, background: "#FFF7F7", borderRadius: 10, padding: 12 } : undefined}>
+              {renderQuestion(q)}
+              {missingNow.includes(q.id) && <div style={{ fontSize: 12, color: C.red, fontWeight: 700, marginTop: 6 }}>هذا السؤال مطلوب</div>}
+            </div>
+          ))}
           {(currentSection?.questions || []).length === 0 && (
             <div style={{ padding: 20, textAlign: "center", color: C.gray, fontSize: 13 }}>لا توجد أسئلة في هذا القسم</div>
           )}
@@ -926,7 +991,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
             <Btn onClick={async () => { if (readOnly) { setSection(s => s + 1); } else { await handleNextSection(); } }}>القسم التالي →</Btn>
           ) : (
             !readOnly && (
-              <Btn onClick={() => { if (!allSectionsComplete) { setValidErr(true); return; } onSubmit(selection.id, answers); }} disabled={loading}>
+              <Btn onClick={submitNow} disabled={loading}>
                 {selection?.status === "revision" ? "إعادة الإرسال بعد التعديل" : ["submitted","reviewing"].includes(selection?.status) ? "إعادة الإرسال" : "إرسال هذه السياسة"}
               </Btn>
             )
@@ -939,8 +1004,28 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
 
 
 // ── Step 3: Work (Questionnaire grid) ─────────────────────────────────────────
-const StepWork = ({ policyTypes, selections, onSave, onSubmit, onSubmitAll, loading, externalEditId, onExternalEditDone, onView }) => {
+// حالة كل سياسة واضحة: لم تبدأ / قيد التعبئة (كم سؤالًا) / مكتملة لم تُرسل / أُرسلت وبانتظار المستشار / تحتاج تعديلًا / معتمدة
+const workState = (sel) => {
+  if (sel.status === "approved") return "approved";
+  if (sel.status === "revision") return "revision";
+  if (["submitted", "reviewing"].includes(sel.status)) return "sent";
+  if (sel.completion?.complete) return "ready";
+  if (sel.status === "in_progress" || (sel.completion?.answered || 0) > 0) return "progress";
+  return "new";
+};
+
+const WORK_STATE = {
+  new:      { label: "لم تبدأ بعد",                     color: C.gray,      bg: C.grayLight,  border: "transparent" },
+  progress: { label: "قيد التعبئة",                     color: C.amberText, bg: C.amberSoft,  border: `${C.amber}40` },
+  ready:    { label: "مكتملة — لم تُرسل بعد",            color: "#7F310E",   bg: "#FDE2D2",    border: C.amber },
+  sent:     { label: "أُرسلت — بانتظار مراجعة المستشار", color: "#1B5E9E",   bg: C.blueLight,  border: `${C.blue}60` },
+  revision: { label: "طلب المستشار تعديلًا",             color: C.amberText, bg: C.amberSoft,  border: C.amber },
+  approved: { label: "معتمدة",                           color: C.green,     bg: C.greenLight, border: `${C.green}60` },
+};
+
+const StepWork = ({ policyTypes, selections, onSave, onSubmit, loading, externalEditId, onExternalEditDone, onView, notice, onDismissNotice, onGoReview }) => {
   const [active, setActive] = useState(externalEditId || null);
+  const [sendingId, setSendingId] = useState(null);
 
   // support opening from outside (e.g. StepReview edit button)
   useEffect(() => {
@@ -957,55 +1042,121 @@ const StepWork = ({ policyTypes, selections, onSave, onSubmit, onSubmitAll, load
     if (ok) handleClose();
   };
 
+  const sendOne = async (sel) => {
+    setSendingId(sel.id);
+    try { await onSubmit(sel.id, sel.form_data || {}); } finally { setSendingId(null); }
+  };
+  const sendAllReady = async (list) => {
+    for (const sel of list) {
+      setSendingId(sel.id);
+      // eslint-disable-next-line no-await-in-loop
+      const ok = await onSubmit(sel.id, sel.form_data || {});
+      if (!ok) break;
+    }
+    setSendingId(null);
+  };
+
   if (active) {
     const sel     = selections.find(s => s.id === active);
     const polType = policyTypes.find(p => p.id === sel?.policy_type_id);
     return <QuestionnaireView selection={sel} policyType={polType} onSave={onSave} onSubmit={handleSubmitAndClose} onBack={handleClose} loading={loading} />;
   }
 
-  const allDone = selections.every(s => ["submitted","reviewing","approved"].includes(s.status));
+  const states   = selections.map(workState);
+  const sentN    = states.filter(st => ["sent", "approved"].includes(st)).length;
+  const ready    = selections.filter((_, i) => states[i] === "ready");
+  const revision = states.filter(st => st === "revision").length;
+  const allSent  = selections.length > 0 && sentN === selections.length;
+  const nextText = ready.length > 0
+    ? `لديك ${ready.length === 1 ? "سياسة مكتملة لم تُرسل" : `${ready.length} سياسات مكتملة لم تُرسل`} — اضغط «إرسال للمراجعة» ليبدأ المستشار مراجعتها.`
+    : revision > 0 ? "طلب المستشار تعديلات — افتح السياسة المعلَّمة، عدّل الإجابات ثم أعد إرسالها."
+    : allSent ? "أُرسلت جميع السياسات ✓ — المستشار يراجعها الآن، وستصلك إشعارات عند الاعتماد أو طلب التعديل. لا يلزمك إدخال أي بيانات أخرى."
+    : "افتح كل سياسة وأجب عن أسئلتها، ثم أرسلها لمراجعة المستشار.";
 
   return (
     <div className="animate-in">
       <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 6 }}>تعبئة الاستمارات ومشاهدة الفيديوهات</h2>
-      <p style={{ fontSize: 13, color: C.gray, marginBottom: 20 }}>اضغط على أي سياسة لبدء تعبئة الاستبيان أو تعديله في أي وقت</p>
+      <p style={{ fontSize: 13, color: C.gray, marginBottom: 16 }}>اضغط على أي سياسة لتعبئة استبيانها، وبعد اكتمالها أرسلها لمراجعة المستشار.</p>
+
+      {notice && (
+        <div role="status" style={{ marginBottom: 14, padding: "12px 16px", background: C.greenLight, border: `1.5px solid ${C.green}50`, borderRadius: 12, fontSize: 13, color: "#086449", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 8 }}><IcCheckCircle width={18} height={18}/>{notice}</span>
+          <button onClick={onDismissNotice} aria-label="إغلاق" style={{ background: "none", border: "none", cursor: "pointer", color: "#086449", fontSize: 16 }}>×</button>
+        </div>
+      )}
+
+      {/* ملخّص التقدّم والخطوة التالية */}
+      <Card style={{ marginBottom: 18, border: `1.5px solid ${ready.length ? C.amber : allSent ? `${C.green}50` : C.grayBorder}` }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>أُرسل {sentN} من {selections.length} {selections.length === 1 ? "سياسة" : "سياسات"} للمراجعة</div>
+          {ready.length > 1 && (
+            <Btn onClick={() => sendAllReady(ready)} disabled={loading || !!sendingId}>إرسال جميع المكتملة ({ready.length})</Btn>
+          )}
+          {allSent && onGoReview && <Btn variant="secondary" onClick={onGoReview}>متابعة مراجعة المستشار ←</Btn>}
+        </div>
+        <ProgressBar percent={selections.length ? (sentN / selections.length) * 100 : 0} />
+        <p style={{ fontSize: 13, color: ready.length ? "#7F310E" : allSent ? "#086449" : C.gray, fontWeight: 600, margin: "10px 0 0", lineHeight: 1.8 }}>{nextText}</p>
+      </Card>
 
       <div style={{ display: "grid", gridTemplateColumns: "var(--g-3)", gap: 14, marginBottom: 20 }}>
-        {selections.map(sel => {
-          const p = policyTypes.find(x => x.id === sel.policy_type_id) || sel.policy_type;
-          const isSubmitted = ["submitted","reviewing"].includes(sel.status);
-          const isApproved  = sel.status === "approved";
-          const isViewable  = ["submitted","reviewing","approved","revision"].includes(sel.status);
+        {selections.map((sel, i) => {
+          const p   = policyTypes.find(x => x.id === sel.policy_type_id) || sel.policy_type;
+          const st  = states[i];
+          const cfg = WORK_STATE[st];
+          const c   = sel.completion;
+          const sentDate = sel.submitted_at ? new Date(sel.submitted_at).toLocaleDateString("ar-SA-u-ca-gregory", { day: "numeric", month: "long" }) : null;
           return (
-            <Card key={sel.id} style={{ cursor: "pointer", textAlign: "center", border: isApproved ? `2px solid ${C.green}30` : isSubmitted ? `2px solid ${C.blue}30` : "2px solid transparent" }}
-              onClick={() => isApproved ? onView && onView(sel.id) : setActive(sel.id)}>
-              <div style={{ width: 56, height: 56, borderRadius: "50%", background: isApproved ? C.greenLight : C.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", color: isApproved ? C.green : C.amberText }}><IcDocument width={26} height={26}/></div>
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: C.ink }}>{p?.name || "سياسة"}</h3>
-              <div style={{ marginTop: 8 }}>{statusBadge(sel.status)}</div>
-              <div style={{ fontSize: 11, color: C.gray, marginTop: 6 }}>{p?.sections?.length || 0} أقسام</div>
-              {isSubmitted && <div style={{ fontSize: 10, color: C.blue, marginTop: 4, display: "flex", alignItems: "center", gap: 3, justifyContent: "center" }}><IcPencil width={10} height={10}/> يمكن التعديل وإعادة الإرسال</div>}
-              {isApproved && <div style={{ fontSize: 10, color: C.green, marginTop: 4, display: "flex", alignItems: "center", gap: 3, justifyContent: "center" }}><IcEye width={10} height={10}/> اضغط لاستعراض</div>}
-              {isViewable && !isApproved && (
-                <button onClick={e => { e.stopPropagation(); onView && onView(sel.id); }}
-                  style={{ marginTop: 8, fontSize: 10, color: C.primary, background: `${C.primary}10`, border: `1px solid ${C.primary}20`, borderRadius: 6, padding: "3px 8px", cursor: "pointer", fontFamily: "inherit", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 3 }}>
-                  <IcEye width={10} height={10}/> عرض فقط
-                </button>
-              )}
-              {sel.consultant_notes && sel.status === "revision" && (
-                <div style={{ marginTop: 8, padding: "8px 10px", background: C.amberSoft, borderRadius: 8, fontSize: 11, color: C.amberText, textAlign: "right" }}>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><IcChat width={12} height={12}/>{sel.consultant_notes}</span>
+            <Card key={sel.id} style={{ textAlign: "center", border: `2px solid ${cfg.border}`, display: "flex", flexDirection: "column" }}>
+              <div style={{ width: 56, height: 56, borderRadius: "50%", background: cfg.bg, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", color: cfg.color }}>
+                {["sent", "approved"].includes(st) ? <IcCheckCircle width={26} height={26}/> : <IcDocument width={26} height={26}/>}
+              </div>
+              {p?.code && <div style={{ fontSize: 10, color: C.primary, fontWeight: 700, direction: "ltr" }}>{p.code}</div>}
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: C.ink, marginTop: 2 }}>{p?.name || "سياسة"}</h3>
+              <div style={{ marginTop: 10 }}>
+                <span data-state={st} style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: cfg.bg, color: cfg.color }}>
+                  {["sent", "approved"].includes(st) && <IcCheck width={11} height={11}/>}{cfg.label}
+                </span>
+              </div>
+
+              {c && c.total > 0 && !["sent", "approved"].includes(st) && (
+                <div style={{ marginTop: 10, textAlign: "right" }}>
+                  <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>أجبت عن {c.answered} من {c.total} سؤالًا{c.required_missing > 0 ? ` — بقي ${c.required_missing} مطلوبًا` : ""}</div>
+                  <ProgressBar percent={(c.answered / c.total) * 100} />
                 </div>
               )}
+              {st === "sent" && (
+                <div style={{ fontSize: 12, color: "#1B5E9E", marginTop: 8, lineHeight: 1.7 }}>
+                  {sentDate ? `أُرسلت في ${sentDate}. ` : ""}لا يلزمك إدخالها مرة أخرى.
+                </div>
+              )}
+              {st === "revision" && sel.consultant_notes && (
+                <div style={{ marginTop: 10, padding: "8px 10px", background: C.amberSoft, borderRadius: 8, fontSize: 12, color: C.amberText, textAlign: "right", lineHeight: 1.7 }}>
+                  <span style={{ display: "inline-flex", alignItems: "flex-start", gap: 4 }}><IcChat width={12} height={12}/>{sel.consultant_notes}</span>
+                </div>
+              )}
+
+              <div style={{ marginTop: "auto", paddingTop: 14, display: "flex", flexDirection: "column", gap: 6 }}>
+                {st === "ready" && (
+                  <>
+                    <Btn full onClick={() => sendOne(sel)} disabled={loading || !!sendingId}>{sendingId === sel.id ? "جارٍ الإرسال..." : "إرسال للمراجعة"}</Btn>
+                    <Btn variant="ghost" small full onClick={() => setActive(sel.id)}>مراجعة الإجابات قبل الإرسال</Btn>
+                  </>
+                )}
+                {st === "new" && <Btn full variant="secondary" onClick={() => setActive(sel.id)}>ابدأ التعبئة</Btn>}
+                {st === "progress" && <Btn full variant="secondary" onClick={() => setActive(sel.id)}>متابعة التعبئة</Btn>}
+                {st === "revision" && <Btn full onClick={() => setActive(sel.id)}>تعديل وإعادة الإرسال</Btn>}
+                {st === "sent" && (
+                  <>
+                    <Btn full variant="secondary" onClick={() => onView && onView(sel.id)}>عرض الإجابات</Btn>
+                    <Btn variant="ghost" small full onClick={() => setActive(sel.id)}>تعديل وإعادة الإرسال</Btn>
+                  </>
+                )}
+                {st === "approved" && <Btn full variant="secondary" onClick={() => onView && onView(sel.id)}>استعراض</Btn>}
+              </div>
             </Card>
           );
         })}
       </div>
-
-      {allDone && (
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <Btn onClick={onSubmitAll} disabled={loading}>إرسال الكل لمراجعة المستشار ←</Btn>
-        </div>
-      )}
     </div>
   );
 };
@@ -1036,7 +1187,7 @@ const StepReview = ({ policyTypes, selections, onEdit, onView, refreshData }) =>
           <span style={{ color: C.blue }}><IcSearch width={24} height={24}/></span>
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: C.blue }}>جاري مراجعة السياسات</div>
-            <div style={{ fontSize: 12, color: C.gray }}>يتم تحديث الحالة تلقائياً كل 30 ثانية</div>
+            <div style={{ fontSize: 12, color: C.gray, lineHeight: 1.7 }}>أرسلت استماراتك ✓ — لا يلزمك إدخال أي بيانات الآن. ستصلك إشعارات عند اعتماد أي سياسة أو طلب تعديل عليها (تُحدَّث الحالة تلقائيًا).</div>
           </div>
         </div>
         <div style={{ fontSize: 11, color: C.gray, background: C.white, padding: "6px 10px", borderRadius: 8, border: `1px solid ${C.grayBorder}`, display: "flex", alignItems: "center", gap: 4 }}>
@@ -1050,10 +1201,15 @@ const StepReview = ({ policyTypes, selections, onEdit, onView, refreshData }) =>
         const p = policyTypes.find(x => x.id === sel.policy_type_id) || sel.policy_type;
         const canEdit = sel.status !== "approved";
         return (
-          <div key={sel.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderBottom: i < selections.length - 1 ? `1px solid ${C.grayLight}` : "none" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div key={sel.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", padding: "14px 16px", borderBottom: i < selections.length - 1 ? `1px solid ${C.grayLight}` : "none", background: sel.status === "revision" ? C.amberSoft : "transparent" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 12, minWidth: 0, flex: "1 1 240px" }}>
               <span style={{ color: C.primary }}><IcDocument width={20} height={20}/></span>
-              <span style={{ fontSize: 14, fontWeight: 600 }}>{p?.name || "سياسة"}</span>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{p?.name || "سياسة"}</div>
+                {sel.status === "revision" && sel.consultant_notes && (
+                  <div style={{ fontSize: 12, color: C.amberText, marginTop: 4, lineHeight: 1.7, display: "flex", gap: 4 }}><IcChat width={12} height={12}/>ملاحظة المستشار: {sel.consultant_notes}</div>
+                )}
+              </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               {statusBadge(sel.status)}
@@ -2020,6 +2176,13 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
   const [error,      setError]      = useState(null);
   const [editingId,  setEditingId]  = useState(null);
   const [viewingId,  setViewingId]  = useState(null);
+  // رسالة تأكيد بعد الإرسال (تختفي تلقائيًا)
+  const [notice,     setNotice]     = useState(null);
+  useEffect(() => {
+    if (!notice) return undefined;
+    const t = setTimeout(() => setNotice(null), 9000);
+    return () => clearTimeout(t);
+  }, [notice]);
 
   const workflow    = pageData?.workflow;
   const selections  = pageData?.selections || [];
@@ -2062,6 +2225,11 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
     try {
       const res = await policiesApi.selectPolicies(workflowId, { policy_type_ids: ids });
       setPageData(prev => ({ ...prev, workflow: res.data.workflow }));
+      return true;
+    } catch (e) {
+      alert(e?.response?.data?.message || "تعذّر حفظ اختيار السياسات. حاول مرة أخرى.");
+      if (e?.response?.data?.workflow) setPageData(prev => ({ ...prev, workflow: e.response.data.workflow }));
+      return false;
     } finally { setActLoading(false); }
   };
 
@@ -2085,6 +2253,9 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
     setActLoading(true);
     try {
       await policiesApi.submitSelection(workflowId, id, { form_data: formData });
+      const sel  = selections.find(x => x.id === id);
+      const name = policyTypes.find(p => p.id === sel?.policy_type_id)?.name || "السياسة";
+      setNotice(`تم إرسال «${name}» لمراجعة المستشار ✓ — ستصلك إشعارات عند ردّه.`);
       await load();
       return true;
     } catch (e) {
@@ -2092,8 +2263,6 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
       return false;
     } finally { setActLoading(false); }
   };
-
-  const handleSubmitAll = () => load();
 
   const handleDownload = async (selId) => {
     setDlLoading(selId);
@@ -2278,6 +2447,13 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
 
       <Stepper step={displayStep} realStep={currentStep} allDone={isFullyDone} onStepClick={workflow ? handleStepClick : undefined} />
 
+      {notice && displayStep !== 3 && (
+        <div role="status" style={{ marginBottom: 14, padding: "12px 16px", background: C.greenLight, border: `1.5px solid ${C.green}50`, borderRadius: 12, fontSize: 13, color: "#086449", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 8 }}><IcCheckCircle width={18} height={18}/>{notice}</span>
+          <button onClick={() => setNotice(null)} aria-label="إغلاق" style={{ background: "none", border: "none", cursor: "pointer", color: "#086449", fontSize: 16 }}>×</button>
+        </div>
+      )}
+
       {displayStep === 0 && (
         <StepIntro
           policyTypes={policyTypes}
@@ -2301,7 +2477,9 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
 
       {displayStep === 3 && (
         <StepWork policyTypes={policyTypes} selections={selections}
-          onSave={handleSave} onSubmit={handleSubmit} onSubmitAll={handleSubmitAll}
+          onSave={handleSave} onSubmit={handleSubmit}
+          notice={notice} onDismissNotice={() => setNotice(null)}
+          onGoReview={workflow?.current_step >= 4 ? () => setViewStep(null) : undefined}
           loading={actLoading} onView={setViewingId} />
       )}
 

@@ -7,6 +7,8 @@ use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\Notification;
 use App\Models\Consultant;
+use App\Models\OperationalWorkflow;
+use App\Models\PolicyWorkflow;
 use App\Models\StrategicWorkflow;
 use Illuminate\Http\Request;
 
@@ -113,17 +115,12 @@ class ChatController extends Controller
 
         // العميل يبدأ محادثة مع مستشاره تلقائياً من خلال الـ workflow
         if ($user->role !== 'consultant' && $user->role !== 'admin') {
-            $workflow = StrategicWorkflow::with('consultant')
-                ->where('user_id', $user->id)
-                ->whereNotNull('consultant_id')
-                ->latest()
-                ->first();
+            // مستشار العميل من أي نظام من الأنظمة الثلاثة (الأحدث تعيينًا) — لا يُشترط وجود خطة استراتيجية
+            $consultantUserId = $this->clientConsultantUserId($user->id);
 
-            if (!$workflow || !$workflow->consultant?->user_id) {
-                return response()->json(['message' => 'لم يتم تعيين مستشار لك بعد'], 422);
+            if (!$consultantUserId) {
+                return response()->json(['message' => 'لم يتم تعيين مستشار لك بعد — يُعيَّن المستشار عند بدء أي خطة (استراتيجية أو تشغيلية أو سياسات).'], 422);
             }
-
-            $consultantUserId = $workflow->consultant->user_id;
 
             $conv = Conversation::firstOrCreate(
                 ['client_id' => $user->id, 'consultant_user_id' => $consultantUserId],
@@ -134,6 +131,23 @@ class ChatController extends Controller
         }
 
         return response()->json(['message' => 'غير مسموح'], 403);
+    }
+
+    /** حساب مستخدم المستشار المعيّن للعميل في أحدث خطة (استراتيجية / تشغيلية / سياسات) */
+    private function clientConsultantUserId(int $clientId): ?int
+    {
+        $candidates = [];
+        foreach ([StrategicWorkflow::class, OperationalWorkflow::class, PolicyWorkflow::class] as $model) {
+            $wf = $model::with('consultant')->where('user_id', $clientId)->whereNotNull('consultant_id')->latest('updated_at')->first();
+            if ($wf?->consultant?->user_id) {
+                $candidates[] = [$wf->updated_at, (int) $wf->consultant->user_id];
+            }
+        }
+        if (!$candidates) {
+            return null;
+        }
+        usort($candidates, fn ($a, $b) => $b[0] <=> $a[0]);
+        return $candidates[0][1];
     }
 
     // ─────────────────────────────────────────────────────────────────────────

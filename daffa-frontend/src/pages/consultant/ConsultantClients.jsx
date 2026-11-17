@@ -2,7 +2,7 @@ import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useCallback } from 'react';
 import { consultantApi } from '../../api/consultant';
 
-const C = {
+const C = { amber: '#EF6A2C', amberLine: '#E05A1F',
   primary: '#235D7F', ink: '#0E2A3D',
   orange: '#EF6A2C', amberText: '#A33F12', amberSoft: '#FEF3EC',
   green: '#0B7F5D', greenLight: '#C9EFE1',

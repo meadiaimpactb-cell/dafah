@@ -9,7 +9,7 @@ import { validateTemplate } from './templateValidation';
 import { OverviewContent, ExplanationContent, GuidelinesContent, templateLabel } from './UnitContent';
 import UnitVideo from '../shared/UnitVideo';
 
-const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
+const colors = { amber: '#EF6A2C', primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
 
 const ConfirmModal = ({ open, title, message, onConfirm, onCancel }) => {
   if (!open) return null;
@@ -184,6 +184,24 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
           <div style={{ fontSize: 12, color: '#8C97A3', padding: '7px 0' }}>آخر وحدة</div>
         )}
       </div>
+
+      {/* حالة الوحدة بوضوح: أُرسلت وبانتظار المستشار / معتمدة / مسودة لم تُرسل */}
+      {['submitted', 'reviewing'].includes(submission.status) && (
+        <div role="status" style={{ background: '#CFE5FA', border: '1.5px solid #9CC9F2', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#1B5E9E', fontWeight: 700, lineHeight: 1.8, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <DfIcon name="check" size={18} />
+          <span>أرسلت هذه الوحدة للمستشار{submission.submitted_at ? ` في ${new Date(submission.submitted_at).toLocaleDateString('ar-SA-u-ca-gregory', { day: 'numeric', month: 'long' })}` : ''} — بانتظار مراجعته. بياناتك محفوظة ولا يلزمك إدخالها مرة أخرى؛ يمكنك الانتقال للوحدة التالية.</span>
+        </div>
+      )}
+      {submission.status === 'approved' && (
+        <div role="status" style={{ background: '#C9EFE1', border: '1.5px solid #7FD3B5', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#086449', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <DfIcon name="check" size={18} />اعتمد المستشار هذه الوحدة ✓ — لا يلزمك أي إجراء عليها.
+        </div>
+      )}
+      {submission.status === 'in_progress' && (
+        <div role="status" style={{ background: '#FEF3EC', border: '1.5px solid #FBC3A3', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#A33F12', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <DfIcon name="save" size={18} />بياناتك محفوظة كمسودة ولم تُرسل للمراجعة بعد — أكملها ثم اضغط «إرسال للمراجعة» في تبويب «نماذج العمل».
+        </div>
+      )}
 
       {/* ملاحظة المستشار — تظهر فقط عند status=revision */}
       {submission.status === 'revision' && submission.consultant_notes && (

@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Consultant;
 use App\Models\DiscountCode;
 use App\Models\OperationalWorkflow;
 use App\Models\Order;
 use App\Models\PolicySelection;
+use App\Support\PolicyCompletion;
 use App\Models\PolicyTypeContent;
 use App\Models\PolicyWorkflow;
 use App\Models\QuestionnaireSection;
@@ -130,7 +132,7 @@ class PolicyController extends Controller
         if ($workflow) {
             $typeMap = collect(self::policyTypes())->keyBy('id');
             $selectionsWithTypes = $workflow->selections->map(
-                fn($s) => array_merge($s->toArray(), ['policy_type' => $typeMap->get($s->policy_type_id)])
+                fn($s) => self::selectionPayload($s, $typeMap)
             );
         }
 
@@ -212,6 +214,14 @@ class PolicyController extends Controller
         ]);
 
         $workflow = $this->userWorkflow($request);
+
+        // بعد الدفع لا يُغيَّر اختيار السياسات (كان يعيد الخطة للخطوة 1 فتعلق عند «تم الدفع مسبقاً»)
+        if ($workflow->payment_status === 'paid') {
+            return response()->json([
+                'message'  => 'تم الدفع لهذه الخطة، ولا يمكن تغيير السياسات المختارة. لإضافة سياسات أخرى أنشئ خطة جديدة بعد اكتمال هذه الخطة.',
+                'workflow' => $workflow->fresh(),
+            ], 422);
+        }
 
         $types    = collect(self::policyTypes())->whereIn('id', $request->policy_type_ids);
         $subtotal = $types->sum('price');
@@ -318,7 +328,7 @@ class PolicyController extends Controller
         $typeMap = collect(self::policyTypes())->keyBy('id');
         $selections = PolicySelection::where('workflow_id', $workflow->id)
             ->get()
-            ->map(fn($s) => array_merge($s->toArray(), ['policy_type' => $typeMap->get($s->policy_type_id)]));
+            ->map(fn($s) => self::selectionPayload($s, $typeMap));
 
         return response()->json([
             'workflow'   => $workflow->fresh(),
@@ -335,7 +345,7 @@ class PolicyController extends Controller
 
         $selections = PolicySelection::where('workflow_id', $workflow->id)
             ->get()
-            ->map(fn($s) => array_merge($s->toArray(), ['policy_type' => $typeMap->get($s->policy_type_id)]));
+            ->map(fn($s) => self::selectionPayload($s, $typeMap));
 
         return response()->json(['selections' => $selections, 'policy_types' => self::policyTypes()]);
     }
@@ -348,7 +358,7 @@ class PolicyController extends Controller
         $selection = PolicySelection::where('workflow_id', $workflow->id)->where('id', $id)->firstOrFail();
 
         return response()->json([
-            'selection' => array_merge($selection->toArray(), ['policy_type' => $typeMap->get($selection->policy_type_id)]),
+            'selection' => self::selectionPayload($selection, $typeMap),
         ]);
     }
 
@@ -389,11 +399,35 @@ class PolicyController extends Controller
             return response()->json(['message' => 'السياسة معتمدة بالفعل.'], 422);
         }
 
+        if (!in_array((int) $workflow->current_step, [3, 4, 5], true) || $workflow->payment_status !== 'paid') {
+            return response()->json(['message' => 'لا يمكن إرسال الاستمارة في هذه المرحلة من الخطة.'], 422);
+        }
+
+        $completion = PolicyCompletion::of($selection, $request->form_data);
+        if (!$completion['complete']) {
+            // نحفظ ما عُبّئ حتى لا يضيع، ونوضّح ما ينقص
+            $selection->update([
+                'form_data' => $request->form_data,
+                'status'    => in_array($selection->status, ['not_started', 'revision'], true) ? 'in_progress' : $selection->status,
+            ]);
+            return response()->json([
+                'message'    => $completion['total'] === 0
+                    ? 'لم تُعدّ أسئلة هذه السياسة بعد — تواصل مع الإدارة.'
+                    : 'بقيت ' . $completion['required_missing'] . ' أسئلة مطلوبة دون إجابة في: ' . implode('، ', $completion['missing_sections']) . '.',
+                'completion' => $completion,
+            ], 422);
+        }
+
+        $wasSubmitted = in_array($selection->status, ['submitted', 'reviewing'], true);
         $selection->update([
             'form_data'    => $request->form_data,
             'status'       => 'submitted',
             'submitted_at' => now(),
         ]);
+
+        $typeName = collect(self::policyTypes())->firstWhere('id', $selection->policy_type_id)['name'] ?? 'سياسة';
+        ActivityLog::record($request->user()->id, $wasSubmitted ? 'إعادة إرسال سياسة للمراجعة' : 'إرسال سياسة للمراجعة', 'review', 'client',
+            $typeName . ' — ' . ($request->user()->org_name ?: $request->user()->email));
 
         $workflow->load('selections');
         $allSubmitted = $workflow->selections->every(
@@ -405,6 +439,15 @@ class PolicyController extends Controller
         }
 
         return response()->json(['selection' => $selection->fresh()]);
+    }
+
+    /** بيانات السياسة للعميل: نوعها + مدى اكتمال استمارتها */
+    private static function selectionPayload(PolicySelection $s, $typeMap): array
+    {
+        return array_merge($s->toArray(), [
+            'policy_type' => $typeMap->get($s->policy_type_id),
+            'completion'  => PolicyCompletion::of($s),
+        ]);
     }
 
     // ── POST /api/policies/workflow/design ────────────────────────────────────

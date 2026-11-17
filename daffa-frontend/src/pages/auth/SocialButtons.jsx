@@ -10,20 +10,27 @@ import { useGoogleOneTap, OrDivider } from './GoogleAuthButton';
 
 const API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
+// تُخزَّن القائمة في الذاكرة فقط عند نجاح الجلب بنتيجة غير فارغة؛ الفشل أو الفراغ لا يُخزَّن حتى لا يختفي الزر
+// بعد عودة من المزوّد (كانت عودة ملغاة تُثبّت [] للجلسة كلها فتختفي الأزرار).
 let providersCache = null;
 let providersPromise = null;
 export function useSocialProviders() {
-  const [list, setList] = useState(providersCache);
+  const [list, setList] = useState(providersCache || []);
   useEffect(() => {
-    if (providersCache) return undefined;
     let alive = true;
+    if (providersCache) { setList(providersCache); return undefined; }
     providersPromise = providersPromise || api.get('/auth/social/providers')
-      .then(r => (providersCache = Array.isArray(r.data) ? r.data : []))
-      .catch(() => { providersPromise = null; return []; });
+      .then(r => {
+        const d = Array.isArray(r.data) ? r.data : [];
+        if (d.length) providersCache = d;
+        return d;
+      })
+      .catch(() => [])
+      .finally(() => { providersPromise = null; });
     providersPromise.then(d => { if (alive) setList(d); });
     return () => { alive = false; };
   }, []);
-  return list || [];
+  return list;
 }
 
 const ICONS = {

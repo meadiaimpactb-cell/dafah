@@ -2,7 +2,7 @@ import DfIcon from '../../../components/ui/DfIcon';
 import React, { useState, useEffect } from 'react';
 import { operationalApi } from '../../../api/operational';
 
-const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
+const colors = { amber: '#EF6A2C', primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
 
 export default function StepOpConsultantSelect({ setWorkflow, setStep }) {
   const [consultants, setConsultants] = useState([]);

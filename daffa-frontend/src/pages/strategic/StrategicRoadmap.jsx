@@ -17,7 +17,7 @@ const STEPS = [
   { id: 5, label: 'الاعتماد' },
 ];
 
-const C = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amberLine: '#E05A1F' };
+const C = { amber: '#EF6A2C', amberText: '#A33F12', primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amberLine: '#E05A1F' };
 
 const STATUS_CFG = {
   pending:   { label: 'جارٍ الإعداد',   color: '#5E6B78', bg: '#F3EFE8' },

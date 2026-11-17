@@ -12,7 +12,7 @@ import { OpSection, OpFormIntro, OpLabel, hasOpSection } from './OpContent';
 import UnitVideo from '../shared/UnitVideo';
 
 // ─── Colors ─────────────────────────────────────────────────────
-const colors = {
+const colors = { amber: '#EF6A2C', amberText: '#A33F12',
   primary: "#235D7F", ink: "#0E2A3D", primaryDeep: "#123247",
   orange: "#EF6A2C", amberLine: '#E05A1F', amberSoft: "#FEF3EC",
   gray: "#5E6B78", grayLight: "#F3EFE8", grayBorder: "#E8E3DA",
@@ -485,8 +485,8 @@ const StatusBar = ({ status }) => {
 const statusMap = {
   approved:    { badge: "معتمد",         color: "green"  },
   revision:    { badge: "يحتاج تعديل",  color: "orange" },
-  submitted:   { badge: "تم الإرسال",   color: "blue"   },
-  in_progress: { badge: "قيد العمل",    color: "yellow" },
+  submitted:   { badge: "أُرسلت ✓ — بانتظار المستشار", color: "blue"   },
+  in_progress: { badge: "مسودة — لم تُرسل",            color: "yellow" },
   not_started: { badge: "لم يبدأ",      color: "gray"   },
 };
 
@@ -1540,6 +1540,20 @@ const OpStepWork = ({ units, setOpStep, setActiveUnit, readOnly }) => {
           );
         })}
       </div>
+
+      {/* الخطوة التالية بوضوح — الوحدات المُرسلة لا تحتاج إدخالًا مجددًا */}
+      {!readOnly && !allSubmitted && (() => {
+        const SENT = ['submitted', 'reviewing', 'revision', 'approved'];
+        const next = (units || []).find(u => !SENT.includes(u.submission_status));
+        const rev  = (units || []).filter(u => u.submission_status === 'revision').length;
+        return (
+          <div style={{ background: '#EAF4FD', border: '1px solid #A9D2F5', borderRadius: 10, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: '#1A65AD', lineHeight: 1.8 }}>
+            {rev > 0
+              ? `طلب المستشار تعديل ${rev === 1 ? 'وحدة' : `${rev} وحدات`} — افتحها، عدّلها وأعد إرسالها.`
+              : next ? `الخطوة التالية: ${next.submission_status === 'in_progress' ? 'أكمل وأرسل' : 'ابدأ'} «${next.name}». الوحدات المُرسلة محفوظة ولا يلزمك إدخالها مجددًا.` : null}
+          </div>
+        );
+      })()}
 
       {/* شريط التقدم */}
       <div style={{ background: "white", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 4px rgba(14,42,61,0.06)" }}>

@@ -7,7 +7,7 @@ import { OrgChartView } from './OrgChart';
  * المصدر: وثائق «تحسينات موقع دفة — 11 وحدة» عبر resources/strategic/units.json.
  */
 
-const C = {
+const C = { amberLine: '#E05A1F', amberText: '#A33F12',
   primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1', orange: '#EF6A2C', amber: '#EF6A2C',
   gray: '#5E6B78', grayText: '#334452', border: '#E8E3DA', blueBg: '#EAF4FD', blueBorder: '#A9D2F5',
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { chatApi } from '../../api/chat';
 import { IcSearch, IcChat, IcCheck, IcDoubleCheck, IcLock } from '../../utils/icons';
 
-const C = {
+const C = { amber: '#EF6A2C',
   primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
   orange: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F', green: '#0B7F5D',
   gray: '#5E6B78', grayLight: '#F3EFE8', grayBorder: '#E8E3DA',

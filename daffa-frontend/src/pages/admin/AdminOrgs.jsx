@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
 
-const C = {
+const C = { amberLine: '#E05A1F',
   primary:       '#235D7F',
   ink:   '#0E2A3D',
   orange:     '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12',

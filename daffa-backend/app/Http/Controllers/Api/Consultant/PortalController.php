@@ -69,12 +69,13 @@ class PortalController extends Controller
             ->take(5)->get()
             ->map(fn($s) => $this->formatOpSubmission($s));
 
+        $polTypes   = collect(PolicyController::policyTypes())->keyBy('id');
         $polPending = PolicySelection::with(['workflow.user'])
             ->whereIn('workflow_id', $polIds)
             ->whereIn('status', ['submitted', 'reviewing'])
             ->orderBy('submitted_at')
             ->take(5)->get()
-            ->map(fn($s) => $this->formatPolSelection($s));
+            ->map(fn($s) => $this->formatPolSelection($s, $polTypes));
 
         $pending = $stPending->concat($opPending)->concat($polPending)
             ->sortBy('submitted_at')
