@@ -357,16 +357,18 @@ const EmbeddedChat = ({ consultantName }) => {
 
   const loadMessages = useCallback((convId, silent = false) => {
     chatApi.messages(convId)
-      .then(r => { setMsgs(r.data); if (!silent) setLoading(false); })
+      // الرسائل قد تصل كمصفوفة أو كصفحة {data:[...]} — نطبّعها دائمًا إلى مصفوفة حتى لا ينهار التبويب
+      .then(r => { setMsgs(Array.isArray(r.data) ? r.data : Array.isArray(r.data?.data) ? r.data.data : []); if (!silent) setLoading(false); })
       .catch(() => { if (!silent) setLoading(false); });
   }, []);
 
   useEffect(() => {
     chatApi.conversations()
       .then(r => {
-        if (r.data.length > 0) {
-          setConv(r.data[0]);
-          loadMessages(r.data[0].id);
+        const convs = Array.isArray(r.data) ? r.data : Array.isArray(r.data?.data) ? r.data.data : [];
+        if (convs.length > 0) {
+          setConv(convs[0]);
+          loadMessages(convs[0].id);
         } else {
           return chatApi.startWith().then(r2 => {
             const id = r2.data?.conversation_id || r2.data?.id;

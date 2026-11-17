@@ -122,7 +122,8 @@ const ChatWindow = ({ conversation, currentUserId, onMessageSent, canSend = true
     if (!silent) setLoading(true);
     chatApi.messages(conversation.id)
       .then(r => {
-        const incoming = r.data;
+        // نطبّع الاستجابة إلى مصفوفة دائمًا (مصفوفة أو صفحة {data:[...]}) حتى لا تنهار الصفحة
+        const incoming = Array.isArray(r.data) ? r.data : Array.isArray(r.data?.data) ? r.data.data : [];
         // Detect new message from the other party → refresh conversation list sidebar
         if (silent && incoming.length > lastCountRef.current) {
           const newest = incoming[incoming.length - 1];
@@ -287,16 +288,17 @@ export default function ChatPage({ role, userId, canSend = true, autoStart = fal
     if (!silent) setLoading(true);
     chatApi.conversations()
       .then(r => {
-        setConversations(r.data);
+        const list = Array.isArray(r.data) ? r.data : Array.isArray(r.data?.data) ? r.data.data : [];
+        setConversations(list);
         setLoading(false);
         if (autoSelectId) {
-          const conv = r.data.find(c => c.id === autoSelectId);
+          const conv = list.find(c => c.id === autoSelectId);
           if (conv) setSelected(conv);
-          else if (r.data.length > 0) setSelected(r.data[0]);
+          else if (list.length > 0) setSelected(list[0]);
         } else if (autoStart && !autoStartedRef.current) {
           autoStartedRef.current = true;
-          if (r.data.length > 0) {
-            setSelected(r.data[0]);
+          if (list.length > 0) {
+            setSelected(list[0]);
           } else {
             setStarting(true);
             chatApi.startWith()
