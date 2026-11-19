@@ -8,7 +8,8 @@ use App\Models\QuestionnaireSection;
 /**
  * مدى اكتمال استمارة سياسة: عدد الأسئلة المُجابة والمطلوبة الناقصة وأقسامها.
  * يُعرض للعميل (حالة واضحة + زر الإرسال) ويُستخدم للتحقق قبل الإرسال للمراجعة.
- * قاعدة «مُجاب» مطابقة للواجهة: الاختيار المتعدد مصفوفة غير فارغة، وغيره نص غير فارغ.
+ * يعتمد على QuestionRules: الأسئلة المخفية بشرط لا تُحتسب، والإجابة غير الصالحة
+ * (رقم سالب، تاريخ غير صحيح، «أخرى» بلا توضيح، خيارات متناقضة…) تُعدّ ناقصة.
  */
 class PolicyCompletion
 {
@@ -24,35 +25,38 @@ class PolicyCompletion
 
     public static function filled($value): bool
     {
-        if (is_array($value)) {
-            return count($value) > 0;
-        }
-        return $value !== null && trim((string) $value) !== '';
+        return QuestionRules::filled($value);
     }
 
     /**
-     * @return array{total:int,answered:int,required:int,required_missing:int,complete:bool,missing_sections:array<int,string>}
+     * @return array{total:int,answered:int,required:int,required_missing:int,complete:bool,missing_sections:array<int,string>,problems:array}
      */
     public static function of(PolicySelection $selection, ?array $answers = null): array
     {
         $answers ??= is_array($selection->form_data) ? $selection->form_data : [];
         $total = $answered = $required = $missing = 0;
         $missingSections = [];
+        $problems = [];
 
         foreach (self::sections((int) $selection->policy_type_id) as $section) {
             $sectionMissing = 0;
             foreach ($section->questions as $q) {
+                $r = QuestionRules::evaluate($q, $answers);
+                if ($r['status'] === 'hidden') {
+                    continue;
+                }
                 $total++;
-                $isFilled = self::filled($answers["q{$q->id}"] ?? null);
-                if ($isFilled) {
+                $isFilled = QuestionRules::filled($answers["q{$q->id}"] ?? null) || (!empty($q->meta['fields']) && $r['status'] !== 'missing');
+                if ($isFilled && $r['status'] === 'ok') {
                     $answered++;
                 }
                 if ($q->required) {
                     $required++;
-                    if (!$isFilled) {
-                        $missing++;
-                        $sectionMissing++;
-                    }
+                }
+                if ($r['status'] !== 'ok' && ($q->required || $r['status'] === 'invalid')) {
+                    $missing++;
+                    $sectionMissing++;
+                    $problems[] = ['q' => $q->id, 'section' => $section->name, 'msg' => $r['msg']];
                 }
             }
             if ($sectionMissing > 0) {
@@ -67,6 +71,7 @@ class PolicyCompletion
             'required_missing' => $missing,
             'complete'         => $total > 0 && $missing === 0,
             'missing_sections' => $missingSections,
+            'problems'         => $problems,
         ];
     }
 }

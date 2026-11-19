@@ -272,7 +272,18 @@ body {
     foreach (($questionnaire ?? collect()) as $section) {
         $fields = [];
         foreach ($section->questions as $q) {
-            $fields[] = ['label' => $q->question, 'value' => $formData['q' . $q->id] ?? null];
+            $meta = is_array($q->meta ?? null) ? $q->meta : [];
+            if (!\App\Support\QuestionRules::visible($meta, $formData)) {
+                continue; // سؤال مخفي بشرط (إجابته لا تدخل في الوثيقة)
+            }
+            $val = $formData['q' . $q->id] ?? null;
+            $other = $formData['q' . $q->id . '__other'] ?? null;
+            if ($other !== null && trim((string) $other) !== '') {
+                $otherLabel = $meta['other']['label'] ?? 'التوضيح';
+                if (is_array($val)) { $val[] = $otherLabel . ': ' . $other; }
+                else { $val = trim((string) $val) . ' — ' . $otherLabel . ': ' . $other; }
+            }
+            $fields[] = ['label' => $q->question, 'value' => $val];
         }
         $sections[] = $section->name;
         $grouped[]  = $fields;

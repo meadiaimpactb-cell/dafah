@@ -90,8 +90,9 @@ class QuestionnaireController extends Controller
             'options'            => 'nullable|array',
             'options.*'          => 'string|max:200',
             'required'           => 'boolean',
-            'hint'               => 'nullable|string|max:300',
+            'hint'               => 'nullable|string|max:1000',
             'display_condition'  => 'nullable|string|max:300',
+            'meta'               => 'nullable|array',
         ]);
 
         QuestionnaireSection::findOrFail($id);
@@ -105,6 +106,7 @@ class QuestionnaireController extends Controller
             'required'          => $request->boolean('required'),
             'hint'              => $request->hint ? trim($request->hint) : null,
             'display_condition' => $request->display_condition ? trim($request->display_condition) : null,
+            'meta'              => $request->meta ?: null,
             'sort_order'        => $maxOrder + 1,
         ]);
 
@@ -120,8 +122,9 @@ class QuestionnaireController extends Controller
             'options'            => 'nullable|array',
             'options.*'          => 'string|max:200',
             'required'           => 'boolean',
-            'hint'               => 'nullable|string|max:300',
+            'hint'               => 'nullable|string|max:1000',
             'display_condition'  => 'nullable|string|max:300',
+            'meta'               => 'nullable|array',
         ]);
 
         $question = QuestionnaireQuestion::findOrFail($id);
@@ -132,6 +135,7 @@ class QuestionnaireController extends Controller
             'required'          => $request->boolean('required'),
             'hint'              => $request->hint ? trim($request->hint) : null,
             'display_condition' => $request->display_condition ? trim($request->display_condition) : null,
+            'meta'              => $request->meta ?: null,
         ]);
 
         return response()->json($question->fresh());

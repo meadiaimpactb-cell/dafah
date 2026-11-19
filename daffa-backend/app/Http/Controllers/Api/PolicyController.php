@@ -378,7 +378,8 @@ class PolicyController extends Controller
 
         $selection->update(['form_data' => $request->form_data, 'status' => $newStatus]);
 
-        return response()->json(['selection' => $selection]);
+        // نعيد الصيغة نفسها التي تعرضها الصفحة (مع الاكتمال) حتى تُحدَّث القائمة فورًا دون إعادة تحميل
+        return response()->json(['selection' => self::selectionPayload($selection->fresh(), collect(self::policyTypes())->keyBy('id'))]);
     }
 
     // ── POST /api/policies/selections/{id}/submit ─────────────────────────────
@@ -438,7 +439,7 @@ class PolicyController extends Controller
             $workflow->update(['current_step' => 4]);
         }
 
-        return response()->json(['selection' => $selection->fresh()]);
+        return response()->json(['selection' => self::selectionPayload($selection->fresh(), collect(self::policyTypes())->keyBy('id'))]);
     }
 
     /** بيانات السياسة للعميل: نوعها + مدى اكتمال استمارتها */

@@ -3771,7 +3771,7 @@ export default function DaffaPlatform() {
     // question modal
     const [qModal,        setQModal]        = React.useState(false);
     const [qEdit,         setQEdit]         = React.useState(null);
-    const [qForm,         setQForm]         = React.useState({ question: "", type: "single", required: false, hint: "", display_condition: "", optionsText: "" });
+    const [qForm,         setQForm]         = React.useState({ question: "", type: "single", required: false, hint: "", display_condition: "", optionsText: "", metaText: "" });
     const [qSaving,       setQSaving]       = React.useState(false);
 
     const TYPE_LABELS = { single: "اختيار واحد", multiple: "اختيار متعدد", yesno: "نعم/لا", text: "نص حر", scale: "مقياس" };
@@ -3840,15 +3840,19 @@ export default function DaffaPlatform() {
     };
 
     // ── Question CRUD ─────────────────────────────────────────────────────────
-    const openAddQ  = () => { setQEdit(null); setQForm({ question: "", type: "single", required: false, hint: "", display_condition: "", optionsText: "" }); setQModal(true); };
-    const openEditQ = (q) => { setQEdit(q); setQForm({ question: q.question, type: q.type, required: q.required, hint: q.hint || "", display_condition: q.display_condition || "", optionsText: q.options ? q.options.join("\n") : "" }); setQModal(true); };
+    const openAddQ  = () => { setQEdit(null); setQForm({ question: "", type: "single", required: false, hint: "", display_condition: "", optionsText: "", metaText: "" }); setQModal(true); };
+    const openEditQ = (q) => { setQEdit(q); setQForm({ question: q.question, type: q.type, required: q.required, hint: q.hint || "", display_condition: q.display_condition || "", optionsText: q.options ? q.options.join("\n") : "", metaText: q.meta ? JSON.stringify(q.meta, null, 2) : "" }); setQModal(true); };
     const saveQuestion = () => {
       if (!qForm.question.trim()) return;
       setQSaving(true);
       const options = ["single","multiple"].includes(qForm.type)
         ? qForm.optionsText.split("\n").map(s => s.trim()).filter(Boolean)
         : null;
-      const payload = { question: qForm.question, type: qForm.type, required: qForm.required, hint: qForm.hint || null, display_condition: qForm.display_condition || null, options };
+      let meta = null;
+      if (qForm.metaText.trim()) {
+        try { meta = JSON.parse(qForm.metaText); } catch { showToast("إعدادات JSON غير صالحة", false); setQSaving(false); return; }
+      }
+      const payload = { question: qForm.question, type: qForm.type, required: qForm.required, hint: qForm.hint || null, display_condition: qForm.display_condition || null, options, meta };
       const req = qEdit
         ? api.put(`/admin/questionnaire/questions/${qEdit.id}`, payload)
         : api.post(`/admin/questionnaire/sections/${activeId}/questions`, payload);
@@ -3950,7 +3954,7 @@ export default function DaffaPlatform() {
                         </div>
                       )}
                       <div style={{ marginTop: 6, fontSize: 11, color: colors.gray }}>
-                        {q.display_condition ? `شرط: ${q.display_condition}` : "يظهر دائماً"}{q.hint ? ` | تلميح: ${q.hint}` : ""}
+                        {q.meta?.show_if ? `يظهر بشرط إجابة السؤال ${q.meta.show_if.q}` : q.display_condition ? `شرط: ${q.display_condition}` : "يظهر دائماً"}{q.meta?.input ? ` | إدخال: ${q.meta.input}` : ""}{q.meta?.fields ? ` | ${q.meta.fields.length} خانات` : ""}{q.hint ? ` | تلميح: ${q.hint}` : ""}
                       </div>
                     </div>
                   ))
@@ -4016,6 +4020,12 @@ export default function DaffaPlatform() {
               <div style={{ marginBottom: 20 }}>
                 <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>شرط العرض (اختياري)</label>
                 <input value={qForm.display_condition} onChange={e => setQForm(f => ({ ...f, display_condition: e.target.value }))} placeholder="مثال: إذا كانت إجابة السؤال السابق نعم" style={{ ...inputS }} />
+              </div>
+
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>إعدادات متقدمة (JSON — اختياري)</label>
+                <textarea value={qForm.metaText} onChange={e => setQForm(f => ({ ...f, metaText: e.target.value }))} rows={4} dir="ltr" placeholder={'{"input":"number","min":0,"unit":"ريال"} / {"show_if":{"q":501,"in":["نعم"]}} / {"other":{"options":["أخرى (حدّدها أدناه)"],"label":"اذكر الجهة"}}'} style={{ ...inputS, fontFamily: "monospace", fontSize: 12, resize: "vertical" }} />
+                <div style={{ fontSize: 11, color: "#8C97A3", marginTop: 4 }}>المفاتيح: input (date/number) min max integer unit · exclusive · other · show_if · fields · checks · force · info</div>
               </div>
 
               <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>

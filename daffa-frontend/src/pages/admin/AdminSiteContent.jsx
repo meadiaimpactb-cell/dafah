@@ -17,6 +17,7 @@ const GROUP_LABELS = {
   contact:  "تواصل معنا",
   footer:   "الفوتر",
   guides:   "الأدلة والفيديوهات",
+  policies: "السياسات واللوائح",
   auth:     "الدخول والتسجيل",
 };
 

@@ -4,28 +4,40 @@ import { useGoogleOneTap, OrDivider } from './GoogleAuthButton';
 
 /*
  * أزرار الدخول/التسجيل عبر Google وFacebook وLinkedIn.
- * تظهر فقط المزوّدات المفعّلة على الخادم (المفاتيح في ‎.env‏) — لا يظهر زر معطّل للزائر.
- * الضغط ينقل المتصفح إلى صفحة المزوّد ثم يعود إلى المنصة مسجَّلًا (انظر SocialAuthController).
+ * الأزرار الثلاثة ظاهرة دائمًا؛ ويعمل الزر فقط متى فُعِّل مزوّده على الخادم (المفاتيح في ‎.env‏)،
+ * وإلا ظهر معطّلًا مع توضيح «بانتظار التفعيل» — فتعرف الإدارة أن الميزة موجودة قبل ضبط المفاتيح.
+ * الضغط على زر مفعّل ينقل المتصفح إلى صفحة المزوّد ثم يعود إلى المنصة مسجَّلًا (انظر SocialAuthController).
  */
 
 const API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
-// تُخزَّن القائمة في الذاكرة فقط عند نجاح الجلب بنتيجة غير فارغة؛ الفشل أو الفراغ لا يُخزَّن حتى لا يختفي الزر
-// بعد عودة من المزوّد (كانت عودة ملغاة تُثبّت [] للجلسة كلها فتختفي الأزرار).
+// القائمة الافتراضية قبل الجلب أو عند تعذّره: المزوّدون الثلاثة معطّلون (لا يختفي زر أبدًا)
+export const DEFAULT_PROVIDERS = [
+  { key: 'google', label: 'Google', enabled: false },
+  { key: 'facebook', label: 'Facebook', enabled: false },
+  { key: 'linkedin', label: 'LinkedIn', enabled: false },
+];
+const normalize = (data) => {
+  const got = Array.isArray(data) ? data : [];
+  return DEFAULT_PROVIDERS.map(d => {
+    const p = got.find(x => x && x.key === d.key);
+    // استجابة قديمة بلا حقل enabled تعني أن المزوّد مفعّل (كانت تُعاد المفعّلة فقط)
+    return p ? { ...d, ...p, enabled: p.enabled === undefined ? true : !!p.enabled } : d;
+  });
+};
+
+// تُخزَّن القائمة في الذاكرة فقط عند نجاح الجلب؛ الفشل لا يُخزَّن حتى لا تبقى الأزرار معطّلة
+// بعد عودة من المزوّد (كانت عودة ملغاة تُثبّت نتيجة فارغة للجلسة كلها).
 let providersCache = null;
 let providersPromise = null;
 export function useSocialProviders() {
-  const [list, setList] = useState(providersCache || []);
+  const [list, setList] = useState(providersCache || DEFAULT_PROVIDERS);
   useEffect(() => {
     let alive = true;
     if (providersCache) { setList(providersCache); return undefined; }
     providersPromise = providersPromise || api.get('/auth/social/providers')
-      .then(r => {
-        const d = Array.isArray(r.data) ? r.data : [];
-        if (d.length) providersCache = d;
-        return d;
-      })
-      .catch(() => [])
+      .then(r => { providersCache = normalize(r.data); return providersCache; })
+      .catch(() => DEFAULT_PROVIDERS)
       .finally(() => { providersPromise = null; });
     providersPromise.then(d => { if (alive) setList(d); });
     return () => { alive = false; };
@@ -63,6 +75,9 @@ const CSS = `
 .df-social button:active{transform:translateY(1px)}
 .df-social button:focus-visible{outline:3px solid rgba(35,93,127,.3);outline-offset:1px}
 .df-social button[disabled]{opacity:.6;cursor:wait}
+.df-social button.off{cursor:not-allowed;background:#FAF8F4;border-style:dashed;color:#8C97A3;box-shadow:none;transform:none;position:relative}
+.df-social button.off svg{filter:grayscale(1);opacity:.55}
+.df-social button.off .soon{position:absolute;top:-9px;inset-inline-end:10px;background:#FFF3E8;color:#B5531D;border:1px solid #F5CDB0;border-radius:999px;padding:1px 8px;font-size:10px;font-weight:800;direction:rtl}
 .df-social button svg{flex-shrink:0}
 @media (max-width:380px){.df-social button span.lbl{font-size:13px}}
 `;
@@ -74,16 +89,26 @@ const CSS = `
 export default function SocialButtons({ intent = 'login', label, after, note, onLogin, onError }) {
   const providers = useSocialProviders();
   const [busy, setBusy] = useState(null);
+  const [hint, setHint] = useState(null);
   const google = providers.find(p => p.key === 'google');
+  const verb = intent === 'register' ? 'التسجيل' : 'الدخول';
+  const off = providers.filter(p => !p.enabled);
+  const allOff = off.length === providers.length;
 
-  useGoogleOneTap(google?.client_id, { onLogin, onError, context: intent === 'register' ? 'signup' : 'signin' });
+  useGoogleOneTap(google?.enabled ? google.client_id : undefined, { onLogin, onError, context: intent === 'register' ? 'signup' : 'signin' });
 
-  if (!providers.length) return null;
-
-  const go = (key) => {
-    setBusy(key);
-    window.location.assign(`${API_BASE}/auth/social/${key}/redirect?intent=${intent}`);
+  const go = (p) => {
+    if (!p.enabled) { setHint(`${verb} عبر ${p.label} بانتظار التفعيل — استخدم البريد الإلكتروني حاليًا.`); return; }
+    setBusy(p.key);
+    window.location.assign(`${API_BASE}/auth/social/${p.key}/redirect?intent=${intent}`);
   };
+
+  // توضيح حالة المزوّدين غير المفعّلين (يظهر بدل الملاحظة العادية عندما يكون الجميع معطّلًا)
+  const offNote = off.length
+    ? (allOff
+        ? `${verb} عبر هذه الحسابات بانتظار التفعيل — سيعمل تلقائيًا فور اكتمال ربطها.`
+        : `${verb} عبر ${off.map(p => p.label).join(' و')} بانتظار التفعيل.`)
+    : null;
 
   return (
     <div>
@@ -91,14 +116,20 @@ export default function SocialButtons({ intent = 'login', label, after, note, on
       {label && <OrDivider label={label} />}
       <div className="df-social" role="group" aria-label="الدخول عبر حساباتك">
         {providers.map(p => (
-          <button key={p.key} type="button" onClick={() => go(p.key)} disabled={!!busy}
-            aria-label={`${intent === 'register' ? 'التسجيل' : 'الدخول'} عبر ${p.label}`}>
+          <button key={p.key} type="button" onClick={() => go(p)} disabled={!!busy}
+            className={p.enabled ? undefined : 'off'} aria-disabled={!p.enabled}
+            data-provider={p.key} data-enabled={p.enabled ? '1' : '0'}
+            title={p.enabled ? undefined : 'بانتظار التفعيل'}
+            aria-label={`${verb} عبر ${p.label}${p.enabled ? '' : ' (بانتظار التفعيل)'}`}>
+            {!p.enabled && <span className="soon" aria-hidden="true">قريبًا</span>}
             <span className="lbl">{busy === p.key ? '...' : p.label}</span>
             {ICONS[p.key]}
           </button>
         ))}
       </div>
-      {note && <p style={{ fontSize: 12, color: '#8C97A3', textAlign: 'center', margin: '10px 0 0', lineHeight: 1.8 }}>{note}</p>}
+      {hint && <p role="status" style={{ fontSize: 12, color: '#B5531D', textAlign: 'center', margin: '10px 0 0', lineHeight: 1.8, fontWeight: 700 }}>{hint}</p>}
+      {(allOff ? offNote : note) && <p style={{ fontSize: 12, color: '#8C97A3', textAlign: 'center', margin: '10px 0 0', lineHeight: 1.8 }}>{allOff ? offNote : note}</p>}
+      {!allOff && offNote && <p style={{ fontSize: 11.5, color: '#B5531D', textAlign: 'center', margin: '6px 0 0', lineHeight: 1.7 }}>{offNote}</p>}
       {after && <OrDivider label={after} />}
     </div>
   );

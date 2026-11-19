@@ -13,7 +13,7 @@ use RuntimeException;
 /**
  * الدخول/التسجيل عبر Google وFacebook وLinkedIn (OAuth 2.0 — Authorization Code).
  *
- * - المزوّد يظهر في المنصة فقط متى ضُبط معرّفه وسرّه في ‎.env‏ الخادم (لا أسرار في Git ولا في الواجهة).
+ * - أزرار المزوّدين الثلاثة ظاهرة دائمًا؛ ويعمل المزوّد فقط متى ضُبط معرّفه وسرّه في ‎.env‏ الخادم (لا أسرار في Git ولا في الواجهة)، وإلا ظهر زره معطّلًا.
  * - حساب جديد ← عميل مؤكَّد البريد يُكمل بيانات منظمته بعد الدخول (needs_profile).
  * - بريد موجود مسبقًا ← يُربط الحساب الاجتماعي به (البريد مؤكَّد لدى المزوّد).
  */
@@ -34,14 +34,17 @@ class SocialLogin
             && config("services.$provider.client_secret");
     }
 
-    /** المزوّدون المفعّلون — يُعاد معرّف عميل Google (عام) لنافذة الدخول بنقرة واحدة */
+    /**
+     * المزوّدون الثلاثة دائمًا مع حالة كلٍّ منهم: `enabled` صحيح متى ضُبط معرّفه وسرّه في ‎.env‏ الخادم.
+     * الواجهة تعرض زر المزوّد غير المفعّل معطّلًا (بانتظار التفعيل) — ومعرّف عميل Google (عام) يُعاد فقط عند تفعيله لنافذة الدخول بنقرة واحدة.
+     */
     public static function available(): array
     {
         $out = [];
         foreach (self::PROVIDERS as $p) {
-            if (self::enabled($p)) {
-                $out[] = ['key' => $p, 'label' => self::LABELS[$p]] + ($p === 'google' ? ['client_id' => config('services.google.client_id')] : []);
-            }
+            $on = self::enabled($p);
+            $out[] = ['key' => $p, 'label' => self::LABELS[$p], 'enabled' => $on]
+                + ($on && $p === 'google' ? ['client_id' => config('services.google.client_id')] : []);
         }
         return $out;
     }

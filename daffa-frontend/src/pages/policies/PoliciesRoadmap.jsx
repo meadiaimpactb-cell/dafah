@@ -9,6 +9,8 @@ import ConsultantPicker from "../shared/ConsultantPicker";
 import { PaymentMethodPicker, ApplePayButton, SecurePaymentBadge, CardNetworkLogo, detectCardNetwork } from "../shared/PaymentBrand";
 import { IcCheckCircle, IcArrowPath, IcUpload, IcSearch, IcWarning, IcLock, IcLightbulb, IcSave, IcDocument, IcUser, IcCalendar, IcCreditCard, IcSparkles, IcCheck, IcPencil, IcEye, IcPalette, IcBeaker, IcChat, IcScroll, IcClock } from '../../utils/icons';
 import UnitVideo from '../shared/UnitVideo';
+import { useSiteContent } from '../auth/AuthShell';
+import { isVisible, evaluate, toggleMultiple, forcedOptions, visibleFields, assembleParts, pruneAnswers, summarize, filled as isFilled } from './questionRules';
 
 // ── Payment Gateway Mock ──────────────────────────────────────────────────────
 // To go live: replace ONLY the body of this function with the real provider SDK
@@ -601,30 +603,46 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate })
 // ── Demo-fill data builder (dynamic) ─────────────────────────────────────────
 const buildDemoAnswers = (apiSections) => {
   const data = {};
-  apiSections.forEach(sec => {
-    (sec.questions || []).forEach(q => {
-      const key = `q${q.id}`;
-      if (q.type === "text")     data[key] = "إجابة تجريبية على هذا السؤال لأغراض الاختبار";
-      else if (q.type === "single")   data[key] = q.options?.[0] ?? "نعم";
-      else if (q.type === "multiple") data[key] = q.options?.slice(0, 2) ?? [];
+  const demoVal = (spec) => {
+    if (spec.input === 'date') return new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10);
+    if (spec.input === 'number') { const lo = spec.min ?? 0; const hi = spec.max ?? Math.max(lo + 10, 100); return String(Math.min(hi, Math.max(lo, lo + Math.round((hi - lo) / 2)))); }
+    if (spec.input === 'select') return spec.options?.[0] ?? '';
+    return "إجابة تجريبية على هذا السؤال لأغراض الاختبار";
+  };
+  const questions = apiSections.flatMap(sec => sec.questions || []);
+  // جولتان: الأولى للأسئلة المستقلة، والثانية للتابعة (تظهر بعد إجابة شرطها)
+  for (let pass = 0; pass < 2; pass++) {
+    questions.forEach(q => {
+      const key = `q${q.id}`; const m = q.meta || {};
+      if (!isVisible(q, data)) { delete data[key]; return; }
+      if (data[key] !== undefined && pass === 1) return;
+      if (m.fields?.length) {
+        const parts = {}; visibleFields(q, data).forEach(f => { parts[f.key] = demoVal(f); });
+        (m.checks || []).forEach(c => {
+          if (c.lte) { const [a, b] = c.lte; if (parts[a] !== undefined && parts[b] !== undefined) parts[b] = String(Math.max(Number(parts[b]), Number(parts[a]))); }
+          if (c.eq_product) { const [a, b, cc] = c.eq_product; parts[b] = '100'; parts[cc] = '10'; parts[a] = '1000'; }
+        });
+        data[`${key}__parts`] = parts; data[key] = assembleParts(q, data, parts); return;
+      }
+      const nonOther = (q.options || []).filter(o => !(m.other?.options || []).includes(o));
+      if (q.type === "text")          data[key] = demoVal(m);
+      else if (q.type === "single")   data[key] = nonOther[0] ?? q.options?.[0] ?? "نعم";
+      else if (q.type === "multiple") { const forced = forcedOptions(q, data); const pick = nonOther.filter(o => !(m.exclusive || []).includes(o)).slice(0, 2); data[key] = Array.from(new Set([...forced, ...pick])); }
       else if (q.type === "yesno")    data[key] = "نعم";
       else if (q.type === "scale")    data[key] = "3";
     });
-  });
-  return data;
+  }
+  return pruneAnswers(questions, data);
 };
 
 // ── Section validation (dynamic) ─────────────────────────────────────────────
-const isSectionComplete = (sectionIndex, answers, apiSections) => {
+// القسم مكتمل إذا لم يبقَ فيه سؤال ظاهر مطلوب بلا إجابة أو بإجابة غير صالحة
+const sectionProblems = (sectionIndex, answers, apiSections) => {
   const sec = apiSections?.[sectionIndex];
-  if (!sec) return true;
-  return (sec.questions || []).every(q => {
-    if (!q.required) return true;
-    const val = answers[`q${q.id}`];
-    if (q.type === "multiple") return Array.isArray(val) && val.length > 0;
-    return val !== undefined && val !== null && String(val).trim() !== "";
-  });
+  if (!sec) return [];
+  return (sec.questions || []).map(q => ({ q, r: evaluate(q, answers) })).filter(({ q, r }) => r.status !== 'ok' && r.status !== 'hidden' && (q.required || r.status === 'invalid'));
 };
+const isSectionComplete = (sectionIndex, answers, apiSections) => sectionProblems(sectionIndex, answers, apiSections).length === 0;
 
 // ── Policy content info panel (shows admin-saved content to client) ───────────
 const PolicyInfoPanel = ({ policyType }) => {
@@ -741,16 +759,18 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
 
   // التمييز الأحمر يبقى على الأسئلة الناقصة فقط ويختفي عن كل سؤال فور الإجابة عنه
   const setAns = (qId, value) => { setAnswers(prev => ({ ...prev, [`q${qId}`]: value })); };
+  const setExtra = (key, value) => { setAnswers(prev => ({ ...prev, [key]: value })); };
   const getAns = (qId) => answers[`q${qId}`] ?? "";
+  const allQuestionsRef = apiSections.flatMap(s => s.questions || []);
 
+  // يُحفظ ما يظهر فقط (إجابات الأسئلة المخفية بشرط لا تدخل الوثيقة)
   const autoSave = useCallback(async () => {
-    await onSave(selection.id, answers).catch(() => {});
-  }, [answers, selection?.id, onSave]);
+    await onSave(selection.id, pruneAnswers(allQuestionsRef, answers)).catch(() => {});
+  }, [answers, selection?.id, onSave, apiSections]);
 
-  // الأسئلة المطلوبة غير المُجابة في قسم معيّن (لتمييزها والتمرير إليها)
-  const missingIn = (idx) => (apiSections[idx]?.questions || []).filter(q => q.required && !(
-    q.type === "multiple" ? Array.isArray(answers[`q${q.id}`]) && answers[`q${q.id}`].length > 0
-      : answers[`q${q.id}`] !== undefined && answers[`q${q.id}`] !== null && String(answers[`q${q.id}`]).trim() !== ""));
+  // الأسئلة الناقصة أو غير الصالحة في قسم معيّن (لتمييزها والتمرير إليها)
+  const missingIn = (idx) => sectionProblems(idx, answers, apiSections).map(({ q }) => q);
+  const problemMsg = (qId) => { const q = allQuestionsRef.find(x => x.id === qId); return q ? evaluate(q, answers).msg : null; };
   const flagMissing = (idx = section) => {
     setValidErr(true);
     if (idx !== section) setSection(idx);
@@ -762,7 +782,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
   const submitNow = () => {
     const firstIncomplete = apiSections.findIndex((_, i) => !isSectionComplete(i, answers, apiSections));
     if (firstIncomplete !== -1) { flagMissing(firstIncomplete); return; }
-    onSubmit(selection.id, answers);
+    onSubmit(selection.id, pruneAnswers(allQuestionsRef, answers));
   };
 
   const handleNextSection = async () => {
@@ -796,46 +816,135 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
   };
 
   const allSectionsComplete = apiSections.every((_, i) => isSectionComplete(i, answers, apiSections));
-  const allQuestions  = apiSections.flatMap(s => s.questions || []);
-  const answeredCount = allQuestions.filter(q => { const v = answers[`q${q.id}`]; return Array.isArray(v) ? v.length > 0 : v !== undefined && v !== null && String(v).trim() !== ""; }).length;
+  const progress      = summarize(apiSections, answers);           // الأسئلة الظاهرة فقط
+  const allQuestions  = { length: progress.total };
+  const answeredCount = progress.answered;
+  const completionPct = progress.total ? Math.round((progress.answered / progress.total) * 100) : 0;
   const isSent        = ["submitted", "reviewing"].includes(selection?.status);
   const sentDate      = selection?.submitted_at ? new Date(selection.submitted_at).toLocaleDateString("ar-SA-u-ca-gregory", { day: "numeric", month: "long" }) : null;
   const missingNow    = validErr ? missingIn(section).map(q => q.id) : [];
   const currentSection = apiSections[section];
 
+  const inputBox = { width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "inherit", boxSizing: "border-box" };
+  const unitTag = (u) => u ? <span style={{ fontSize: 12, color: C.gray, whiteSpace: "nowrap" }}>{u}</span> : null;
+
+  // خانة فرعية بحسب نوعها (نص/رقم/تاريخ/قائمة)
+  const renderInput = (spec, value, onChange, opts = {}) => {
+    const kind = spec.input || 'text';
+    if (kind === 'date') return (
+      <input type="date" value={value || ""} onChange={e => onChange(e.target.value)} lang="en-GB" style={{ ...inputBox, direction: "ltr", textAlign: "right", maxWidth: 260 }} aria-label={opts.label} />
+    );
+    if (kind === 'number') return (
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <input type="text" inputMode="decimal" value={value || ""} onChange={e => onChange(e.target.value)} placeholder={spec.placeholder || (spec.min !== undefined ? `${spec.min} فأكثر` : "0")} style={{ ...inputBox, direction: "ltr", textAlign: "right", maxWidth: 220 }} aria-label={opts.label} />
+        {unitTag(spec.unit)}
+      </div>
+    );
+    if (kind === 'select') return (
+      <select value={value || ""} onChange={e => onChange(e.target.value)} style={{ ...inputBox, maxWidth: 320 }} aria-label={opts.label}>
+        <option value="">— اختر —</option>
+        {(spec.options || []).map(o => <option key={o} value={o}>{o}</option>)}
+      </select>
+    );
+    return <input type="text" value={value || ""} onChange={e => onChange(e.target.value)} placeholder={spec.placeholder} style={{ ...inputBox, maxWidth: 420 }} aria-label={opts.label} />;
+  };
+
   const renderQuestion = (q) => {
-    const key = `q${q.id}`;
+    const key  = `q${q.id}`;
+    const m    = q.meta || {};
     const label = <label style={{ fontSize: 14, fontWeight: 600, color: C.ink, display: "block", marginBottom: 8 }}>{q.question}{q.required && <span style={{ color: C.red }}> *</span>}</label>;
     const hint  = q.hint && <div style={{ fontSize: 12, color: C.gray, marginBottom: 6 }}>{q.hint}</div>;
+    const info  = m.info && (
+      <div style={{ margin: "6px 0 12px", border: `1px solid ${C.primary}30`, borderRadius: 10, overflow: "hidden" }}>
+        <div style={{ padding: "8px 12px", background: `${C.primary}10`, fontSize: 12, fontWeight: 700, color: C.primary }}>{m.info.title}</div>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+            {m.info.headers && <thead><tr>{m.info.headers.map((h, i) => <th key={i} style={{ padding: "6px 10px", textAlign: "right", background: C.grayLight, color: C.ink, fontWeight: 700, whiteSpace: "nowrap" }}>{h}</th>)}</tr></thead>}
+            <tbody>{(m.info.rows || []).map((r, i) => <tr key={i} style={{ borderTop: `1px solid ${C.grayBorder}` }}>{r.map((c, j) => <td key={j} style={{ padding: "6px 10px", color: "#334452", verticalAlign: "top" }}>{c}</td>)}</tr>)}</tbody>
+          </table>
+        </div>
+      </div>
+    );
+    // حقل «أخرى»: يظهر فور اختيار خيار يستلزم توضيحًا
+    const otherBox = (() => {
+      if (!m.other?.options?.length) return null;
+      const v = answers[key];
+      const chosen = Array.isArray(v) ? v.some(x => m.other.options.includes(x)) : m.other.options.includes(String(v ?? ""));
+      if (!chosen) return null;
+      return (
+        <div style={{ marginTop: 8, padding: "10px 12px", background: C.amberSoft, borderRadius: 10, border: `1px dashed ${C.amber}80` }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: C.amberText, marginBottom: 6 }}>{m.other.label || "حدّد المقصود بـ«أخرى»"} <span style={{ color: C.red }}>*</span></div>
+          {renderInput({ input: m.other.input || 'text', placeholder: m.other.placeholder }, answers[`${key}__other`], v2 => setExtra(`${key}__other`, v2), { label: m.other.label })}
+        </div>
+      );
+    })();
+
+    // سؤال مركّب بعدة خانات
+    if (m.fields?.length) {
+      const parts = (answers[`${key}__parts`] && typeof answers[`${key}__parts`] === 'object') ? answers[`${key}__parts`] : {};
+      const setPart = (fk, v) => setAnswers(prev => {
+        const np = { ...((prev[`${key}__parts`] && typeof prev[`${key}__parts`] === 'object') ? prev[`${key}__parts`] : {}), [fk]: v };
+        return { ...prev, [`${key}__parts`]: np, [key]: assembleParts(q, prev, np) };
+      });
+      const fields = visibleFields(q, answers);
+      return (
+        <div key={q.id}>{label}{hint}{info}
+          <div style={{ display: "grid", gridTemplateColumns: fields.length > 2 ? "repeat(auto-fit, minmax(220px, 1fr))" : "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
+            {fields.map(f => (
+              <div key={f.key}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "#334452", marginBottom: 4 }}>{f.label}{f.required !== false && q.required && <span style={{ color: C.red }}> *</span>}</div>
+                {renderInput(f, parts[f.key], v => setPart(f.key, v), { label: f.label })}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
     if (q.type === "text") return (
-      <div key={q.id}>{label}{hint}<textarea value={getAns(q.id)} onChange={e => setAns(q.id, e.target.value)} rows={3} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "inherit", resize: "vertical", boxSizing: "border-box" }} /></div>
+      <div key={q.id}>{label}{hint}{info}
+        {m.input === 'date' || m.input === 'number'
+          ? renderInput(m, getAns(q.id), v => setAns(q.id, v), { label: q.question })
+          : <textarea value={getAns(q.id)} onChange={e => setAns(q.id, e.target.value)} rows={3} style={{ ...inputBox, resize: "vertical", direction: "rtl", textAlign: "right" }} />}
+      </div>
     );
     if (q.type === "single") return (
-      <div key={q.id}>{label}{hint}
+      <div key={q.id}>{label}{hint}{info}
         {(q.options || []).map((o, i) => (
           <label key={i} onClick={() => setAns(q.id, o)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, marginBottom: 4, cursor: "pointer", border: `1.5px solid ${getAns(q.id) === o ? C.primary : C.grayBorder}`, background: getAns(q.id) === o ? `${C.primary}08` : "transparent" }}>
             <input type="radio" checked={getAns(q.id) === o} onChange={() => setAns(q.id, o)} style={{ accentColor: C.primary }} />
             <span style={{ fontSize: 13 }}>{o}</span>
           </label>
         ))}
+        {otherBox}
       </div>
     );
     if (q.type === "multiple") {
       const vals = Array.isArray(getAns(q.id)) ? getAns(q.id) : [];
-      const toggle = (o) => setAns(q.id, vals.includes(o) ? vals.filter(x => x !== o) : [...vals, o]);
+      const forced = forcedOptions(q, answers);
+      // التبديل من آخر حالة (لا من نسخة قديمة)، والنقر على النص يصل إلى خانة الاختيار عبر <label> نفسها فلا نكرّر المعالجة
+      const toggle = (o) => setAnswers(prev => ({ ...prev, [key]: toggleMultiple(q, prev, o) }));
+      const excl = m.exclusive || [];
       return (
-        <div key={q.id}>{label}{hint}
-          {(q.options || []).map((o, i) => (
-            <label key={i} onClick={() => toggle(o)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, marginBottom: 4, cursor: "pointer", border: `1.5px solid ${vals.includes(o) ? C.primary : C.grayBorder}`, background: vals.includes(o) ? `${C.primary}08` : "transparent" }}>
-              <input type="checkbox" checked={vals.includes(o)} onChange={() => toggle(o)} style={{ accentColor: C.primary }} />
-              <span style={{ fontSize: 13 }}>{o}</span>
-            </label>
-          ))}
+        <div key={q.id}>{label}{hint}{info}
+          {forced.length > 0 && <div style={{ fontSize: 12, color: C.amberText, marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}><IcLock width={12} height={12}/> خيارات إلزامية في حالتكم ولا يمكن إلغاؤها: {forced.join("، ")}</div>}
+          {(q.options || []).map((o, i) => {
+            const on = vals.includes(o) || forced.includes(o); const locked = forced.includes(o); const isNeg = excl.includes(o);
+            return (
+              <label key={i} title={locked ? "خيار إلزامي" : isNeg ? "اختياره يلغي بقية الخيارات" : ""}
+                style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, marginBottom: 4, cursor: locked ? "not-allowed" : "pointer", border: `1.5px solid ${on ? C.primary : C.grayBorder}`, background: on ? `${C.primary}08` : "transparent", opacity: locked ? 0.85 : 1, marginTop: isNeg ? 8 : 0 }}>
+                <input type="checkbox" checked={on} disabled={locked} onChange={() => !locked && toggle(o)} style={{ accentColor: C.primary }} />
+                <span style={{ fontSize: 13 }}>{o}</span>
+                {locked && <span style={{ marginInlineStart: "auto", color: C.gray, display: "inline-flex" }}><IcLock width={12} height={12}/></span>}
+              </label>
+            );
+          })}
+          {otherBox}
         </div>
       );
     }
     if (q.type === "yesno") return (
-      <div key={q.id}>{label}{hint}
+      <div key={q.id}>{label}{hint}{info}
         {["نعم", "لا"].map((o) => (
           <label key={o} onClick={() => setAns(q.id, o)} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 18px", borderRadius: 8, marginLeft: 8, cursor: "pointer", border: `1.5px solid ${getAns(q.id) === o ? C.primary : C.grayBorder}`, background: getAns(q.id) === o ? `${C.primary}08` : "transparent" }}>
             <input type="radio" checked={getAns(q.id) === o} onChange={() => setAns(q.id, o)} style={{ accentColor: C.primary }} />
@@ -898,10 +1007,10 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
 
       <div style={{ marginBottom: 16 }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-          <span style={{ fontSize: 12, color: C.gray }}>القسم {section + 1} من {apiSections.length} · أجبت عن {answeredCount} من {allQuestions.length} سؤالًا</span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: C.primary }}>{Math.round(((section + 1) / apiSections.length) * 100)}%</span>
+          <span style={{ fontSize: 12, color: C.gray }}>القسم الحالي: {section + 1} من {apiSections.length} · أجبت عن {answeredCount} من {allQuestions.length} سؤالًا</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: C.primary }} title="تُحسب من الأسئلة المكتملة (الظاهرة) ولا تتغير بمجرد التنقل بين الأقسام">نسبة استكمال الإجابات {completionPct}%</span>
         </div>
-        <ProgressBar percent={((section + 1) / apiSections.length) * 100} />
+        <ProgressBar percent={completionPct} />
       </div>
 
       <div style={{ display: "flex", gap: 4, marginBottom: 16, overflowX: "auto", padding: "4px 0" }}>
@@ -952,7 +1061,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
       )}
       {!readOnly && validErr && missingNow.length > 0 && (
         <div style={{ marginBottom: 12, padding: "12px 16px", background: C.redLight, border: `1.5px solid ${C.red}40`, borderRadius: 10, fontSize: 13, color: C.red, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <IcWarning width={16} height={16}/> {missingNow.length > 0 ? `بقي ${missingNow.length} من الأسئلة المطلوبة (*) دون إجابة في هذا القسم — ميّزناها لك باللون الأحمر` : "يرجى تعبئة جميع الحقول المطلوبة (*) قبل المتابعة"}
+          <IcWarning width={16} height={16}/> {`بقي ${missingNow.length} من الأسئلة في هذا القسم يحتاج إلى إجابة أو تصحيح — ميّزناها لك باللون الأحمر مع سبب كل واحدة`}
         </div>
       )}
 
@@ -963,12 +1072,16 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
         </p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 20, pointerEvents: readOnly ? 'none' : 'auto', opacity: readOnly ? 0.85 : 1 }}>
-          {(currentSection?.questions || []).map(q => (
-            <div key={q.id} id={`pq-${q.id}`} style={missingNow.includes(q.id) ? { border: `1.5px solid ${C.red}`, background: "#FFF7F7", borderRadius: 10, padding: 12 } : undefined}>
-              {renderQuestion(q)}
-              {missingNow.includes(q.id) && <div style={{ fontSize: 12, color: C.red, fontWeight: 700, marginTop: 6 }}>هذا السؤال مطلوب</div>}
-            </div>
-          ))}
+          {(currentSection?.questions || []).filter(q => isVisible(q, answers)).map(q => {
+            const liveMsg = !readOnly && isFilled(answers[`q${q.id}`]) && evaluate(q, answers).status === 'invalid' ? evaluate(q, answers).msg : null;
+            const flagged = missingNow.includes(q.id);
+            return (
+              <div key={q.id} id={`pq-${q.id}`} style={flagged || liveMsg ? { border: `1.5px solid ${C.red}`, background: "#FFF7F7", borderRadius: 10, padding: 12 } : undefined}>
+                {renderQuestion(q)}
+                {(flagged || liveMsg) && <div role="alert" style={{ fontSize: 12, color: C.red, fontWeight: 700, marginTop: 6 }}>{liveMsg || problemMsg(q.id) || "هذا السؤال مطلوب"}</div>}
+              </div>
+            );
+          })}
           {(currentSection?.questions || []).length === 0 && (
             <div style={{ padding: 20, textAlign: "center", color: C.gray, fontSize: 13 }}>لا توجد أسئلة في هذا القسم</div>
           )}
@@ -1079,7 +1192,7 @@ const StepWork = ({ policyTypes, selections, onSave, onSubmit, loading, external
       <p style={{ fontSize: 13, color: C.gray, marginBottom: 16 }}>اضغط على أي سياسة لتعبئة استبيانها، وبعد اكتمالها أرسلها لمراجعة المستشار.</p>
 
       {notice && (
-        <div role="status" style={{ marginBottom: 14, padding: "12px 16px", background: C.greenLight, border: `1.5px solid ${C.green}50`, borderRadius: 12, fontSize: 13, color: "#086449", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+        <div role="status" style={{ marginBottom: 14, padding: "12px 16px", background: /تعذّر/.test(notice) ? C.amberSoft : C.greenLight, border: `1.5px solid ${/تعذّر/.test(notice) ? C.amber : C.green}50`, borderRadius: 12, fontSize: 13, color: /تعذّر/.test(notice) ? C.amberText : "#086449", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
           <span style={{ display: "flex", alignItems: "center", gap: 8 }}><IcCheckCircle width={18} height={18}/>{notice}</span>
           <button onClick={onDismissNotice} aria-label="إغلاق" style={{ background: "none", border: "none", cursor: "pointer", color: "#086449", fontSize: 16 }}>×</button>
         </div>
@@ -2004,6 +2117,42 @@ const StepDesign = ({
 
 // ══════════════════════════════════════════════════════════════════════════════
 // ── WorkflowsList ─────────────────────────────────────────────────────────────
+// شرح البداية في صفحة الخطط (نصوصه وفيديوه من «محتوى الموقع» ← السياسات واللوائح)
+const PlansIntro = () => {
+  const sc = useSiteContent();
+  const [showVideo, setShowVideo] = useState(false);
+  const steps = String(sc.policies_plans_intro_steps || '').split('\n').map(x => x.trim()).filter(Boolean);
+  const hasVideo = !!(sc.policies_video_url || sc.policies_video_url_alt);
+  if (!sc.policies_plans_intro_title && !steps.length) return null;
+  return (
+    <Card style={{ padding: '20px 24px', marginBottom: 16, borderRight: `4px solid ${C.amber}` }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, minWidth: 260 }}>
+          {sc.policies_plans_intro_title && <h3 style={{ fontSize: 17, fontWeight: 800, color: C.ink, marginBottom: 6 }}>{sc.policies_plans_intro_title}</h3>}
+          {sc.policies_plans_intro_text && <p style={{ fontSize: 13, color: C.gray, lineHeight: 1.8, margin: 0 }}>{sc.policies_plans_intro_text}</p>}
+        </div>
+        {hasVideo && (
+          <button onClick={() => setShowVideo(v => !v)} style={{ padding: '9px 16px', borderRadius: 10, border: `1.5px solid ${C.primary}`, background: showVideo ? C.primary : '#fff', color: showVideo ? '#fff' : C.primary, fontSize: 13, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            {showVideo ? 'إخفاء الفيديو التعريفي' : '▶ شاهد الفيديو التعريفي'}
+          </button>
+        )}
+      </div>
+      {showVideo && hasVideo && <div style={{ marginTop: 14, maxWidth: 760 }}><UnitVideo url={sc.policies_video_url} altUrl={sc.policies_video_url_alt} title="الفيديو التعريفي للسياسات واللوائح" radius={10} /></div>}
+      {steps.length > 0 && (
+        <ol style={{ margin: '14px 0 0', padding: 0, listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 8 }}>
+          {steps.map((st, i) => (
+            <li key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13, color: C.ink, lineHeight: 1.7 }}>
+              <span style={{ width: 24, height: 24, borderRadius: '50%', background: C.primary, color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0, marginTop: 2 }}>{i + 1}</span>
+              <span>{st}</span>
+            </li>
+          ))}
+        </ol>
+      )}
+      <div style={{ marginTop: 12, fontSize: 12, color: C.gray, display: 'flex', alignItems: 'center', gap: 6 }}><IcLightbulb width={14} height={14}/> داخل كل استبيان تجد زر «معلومات هذه السياسة» وفيه النبذة والإرشادات والفيديو الخاص بها.</div>
+    </Card>
+  );
+};
+
 const WorkflowsList = ({ onSelect, onNew }) => {
   const [workflows,   setWorkflows]   = useState([]);
   const [canCreate,   setCanCreate]   = useState(false);
@@ -2052,6 +2201,7 @@ const WorkflowsList = ({ onSelect, onNew }) => {
   return (
     <div className="animate-in">
       {/* Header */}
+      <PlansIntro />
       <div style={{ background: C.white, borderRadius: 16, padding: '28px 32px', marginBottom: 16, boxShadow: '0 1px 6px rgba(14,42,61,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14 }}>
         <div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: C.ink, marginBottom: 4 }}>خططك للسياسات واللوائح</h2>
@@ -2243,16 +2393,24 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
     } finally { setActLoading(false); }
   };
 
+  // تحديث نسخة السياسة في الصفحة فور الحفظ حتى تظهر آخر إجابة عند إعادة فتح الاستبيان دون تحديث الصفحة
+  const mergeSelection = (sel) => { if (sel?.id) setPageData(prev => prev ? ({ ...prev, selections: (prev.selections || []).map(s => s.id === sel.id ? { ...s, ...sel } : s) }) : prev); };
   const handleSave = async (id, formData) => {
     try {
-      await policiesApi.saveSelection(workflowId, id, { form_data: formData });
-    } catch {}
+      const res = await policiesApi.saveSelection(workflowId, id, { form_data: formData });
+      mergeSelection(res.data?.selection);
+    } catch {
+      // نحتفظ بما كتبه العميل محليًا حتى لو تعذّر الحفظ، ونعلمه بوضوح
+      setPageData(prev => prev ? ({ ...prev, selections: (prev.selections || []).map(s => s.id === id ? { ...s, form_data: formData } : s) }) : prev);
+      setNotice("تعذّر حفظ الإجابات على الخادم — تحقق من الاتصال ثم اضغط «حفظ ومتابعة لاحقاً» مرة أخرى.");
+    }
   };
 
   const handleSubmit = async (id, formData) => {
     setActLoading(true);
     try {
-      await policiesApi.submitSelection(workflowId, id, { form_data: formData });
+      const res = await policiesApi.submitSelection(workflowId, id, { form_data: formData });
+      mergeSelection(res.data?.selection);
       const sel  = selections.find(x => x.id === id);
       const name = policyTypes.find(p => p.id === sel?.policy_type_id)?.name || "السياسة";
       setNotice(`تم إرسال «${name}» لمراجعة المستشار ✓ — ستصلك إشعارات عند ردّه.`);
@@ -2448,7 +2606,7 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
       <Stepper step={displayStep} realStep={currentStep} allDone={isFullyDone} onStepClick={workflow ? handleStepClick : undefined} />
 
       {notice && displayStep !== 3 && (
-        <div role="status" style={{ marginBottom: 14, padding: "12px 16px", background: C.greenLight, border: `1.5px solid ${C.green}50`, borderRadius: 12, fontSize: 13, color: "#086449", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+        <div role="status" style={{ marginBottom: 14, padding: "12px 16px", background: /تعذّر/.test(notice) ? C.amberSoft : C.greenLight, border: `1.5px solid ${/تعذّر/.test(notice) ? C.amber : C.green}50`, borderRadius: 12, fontSize: 13, color: /تعذّر/.test(notice) ? C.amberText : "#086449", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
           <span style={{ display: "flex", alignItems: "center", gap: 8 }}><IcCheckCircle width={18} height={18}/>{notice}</span>
           <button onClick={() => setNotice(null)} aria-label="إغلاق" style={{ background: "none", border: "none", cursor: "pointer", color: "#086449", fontSize: 16 }}>×</button>
         </div>

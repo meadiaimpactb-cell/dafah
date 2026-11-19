@@ -5,6 +5,7 @@ import api from '../../api/axios';
 import { consultantApi } from '../../api/consultant';
 import { consultantPoliciesApi } from '../../api/policies';
 import FormDataViewer from './FormDataViewer';
+import { isVisible as policyQuestionVisible } from '../policies/questionRules';
 import { usePermissions } from '../../utils/permissions';
 import { IcCheckCircle, IcArrowPath, IcWarning, IcXMark, IcSparkles, IcClipboard, IcCog, IcScroll, IcPalette, IcLock, IcUpload, IcEye, IcDocument } from '../../utils/icons';
 
@@ -68,8 +69,14 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
 
               {/* Questions */}
               <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {questions.map((q, qi) => {
-                  const answer = formData[`q${q.id}`];
+                {questions.filter(q => policyQuestionVisible(q, formData)).map((q, qi) => {
+                  const rawAnswer = formData[`q${q.id}`];
+                  const otherTxt  = formData[`q${q.id}__other`];
+                  const otherLbl  = q.meta?.other?.label || 'التوضيح';
+                  // «أخرى» مع توضيحها يظهران معًا للمستشار
+                  const answer = otherTxt && String(otherTxt).trim()
+                    ? (Array.isArray(rawAnswer) ? [...rawAnswer, `${otherLbl}: ${otherTxt}`] : `${rawAnswer ?? ''} — ${otherLbl}: ${otherTxt}`)
+                    : rawAnswer;
                   const isEmpty = answer === undefined || answer === '' || answer === null || (Array.isArray(answer) && answer.length === 0);
 
                   return (

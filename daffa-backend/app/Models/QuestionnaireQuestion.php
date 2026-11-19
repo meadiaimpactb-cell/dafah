@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class QuestionnaireQuestion extends Model
 {
-    protected $fillable = ['section_id', 'question', 'type', 'options', 'required', 'hint', 'display_condition', 'sort_order'];
+    protected $fillable = ['section_id', 'question', 'type', 'options', 'required', 'hint', 'display_condition', 'meta', 'sort_order'];
 
-    protected $casts = ['required' => 'boolean', 'options' => 'array'];
+    protected $casts = ['required' => 'boolean', 'options' => 'array', 'meta' => 'array'];
 
     public function section()
     {
