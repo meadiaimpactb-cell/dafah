@@ -16,21 +16,26 @@ use Illuminate\Support\Facades\RateLimiter;
  */
 class EmailOtp
 {
-    public const TTL_MINUTES    = 10;
-    public const MAX_ATTEMPTS   = 5;
-    public const RESEND_SECONDS = 60;
-    public const MAX_PER_HOUR   = 6;
+    public const TTL_MINUTES = 10;
 
-    public const VERIFY       = 'verify';
+    public const MAX_ATTEMPTS = 5;
+
+    public const RESEND_SECONDS = 60;
+
+    public const MAX_PER_HOUR = 6;
+
+    public const VERIFY = 'verify';
+
     public const EMAIL_CHANGE = 'email_change';
 
     /**
      * إنشاء رمز وإرساله.
+     *
      * @return array{status: 'sent'|'throttled'|'failed', retry_after: int}
      */
     public static function send(string $email, string $name, string $purpose = self::VERIFY, ?int $userId = null): array
     {
-        $email   = mb_strtolower(trim($email));
+        $email = mb_strtolower(trim($email));
         $coolKey = "otp-send:{$purpose}:{$email}";
         $hourKey = "otp-send-hour:{$email}";
 
@@ -45,11 +50,11 @@ class EmailOtp
 
         EmailVerification::where('email', $email)->where('purpose', $purpose)->delete();
         $row = EmailVerification::create([
-            'email'      => $email,
-            'code'       => self::hash($email, $code),
-            'purpose'    => $purpose,
-            'user_id'    => $userId,
-            'attempts'   => 0,
+            'email' => $email,
+            'code' => self::hash($email, $code),
+            'purpose' => $purpose,
+            'user_id' => $userId,
+            'attempts' => 0,
             'expires_at' => now()->addMinutes(self::TTL_MINUTES),
         ]);
 
@@ -58,6 +63,7 @@ class EmailOtp
         } catch (\Throwable $e) {
             $row->delete();
             Log::error('[OTP] تعذّر إرسال رمز التحقق', ['email' => $email, 'purpose' => $purpose, 'error' => $e->getMessage()]);
+
             return ['status' => 'failed', 'retry_after' => 0];
         }
 
@@ -73,6 +79,7 @@ class EmailOtp
 
     /**
      * التحقق من رمز. عند النجاح يُحذف الرمز (لا يُستخدم مرتين).
+     *
      * @return 'ok'|'invalid'|'expired'|'locked'
      */
     public static function check(string $email, string $code, string $purpose = self::VERIFY, ?int $userId = null): string
@@ -84,20 +91,23 @@ class EmailOtp
             ->latest('id')
             ->first();
 
-        if (!$row || $row->isExpired() || ($userId !== null && (int) $row->user_id !== $userId)) {
+        if (! $row || $row->isExpired() || ($userId !== null && (int) $row->user_id !== $userId)) {
             return 'expired';
         }
 
-        if (!hash_equals($row->code, self::hash($email, $code))) {
+        if (! hash_equals($row->code, self::hash($email, $code))) {
             $row->increment('attempts');
             if ($row->attempts >= self::MAX_ATTEMPTS) {
                 $row->delete();
+
                 return 'locked';
             }
+
             return 'invalid';
         }
 
         $row->delete();
+
         return 'ok';
     }
 
@@ -106,8 +116,8 @@ class EmailOtp
     {
         return match ($result) {
             'invalid' => 'الرمز غير صحيح، تحقق منه وأعد المحاولة.',
-            'locked'  => 'تجاوزت عدد المحاولات المسموح. اطلب رمزًا جديدًا.',
-            default   => 'الرمز منتهي الصلاحية أو غير صالح. اطلب رمزًا جديدًا.',
+            'locked' => 'تجاوزت عدد المحاولات المسموح. اطلب رمزًا جديدًا.',
+            default => 'الرمز منتهي الصلاحية أو غير صالح. اطلب رمزًا جديدًا.',
         };
     }
 
@@ -115,19 +125,19 @@ class EmailOtp
     public static function sendMessage(array $result, string $sentText = 'أرسلنا رمز التحقق إلى بريدك الإلكتروني.'): string
     {
         return match ($result['status']) {
-            'sent'      => $sentText,
-            'throttled' => 'أرسلنا لك رمزًا قبل قليل — تحقق من بريدك (ومجلد البريد غير الهام). يمكنك طلب رمز جديد بعد ' . self::wait($result['retry_after']) . '.',
-            default     => 'تعذّر إرسال الرمز الآن. حاول مرة أخرى بعد قليل.',
+            'sent' => $sentText,
+            'throttled' => 'أرسلنا لك رمزًا قبل قليل — تحقق من بريدك (ومجلد البريد غير الهام). يمكنك طلب رمز جديد بعد '.self::wait($result['retry_after']).'.',
+            default => 'تعذّر إرسال الرمز الآن. حاول مرة أخرى بعد قليل.',
         };
     }
 
     private static function wait(int $seconds): string
     {
-        return $seconds >= 120 ? ceil($seconds / 60) . ' دقيقة' : max(1, $seconds) . ' ثانية';
+        return $seconds >= 120 ? ceil($seconds / 60).' دقيقة' : max(1, $seconds).' ثانية';
     }
 
     private static function hash(string $email, string $code): string
     {
-        return hash_hmac('sha256', $email . '|' . $code, (string) config('app.key'));
+        return hash_hmac('sha256', $email.'|'.$code, (string) config('app.key'));
     }
 }

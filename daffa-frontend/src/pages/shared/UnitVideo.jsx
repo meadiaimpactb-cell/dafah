@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /*
  * فيديو شرح الوحدة — مشترك بين التخطيط الاستراتيجي والتشغيلي والسياسات.

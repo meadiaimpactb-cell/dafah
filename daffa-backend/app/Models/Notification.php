@@ -10,7 +10,7 @@ class Notification extends Model
     protected $fillable = ['user_id', 'type', 'title', 'body', 'data', 'read_at'];
 
     protected $casts = [
-        'data'    => 'array',
+        'data' => 'array',
         'read_at' => 'datetime',
     ];
 
@@ -29,10 +29,10 @@ class Notification extends Model
     {
         return self::create([
             'user_id' => $userId,
-            'type'    => $type,
-            'title'   => $title,
-            'body'    => $body,
-            'data'    => $data ?: null,
+            'type' => $type,
+            'title' => $title,
+            'body' => $body,
+            'data' => $data ?: null,
         ]);
     }
 }

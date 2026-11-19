@@ -1,4 +1,3 @@
-import React from 'react';
 
 const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
 const norm = s => (s || '').replace(/\s+/g, ' ').trim();

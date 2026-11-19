@@ -1,5 +1,4 @@
 import DfIcon from '../../components/ui/DfIcon';
-import React from 'react';
 
 const colors = {
   primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
@@ -235,9 +234,9 @@ const TocViewer = ({ data }) => {
 // ── عارض BMC ──────────────────────────────────────────────────────────────────
 const BmcViewer = ({ data }) => {
   const blocks = [
-    ['value_proposition', <DfIcon name="gem" size={20} />], ['customer_segments', <DfIcon name="users" size={20} />], ['channels', <DfIcon name="signal" size={20} />],
-    ['relationships', <DfIcon name="handshake" size={20} />], ['key_activities', <DfIcon name="gear" size={20} />], ['key_resources', <DfIcon name="wrench" size={20} />],
-    ['partners', <DfIcon name="building" size={20} />], ['revenue_streams', <DfIcon name="money" size={20} />], ['cost_structure', <DfIcon name="chart" size={20} />],
+    ['value_proposition', <DfIcon key="gem" name="gem" size={20} />], ['customer_segments', <DfIcon key="users" name="users" size={20} />], ['channels', <DfIcon key="signal" name="signal" size={20} />],
+    ['relationships', <DfIcon key="handshake" name="handshake" size={20} />], ['key_activities', <DfIcon key="gear" name="gear" size={20} />], ['key_resources', <DfIcon key="wrench" name="wrench" size={20} />],
+    ['partners', <DfIcon key="building" name="building" size={20} />], ['revenue_streams', <DfIcon key="money" name="money" size={20} />], ['cost_structure', <DfIcon key="chart" name="chart" size={20} />],
   ];
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 10 }}>
@@ -459,7 +458,7 @@ export default function FormDataViewer({ data, template }) {
         return (
           <Section key={key} title={sectionLabel}>
             <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 10 }}>
-              {[['strengths','#E8F8F2','#0B7F5D',<DfIcon name="muscle" size={20} />], ['weaknesses','#FCEBEB','#C53A3A',<DfIcon name="warning" size={20} />], ['opportunities','#EAF4FD','#1A65AD',<DfIcon name="rocket" size={20} />], ['threats','#FEF3EC','#A33F12',<DfIcon name="shield" size={20} />]].map(([k, bg, clr, ico]) => value[k] ? (
+              {[['strengths','#E8F8F2','#0B7F5D',<DfIcon key="muscle" name="muscle" size={20} />], ['weaknesses','#FCEBEB','#C53A3A',<DfIcon key="warning" name="warning" size={20} />], ['opportunities','#EAF4FD','#1A65AD',<DfIcon key="rocket" name="rocket" size={20} />], ['threats','#FEF3EC','#A33F12',<DfIcon key="shield" name="shield" size={20} />]].map(([k, bg, clr, ico]) => value[k] ? (
                 <div key={k} style={{ padding: 12, background: bg, borderRadius: 10, border: `1px solid ${clr}30` }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: clr, marginBottom: 6 }}>{ico} {LABELS[k]}</div>
                   <div style={{ fontSize: 12, color: '#334452', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{value[k]}</div>

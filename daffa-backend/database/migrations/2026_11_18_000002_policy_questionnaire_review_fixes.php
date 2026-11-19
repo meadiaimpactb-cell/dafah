@@ -18,7 +18,8 @@ use Illuminate\Support\Facades\Schema;
  *  - نص تعريفي وفيديو في صفحة «خططك للسياسات واللوائح» (قابل للتعديل من محتوى الموقع).
  * المطابقة بنص السؤال داخل كل سياسة (لا بالأرقام) حتى تصح على أي بيئة.
  */
-return new class extends Migration {
+return new class extends Migration
+{
     private array $log = [];
 
     private function q(int $pid, string $start)
@@ -26,28 +27,36 @@ return new class extends Migration {
         $rows = DB::table('questionnaire_questions as q')
             ->join('questionnaire_sections as s', 's.id', '=', 'q.section_id')
             ->where('s.policy_type_id', $pid)
-            ->where('q.question', 'like', str_replace(['%', '_'], ['\%', '\_'], $start) . '%')
+            ->where('q.question', 'like', str_replace(['%', '_'], ['\%', '\_'], $start).'%')
             ->select('q.*')->get();
         if ($rows->count() !== 1) {
             $this->log[] = "WARN p{$pid} «{$start}» → {$rows->count()} match";
+
             return null;
         }
+
         return $rows->first();
     }
 
     private function patch(int $pid, string $start, array $patch): void
     {
         $row = $this->q($pid, $start);
-        if (!$row) return;
+        if (! $row) {
+            return;
+        }
         $upd = ['updated_at' => now()];
         if (array_key_exists('meta', $patch)) {
             $meta = json_decode($row->meta ?? 'null', true) ?: [];
             $upd['meta'] = json_encode(array_replace($meta, $patch['meta']), JSON_UNESCAPED_UNICODE);
         }
         foreach (['hint', 'question', 'required'] as $k) {
-            if (array_key_exists($k, $patch)) $upd[$k] = $patch[$k];
+            if (array_key_exists($k, $patch)) {
+                $upd[$k] = $patch[$k];
+            }
         }
-        if (array_key_exists('options', $patch)) $upd['options'] = json_encode($patch['options'], JSON_UNESCAPED_UNICODE);
+        if (array_key_exists('options', $patch)) {
+            $upd['options'] = json_encode($patch['options'], JSON_UNESCAPED_UNICODE);
+        }
         DB::table('questionnaire_questions')->where('id', $row->id)->update($upd);
     }
 
@@ -59,16 +68,16 @@ return new class extends Migration {
         // ── 1) قواعد عامة على كل الأسئلة ─────────────────────────────────────────────
         $all = DB::table('questionnaire_questions')->get();
         $renames = [
-            'أخرى (تُوضَّح في الملاحظات)'                 => 'أخرى (حدّدها أدناه)',
-            'سنة مالية أخرى تُحدد بدايتها في الملاحظات'   => 'سنة مالية أخرى (حدّد بدايتها أدناه)',
+            'أخرى (تُوضَّح في الملاحظات)' => 'أخرى (حدّدها أدناه)',
+            'سنة مالية أخرى تُحدد بدايتها في الملاحظات' => 'سنة مالية أخرى (حدّد بدايتها أدناه)',
             'لغة أخرى يفهمها المستفيدون (تُوضَّح في الملاحظات)' => 'لغة أخرى يفهمها المستفيدون (حدّدها أدناه)',
-            'أنواع أخرى تتيحها المنصة (تُوضَّح في الملاحظات)'  => 'أنواع أخرى تتيحها المنصة (حدّدها أدناه)',
-            'مدد أطول لبعض السجلات (تُوضَّح في الملاحظات)'      => 'مدد أطول لبعض السجلات (حدّدها أدناه)',
+            'أنواع أخرى تتيحها المنصة (تُوضَّح في الملاحظات)' => 'أنواع أخرى تتيحها المنصة (حدّدها أدناه)',
+            'مدد أطول لبعض السجلات (تُوضَّح في الملاحظات)' => 'مدد أطول لبعض السجلات (حدّدها أدناه)',
         ];
         foreach ($all as $row) {
             $meta = json_decode($row->meta ?? 'null', true) ?: [];
             $opts = json_decode($row->options ?? 'null', true);
-            $upd  = [];
+            $upd = [];
 
             // خانة تاريخ
             if ($row->type === 'text' && mb_strpos($row->question, 'ما تاريخ النفاذ المقترح') === 0) {
@@ -79,47 +88,73 @@ return new class extends Migration {
             if (is_array($opts)) {
                 $changed = false;
                 foreach ($opts as $i => $o) {
-                    if (isset($renames[$o])) { $opts[$i] = $renames[$o]; $changed = true; }
+                    if (isset($renames[$o])) {
+                        $opts[$i] = $renames[$o];
+                        $changed = true;
+                    }
                 }
                 // «أخرى» → حقل توضيح مطلوب
                 $others = array_values(array_filter($opts, fn ($o) => mb_strpos($o, 'أدناه') !== false));
                 if ($others) {
                     $label = 'حدّد المقصود بـ«أخرى»';
                     $extra = [];
-                    if (mb_strpos($row->question, 'باعتماد') !== false)                 $label = 'اذكر جهة الاعتماد';
-                    elseif (mb_strpos($row->question, 'دورية مراجعة') !== false)          $label = 'حدّد دورية المراجعة';
-                    elseif (mb_strpos($row->question, 'السنة المالية') !== false)         { $label = 'تاريخ بداية السنة المالية'; $extra = ['placeholder' => 'مثال: 1 يوليو']; }
-                    elseif (mb_strpos($row->question, 'لغة') !== false)                   $label = 'اذكر اللغة';
-                    elseif (mb_strpos($others[0], 'السجلات') !== false)                   $label = 'اذكر السجلات ومددها';
+                    if (mb_strpos($row->question, 'باعتماد') !== false) {
+                        $label = 'اذكر جهة الاعتماد';
+                    } elseif (mb_strpos($row->question, 'دورية مراجعة') !== false) {
+                        $label = 'حدّد دورية المراجعة';
+                    } elseif (mb_strpos($row->question, 'السنة المالية') !== false) {
+                        $label = 'تاريخ بداية السنة المالية';
+                        $extra = ['placeholder' => 'مثال: 1 يوليو'];
+                    } elseif (mb_strpos($row->question, 'لغة') !== false) {
+                        $label = 'اذكر اللغة';
+                    } elseif (mb_strpos($others[0], 'السجلات') !== false) {
+                        $label = 'اذكر السجلات ومددها';
+                    }
                     $meta['other'] = array_merge(['options' => $others, 'label' => $label], $extra);
                 }
                 // خيارات النفي حصرية
                 if ($row->type === 'multiple') {
                     $neg = array_values(array_filter($opts, fn ($o) => preg_match('/^(لا |لم )/u', $o)));
-                    if ($neg) $meta['exclusive'] = $neg;
+                    if ($neg) {
+                        $meta['exclusive'] = $neg;
+                    }
                 }
-                if ($changed) $upd['options'] = json_encode($opts, JSON_UNESCAPED_UNICODE);
+                if ($changed) {
+                    $upd['options'] = json_encode($opts, JSON_UNESCAPED_UNICODE);
+                }
             }
 
-            if ($meta !== (json_decode($row->meta ?? 'null', true) ?: [])) $upd['meta'] = json_encode($meta, JSON_UNESCAPED_UNICODE);
-            if ($upd) { $upd['updated_at'] = now(); DB::table('questionnaire_questions')->where('id', $row->id)->update($upd); }
+            if ($meta !== (json_decode($row->meta ?? 'null', true) ?: [])) {
+                $upd['meta'] = json_encode($meta, JSON_UNESCAPED_UNICODE);
+            }
+            if ($upd) {
+                $upd['updated_at'] = now();
+                DB::table('questionnaire_questions')->where('id', $row->id)->update($upd);
+            }
         }
 
         // إجابات محفوظة بالنص القديم للخيارات
         foreach (DB::table('policy_selections')->whereNotNull('form_data')->get() as $sel) {
             $fd = json_decode($sel->form_data, true);
-            if (!is_array($fd)) continue;
+            if (! is_array($fd)) {
+                continue;
+            }
             $orig = $fd;
             foreach ($fd as $k => $v) {
-                if (is_string($v) && isset($renames[$v])) $fd[$k] = $renames[$v];
-                elseif (is_array($v)) $fd[$k] = array_map(fn ($x) => is_string($x) && isset($renames[$x]) ? $renames[$x] : $x, $v);
+                if (is_string($v) && isset($renames[$v])) {
+                    $fd[$k] = $renames[$v];
+                } elseif (is_array($v)) {
+                    $fd[$k] = array_map(fn ($x) => is_string($x) && isset($renames[$x]) ? $renames[$x] : $x, $v);
+                }
             }
-            if ($fd !== $orig) DB::table('policy_selections')->where('id', $sel->id)->update(['form_data' => json_encode($fd, JSON_UNESCAPED_UNICODE)]);
+            if ($fd !== $orig) {
+                DB::table('policy_selections')->where('id', $sel->id)->update(['form_data' => json_encode($fd, JSON_UNESCAPED_UNICODE)]);
+            }
         }
 
         $riyal = ['input' => 'number', 'min' => 0, 'unit' => 'ريال'];
-        $pct   = ['input' => 'number', 'min' => 0, 'max' => 100, 'unit' => '%'];
-        $days  = ['input' => 'number', 'min' => 0, 'integer' => true, 'unit' => 'يوم'];
+        $pct = ['input' => 'number', 'min' => 0, 'max' => 100, 'unit' => '%'];
+        $days = ['input' => 'number', 'min' => 0, 'integer' => true, 'unit' => 'يوم'];
         $count = fn (int $min = 0) => ['input' => 'number', 'min' => $min, 'integer' => true];
 
         // ── 2) السياسة الإعلامية (25) ────────────────────────────────────────────────
@@ -136,9 +171,9 @@ return new class extends Migration {
         $this->patch(16, 'كيف ستُعتمد مستهدفات مؤشرات أداء الموارد البشرية', [
             'hint' => 'راجع المؤشرات والقيم المقترحة في الجدول أعلاه، ثم اختر طريقة اعتمادها في منظمتك.',
             'meta' => ['info' => [
-                'title'   => 'المؤشرات والمستهدفات الاسترشادية الواردة في الوثيقة',
+                'title' => 'المؤشرات والمستهدفات الاسترشادية الواردة في الوثيقة',
                 'headers' => ['المؤشر', 'طريقة القياس', 'الدورية', 'المستهدف الاسترشادي'],
-                'rows'    => [
+                'rows' => [
                     ['عقود موثقة قبل المباشرة', 'العاملون بعقود موثقة ومكتملة قبل المباشرة ÷ التعيينات', 'شهري', '100%'],
                     ['لياقة مهنية مستوفاة', 'الحالات التي أكملت الفحص المطلوب في موعده ÷ الحالات المستحقة', 'شهري', '100%'],
                     ['تسجيل تأمينات في الموعد', 'التسجيلات المنجزة خلال المدة النظامية ÷ التسجيلات المستحقة', 'شهري', '100%'],
@@ -153,11 +188,13 @@ return new class extends Migration {
         ]);
         $this->patch(16, $this->q(16, 'ما الحد الأقصى للإجازة دون أجر') ? 'ما الحد الأقصى للإجازة دون أجر' : 'ما الحد الأقصى للإجازة بدون أجر', [
             'question' => 'ما الحد الأقصى للإجازة دون أجر في السنة (بالأيام)؟',
-            'hint'     => 'عدد صحيح من الأيام؛ تُمنح باتفاق كتابي يحدد المدة والأثر وضمن الحدود التشغيلية.',
-            'meta'     => $days,
+            'hint' => 'عدد صحيح من الأيام؛ تُمنح باتفاق كتابي يحدد المدة والأثر وضمن الحدود التشغيلية.',
+            'meta' => $days,
         ]);
         $remote = $this->q(16, 'هل تتيح الجهة العمل عن بعد');
-        if ($remote) $this->patch(16, 'كيف تُغطّى تكاليف الاتصال والمعدات', ['required' => 1, 'meta' => ['show_if' => ['q' => $remote->id, 'in' => ['نعم']]]]);
+        if ($remote) {
+            $this->patch(16, 'كيف تُغطّى تكاليف الاتصال والمعدات', ['required' => 1, 'meta' => ['show_if' => ['q' => $remote->id, 'in' => ['نعم']]]]);
+        }
 
         // ── 4) اللائحة التنظيمية للجمعيات الأهلية (8) ────────────────────────────────
         $this->patch(8, 'هل تدير الجمعية أوقافًا', ['hint' => 'عند الإجابة بنعم تُطبَّق أحكام نظام الوقف ولائحته: تُسجَّل الأوقاف في سجل مستقل، وتُفصل حساباتها وعوائدها عن أموال الجمعية، وتُصرف العوائد في مصارفها المشروطة. (يفصّلها باب الموارد المالية في لائحتك المعتمدة.)']);
@@ -241,19 +278,19 @@ return new class extends Migration {
         $this->patch(9, 'ما الحد المالي لصلاحية المسؤول التنفيذي', ['hint' => 'بالريال للعملية الواحدة. هذا الحد نفسه يُدوَّن في «لائحة مصفوفة الصلاحيات والتفويض» من حزمة دفة (رمزها DAF-GOV-05) إن كانت ضمن خطتك، فاجعل القيمتين متطابقتين.', 'meta' => $riyal]);
         $this->patch(9, 'ما الحد المالي الذي تُرفع عنده العملية إلى مجلس الأمناء', ['meta' => $riyal]);
         $this->patch(9, 'ما الصلاحيات التي يحتفظ بها المؤسس صراحة', [
-            'hint'    => 'دون تدخل في الإدارة التنفيذية أو إخلال باختصاص المجلس والمركز. إن لم يحتفظ المؤسس بصلاحيات إضافية فاختر الخيار الأخير.',
+            'hint' => 'دون تدخل في الإدارة التنفيذية أو إخلال باختصاص المجلس والمركز. إن لم يحتفظ المؤسس بصلاحيات إضافية فاختر الخيار الأخير.',
             'options' => ['تعيين الأمناء وإنهاء تعيينهم واستبدالهم', 'الموافقة على التعديلات الجوهرية لغرض التخصيص أو الأصول المقيدة', 'الموافقة على طلب الحل وفق الضوابط', 'الاطلاع الاستشاري على التقارير ومؤشرات الأداء عبر المجلس', 'المشاركة في لجان تأسيسية أو استشارية', 'لا يحتفظ المؤسس بصلاحيات إضافية'],
-            'meta'    => ['exclusive' => ['لا يحتفظ المؤسس بصلاحيات إضافية']],
+            'meta' => ['exclusive' => ['لا يحتفظ المؤسس بصلاحيات إضافية']],
         ]);
         $this->patch(9, 'ما اللجان الدائمة التي سيشكلها مجلس الأمناء', [
-            'hint'    => 'يُفضل في المؤسسات المتوسطة فأكبر لجان المراجعة والاستثمار والبرامج. إن لم يُشكِّل المجلس لجانًا دائمة بعد فاختر الخيار الأخير.',
+            'hint' => 'يُفضل في المؤسسات المتوسطة فأكبر لجان المراجعة والاستثمار والبرامج. إن لم يُشكِّل المجلس لجانًا دائمة بعد فاختر الخيار الأخير.',
             'options' => ['لجنة المراجعة', 'لجنة الاستثمار', 'لجنة البرامج', 'لجنة الأوقاف', 'لجنة الترشيحات والمكافآت', 'لم يُشكِّل المجلس لجانًا دائمة'],
-            'meta'    => ['exclusive' => ['لم يُشكِّل المجلس لجانًا دائمة']],
+            'meta' => ['exclusive' => ['لم يُشكِّل المجلس لجانًا دائمة']],
         ]);
         $this->patch(9, 'ما الجهة المختصة باعتماد هذه الوثيقة', [
-            'hint'    => 'المؤسسة الأهلية لا جمعية عمومية لها؛ أعلى سلطة داخلية فيها مجلس الأمناء. تصبح الوثيقة نافذة بعد صدور قرار الاعتماد من صاحب الصلاحية.',
+            'hint' => 'المؤسسة الأهلية لا جمعية عمومية لها؛ أعلى سلطة داخلية فيها مجلس الأمناء. تصبح الوثيقة نافذة بعد صدور قرار الاعتماد من صاحب الصلاحية.',
             'options' => ['مجلس الأمناء', 'المؤسس وفق ما تقرره اللائحة', 'المسؤول التنفيذي بتفويض من مجلس الأمناء', 'أخرى (حدّدها أدناه)'],
-            'meta'    => ['other' => ['options' => ['أخرى (حدّدها أدناه)'], 'label' => 'اذكر جهة الاعتماد']],
+            'meta' => ['other' => ['options' => ['أخرى (حدّدها أدناه)'], 'label' => 'اذكر جهة الاعتماد']],
         ]);
 
         // ── 6) اللائحة التنظيمية للتعاونيات (10) ─────────────────────────────────────
@@ -280,32 +317,36 @@ return new class extends Migration {
 
         // ── 7) لائحة تشكيل وعمل اللجان المتخصصة (11) ─────────────────────────────────
         $rev = $this->q(11, 'ما الإيرادات السنوية التقديرية للجهة');
-        if ($rev) $this->patch(11, 'ما اللجان الرقابية الدائمة المعتمدة', [
-            'hint' => 'عند إيرادات 8 ملايين ريال فأكثر تلزم لجنة المراجعة ولجنة الترشيحات والمكافآت نظامًا فتُثبَّتان تلقائيًا؛ وفي غير ذلك اختيارهما متروك لك.',
-            'meta' => ['force' => ['q' => $rev->id, 'in' => ['8 ملايين ريال فأكثر'], 'options' => ['لجنة المراجعة', 'لجنة الترشيحات والمكافآت']]],
-        ]);
+        if ($rev) {
+            $this->patch(11, 'ما اللجان الرقابية الدائمة المعتمدة', [
+                'hint' => 'عند إيرادات 8 ملايين ريال فأكثر تلزم لجنة المراجعة ولجنة الترشيحات والمكافآت نظامًا فتُثبَّتان تلقائيًا؛ وفي غير ذلك اختيارهما متروك لك.',
+                'meta' => ['force' => ['q' => $rev->id, 'in' => ['8 ملايين ريال فأكثر'], 'options' => ['لجنة المراجعة', 'لجنة الترشيحات والمكافآت']]],
+            ]);
+        }
         $this->patch(11, 'كم عدد أعضاء كل لجنة دائمة معتمدة', ['meta' => $count(3) + ['unit' => 'عضو']]);
         $this->patch(11, 'كم عدد الأعضاء المستقلين من خارج الجهة', ['meta' => $count(0) + ['unit' => 'عضو']]);
         $pay = $this->q(11, 'هل تعتزم الجهة صرف مكافآت لأعضاء المجلس واللجان');
-        if ($pay) foreach (['ما قيمة مكافأة الاجتماع لعضو اللجنة', 'ما قيمة مكافأة الاجتماع لعضو مجلس الإدارة', 'ما الحد الأقصى لعدد الاجتماعات المستحق عنها مكافأة'] as $s) {
-            $this->patch(11, $s, ['meta' => ['show_if' => ['q' => $pay->id, 'in' => ['نعم']]]]);
+        if ($pay) {
+            foreach (['ما قيمة مكافأة الاجتماع لعضو اللجنة', 'ما قيمة مكافأة الاجتماع لعضو مجلس الإدارة', 'ما الحد الأقصى لعدد الاجتماعات المستحق عنها مكافأة'] as $s) {
+                $this->patch(11, $s, ['meta' => ['show_if' => ['q' => $pay->id, 'in' => ['نعم']]]]);
+            }
         }
         $this->patch(11, 'من غير أعضاء المجلس واللجنة يحق له الاطلاع', ['hint' => 'تُدوَّن هذه الصلاحيات أيضًا في «لائحة مصفوفة الصلاحيات والتفويض» من حزمة دفة إن كانت ضمن خطتك.']);
 
         // ── 8) لائحة مصفوفة الصلاحيات والتفويض (12) ──────────────────────────────────
         $levels = $this->q(12, 'ما المستويات الإدارية القائمة فعليًا');
-        $roleF  = fn ($key, $label, $opt) => ['key' => $key, 'label' => $label] + $riyal + ($levels ? ['show_if_opt' => ['q' => $levels->id, 'has' => [$opt]]] : []);
+        $roleF = fn ($key, $label, $opt) => ['key' => $key, 'label' => $label] + $riyal + ($levels ? ['show_if_opt' => ['q' => $levels->id, 'has' => [$opt]]] : []);
         $this->patch(12, 'ما حد الالتزام بالمصروف التشغيلي لكل من رئيس القسم', [
             'hint' => 'تظهر خانة لكل مستوى إداري اخترته في سؤال المستويات. القيم الافتراضية: 5,000 و20,000 و100,000 ريال على الترتيب.',
             'meta' => ['fields' => [
                 $roleF('head', 'سقف رئيس القسم بالريال', 'رئيس قسم'),
-                $roleF('dir',  'سقف مدير الإدارة بالريال', 'مدير إدارة'),
-                $roleF('ceo',  'سقف المدير التنفيذي بالريال', 'المدير التنفيذي'),
+                $roleF('dir', 'سقف مدير الإدارة بالريال', 'مدير إدارة'),
+                $roleF('ceo', 'سقف المدير التنفيذي بالريال', 'المدير التنفيذي'),
             ], 'checks' => [['lte' => ['head', 'dir'], 'msg' => 'سقف رئيس القسم لا يتجاوز سقف مدير الإدارة'], ['lte' => ['dir', 'ceo'], 'msg' => 'سقف مدير الإدارة لا يتجاوز سقف المدير التنفيذي'], ['lte' => ['head', 'ceo'], 'msg' => 'سقف رئيس القسم لا يتجاوز سقف المدير التنفيذي']]],
         ]);
         foreach (['ما الحد الأعلى لما يعتمده مجلس الإدارة مباشرة', 'ما الحد الذي يصبح بعده مبدأ الشخصين إلزاميًا', 'ما حد نقل المبالغ بين فصول الموازنة',
-                  'ما سقف الترسية المباشرة المسبَّبة', 'ما حد اختصاص المدير التنفيذي في إنهاء الخدمات', 'ما حد استثمار الفائض النقدي', 'ما سقف الحملات الإعلامية والإعلانية',
-                  'ما حد التوقيع المزدوج للمدير التنفيذي', 'ما الحد الأعلى للمستوى الثالث من التوقيع البنكي'] as $s) {
+            'ما سقف الترسية المباشرة المسبَّبة', 'ما حد اختصاص المدير التنفيذي في إنهاء الخدمات', 'ما حد استثمار الفائض النقدي', 'ما سقف الحملات الإعلامية والإعلانية',
+            'ما حد التوقيع المزدوج للمدير التنفيذي', 'ما الحد الأعلى للمستوى الثالث من التوقيع البنكي'] as $s) {
             $this->patch(12, $s, ['meta' => $riyal]);
         }
         $this->patch(12, 'ما حد العهدة الفردية ومدة تسويتها', ['meta' => ['fields' => [['key' => 'amount', 'label' => 'حد العهدة الفردية بالريال'] + $riyal, ['key' => 'days', 'label' => 'مدة التسوية'] + $days + ['min' => 1]]]]);
@@ -325,7 +366,7 @@ return new class extends Migration {
         $this->patch(12, 'ما الحد الأعلى لمكافآت المتطوعين التقديرية', [
             'hint' => 'حدّد الحد الأقصى لمكافأة المتطوع خلال الشهر، والحد الأقصى لمجموع مكافآته خلال السنة، وفق الحدود المعتمدة لدى منظمتك.',
             'meta' => ['fields' => [['key' => 'monthly', 'label' => 'الحد الشهري للمتطوع بالريال'] + $riyal, ['key' => 'yearly', 'label' => 'الحد السنوي للمتطوع بالريال'] + $riyal],
-                       'checks' => [['lte' => ['monthly', 'yearly'], 'msg' => 'الحد الشهري لا يتجاوز الحد السنوي']]],
+                'checks' => [['lte' => ['monthly', 'yearly'], 'msg' => 'الحد الشهري لا يتجاوز الحد السنوي']]],
         ]);
         $this->patch(12, 'ما حدود المدير التنفيذي في إطلاق برنامج جديد', ['meta' => ['fields' => [
             ['key' => 'program', 'label' => 'إطلاق برنامج جديد بتكلفته السنوية'] + $riyal,
@@ -365,14 +406,16 @@ return new class extends Migration {
             ])],
         ];
         foreach ($items as [$key, $label, $type, $value]) {
-            if (!DB::table('site_contents')->where('key', $key)->exists()) {
+            if (! DB::table('site_contents')->where('key', $key)->exists()) {
                 DB::table('site_contents')->insert(['group' => 'policies', 'key' => $key, 'label' => $label, 'type' => $type, 'value' => $value, 'created_at' => now(), 'updated_at' => now()]);
             }
         }
 
         foreach ($this->log as $l) {
-            \Log::warning('policy_questionnaire_review_fixes: ' . $l);
-            if (app()->runningInConsole()) echo $l, "\n";
+            Log::warning('policy_questionnaire_review_fixes: '.$l);
+            if (app()->runningInConsole()) {
+                echo $l, "\n";
+            }
         }
     }
 

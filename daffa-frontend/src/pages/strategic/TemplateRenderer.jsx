@@ -650,7 +650,7 @@ function BmcTemplate({ formData, set, disabled, guide }) {
 }
 
 /* ─────────────── 9. مؤشرات الأداء ─────────────── */
-function KpisTemplate({ formData, set, disabled, unit, guide }) {
+function KpisTemplate({ formData, set, disabled, guide }) {
   const kpis = formData.kpis || [emptyKpi()];
 
   function emptyKpi() {
@@ -858,13 +858,6 @@ function GenericTemplate({ formData, set, disabled }) {
 }
 
 /* ─── Helper components ─── */
-const FieldBox = ({ label, children, style }) => (
-  <div style={style}>
-    <div style={{ fontSize: 12, fontWeight: 600, color: '#334452', marginBottom: 4 }}>{label}</div>
-    {children}
-  </div>
-);
-
 const FieldBoxTip = ({ guide, anchor, label, children, style }) => (
   <div style={style}>
     <div style={{ fontSize: 12, fontWeight: 600, color: '#334452', marginBottom: 4 }}><Lbl guide={guide} anchor={anchor} label={label} /></div>

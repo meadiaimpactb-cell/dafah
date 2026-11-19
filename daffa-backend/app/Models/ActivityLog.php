@@ -18,11 +18,10 @@ class ActivityLog extends Model
     /**
      * Quick static helper used throughout all controllers.
      *
-     * @param int|null  $userId
-     * @param string    $action   e.g. 'login', 'unit_submit'
-     * @param string    $category auth | workflow | payment | review | admin | policy | consultant
-     * @param string    $role     admin | consultant | client | system
-     * @param string|null $details Human-readable detail string
+     * @param  string  $action  e.g. 'login', 'unit_submit'
+     * @param  string  $category  auth | workflow | payment | review | admin | policy | consultant
+     * @param  string  $role  admin | consultant | client | system
+     * @param  string|null  $details  Human-readable detail string
      */
     public static function record(
         ?int $userId,
@@ -33,12 +32,12 @@ class ActivityLog extends Model
     ): void {
         try {
             self::create([
-                'user_id'  => $userId,
-                'action'   => $action,
+                'user_id' => $userId,
+                'action' => $action,
                 'category' => $category,
-                'role'     => $role,
-                'details'  => $details,
-                'ip'       => Request::ip(),
+                'role' => $role,
+                'details' => $details,
+                'ip' => Request::ip(),
             ]);
         } catch (\Throwable) {
             // never let logging break the main request

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Support\EmailOtp;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -32,7 +33,7 @@ class EmailVerificationMail extends Mailable
         return new Content(
             view: 'emails.verify-otp',
             text: 'emails.verify-otp-text', // نسخة نصية تحسّن وصول الرسالة إلى صندوق الوارد
-            with: ['minutes' => \App\Support\EmailOtp::TTL_MINUTES],
+            with: ['minutes' => EmailOtp::TTL_MINUTES],
         );
     }
 }

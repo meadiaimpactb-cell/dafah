@@ -34,18 +34,18 @@ class PolicyQuestionnaireV3Seeder extends Seeder
                 foreach ($policy['sections'] as $sOrder => $sec) {
                     $section = QuestionnaireSection::create([
                         'policy_type_id' => $policy['policy_type_id'],
-                        'name'           => $sec['name'],
-                        'sort_order'     => $sOrder,
+                        'name' => $sec['name'],
+                        'sort_order' => $sOrder,
                     ]);
 
                     foreach ($sec['questions'] as $qOrder => $q) {
                         QuestionnaireQuestion::create([
                             'section_id' => $section->id,
-                            'question'   => $q['question'],
-                            'type'       => $q['type'],
-                            'options'    => $q['options'] ?? null,
-                            'required'   => (bool) ($q['required'] ?? false),
-                            'hint'       => $q['hint'] ?? null,
+                            'question' => $q['question'],
+                            'type' => $q['type'],
+                            'options' => $q['options'] ?? null,
+                            'required' => (bool) ($q['required'] ?? false),
+                            'hint' => $q['hint'] ?? null,
                             'sort_order' => $qOrder,
                         ]);
                     }

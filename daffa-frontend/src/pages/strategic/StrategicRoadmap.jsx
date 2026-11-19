@@ -293,7 +293,7 @@ function WorkflowStepper({ step, workflow, onStepClick }) {
 // ── StrategicRoadmap (main) ──────────────────────────────────────────────────
 export default function StrategicRoadmap({ activeUnit, setActiveUnit, navigate, workflowId, onWorkflowSelect }) {
   const [workflow,      setWorkflow]      = useState(null);
-  const [units,         setUnits]         = useState(null);
+  const [, setUnits] = useState(null);
   const [catalog,       setCatalog]       = useState(null);
   const [pricing,       setPricing]       = useState(null);
   const [step,          setStep]          = useState(0);

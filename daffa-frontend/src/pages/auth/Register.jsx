@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import DfIcon from '../../components/ui/DfIcon';
 import api from '../../api/axios';
 import OtpVerification from './OtpVerification';

@@ -26,7 +26,7 @@ class ServiceSettingSeeder extends Seeder
 
         $codes = [
             ['code' => 'DAFFA10',  'type' => 'percentage', 'value' => 10, 'expires_at' => null,         'is_active' => true],
-            ['code' => 'DAFFA2024','type' => 'percentage', 'value' => 20, 'expires_at' => '2024-12-31', 'is_active' => false],
+            ['code' => 'DAFFA2024', 'type' => 'percentage', 'value' => 20, 'expires_at' => '2024-12-31', 'is_active' => false],
             ['code' => 'LAUNCH',   'type' => 'percentage', 'value' => 15, 'expires_at' => '2024-06-30', 'is_active' => false],
         ];
 

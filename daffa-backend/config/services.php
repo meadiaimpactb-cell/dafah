@@ -38,17 +38,17 @@ return [
     // الدخول الاجتماعي: يُفعَّل كل مزوّد تلقائيًا متى ضُبط معرّفه وسرّه في .env
     // عناوين العودة: {SOCIAL_AUTH_BASE_URL أو APP_URL}/api/auth/social/{google|facebook|linkedin}/callback
     'google' => [
-        'client_id'     => env('GOOGLE_CLIENT_ID'),
+        'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
     ],
 
     'facebook' => [
-        'client_id'     => env('FACEBOOK_CLIENT_ID'),
+        'client_id' => env('FACEBOOK_CLIENT_ID'),
         'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
     ],
 
     'linkedin' => [
-        'client_id'     => env('LINKEDIN_CLIENT_ID'),
+        'client_id' => env('LINKEDIN_CLIENT_ID'),
         'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
     ],
 

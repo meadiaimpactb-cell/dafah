@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\StrategicWorkflow;
 use App\Models\OperationalWorkflow;
 use App\Models\PolicyWorkflow;
+use App\Models\StrategicWorkflow;
+use App\Models\User;
 use App\Rules\RealEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -22,8 +22,8 @@ class OrganizationController extends Controller
             $s = $request->search;
             $query->where(function ($q) use ($s) {
                 $q->where('org_name', 'like', "%{$s}%")
-                  ->orWhere('rep_name', 'like', "%{$s}%")
-                  ->orWhere('email',    'like', "%{$s}%");
+                    ->orWhere('rep_name', 'like', "%{$s}%")
+                    ->orWhere('email', 'like', "%{$s}%");
             });
         }
 
@@ -39,7 +39,7 @@ class OrganizationController extends Controller
             }
         }
 
-        $orgs = $query->orderByDesc('created_at')->get()->map(fn($u) => $this->format($u));
+        $orgs = $query->orderByDesc('created_at')->get()->map(fn ($u) => $this->format($u));
 
         return response()->json($orgs);
     }
@@ -47,6 +47,7 @@ class OrganizationController extends Controller
     public function show(int $id)
     {
         $user = User::where('role', 'client')->findOrFail($id);
+
         return response()->json($this->format($user));
     }
 
@@ -57,9 +58,9 @@ class OrganizationController extends Controller
             'org_name' => 'required|string|max:100',
             'org_type' => 'required|string|max:50',
             'rep_name' => 'required|string|max:100',
-            'email'    => RealEmail::rules(),
-            'phone'    => 'required|string|max:20|unique:users,phone',
-            'sector'   => 'nullable|string|max:100',
+            'email' => RealEmail::rules(),
+            'phone' => 'required|string|max:20|unique:users,phone',
+            'sector' => 'nullable|string|max:100',
             'password' => 'required|string|min:6',
         ], RealEmail::messages() + [
             'email.unique' => 'البريد الإلكتروني مسجّل مسبقاً في حساب آخر',
@@ -68,14 +69,14 @@ class OrganizationController extends Controller
         ]);
 
         $user = User::create([
-            'org_name'  => $request->org_name,
-            'org_type'  => $request->org_type,
-            'rep_name'  => $request->rep_name,
-            'email'     => $request->email,
-            'phone'     => $request->phone,
-            'sector'    => $request->sector,
-            'password'  => Hash::make($request->password),
-            'role'      => 'client',
+            'org_name' => $request->org_name,
+            'org_type' => $request->org_type,
+            'rep_name' => $request->rep_name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'sector' => $request->sector,
+            'password' => Hash::make($request->password),
+            'role' => 'client',
             'is_active' => true,
         ]);
 
@@ -93,9 +94,9 @@ class OrganizationController extends Controller
             'org_name' => 'sometimes|string|max:100',
             'org_type' => 'sometimes|string|max:50',
             'rep_name' => 'sometimes|string|max:100',
-            'email'    => array_merge(['sometimes'], RealEmail::rules($id)),
-            'phone'    => "sometimes|string|max:20|unique:users,phone,{$id}",
-            'sector'   => 'nullable|string|max:100',
+            'email' => array_merge(['sometimes'], RealEmail::rules($id)),
+            'phone' => "sometimes|string|max:20|unique:users,phone,{$id}",
+            'sector' => 'nullable|string|max:100',
             'password' => 'nullable|string|min:6',
         ], RealEmail::messages() + [
             'email.unique' => 'البريد الإلكتروني مسجّل مسبقاً في حساب آخر',
@@ -104,9 +105,9 @@ class OrganizationController extends Controller
         ]);
 
         $data = $request->only(['org_name', 'org_type', 'rep_name', 'email', 'phone', 'sector']);
-        $data = array_filter($data, fn($v) => $v !== null);
+        $data = array_filter($data, fn ($v) => $v !== null);
         // تغيير البريد من لوحة التحكم: يؤكده صاحبه برمز عند دخوله القادم
-        if (!empty($data['email']) && mb_strtolower($data['email']) !== mb_strtolower($user->email)) {
+        if (! empty($data['email']) && mb_strtolower($data['email']) !== mb_strtolower($user->email)) {
             $user->email_verified_at = null;
         }
 
@@ -122,7 +123,8 @@ class OrganizationController extends Controller
     public function toggle(int $id)
     {
         $user = User::where('role', 'client')->findOrFail($id);
-        $user->update(['is_active' => !$user->is_active]);
+        $user->update(['is_active' => ! $user->is_active]);
+
         return response()->json($this->format($user->fresh()));
     }
 
@@ -133,6 +135,7 @@ class OrganizationController extends Controller
             Storage::disk('public')->delete($user->logo);
         }
         $user->delete();
+
         return response()->json(['message' => 'تم حذف المنظمة بنجاح']);
     }
 
@@ -156,9 +159,9 @@ class OrganizationController extends Controller
 
     private function format(User $u): array
     {
-        $strategic   = StrategicWorkflow::where('user_id', $u->id)->count();
+        $strategic = StrategicWorkflow::where('user_id', $u->id)->count();
         $operational = OperationalWorkflow::where('user_id', $u->id)->count();
-        $policy      = PolicyWorkflow::where('user_id', $u->id)->count();
+        $policy = PolicyWorkflow::where('user_id', $u->id)->count();
         $servicesCount = $strategic + $operational + $policy;
 
         // جلب آخر مستشار مرتبط بالمنظمة
@@ -173,27 +176,27 @@ class OrganizationController extends Controller
         }
 
         $status = 'جديد';
-        if (!$u->is_active) {
+        if (! $u->is_active) {
             $status = 'معلق';
         } elseif ($servicesCount > 0) {
             $status = 'نشط';
         }
 
         return [
-            'id'             => $u->id,
-            'org_name'       => $u->org_name ?? '—',
-            'org_type'       => $u->org_type ?? '—',
-            'rep_name'       => $u->rep_name ?? '—',
-            'email'          => $u->email,
-            'phone'          => $u->phone ?? '—',
-            'sector'         => $u->sector ?? '—',
-            'logo'           => $u->logo,
-            'logo_url'       => $u->logo ? Storage::disk('public')->url($u->logo) : null,
-            'is_active'      => $u->is_active,
+            'id' => $u->id,
+            'org_name' => $u->org_name ?? '—',
+            'org_type' => $u->org_type ?? '—',
+            'rep_name' => $u->rep_name ?? '—',
+            'email' => $u->email,
+            'phone' => $u->phone ?? '—',
+            'sector' => $u->sector ?? '—',
+            'logo' => $u->logo,
+            'logo_url' => $u->logo ? Storage::disk('public')->url($u->logo) : null,
+            'is_active' => $u->is_active,
             'services_count' => $servicesCount,
-            'consultant'     => $consultantName,
-            'status'         => $status,
-            'created_at'     => $u->created_at?->format('Y/m'),
+            'consultant' => $consultantName,
+            'status' => $status,
+            'created_at' => $u->created_at?->format('Y/m'),
         ];
     }
 }

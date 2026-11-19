@@ -17,10 +17,10 @@ class StrategicWorkflow extends Model
 
     protected $casts = [
         'addon_certification' => 'boolean',
-        'addon_design'        => 'boolean',
-        'paid_at'             => 'datetime',
-        'started_at'          => 'datetime',
-        'completed_at'        => 'datetime',
+        'addon_design' => 'boolean',
+        'paid_at' => 'datetime',
+        'started_at' => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
     public function user()

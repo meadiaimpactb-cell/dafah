@@ -13,8 +13,8 @@ class EmailVerification extends Model
 
     protected $casts = [
         'expires_at' => 'datetime',
-        'used_at'    => 'datetime',
-        'attempts'   => 'integer',
+        'used_at' => 'datetime',
+        'attempts' => 'integer',
     ];
 
     public function isExpired(): bool

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { chatApi } from '../../api/chat';
-import { IcSearch, IcChat, IcCheck, IcDoubleCheck, IcLock } from '../../utils/icons';
+import { IcSearch, IcChat, IcCheck, IcDoubleCheck } from '../../utils/icons';
 
 const C = { amber: '#EF6A2C',
   primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
@@ -280,7 +280,7 @@ export default function ChatPage({ role, userId, canSend = true, autoStart = fal
   const [selected,      setSelected]      = useState(null);
   const [loading,       setLoading]       = useState(true);
   const [error,         setError]         = useState(null);
-  const [starting,      setStarting]      = useState(false);
+  const [, setStarting] = useState(false);
   const listPollRef                       = useRef(null);
   const autoStartedRef                    = useRef(false);
 

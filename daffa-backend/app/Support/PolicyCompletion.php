@@ -46,7 +46,7 @@ class PolicyCompletion
                     continue;
                 }
                 $total++;
-                $isFilled = QuestionRules::filled($answers["q{$q->id}"] ?? null) || (!empty($q->meta['fields']) && $r['status'] !== 'missing');
+                $isFilled = QuestionRules::filled($answers["q{$q->id}"] ?? null) || (! empty($q->meta['fields']) && $r['status'] !== 'missing');
                 if ($isFilled && $r['status'] === 'ok') {
                     $answered++;
                 }
@@ -65,13 +65,13 @@ class PolicyCompletion
         }
 
         return [
-            'total'            => $total,
-            'answered'         => $answered,
-            'required'         => $required,
+            'total' => $total,
+            'answered' => $answered,
+            'required' => $required,
             'required_missing' => $missing,
-            'complete'         => $total > 0 && $missing === 0,
+            'complete' => $total > 0 && $missing === 0,
             'missing_sections' => $missingSections,
-            'problems'         => $problems,
+            'problems' => $problems,
         ];
     }
 }

@@ -7,7 +7,8 @@ import { consultantPoliciesApi } from '../../api/policies';
 import FormDataViewer from './FormDataViewer';
 import { isVisible as policyQuestionVisible } from '../policies/questionRules';
 import { usePermissions } from '../../utils/permissions';
-import { IcCheckCircle, IcArrowPath, IcWarning, IcXMark, IcSparkles, IcClipboard, IcCog, IcScroll, IcPalette, IcLock, IcUpload, IcEye, IcDocument } from '../../utils/icons';
+import { IcCheckCircle, IcArrowPath, IcWarning, IcXMark, IcSparkles, IcClipboard, IcPalette, IcLock, IcEye, IcDocument } from '../../utils/icons';
+import { asObject } from '../../utils/apiData';
 
 const colors = {
   primary: '#235D7F', ink: '#0E2A3D',
@@ -221,8 +222,9 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
     else            call = consultantApi.getSubmission(submissionId);
     call
       .then(r => {
-        setSub(r.data);
-        setNotes(r.data.consultant_notes || '');
+        const d = asObject(r.data);
+        setSub(d);
+        setNotes(d?.consultant_notes || '');
         setSubLoading(false);
         if (isPol && r.data.policy_type_id) {
           api.get(`/questionnaire/${r.data.policy_type_id}`)
@@ -583,7 +585,6 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
     setClientFilter(null);
   };
   const CACHE_KEY = `consultant_reviews_${mode}_${serviceType}_cache_v2`;
-  const cached = (() => { try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || []; } catch { return []; } })();
 
   const [submissions,  setSubmissions]  = useState([]);
   const [loading,      setLoading]      = useState(true);
@@ -614,8 +615,10 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
     }
     call
       .then(r => {
-        setSubmissions(r.data);
-        localStorage.setItem(CACHE_KEY, JSON.stringify(r.data));
+        // الاستجابة مصفوفة دائمًا؛ أي شكل آخر (خطأ وسيط/بروكسي) يُعامل كقائمة فارغة بدل انهيار الصفحة
+        const list = Array.isArray(r.data) ? r.data : [];
+        setSubmissions(list);
+        localStorage.setItem(CACHE_KEY, JSON.stringify(list));
       })
       .catch(e => { if (!silent) setError(e.response?.data?.message || 'تعذّر الاتصال بالخادم'); })
       .finally(() => setLoading(false));

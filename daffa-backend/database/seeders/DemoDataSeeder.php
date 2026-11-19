@@ -27,6 +27,7 @@ class DemoDataSeeder extends Seeder
     {
         if (app()->environment('production')) {
             $this->command?->warn('DemoDataSeeder: متوقف — بيئة الإنتاج.');
+
             return;
         }
 
@@ -36,7 +37,7 @@ class DemoDataSeeder extends Seeder
         User::where('email', 'admin@daffa.sa')->whereNull('email_verified_at')->update(['email_verified_at' => now()]);
 
         $pass = Hash::make('Demo@1234');
-        $forms = json_decode(file_get_contents(__DIR__ . '/demo/strategic_form_data.json'), true);
+        $forms = json_decode(file_get_contents(__DIR__.'/demo/strategic_form_data.json'), true);
 
         // ── حسابات المستشارين ──
         $consultantUsers = [];
@@ -56,13 +57,13 @@ class DemoDataSeeder extends Seeder
         // ── العملاء ──
         $clients = [
             ['email' => 'athar@demo.sa',  'org' => 'جمعية أثر للتنمية الاجتماعية', 'rep' => 'عبدالله الحربي', 'type' => 'جمعية أهلية', 'sector' => 'التنمية الاجتماعية',
-             'consultant' => 1, 'plan' => [1 => 'approved', 2 => 'approved', 3 => 'approved', 4 => 'submitted', 5 => 'in_progress']],
+                'consultant' => 1, 'plan' => [1 => 'approved', 2 => 'approved', 3 => 'approved', 4 => 'submitted', 5 => 'in_progress']],
             ['email' => 'namaa@demo.sa',  'org' => 'مؤسسة نماء الخيرية',          'rep' => 'هند السبيعي',   'type' => 'مؤسسة خيرية',  'sector' => 'التعليم',
-             'consultant' => 1, 'plan' => [1 => 'approved', 2 => 'revision', 3 => 'submitted']],
+                'consultant' => 1, 'plan' => [1 => 'approved', 2 => 'revision', 3 => 'submitted']],
             ['email' => 'baseera@demo.sa', 'org' => 'جمعية بصيرة لرعاية المكفوفين', 'rep' => 'فهد الدوسري',  'type' => 'جمعية أهلية', 'sector' => 'الرعاية الصحية',
-             'consultant' => 2, 'plan' => [1 => 'approved', 2 => 'approved', 3 => 'approved', 4 => 'approved', 5 => 'approved', 6 => 'submitted']],
+                'consultant' => 2, 'plan' => [1 => 'approved', 2 => 'approved', 3 => 'approved', 4 => 'approved', 5 => 'approved', 6 => 'submitted']],
             ['email' => 'new@demo.sa',    'org' => 'جمعية غراس البيئية',          'rep' => 'ريم الزهراني',  'type' => 'جمعية أهلية', 'sector' => 'البيئة',
-             'consultant' => null, 'plan' => []],
+                'consultant' => null, 'plan' => []],
         ];
 
         $units = StrategicUnit::orderBy('unit_number')->get()->keyBy('unit_number');
@@ -74,7 +75,7 @@ class DemoDataSeeder extends Seeder
         foreach ($clients as $i => $cl) {
             $user = User::updateOrCreate(['email' => $cl['email']], [
                 'org_name' => $cl['org'], 'rep_name' => $cl['rep'], 'org_type' => $cl['type'], 'sector' => $cl['sector'],
-                'phone' => '05' . str_pad((string) (51234567 + $i * 1111), 8, '0', STR_PAD_LEFT),
+                'phone' => '05'.str_pad((string) (51234567 + $i * 1111), 8, '0', STR_PAD_LEFT),
                 'password' => $pass, 'role' => 'client', 'is_active' => true, 'email_verified_at' => now(),
             ]);
             if (! $cl['consultant']) {
@@ -89,7 +90,7 @@ class DemoDataSeeder extends Seeder
             ]);
 
             Order::updateOrCreate(['workflow_id' => $wf->id, 'service_type' => 'strategic'], [
-                'user_id' => $user->id, 'order_number' => 'STR-DEMO' . ($i + 1), 'consultant_id' => $cl['consultant'],
+                'user_id' => $user->id, 'order_number' => 'STR-DEMO'.($i + 1), 'consultant_id' => $cl['consultant'],
                 'consultant_share' => 12000, 'subtotal' => 15000, 'tax_amount' => 2250, 'discount_amount' => 0,
                 'total' => 17250, 'payment_method' => 'card', 'payment_status' => 'paid', 'paid_at' => $wf->paid_at,
             ]);

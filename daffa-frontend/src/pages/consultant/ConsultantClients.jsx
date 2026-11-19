@@ -1,5 +1,5 @@
 import DfIcon from '../../components/ui/DfIcon';
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { consultantApi } from '../../api/consultant';
 
 const C = { amber: '#EF6A2C', amberLine: '#E05A1F',
@@ -131,7 +131,7 @@ export default function ConsultantClients({ navigate }) {
     if (!silent) setLoading(true);
     try {
       const r = await consultantApi.clients();
-      setClients(r.data);
+      setClients(Array.isArray(r.data) ? r.data : []);
       setLastSync(new Date());
     } finally {
       setLoading(false);
@@ -295,7 +295,7 @@ export default function ConsultantClients({ navigate }) {
 
               {/* Services grid — يعرض فقط البطاقات المرئية حسب الفلتر */}
               {visCount > 0 && (
-                <div style={{ display: 'grid', gridTemplateColumns: `repeat(${visCount}, 1fr)`, gap: 10 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: `repeat(${visCount}, minmax(0, 1fr))`, gap: 10 }}>
                   {vis.strategic   && <ServiceCard type="strategic"   data={vis.strategic}   navigate={navigate} userId={client.user_id} orgName={client.org_name} />}
                   {vis.operational && <ServiceCard type="operational" data={vis.operational} navigate={navigate} userId={client.user_id} orgName={client.org_name} />}
                   {vis.policies    && <ServiceCard type="policies"    data={vis.policies}    navigate={navigate} userId={client.user_id} orgName={client.org_name} />}

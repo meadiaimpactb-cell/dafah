@@ -13,13 +13,13 @@ class AdminSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin@daffa.sa'],
             [
-                'org_name'  => 'منصة دفة',
-                'org_type'  => 'منصة',
-                'rep_name'  => 'مدير النظام',
-                'phone'     => '0500000000',
-                'sector'    => 'تقنية',
-                'password'  => Hash::make('Admin@1234'),
-                'role'      => 'admin',
+                'org_name' => 'منصة دفة',
+                'org_type' => 'منصة',
+                'rep_name' => 'مدير النظام',
+                'phone' => '0500000000',
+                'sector' => 'تقنية',
+                'password' => Hash::make('Admin@1234'),
+                'role' => 'admin',
                 'is_active' => true,
             ]
         );

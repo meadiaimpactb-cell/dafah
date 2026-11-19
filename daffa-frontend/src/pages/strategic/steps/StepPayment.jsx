@@ -1,5 +1,5 @@
 import DfIcon from '../../../components/ui/DfIcon';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { strategicApi } from '../../../api/strategic';
 import { PayLogo, PaymentMethodPicker, ApplePayButton, SecurePaymentBadge } from '../../shared/PaymentBrand';
 
@@ -139,7 +139,7 @@ export const CopyBtn = ({ text }) => {
 };
 
 // ── Main Component ───────────────────────────────────────────────────────────
-export default function StepPayment({ workflow, setWorkflow, setStep, pricing, workflowId, refreshWorkflow }) {
+export default function StepPayment({ workflow, setStep, pricing, workflowId, refreshWorkflow }) {
   const [method,   setMethod]   = useState('card');
   const [cardNum,  setCardNum]  = useState('');
   const [expiry,   setExpiry]   = useState('');

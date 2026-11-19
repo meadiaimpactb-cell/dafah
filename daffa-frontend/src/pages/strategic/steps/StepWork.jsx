@@ -1,5 +1,5 @@
 import DfIcon from '../../../components/ui/DfIcon';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { strategicApi } from '../../../api/strategic';
 
 const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
@@ -13,7 +13,7 @@ const STATUS_MAP = {
   approved:    { label: 'معتمد',      bg: '#C9EFE1', color: '#0B7F5D' },
 };
 
-export default function StepWork({ workflow, setActiveUnit, workflowId, refreshWorkflow, refreshKey }) {
+export default function StepWork({ setActiveUnit, workflowId, refreshWorkflow, refreshKey }) {
   const [units,   setUnits]   = useState([]);
   const [loading, setLoading] = useState(true);
   const [proceeding, setProceeding] = useState(false);

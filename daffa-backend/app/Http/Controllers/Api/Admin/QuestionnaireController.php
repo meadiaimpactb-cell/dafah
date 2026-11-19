@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\QuestionnaireSection;
 use App\Models\QuestionnaireQuestion;
+use App\Models\QuestionnaireSection;
 use App\Support\PolicyCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -28,18 +28,19 @@ class QuestionnaireController extends Controller
     public function storeSection(Request $request)
     {
         $request->validate([
-            'name'           => 'required|string|max:100',
+            'name' => 'required|string|max:100',
             'policy_type_id' => ['nullable', 'integer', Rule::in(PolicyCatalog::allIds())],
         ]);
 
         $maxOrder = QuestionnaireSection::where('policy_type_id', $request->policy_type_id)->max('sort_order') ?? 0;
-        $section  = QuestionnaireSection::create([
-            'name'           => trim($request->name),
-            'sort_order'     => $maxOrder + 1,
+        $section = QuestionnaireSection::create([
+            'name' => trim($request->name),
+            'sort_order' => $maxOrder + 1,
             'policy_type_id' => $request->policy_type_id,
         ]);
 
         $section->questions_count = 0;
+
         return response()->json($section, 201);
     }
 
@@ -58,6 +59,7 @@ class QuestionnaireController extends Controller
     public function destroySection(int $id)
     {
         QuestionnaireSection::findOrFail($id)->delete();
+
         return response()->json(['message' => 'تم الحذف.']);
     }
 
@@ -68,6 +70,7 @@ class QuestionnaireController extends Controller
         foreach ($request->ids as $order => $id) {
             QuestionnaireSection::where('id', $id)->update(['sort_order' => $order]);
         }
+
         return response()->json(['message' => 'ok']);
     }
 
@@ -75,8 +78,9 @@ class QuestionnaireController extends Controller
     public function sectionQuestions(int $id)
     {
         $section = QuestionnaireSection::findOrFail($id);
+
         return response()->json([
-            'section'   => $section,
+            'section' => $section,
             'questions' => $section->questions,
         ]);
     }
@@ -85,29 +89,29 @@ class QuestionnaireController extends Controller
     public function storeQuestion(Request $request, int $id)
     {
         $request->validate([
-            'question'           => 'required|string|max:500',
-            'type'               => 'required|in:single,multiple,yesno,text,scale',
-            'options'            => 'nullable|array',
-            'options.*'          => 'string|max:200',
-            'required'           => 'boolean',
-            'hint'               => 'nullable|string|max:1000',
-            'display_condition'  => 'nullable|string|max:300',
-            'meta'               => 'nullable|array',
+            'question' => 'required|string|max:500',
+            'type' => 'required|in:single,multiple,yesno,text,scale',
+            'options' => 'nullable|array',
+            'options.*' => 'string|max:200',
+            'required' => 'boolean',
+            'hint' => 'nullable|string|max:1000',
+            'display_condition' => 'nullable|string|max:300',
+            'meta' => 'nullable|array',
         ]);
 
         QuestionnaireSection::findOrFail($id);
         $maxOrder = QuestionnaireQuestion::where('section_id', $id)->max('sort_order') ?? 0;
 
         $question = QuestionnaireQuestion::create([
-            'section_id'        => $id,
-            'question'          => trim($request->question),
-            'type'              => $request->type,
-            'options'           => $this->cleanOptions($request->options, $request->type),
-            'required'          => $request->boolean('required'),
-            'hint'              => $request->hint ? trim($request->hint) : null,
+            'section_id' => $id,
+            'question' => trim($request->question),
+            'type' => $request->type,
+            'options' => $this->cleanOptions($request->options, $request->type),
+            'required' => $request->boolean('required'),
+            'hint' => $request->hint ? trim($request->hint) : null,
             'display_condition' => $request->display_condition ? trim($request->display_condition) : null,
-            'meta'              => $request->meta ?: null,
-            'sort_order'        => $maxOrder + 1,
+            'meta' => $request->meta ?: null,
+            'sort_order' => $maxOrder + 1,
         ]);
 
         return response()->json($question, 201);
@@ -117,25 +121,25 @@ class QuestionnaireController extends Controller
     public function updateQuestion(Request $request, int $id)
     {
         $request->validate([
-            'question'           => 'required|string|max:500',
-            'type'               => 'required|in:single,multiple,yesno,text,scale',
-            'options'            => 'nullable|array',
-            'options.*'          => 'string|max:200',
-            'required'           => 'boolean',
-            'hint'               => 'nullable|string|max:1000',
-            'display_condition'  => 'nullable|string|max:300',
-            'meta'               => 'nullable|array',
+            'question' => 'required|string|max:500',
+            'type' => 'required|in:single,multiple,yesno,text,scale',
+            'options' => 'nullable|array',
+            'options.*' => 'string|max:200',
+            'required' => 'boolean',
+            'hint' => 'nullable|string|max:1000',
+            'display_condition' => 'nullable|string|max:300',
+            'meta' => 'nullable|array',
         ]);
 
         $question = QuestionnaireQuestion::findOrFail($id);
         $question->update([
-            'question'          => trim($request->question),
-            'type'              => $request->type,
-            'options'           => $this->cleanOptions($request->options, $request->type),
-            'required'          => $request->boolean('required'),
-            'hint'              => $request->hint ? trim($request->hint) : null,
+            'question' => trim($request->question),
+            'type' => $request->type,
+            'options' => $this->cleanOptions($request->options, $request->type),
+            'required' => $request->boolean('required'),
+            'hint' => $request->hint ? trim($request->hint) : null,
             'display_condition' => $request->display_condition ? trim($request->display_condition) : null,
-            'meta'              => $request->meta ?: null,
+            'meta' => $request->meta ?: null,
         ]);
 
         return response()->json($question->fresh());
@@ -145,6 +149,7 @@ class QuestionnaireController extends Controller
     public function destroyQuestion(int $id)
     {
         QuestionnaireQuestion::findOrFail($id)->delete();
+
         return response()->json(['message' => 'تم الحذف.']);
     }
 
@@ -155,14 +160,20 @@ class QuestionnaireController extends Controller
         foreach ($request->ids as $order => $id) {
             QuestionnaireQuestion::where('id', $id)->update(['sort_order' => $order]);
         }
+
         return response()->json(['message' => 'ok']);
     }
 
     private function cleanOptions(?array $options, string $type): ?array
     {
-        if (!in_array($type, ['single', 'multiple'])) return null;
-        if (!$options) return null;
+        if (! in_array($type, ['single', 'multiple'])) {
+            return null;
+        }
+        if (! $options) {
+            return null;
+        }
         $clean = array_values(array_filter(array_map('trim', $options)));
+
         return count($clean) ? $clean : null;
     }
 }

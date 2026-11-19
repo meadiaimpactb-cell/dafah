@@ -16,11 +16,11 @@ class StrategicUnit extends Model
 
     protected $casts = [
         'table_headers' => 'array',
-        'table_rows'    => 'array',
-        'topics'        => 'array',
-        'steps'         => 'array',
-        'tips'          => 'array',
-        'content'       => 'array',
+        'table_rows' => 'array',
+        'topics' => 'array',
+        'steps' => 'array',
+        'tips' => 'array',
+        'content' => 'array',
     ];
 
     // روابط ملفات PDF المرفوعة من لوحة التحكم (null = الملف المعتمد الافتراضي في الواجهة)

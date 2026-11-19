@@ -1,4 +1,3 @@
-import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
@@ -123,27 +122,6 @@ function ContentBadge({ filled, label, onClick }) {
 }
 
 // Clickable name badge for identity section
-function NameBadge({ onClick }) {
-  const [hover, setHover] = useState(false);
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{
-        padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, fontFamily: 'inherit',
-        background: hover ? C.primary : C.primarySoft,
-        color: hover ? '#fff' : C.ink,
-        border: 'none', cursor: 'pointer',
-        display: 'inline-flex', alignItems: 'center', gap: 4,
-        transition: 'all .15s',
-      }}
-    >
-      <DfIcon name="pencil" size={18} style={{ marginInlineEnd: 6 }} />الاسم
-    </button>
-  );
-}
-
 // ─── Field component with forwarded ref ───────────────────────────────────────
 
 const FieldRef = React.forwardRef(function Field({ label, fkey, form, set, rows, placeholder, type = 'text', suffix, highlight }, ref) {
@@ -395,7 +373,7 @@ function UnitRow({ unit, section, onEdit }) {
 
         {/* Right: clickable content badges */}
         {section === 'strategic' ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
             {STRATEGIC_FIELDS.map(f => (
               <ContentBadge key={f.key} filled={f.filled(unit)} label={f.label} onClick={() => onEdit(unit, f.tab)} />
             ))}
@@ -405,13 +383,13 @@ function UnitRow({ unit, section, onEdit }) {
             </span>
           </div>
         ) : section === 'operational' ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
             {OPERATIONAL_FIELDS.map(f => (
               <ContentBadge key={f.key} filled={f.filled(unit)} label={f.label} onClick={() => onEdit(unit, f.tab)} />
             ))}
           </div>
         ) : (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <ContentBadge filled={!!unit.overview}            label="نبذة"    onClick={() => onEdit(unit, 'overview')} />
           <ContentBadge filled={!!unit.written_description} label="شرح"     onClick={() => onEdit(unit, 'written_description')} />
           <ContentBadge filled={!!unit.tip}                 label="إرشادات" onClick={() => onEdit(unit, 'tip')} />
@@ -531,7 +509,7 @@ export default function AdminContent() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 4, background: C.grayLight, borderRadius: 12, padding: 4, marginBottom: 16, width: 'fit-content' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, background: C.grayLight, borderRadius: 12, padding: 4, marginBottom: 16, width: 'fit-content', maxWidth: '100%' }}>
         {TABS.map(t => (
           <button key={t.key} onClick={() => setActiveTab(t.key)}
             style={{ padding: '8px 18px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: activeTab === t.key ? 700 : 400, background: activeTab === t.key ? C.white : 'transparent', color: activeTab === t.key ? C.primary : C.gray, boxShadow: activeTab === t.key ? '0 1px 4px rgba(14,42,61,.1)' : 'none', transition: 'all .18s', whiteSpace: 'nowrap' }}>

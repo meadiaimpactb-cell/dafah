@@ -1,5 +1,4 @@
 // مكوّنات الواجهة المشتركة بهوية دفة.
-import React from 'react';
 import { colors, tones, font, shadow } from '../../theme/tokens';
 import { IcClock, IcUpload, IcSearch, IcCheckCircle, IcArrowPath, IcXMark } from '../../utils/icons';
 import { Help } from './Help';

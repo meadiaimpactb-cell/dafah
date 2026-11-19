@@ -1,5 +1,5 @@
 import DfIcon from '../../components/ui/DfIcon';
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
 

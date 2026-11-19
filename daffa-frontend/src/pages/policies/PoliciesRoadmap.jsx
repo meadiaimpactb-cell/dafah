@@ -7,7 +7,7 @@ import { ConsultantRating } from "../strategic/steps/StepApproval";
 import { PaymentReceipt } from "../strategic/steps/StepPayment";
 import ConsultantPicker from "../shared/ConsultantPicker";
 import { PaymentMethodPicker, ApplePayButton, SecurePaymentBadge, CardNetworkLogo, detectCardNetwork } from "../shared/PaymentBrand";
-import { IcCheckCircle, IcArrowPath, IcUpload, IcSearch, IcWarning, IcLock, IcLightbulb, IcSave, IcDocument, IcUser, IcCalendar, IcCreditCard, IcSparkles, IcCheck, IcPencil, IcEye, IcPalette, IcBeaker, IcChat, IcScroll, IcClock } from '../../utils/icons';
+import { IcCheckCircle, IcArrowPath, IcSearch, IcWarning, IcLock, IcLightbulb, IcSave, IcDocument, IcUser, IcCalendar, IcCreditCard, IcSparkles, IcCheck, IcPencil, IcEye, IcPalette, IcBeaker, IcChat, IcScroll, IcClock } from '../../utils/icons';
 import UnitVideo from '../shared/UnitVideo';
 import { useSiteContent } from '../auth/AuthShell';
 import { isVisible, evaluate, toggleMultiple, forcedOptions, visibleFields, assembleParts, pruneAnswers, summarize, filled as isFilled } from './questionRules';
@@ -752,7 +752,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
     if (!policyType?.id) return;
     setLoadingQ(true);
     api.get(`/questionnaire/${policyType.id}`)
-      .then(r => { setApiSections(r.data); setSection(0); })
+      .then(r => { setApiSections(Array.isArray(r.data) ? r.data : []); setSection(0); })
       .catch(() => setApiSections([]))
       .finally(() => setLoadingQ(false));
   }, [policyType?.id]);
@@ -1162,7 +1162,7 @@ const StepWork = ({ policyTypes, selections, onSave, onSubmit, loading, external
   const sendAllReady = async (list) => {
     for (const sel of list) {
       setSendingId(sel.id);
-      // eslint-disable-next-line no-await-in-loop
+       
       const ok = await onSubmit(sel.id, sel.form_data || {});
       if (!ok) break;
     }
@@ -1476,11 +1476,28 @@ const StepDesign = ({
   const [showRevision,  setShowRevision]  = useState(false);
   const [paying,        setPaying]        = useState(false);
   const [cardErr,       setCardErr]       = useState("");
+  // حالة شاشة الاختيار → المتطلبات → الدفع (تُعرَّف هنا قبل أي return مبكر حفاظًا على ترتيب الـhooks)
+  const [subStep,    setSubStep]    = useState('choice');
+  const [briefPage,  setBriefPage]  = useState(1); // 1 or 2 within brief
+  const [brief,      setBrief]      = useState({
+    // هوية المنظمة
+    org_name:    '', org_name_en: '', org_type:   '',
+    org_slogan:  '', org_phone:   '', org_email:  '',
+    org_website: '', org_city:    '',
+    // التصميم
+    design_scope: 'unified',           // 'unified' | 'color_coded' | 'per_policy'
+    primary_color: '#235D7F', secondary_color: '#A33F12',
+    design_style:  'corporate',        // 'modern' | 'corporate' | 'classic'
+    language:      'arabic',           // 'arabic' | 'english' | 'bilingual'
+    include_cover: true, include_toc: true,
+    notes: '',
+  });
+  const [logoFile,   setLogoFile]   = useState(null);
+  const [logoPreview,setLogoPreview]= useState(null);
 
   const designStatus   = workflow?.design_status;
   const isCompleted    = workflow?.status === 'completed';
   const wantedDesign   = workflow?.want_design;
-  const consultantName = workflow?.consultant?.name ?? '—';
   const selCount       = selections?.length ?? 0;
   const price          = designPrice  ?? 1500;
   const tax            = designTax    ?? Math.round(price * 0.15);
@@ -1513,10 +1530,10 @@ const StepDesign = ({
 
         <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 12, marginBottom: 20 }}>
           {[
-            ["الجهة المنفذة",   'فريق التصميم — دفة', <IcUser width={20} height={20}/>],
-            ["تاريخ الدفع",     paidAt,               <IcCalendar width={20} height={20}/>],
-            ["المبلغ المدفوع",  `${(workflow?.design_fee ?? price).toLocaleString('en-US')} ريال`, <IcCreditCard width={20} height={20}/>],
-            ["عدد السياسات",    `${selCount} سياسة`,  <IcScroll width={20} height={20}/>],
+            ["الجهة المنفذة",   'فريق التصميم — دفة', <IcUser key="User" width={20} height={20}/>],
+            ["تاريخ الدفع",     paidAt,               <IcCalendar key="Calendar" width={20} height={20}/>],
+            ["المبلغ المدفوع",  `${(workflow?.design_fee ?? price).toLocaleString('en-US')} ريال`, <IcCreditCard key="CreditCard" width={20} height={20}/>],
+            ["عدد السياسات",    `${selCount} سياسة`,  <IcScroll key="Scroll" width={20} height={20}/>],
           ].map(([lbl, val, icon]) => (
             <Card key={lbl} style={{ padding: "12px 14px", textAlign: "center" }}>
               <div style={{ marginBottom: 3, display: "flex", justifyContent: "center", color: C.primary }}>{icon}</div>
@@ -1651,23 +1668,6 @@ const StepDesign = ({
 
   // ── ٥. شاشة الاختيار → المتطلبات → المراجعة → الدفع ──
   // subStep: 'choice' | 'brief-identity' | 'brief-design' | 'review' | 'payment'
-  const [subStep,    setSubStep]    = useState('choice');
-  const [briefPage,  setBriefPage]  = useState(1); // 1 or 2 within brief
-  const [brief,      setBrief]      = useState({
-    // هوية المنظمة
-    org_name:    '', org_name_en: '', org_type:   '',
-    org_slogan:  '', org_phone:   '', org_email:  '',
-    org_website: '', org_city:    '',
-    // التصميم
-    design_scope: 'unified',           // 'unified' | 'color_coded' | 'per_policy'
-    primary_color: '#235D7F', secondary_color: '#A33F12',
-    design_style:  'corporate',        // 'modern' | 'corporate' | 'classic'
-    language:      'arabic',           // 'arabic' | 'english' | 'bilingual'
-    include_cover: true, include_toc: true,
-    notes: '',
-  });
-  const [logoFile,   setLogoFile]   = useState(null);
-  const [logoPreview,setLogoPreview]= useState(null);
 
   const orgTypes  = ['شركة','مؤسسة','جمعية','هيئة حكومية','مؤسسة تعليمية','أخرى'];
   const styleOpts = [
@@ -2093,24 +2093,6 @@ const StepDesign = ({
         </Btn>
         <button onClick={() => setSubStep('brief')} style={{ width: '100%', marginTop: 8, background: 'none', border: 'none', color: C.gray, cursor: 'pointer', fontSize: 11, fontFamily: "inherit", padding: '6px 0' }}>← العودة لتعديل المتطلبات</button>
       </Card>
-    </div>
-  );
-
-  return (
-    <div className="animate-in" style={{ maxWidth: 640, margin: "0 auto" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 14 }}>
-        <div style={{ width: 44, height: 44, background: C.amber, transform: "rotate(45deg)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ transform: "rotate(-45deg)", color: "white", fontWeight: 700, fontSize: 16 }}>؟</span>
-        </div>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: C.ink }}>هل تود تصميم احترافي؟</h2>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 16, marginBottom: 16, alignItems: "start" }}>
-      </div>
-
-      <div style={{ padding: 12, background: C.greenLight, borderRadius: 12, border: `1px solid ${C.green}30`, textAlign: "center" }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: C.green, marginBottom: 3, display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}><IcSparkles width={14} height={14}/> مبروك! اكتمل نظام بناء السياسات واللوائح</div>
-        <div style={{ fontSize: 11, color: C.gray }}>يمكنك الآن العودة للوحة التحكم أو مراجعة خدماتك الأخرى</div>
-      </div>
     </div>
   );
 };

@@ -11,7 +11,7 @@ class EnsureRole
     {
         $user = $request->user();
 
-        if (!$user || !in_array($user->role, $roles)) {
+        if (! $user || ! in_array($user->role, $roles)) {
             return response()->json(['message' => 'غير مصرح بالوصول.'], 403);
         }
 

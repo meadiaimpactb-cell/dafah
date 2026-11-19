@@ -1,5 +1,5 @@
 // قاموس دفة — لوحة جانبية بكل المصطلحات وشرحها المبسّط مع البحث.
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { GLOSSARY, GLOSSARY_GROUPS } from '../../theme/glossary';
 import { colors, font } from '../../theme/tokens';
 

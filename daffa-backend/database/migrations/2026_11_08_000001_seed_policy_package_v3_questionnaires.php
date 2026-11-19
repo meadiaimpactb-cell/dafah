@@ -6,10 +6,11 @@ use Illuminate\Database\Migrations\Migration;
 /**
  * يحمّل استبيانات حزمة سياسات دفة الإصدار 3.0 عند تشغيل migrate على أي بيئة.
  */
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
-        (new PolicyQuestionnaireV3Seeder())->run();
+        (new PolicyQuestionnaireV3Seeder)->run();
     }
 
     public function down(): void

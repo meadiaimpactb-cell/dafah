@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import api from '../../api/axios';
 import OtpVerification from '../auth/OtpVerification';
-import { IcCheck, IcLightbulb, IcShield, IcBriefcase, IcBuilding, IcUser, IcLock, IcDocument, IcSave } from '../../utils/icons';
+import { IcCheck, IcLightbulb } from '../../utils/icons';
 
 const C = {
   primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
@@ -245,7 +245,6 @@ export default function ProfilePage({ authUser, onUpdate }) {
     }
   };
 
-  const roleName = role === 'admin' ? 'مدير النظام' : role === 'consultant' ? 'مستشار' : (authUser?.org_type || 'عميل');
   const displayName = role === 'client' ? (authUser?.org_name || authUser?.rep_name) : authUser?.rep_name;
 
   return (

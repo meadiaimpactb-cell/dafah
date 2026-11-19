@@ -1,5 +1,5 @@
 import DfIcon from '../../components/ui/DfIcon';
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
 
@@ -122,7 +122,7 @@ export default function AdminOrgs() {
     setLoadError(null);
     adminApi.getOrganizations()
       .then(r => {
-        setOrgs(r.data);
+        setOrgs(Array.isArray(r.data) ? r.data : []);
         localStorage.setItem(CACHE_KEY, JSON.stringify(r.data));
       })
       .catch(e => {
@@ -367,7 +367,7 @@ export default function AdminOrgs() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((o, i) => (
+              {filtered.map((o) => (
                 <tr
                   key={o.id}
                   style={{ borderBottom: `1px solid ${C.grayLight}`, cursor: 'pointer', transition: 'background 0.15s' }}

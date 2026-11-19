@@ -15,7 +15,7 @@ class Order extends Model
 
     public function consultant()
     {
-        return $this->belongsTo(\App\Models\Consultant::class);
+        return $this->belongsTo(Consultant::class);
     }
 
     protected $casts = [

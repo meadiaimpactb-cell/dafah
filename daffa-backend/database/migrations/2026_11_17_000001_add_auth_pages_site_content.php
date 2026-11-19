@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\DB;
  * اللوحة التعريفية بجانب نموذج التسجيل، ونص الشروط والأحكام (يظهر رابطها في التسجيل متى وُجد النص).
  * لا يُستبدل أي مفتاح موجود مسبقًا.
  */
-return new class extends Migration {
+return new class extends Migration
+{
     private const ITEMS = [
         ['auth_panel_title',  'عنوان اللوحة التعريفية في صفحة التسجيل', 'text',     'خطّط لمنظمتك بثقة'],
         ['auth_panel_text',   'نص اللوحة التعريفية',                    'textarea', 'منصة دفة ترافقك خطوة بخطوة في بناء خطتك الاستراتيجية والتشغيلية وسياسات منظمتك، بإشراف مستشار متخصص.'],
@@ -19,7 +20,7 @@ return new class extends Migration {
     public function up(): void
     {
         foreach (self::ITEMS as [$key, $label, $type, $value]) {
-            if (!DB::table('site_contents')->where('key', $key)->exists()) {
+            if (! DB::table('site_contents')->where('key', $key)->exists()) {
                 DB::table('site_contents')->insert([
                     'group' => 'auth', 'key' => $key, 'label' => $label, 'type' => $type, 'value' => $value,
                     'created_at' => now(), 'updated_at' => now(),

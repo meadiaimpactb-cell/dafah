@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /storage/
+
+Sitemap: https://daffah.org/sitemap.xml

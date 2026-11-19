@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Logo from '../../components/brand/Logo';
 import DfIcon from '../../components/ui/DfIcon';
 import api from '../../api/axios';

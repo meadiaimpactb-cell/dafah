@@ -11,6 +11,7 @@ use App\Models\ServiceSetting;
 use App\Models\StrategicUnit;
 use App\Models\StrategicWorkflow;
 use App\Models\UnitSubmission;
+use App\Support\PdfBrand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -25,22 +26,22 @@ class StrategicController extends Controller
         $workflows = StrategicWorkflow::with('consultant')
             ->where('user_id', $request->user()->id)
             ->withCount([
-                'submissions as approved_count'  => fn($q) => $q->where('status', 'approved'),
-                'submissions as submitted_count' => fn($q) => $q->whereIn('status', ['submitted', 'reviewing', 'approved']),
+                'submissions as approved_count' => fn ($q) => $q->where('status', 'approved'),
+                'submissions as submitted_count' => fn ($q) => $q->whereIn('status', ['submitted', 'reviewing', 'approved']),
                 'submissions as total_count',
             ])
             ->orderBy('created_at', 'desc')
             ->get();
 
         // منع إنشاء خطة جديدة إذا كانت هناك خطة لم تُستكمل تعبئة جميع وحداتها
-        $unitCount     = StrategicUnit::count();
+        $unitCount = StrategicUnit::count();
         $hasIncomplete = $workflows->contains(
-            fn($wf) => $wf->status !== 'completed' && $wf->submitted_count < $unitCount
+            fn ($wf) => $wf->status !== 'completed' && $wf->submitted_count < $unitCount
         );
 
         return response()->json([
-            'workflows'      => $workflows,
-            'can_create_new' => !$hasIncomplete,
+            'workflows' => $workflows,
+            'can_create_new' => ! $hasIncomplete,
         ]);
     }
 
@@ -49,12 +50,12 @@ class StrategicController extends Controller
     {
         $workflow = $this->resolveWorkflow($request);
 
-        if (!$workflow) {
+        if (! $workflow) {
             return response()->json(['workflow' => null]);
         }
 
         return response()->json([
-            'workflow'    => $workflow,
+            'workflow' => $workflow,
             'submissions' => $workflow->submissions->keyBy('unit_number'),
         ]);
     }
@@ -64,7 +65,7 @@ class StrategicController extends Controller
     {
         $workflow = $this->resolveWorkflow($request);
 
-        $units       = null;
+        $units = null;
         $submissions = null;
 
         if ($workflow) {
@@ -72,34 +73,35 @@ class StrategicController extends Controller
 
             // دائماً أرجع الوحدات بعد بدء مرحلة العمل — للسماح بمراجعة الخطوات السابقة
             if ($workflow->current_step >= 3) {
-                $allUnits  = StrategicUnit::orderBy('unit_number')->get();
+                $allUnits = StrategicUnit::orderBy('unit_number')->get();
                 $subsByNum = UnitSubmission::where('workflow_id', $workflow->id)
                     ->get()->keyBy('unit_number');
 
                 $units = $allUnits->map(function ($unit) use ($subsByNum) {
                     $sub = $subsByNum->get($unit->unit_number);
+
                     return array_merge($unit->toArray(), [
                         'submission_status' => $sub?->status ?? 'not_started',
-                        'submission_id'     => $sub?->id,
-                        'consultant_notes'  => $sub?->consultant_notes,
+                        'submission_id' => $sub?->id,
+                        'consultant_notes' => $sub?->consultant_notes,
                     ]);
                 });
             }
         }
 
-        $s       = ServiceSetting::map();
+        $s = ServiceSetting::map();
         $catalog = StrategicUnit::orderBy('unit_number')->get(['unit_number', 'name']);
 
         return response()->json([
-            'workflow'    => $workflow,
+            'workflow' => $workflow,
             'submissions' => $submissions,
-            'units'       => $units,
-            'catalog'     => $catalog,
-            'pricing'     => [
-                'base'                => (float) ($s['strategic_base']      ?? 5000),
+            'units' => $units,
+            'catalog' => $catalog,
+            'pricing' => [
+                'base' => (float) ($s['strategic_base'] ?? 5000),
                 'addon_certification' => (float) ($s['addon_certification'] ?? 2000),
-                'addon_design'        => (float) ($s['addon_design']        ?? 1500),
-                'tax_rate'            => (float) ($s['tax_rate']            ?? 15),
+                'addon_design' => (float) ($s['addon_design'] ?? 1500),
+                'tax_rate' => (float) ($s['tax_rate'] ?? 15),
             ],
         ]);
     }
@@ -110,31 +112,35 @@ class StrategicController extends Controller
     {
         $request->validate([
             'addon_certification' => 'boolean',
-            'addon_design'        => 'boolean',
+            'addon_design' => 'boolean',
         ]);
 
-        $s        = ServiceSetting::map();
+        $s = ServiceSetting::map();
         $subtotal = (float) ($s['strategic_base'] ?? 5000);
-        if ($request->addon_certification) $subtotal += (float) ($s['addon_certification'] ?? 2000);
-        if ($request->addon_design)        $subtotal += (float) ($s['addon_design'] ?? 1500);
-        $taxRate  = (float) ($s['tax_rate'] ?? 15) / 100;
-        $tax      = round($subtotal * $taxRate, 2);
-        $total    = $subtotal + $tax;
+        if ($request->addon_certification) {
+            $subtotal += (float) ($s['addon_certification'] ?? 2000);
+        }
+        if ($request->addon_design) {
+            $subtotal += (float) ($s['addon_design'] ?? 1500);
+        }
+        $taxRate = (float) ($s['tax_rate'] ?? 15) / 100;
+        $tax = round($subtotal * $taxRate, 2);
+        $total = $subtotal + $tax;
 
         $workflow = StrategicWorkflow::create([
-            'user_id'             => $request->user()->id,
-            'current_step'        => 1,
-            'status'              => 'pending',
+            'user_id' => $request->user()->id,
+            'current_step' => 1,
+            'status' => 'pending',
             'addon_certification' => $request->boolean('addon_certification'),
-            'addon_design'        => $request->boolean('addon_design'),
-            'subtotal'            => $subtotal,
-            'tax_amount'          => $tax,
-            'total'               => $total,
-            'started_at'          => now(),
+            'addon_design' => $request->boolean('addon_design'),
+            'subtotal' => $subtotal,
+            'tax_amount' => $tax,
+            'total' => $total,
+            'started_at' => now(),
         ]);
 
         ActivityLog::record($request->user()->id, 'بدء التخطيط الاستراتيجي', 'workflow', 'client',
-            'المنظمة: ' . ($request->user()->org_name ?: $request->user()->email));
+            'المنظمة: '.($request->user()->org_name ?: $request->user()->email));
 
         return response()->json(['workflow' => $workflow], 201);
     }
@@ -159,17 +165,17 @@ class StrategicController extends Controller
         }
 
         $consultant = Consultant::findOrFail($request->consultant_id);
-        if (!$consultant->available) {
+        if (! $consultant->available) {
             return response()->json(['message' => 'المستشار غير متاح حالياً.'], 422);
         }
 
         $workflow->update([
             'consultant_id' => $consultant->id,
-            'current_step'  => 2,
+            'current_step' => 2,
         ]);
 
         ActivityLog::record($request->user()->id, 'اختيار مستشار — استراتيجي', 'workflow', 'client',
-            'المستشار: ' . $consultant->name . ' — ' . ($request->user()->org_name ?: $request->user()->email));
+            'المستشار: '.$consultant->name.' — '.($request->user()->org_name ?: $request->user()->email));
 
         return response()->json(['workflow' => $workflow->fresh('consultant')]);
     }
@@ -179,7 +185,7 @@ class StrategicController extends Controller
     {
         $request->validate([
             'payment_method' => 'required|in:card,mada,apple_pay,bank_transfer',
-            'discount_code'  => 'nullable|string|max:50',
+            'discount_code' => 'nullable|string|max:50',
         ]);
 
         $workflow = $this->userWorkflow($request);
@@ -199,55 +205,55 @@ class StrategicController extends Controller
 
         $total = $workflow->subtotal - $discount + $workflow->tax_amount;
 
-        $commissionRate  = (float) (ServiceSetting::val('consultant_commission_rate', 80)) / 100;
+        $commissionRate = (float) (ServiceSetting::val('consultant_commission_rate', 80)) / 100;
         $consultantShare = round(($workflow->subtotal - $discount) * $commissionRate, 2);
 
         $order = Order::create([
-            'user_id'          => $request->user()->id,
-            'order_number'     => 'STR-' . strtoupper(Str::random(8)),
-            'service_type'     => 'strategic',
-            'workflow_id'      => $workflow->id,
-            'consultant_id'    => $workflow->consultant_id,
-            'subtotal'         => $workflow->subtotal,
-            'tax_amount'       => $workflow->tax_amount,
-            'discount_code'    => $request->discount_code,
-            'discount_amount'  => $discount,
-            'total'            => $total,
+            'user_id' => $request->user()->id,
+            'order_number' => 'STR-'.strtoupper(Str::random(8)),
+            'service_type' => 'strategic',
+            'workflow_id' => $workflow->id,
+            'consultant_id' => $workflow->consultant_id,
+            'subtotal' => $workflow->subtotal,
+            'tax_amount' => $workflow->tax_amount,
+            'discount_code' => $request->discount_code,
+            'discount_amount' => $discount,
+            'total' => $total,
             'consultant_share' => $consultantShare,
-            'payment_method'   => $request->payment_method,
-            'payment_status'   => 'paid',
-            'paid_at'          => now(),
+            'payment_method' => $request->payment_method,
+            'payment_status' => 'paid',
+            'paid_at' => now(),
         ]);
 
         $workflow->update([
-            'current_step'    => 3,
-            'status'          => 'active',
-            'payment_status'  => 'paid',
-            'payment_method'  => $request->payment_method,
-            'paid_at'         => now(),
-            'discount_code'   => $request->discount_code,
+            'current_step' => 3,
+            'status' => 'active',
+            'payment_status' => 'paid',
+            'payment_method' => $request->payment_method,
+            'paid_at' => now(),
+            'discount_code' => $request->discount_code,
             'discount_amount' => $discount,
-            'total'           => $total,
+            'total' => $total,
         ]);
 
         $units = StrategicUnit::orderBy('unit_number')->get();
         foreach ($units as $unit) {
             UnitSubmission::firstOrCreate([
                 'workflow_id' => $workflow->id,
-                'unit_id'     => $unit->id,
+                'unit_id' => $unit->id,
             ], [
                 'unit_number' => $unit->unit_number,
-                'status'      => 'not_started',
-                'form_data'   => null,
+                'status' => 'not_started',
+                'form_data' => null,
             ]);
         }
 
         ActivityLog::record($request->user()->id, 'دفع — استراتيجي', 'payment', 'client',
-            number_format($total, 2) . ' ر.س — ' . ($request->user()->org_name ?: $request->user()->email) . ' — ' . $order->order_number);
+            number_format($total, 2).' ر.س — '.($request->user()->org_name ?: $request->user()->email).' — '.$order->order_number);
 
         return response()->json([
             'workflow' => $workflow->fresh(),
-            'order'    => $order,
+            'order' => $order,
         ]);
     }
 
@@ -256,17 +262,18 @@ class StrategicController extends Controller
     {
         $workflow = $this->userWorkflow($request);
         // المحتوى المنظَّم كبير ويُجلب مع الوحدة المفردة فقط
-        $units    = StrategicUnit::orderBy('unit_number')->get()->makeHidden('content');
+        $units = StrategicUnit::orderBy('unit_number')->get()->makeHidden('content');
 
         $submissions = UnitSubmission::where('workflow_id', $workflow->id)
             ->get()->keyBy('unit_number');
 
         $data = $units->map(function ($unit) use ($submissions) {
             $sub = $submissions->get($unit->unit_number);
+
             return array_merge($unit->toArray(), [
                 'submission_status' => $sub?->status ?? 'not_started',
-                'submission_id'     => $sub?->id,
-                'consultant_notes'  => $sub?->consultant_notes,
+                'submission_id' => $sub?->id,
+                'consultant_notes' => $sub?->consultant_notes,
             ]);
         });
 
@@ -277,15 +284,15 @@ class StrategicController extends Controller
     public function unit(Request $request, int $unitNumber)
     {
         $workflow = $this->userWorkflow($request);
-        $unit     = StrategicUnit::where('unit_number', $unitNumber)->firstOrFail();
+        $unit = StrategicUnit::where('unit_number', $unitNumber)->firstOrFail();
 
         $submission = UnitSubmission::where('workflow_id', $workflow->id)
             ->where('unit_id', $unit->id)
             ->first();
 
         return response()->json([
-            'unit'        => $unit,
-            'submission'  => $submission,
+            'unit' => $unit,
+            'submission' => $submission,
             // الوثيقة الاستراتيجية تعرض فترة الخطة الفعلية بدل تاريخ ثابت
             'plan_period' => $unit->template_type === 'document' ? $this->planPeriod($workflow->id) : null,
         ]);
@@ -295,8 +302,8 @@ class StrategicController extends Controller
     private function planPeriod(int $workflowId): ?array
     {
         $unitId = StrategicUnit::where('template_type', 'initiatives')->value('id');
-        $rows   = UnitSubmission::where('workflow_id', $workflowId)->where('unit_id', $unitId)->value('form_data');
-        $rows   = (is_string($rows) ? json_decode($rows, true) : $rows)['initiatives'] ?? [];
+        $rows = UnitSubmission::where('workflow_id', $workflowId)->where('unit_id', $unitId)->value('form_data');
+        $rows = (is_string($rows) ? json_decode($rows, true) : $rows)['initiatives'] ?? [];
 
         $years = collect($rows)
             ->flatMap(fn ($r) => [$r['start_date'] ?? null, $r['end_date'] ?? null])
@@ -314,7 +321,7 @@ class StrategicController extends Controller
         ]);
 
         $workflow = $this->userWorkflow($request);
-        $unit     = StrategicUnit::where('unit_number', $unitNumber)->firstOrFail();
+        $unit = StrategicUnit::where('unit_number', $unitNumber)->firstOrFail();
 
         $submission = UnitSubmission::where('workflow_id', $workflow->id)
             ->where('unit_id', $unit->id)
@@ -330,7 +337,7 @@ class StrategicController extends Controller
 
         $submission->update([
             'form_data' => $request->form_data,
-            'status'    => $newStatus,
+            'status' => $newStatus,
         ]);
 
         return response()->json(['submission' => $submission]);
@@ -344,7 +351,7 @@ class StrategicController extends Controller
         ]);
 
         $workflow = $this->userWorkflow($request);
-        $unit     = StrategicUnit::where('unit_number', $unitNumber)->firstOrFail();
+        $unit = StrategicUnit::where('unit_number', $unitNumber)->firstOrFail();
 
         $submission = UnitSubmission::where('workflow_id', $workflow->id)
             ->where('unit_id', $unit->id)
@@ -355,7 +362,7 @@ class StrategicController extends Controller
         }
 
         if ($unitNumber > 1) {
-            $prevUnits    = StrategicUnit::where('unit_number', '<', $unitNumber)->pluck('id');
+            $prevUnits = StrategicUnit::where('unit_number', '<', $unitNumber)->pluck('id');
             $notSubmitted = UnitSubmission::where('workflow_id', $workflow->id)
                 ->whereIn('unit_id', $prevUnits)
                 ->whereNotIn('status', ['submitted', 'reviewing', 'revision', 'approved'])
@@ -366,8 +373,8 @@ class StrategicController extends Controller
         }
 
         $submission->update([
-            'form_data'    => $request->form_data,
-            'status'       => 'submitted',
+            'form_data' => $request->form_data,
+            'status' => 'submitted',
             'submitted_at' => now(),
         ]);
 
@@ -380,7 +387,7 @@ class StrategicController extends Controller
         }
 
         ActivityLog::record($request->user()->id, 'إرسال وحدة للمراجعة — استراتيجي', 'review', 'client',
-            'الوحدة ' . $unitNumber . ': ' . $unit->name . ' — ' . ($request->user()->org_name ?: $request->user()->email));
+            'الوحدة '.$unitNumber.': '.$unit->name.' — '.($request->user()->org_name ?: $request->user()->email));
 
         return response()->json(['submission' => $submission, 'workflow_step' => $workflow->fresh()->current_step]);
     }
@@ -391,17 +398,17 @@ class StrategicController extends Controller
         $workflow = $this->userWorkflow($request);
         $workflow->load('consultant');
 
-        $total    = UnitSubmission::where('workflow_id', $workflow->id)->count();
+        $total = UnitSubmission::where('workflow_id', $workflow->id)->count();
         $approved = UnitSubmission::where('workflow_id', $workflow->id)->where('status', 'approved')->count();
-        $percent  = $total > 0 ? round(($approved / $total) * 100) : 0;
+        $percent = $total > 0 ? round(($approved / $total) * 100) : 0;
 
         return response()->json([
-            'current_step'     => $workflow->current_step,
-            'status'           => $workflow->status,
-            'total_units'      => $total,
-            'approved_units'   => $approved,
+            'current_step' => $workflow->current_step,
+            'status' => $workflow->status,
+            'total_units' => $total,
+            'approved_units' => $approved,
             'progress_percent' => $percent,
-            'consultant'       => $workflow->consultant,
+            'consultant' => $workflow->consultant,
         ]);
     }
 
@@ -422,11 +429,11 @@ class StrategicController extends Controller
     // ── GET /pdf/strategic (web route — signed URL) ───────────────────────────
     public function downloadPDFSigned(Request $request)
     {
-        if (!$request->hasValidSignature()) {
+        if (! $request->hasValidSignature()) {
             abort(403, 'الرابط منتهي الصلاحية أو غير صالح.');
         }
 
-        $userId     = (int) $request->user_id;
+        $userId = (int) $request->user_id;
         $workflowId = $request->workflow_id ? (int) $request->workflow_id : null;
 
         $query = StrategicWorkflow::with(['consultant', 'submissions.unit', 'user'])
@@ -437,7 +444,7 @@ class StrategicController extends Controller
             : $query->latest()->firstOrFail();
 
         $submissions = $workflow->submissions
-            ->filter(fn($s) => !empty($s->form_data))
+            ->filter(fn ($s) => ! empty($s->form_data))
             ->sortBy('unit_number')
             ->values();
 
@@ -455,6 +462,7 @@ class StrategicController extends Controller
     public function downloadPDF(Request $request)
     {
         $workflowId = $request->input('workflow_id') ? (int) $request->input('workflow_id') : null;
+
         return $this->buildPdfResponse($request->user()->id, $workflowId);
     }
 
@@ -469,7 +477,7 @@ class StrategicController extends Controller
             : $query->latest()->firstOrFail();
 
         $submissions = $workflow->submissions
-            ->filter(fn($s) => !empty($s->form_data))
+            ->filter(fn ($s) => ! empty($s->form_data))
             ->sortBy('unit_number')
             ->values();
 
@@ -482,36 +490,36 @@ class StrategicController extends Controller
 
         $html = view('pdf.strategic', compact('workflow', 'submissions'))->render();
 
-        set_error_handler(fn() => true, E_WARNING | E_NOTICE);
+        set_error_handler(fn () => true, E_WARNING | E_NOTICE);
         try {
-            $mpdf = new Mpdf(\App\Support\PdfBrand::config([
-                'mode'              => 'utf-8',
-                'format'            => 'A4',
-                'default_font'      => 'dejavusans',
+            $mpdf = new Mpdf(PdfBrand::config([
+                'mode' => 'utf-8',
+                'format' => 'A4',
+                'default_font' => 'dejavusans',
                 'default_font_size' => 11,
-                'margin_left'       => 12,
-                'margin_right'      => 12,
-                'margin_top'        => 10,
-                'margin_bottom'     => 10,
-                'autoLangToFont'    => false,
-                'autoScriptToLang'  => false,
-                'useSubstitutions'  => false,
-                'tempDir'           => storage_path('app/mpdf-tmp'),
+                'margin_left' => 12,
+                'margin_right' => 12,
+                'margin_top' => 10,
+                'margin_bottom' => 10,
+                'autoLangToFont' => false,
+                'autoScriptToLang' => false,
+                'useSubstitutions' => false,
+                'tempDir' => storage_path('app/mpdf-tmp'),
             ]));
 
             $mpdf->WriteHTML($html);
 
-            $filename   = 'strategic-plan-' . now()->format('Y-m-d') . '.pdf';
+            $filename = 'strategic-plan-'.now()->format('Y-m-d').'.pdf';
             $pdfContent = $mpdf->Output('', 'S');
         } finally {
             restore_error_handler();
         }
 
         return response($pdfContent, 200, [
-            'Content-Type'        => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-            'Content-Length'      => strlen($pdfContent),
-            'Cache-Control'       => 'no-cache, no-store, must-revalidate',
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            'Content-Length' => strlen($pdfContent),
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
         ]);
     }
 
@@ -544,7 +552,7 @@ class StrategicController extends Controller
 
         return $query
             ->orderByRaw("(status = 'completed') DESC")
-            ->orderByRaw("current_step DESC")
+            ->orderByRaw('current_step DESC')
             ->orderBy('id', 'desc')
             ->firstOrFail();
     }

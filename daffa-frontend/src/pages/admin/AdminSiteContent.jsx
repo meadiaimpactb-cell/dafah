@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import api from "../../api/axios";
+import { asArray, asObject } from '../../utils/apiData';
 
 const colors = { amber: '#EF6A2C', amberLine: '#E05A1F',
   primary: "#235D7F", ink: "#0E2A3D", primaryDeep: "#123247",
@@ -36,10 +37,11 @@ export default function AdminSiteContent() {
     setLoading(true);
     api.get("/admin/site-content")
       .then(r => {
+        r.data = asObject(r.data, {});
         setGrouped(r.data);
         const initEdits = {};
         Object.values(r.data).forEach(items =>
-          items.forEach(item => { initEdits[item.key] = item.value ?? ""; })
+          asArray(items).forEach(item => { initEdits[item.key] = item.value ?? ""; })
         );
         setEdits(initEdits);
       })

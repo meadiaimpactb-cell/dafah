@@ -16,11 +16,11 @@ return new class extends Migration
 
         // نسبة عمولة المستشار — 80% تذهب للمستشار والمنصة تأخذ 20%
         DB::table('service_settings')->insertOrIgnore([
-            'key'        => 'consultant_commission_rate',
-            'label'      => 'نسبة حصة المستشار (%)',
-            'value'      => 80.00,
-            'unit'       => '%',
-            'is_active'  => true,
+            'key' => 'consultant_commission_rate',
+            'label' => 'نسبة حصة المستشار (%)',
+            'value' => 80.00,
+            'unit' => '%',
+            'is_active' => true,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

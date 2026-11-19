@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\ConsultantReview;
 use App\Models\Consultant;
+use App\Models\ConsultantReview;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,21 +16,21 @@ class ReviewController extends Controller
         $request->validate([
             'consultant_id' => 'required|integer|exists:consultants,id',
             'workflow_type' => 'required|in:strategic,operational,policy',
-            'workflow_id'   => 'required|integer',
-            'rating'        => 'required|integer|min:1|max:5',
-            'comment'       => 'nullable|string|max:500',
+            'workflow_id' => 'required|integer',
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:500',
         ]);
 
         $review = ConsultantReview::updateOrCreate(
             [
-                'user_id'       => Auth::id(),
+                'user_id' => Auth::id(),
                 'workflow_type' => $request->workflow_type,
-                'workflow_id'   => $request->workflow_id,
+                'workflow_id' => $request->workflow_id,
             ],
             [
                 'consultant_id' => $request->consultant_id,
-                'rating'        => $request->rating,
-                'comment'       => $request->comment,
+                'rating' => $request->rating,
+                'comment' => $request->comment,
             ]
         );
 

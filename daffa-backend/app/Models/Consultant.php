@@ -13,11 +13,11 @@ class Consultant extends Model
 
     protected $casts = [
         'available' => 'boolean',
-        'rating'    => 'decimal:1',
+        'rating' => 'decimal:1',
     ];
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 }

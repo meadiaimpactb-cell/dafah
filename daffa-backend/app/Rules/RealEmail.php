@@ -15,13 +15,14 @@ class RealEmail implements ValidationRule
 {
     /** نطاقات محجوزة لا تخص أحدًا (RFC 2606 / 6761) */
     private const RESERVED = ['example.com', 'example.net', 'example.org', 'example.edu', 'test.com'];
+
     private const RESERVED_TLDS = ['test', 'example', 'invalid', 'localhost', 'local'];
 
     private static ?array $disposable = null;
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $email  = mb_strtolower(trim((string) $value));
+        $email = mb_strtolower(trim((string) $value));
         $domain = substr(strrchr($email, '@') ?: '', 1);
         if ($domain === '') {
             return; // الصيغة تتولاها قاعدة email
@@ -30,6 +31,7 @@ class RealEmail implements ValidationRule
         $tld = substr(strrchr($domain, '.') ?: '', 1);
         if (in_array($domain, self::RESERVED, true) || in_array($tld, self::RESERVED_TLDS, true)) {
             $fail('هذا البريد غير حقيقي — استخدم بريدًا تملكه وتستطيع استقبال الرسائل عليه.');
+
             return;
         }
 
@@ -53,6 +55,7 @@ class RealEmail implements ValidationRule
             }
             array_shift($parts);
         }
+
         return false;
     }
 
@@ -63,7 +66,8 @@ class RealEmail implements ValidationRule
         if ($ignoreUserId) {
             $unique->ignore($ignoreUserId);
         }
-        return [$required ? 'required' : 'nullable', 'string', 'max:255', 'email:rfc,dns', new self(), $unique];
+
+        return [$required ? 'required' : 'nullable', 'string', 'max:255', 'email:rfc,dns', new self, $unique];
     }
 
     /** رسائل عربية لحقل البريد (field = اسم الحقل في الطلب) */
@@ -71,10 +75,10 @@ class RealEmail implements ValidationRule
     {
         return [
             "{$field}.required" => 'البريد الإلكتروني مطلوب.',
-            "{$field}.string"   => 'البريد الإلكتروني غير صحيح.',
-            "{$field}.max"      => 'البريد الإلكتروني طويل جدًا.',
-            "{$field}.email"    => 'البريد الإلكتروني غير صحيح أو أن نطاقه لا يستقبل البريد — تأكد من كتابته بشكل صحيح.',
-            "{$field}.unique"   => 'البريد الإلكتروني مسجّل مسبقًا.',
+            "{$field}.string" => 'البريد الإلكتروني غير صحيح.',
+            "{$field}.max" => 'البريد الإلكتروني طويل جدًا.',
+            "{$field}.email" => 'البريد الإلكتروني غير صحيح أو أن نطاقه لا يستقبل البريد — تأكد من كتابته بشكل صحيح.',
+            "{$field}.unique" => 'البريد الإلكتروني مسجّل مسبقًا.',
         ];
     }
 

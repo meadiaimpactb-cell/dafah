@@ -50,7 +50,7 @@ return [
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
             // لا قيمة افتراضية: إن غاب DB_DATABASE (مثلًا أثناء كتابة .env) يفشل الاتصال بوضوح بدل التوجه لقاعدة «laravel» غير الموجودة
-            'database' => env('DB_DATABASE') ?: throw new \RuntimeException('DB_DATABASE is not set — check .env'),
+            'database' => env('DB_DATABASE') ?: throw new RuntimeException('DB_DATABASE is not set — check .env'),
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
@@ -71,7 +71,7 @@ return [
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
             // لا قيمة افتراضية: إن غاب DB_DATABASE (مثلًا أثناء كتابة .env) يفشل الاتصال بوضوح بدل التوجه لقاعدة «laravel» غير الموجودة
-            'database' => env('DB_DATABASE') ?: throw new \RuntimeException('DB_DATABASE is not set — check .env'),
+            'database' => env('DB_DATABASE') ?: throw new RuntimeException('DB_DATABASE is not set — check .env'),
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
@@ -92,7 +92,7 @@ return [
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
             // لا قيمة افتراضية: إن غاب DB_DATABASE (مثلًا أثناء كتابة .env) يفشل الاتصال بوضوح بدل التوجه لقاعدة «laravel» غير الموجودة
-            'database' => env('DB_DATABASE') ?: throw new \RuntimeException('DB_DATABASE is not set — check .env'),
+            'database' => env('DB_DATABASE') ?: throw new RuntimeException('DB_DATABASE is not set — check .env'),
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8'),
@@ -108,7 +108,7 @@ return [
             'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', '1433'),
             // لا قيمة افتراضية: إن غاب DB_DATABASE (مثلًا أثناء كتابة .env) يفشل الاتصال بوضوح بدل التوجه لقاعدة «laravel» غير الموجودة
-            'database' => env('DB_DATABASE') ?: throw new \RuntimeException('DB_DATABASE is not set — check .env'),
+            'database' => env('DB_DATABASE') ?: throw new RuntimeException('DB_DATABASE is not set — check .env'),
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8'),

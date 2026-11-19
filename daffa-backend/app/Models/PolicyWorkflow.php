@@ -21,16 +21,16 @@ class PolicyWorkflow extends Model
     ];
 
     protected $casts = [
-        'selected_policies'  => 'array',
-        'design_brief'       => 'array',
-        'include_arbitration'=> 'boolean',
-        'want_design'        => 'boolean',
-        'paid_at'            => 'datetime',
-        'design_paid_at'     => 'datetime',
+        'selected_policies' => 'array',
+        'design_brief' => 'array',
+        'include_arbitration' => 'boolean',
+        'want_design' => 'boolean',
+        'paid_at' => 'datetime',
+        'design_paid_at' => 'datetime',
         'design_uploaded_at' => 'datetime',
         'design_approved_at' => 'datetime',
-        'started_at'         => 'datetime',
-        'completed_at'       => 'datetime',
+        'started_at' => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

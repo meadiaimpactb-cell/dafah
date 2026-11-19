@@ -18,7 +18,7 @@ class PasswordResetController extends Controller
             'email' => 'required|email',
         ], [
             'email.required' => 'البريد الإلكتروني مطلوب',
-            'email.email'    => 'صيغة البريد الإلكتروني غير صحيحة',
+            'email.email' => 'صيغة البريد الإلكتروني غير صحيحة',
         ]);
 
         Password::sendResetLink($request->only('email'));
@@ -34,16 +34,16 @@ class PasswordResetController extends Controller
     public function reset(Request $request)
     {
         $request->validate([
-            'token'                 => 'required',
-            'email'                 => 'required|email',
-            'password'              => 'required|min:8|confirmed',
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
             'password_confirmation' => 'required',
         ], [
-            'token.required'                 => 'رابط إعادة التعيين غير صالح',
-            'email.required'                 => 'البريد الإلكتروني مطلوب',
-            'password.required'              => 'كلمة المرور الجديدة مطلوبة',
-            'password.min'                   => 'يجب أن تكون كلمة المرور 8 أحرف على الأقل',
-            'password.confirmed'             => 'كلمتا المرور غير متطابقتين',
+            'token.required' => 'رابط إعادة التعيين غير صالح',
+            'email.required' => 'البريد الإلكتروني مطلوب',
+            'password.required' => 'كلمة المرور الجديدة مطلوبة',
+            'password.min' => 'يجب أن تكون كلمة المرور 8 أحرف على الأقل',
+            'password.confirmed' => 'كلمتا المرور غير متطابقتين',
             'password_confirmation.required' => 'تأكيد كلمة المرور مطلوب',
         ]);
 

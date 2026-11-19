@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import api from "../../api/axios";
+import { asObject } from '../../utils/apiData';
 
 const colors = {
   primary: "#235D7F", ink: "#0E2A3D",
@@ -26,6 +27,7 @@ export default function AdminSettings() {
     setLoading(true);
     api.get("/admin/site-content")
       .then(r => {
+        r.data = asObject(r.data, {});
         setGrouped(r.data);
         const init = {};
         ["system", "email", "payment", "security"].forEach(g => {

@@ -14,8 +14,8 @@ class OperationalUnit extends Model
 
     protected $casts = [
         'topics' => 'array',
-        'steps'  => 'array',
-        'tips'   => 'array',
+        'steps' => 'array',
+        'tips' => 'array',
         // المحتوى المنظَّم (App\Support\OperationalContent)
         'content' => 'array',
     ];

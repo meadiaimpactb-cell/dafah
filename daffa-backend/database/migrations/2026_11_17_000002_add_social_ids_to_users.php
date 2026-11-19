@@ -7,14 +7,15 @@ use Illuminate\Support\Facades\Schema;
 /**
  * معرّفات حسابات Facebook وLinkedIn لربطها بحساب المستخدم (مثل google_id) عند الدخول الاجتماعي.
  */
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::table('users', function (Blueprint $t) {
-            if (!Schema::hasColumn('users', 'facebook_id')) {
+            if (! Schema::hasColumn('users', 'facebook_id')) {
                 $t->string('facebook_id')->nullable()->unique()->after('google_id');
             }
-            if (!Schema::hasColumn('users', 'linkedin_id')) {
+            if (! Schema::hasColumn('users', 'linkedin_id')) {
                 $t->string('linkedin_id')->nullable()->unique()->after('facebook_id');
             }
         });

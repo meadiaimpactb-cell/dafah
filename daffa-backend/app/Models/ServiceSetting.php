@@ -9,7 +9,7 @@ class ServiceSetting extends Model
     protected $fillable = ['key', 'label', 'value', 'unit', 'is_active'];
 
     protected $casts = [
-        'value'     => 'decimal:2',
+        'value' => 'decimal:2',
         'is_active' => 'boolean',
     ];
 

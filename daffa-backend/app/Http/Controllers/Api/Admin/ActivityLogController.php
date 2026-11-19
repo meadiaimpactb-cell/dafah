@@ -29,24 +29,23 @@ class ActivityLogController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('details', 'like', "%{$search}%")
-                  ->orWhere('action', 'like', "%{$search}%")
-                  ->orWhereHas('user', fn($u) =>
-                        $u->where('rep_name', 'like', "%{$search}%")
-                          ->orWhere('org_name', 'like', "%{$search}%")
-                          ->orWhere('email', 'like', "%{$search}%")
-                  );
+                    ->orWhere('action', 'like', "%{$search}%")
+                    ->orWhereHas('user', fn ($u) => $u->where('rep_name', 'like', "%{$search}%")
+                        ->orWhere('org_name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                    );
             });
         }
 
-        $logs = $query->limit(500)->get()->map(fn($l) => [
-            'id'         => $l->id,
-            'user_name'  => $this->userName($l),
-            'role'       => $l->role,
-            'action'     => $l->action,
-            'category'   => $l->category,
-            'details'    => $l->details,
-            'ip'         => $l->ip,
-            'time'       => $l->created_at->diffForHumans(),
+        $logs = $query->limit(500)->get()->map(fn ($l) => [
+            'id' => $l->id,
+            'user_name' => $this->userName($l),
+            'role' => $l->role,
+            'action' => $l->action,
+            'category' => $l->category,
+            'details' => $l->details,
+            'ip' => $l->ip,
+            'time' => $l->created_at->diffForHumans(),
             'created_at' => $l->created_at->format('Y/m/d H:i'),
         ]);
 
@@ -55,7 +54,10 @@ class ActivityLogController extends Controller
 
     private function userName(ActivityLog $l): string
     {
-        if (!$l->user) return 'النظام';
+        if (! $l->user) {
+            return 'النظام';
+        }
+
         return $l->user->org_name ?: $l->user->rep_name ?: $l->user->email;
     }
 }

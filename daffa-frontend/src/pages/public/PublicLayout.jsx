@@ -1,8 +1,9 @@
 // الشريط العلوي والتذييل للصفحات العامة (متجاوبان).
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Logo, { RosetteShape } from '../../components/brand/Logo';
 import { colors } from '../../theme/tokens';
 import useViewport from '../../hooks/useViewport';
+import { PUBLIC_PATHS } from '../../utils/publicRoutes';
 
 const LINKS = [
   { l: 'الرئيسية', v: 'landing' },
@@ -35,19 +36,19 @@ export function PublicNav({ current, navigate, onLogin, onRegister }) {
   return (
     <header style={{ position: 'sticky', top: 0, zIndex: 100, background: scrolled || open ? 'rgba(255,255,255,0.96)' : 'rgba(251,249,245,0.85)', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${scrolled ? colors.grayBorder : 'transparent'}`, transition: 'border-color 0.2s, background 0.2s' }}>
       <nav aria-label="روابط الموقع" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, height: compact ? 64 : 76, padding: '0 clamp(16px, 4vw, 40px)', maxWidth: 1280, margin: '0 auto' }}>
-        <span onClick={() => go('landing')} style={{ cursor: 'pointer', display: 'flex' }} aria-label="دفة — الرئيسية">
-          <Logo variant={vp.isPhone ? 'horizontal' : 'horizontal'} size={vp.isPhone ? 36 : 42} />
-        </span>
+        <a href="/" onClick={(e) => { e.preventDefault(); go('landing'); }} style={{ cursor: 'pointer', display: 'flex' }} aria-label="دفة — الرئيسية">
+          <Logo variant="horizontal" size={vp.isPhone ? 36 : 42} />
+        </a>
 
         {!compact && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             {LINKS.map((n) => {
               const active = current === n.v;
               return (
-                <button key={n.v} onClick={() => go(n.v)} aria-current={active ? 'page' : undefined} style={{ position: 'relative', padding: '8px 14px', border: 'none', background: 'none', fontFamily: 'inherit', fontSize: 15, fontWeight: active ? 700 : 500, color: active ? colors.ink : colors.gray, cursor: 'pointer' }}>
+                <a key={n.v} href={PUBLIC_PATHS[n.v]} onClick={(e) => { e.preventDefault(); go(n.v); }} aria-current={active ? 'page' : undefined} style={{ textDecoration: 'none', display: 'inline-block', position: 'relative', padding: '8px 14px', border: 'none', background: 'none', fontFamily: 'inherit', fontSize: 15, fontWeight: active ? 700 : 500, color: active ? colors.ink : colors.gray, cursor: 'pointer' }}>
                   {n.l}
                   {active && <span style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: 6, height: 6, borderRadius: '50%', background: colors.amber }} />}
-                </button>
+                </a>
               );
             })}
           </div>
@@ -66,7 +67,7 @@ export function PublicNav({ current, navigate, onLogin, onRegister }) {
       {compact && open && (
         <div style={{ padding: '8px 16px 18px', borderTop: `1px solid ${colors.grayBorder}`, background: '#fff', display: 'flex', flexDirection: 'column', gap: 2, animation: 'pageIn 0.15s' }}>
           {LINKS.map((n) => (
-            <button key={n.v} onClick={() => go(n.v)} style={{ textAlign: 'right', padding: '13px 10px', border: 'none', borderRadius: 12, background: current === n.v ? colors.primaryTint : 'none', fontFamily: 'inherit', fontSize: 16, fontWeight: current === n.v ? 700 : 500, color: colors.ink, cursor: 'pointer' }}>{n.l}</button>
+            <a key={n.v} href={PUBLIC_PATHS[n.v]} onClick={(e) => { e.preventDefault(); go(n.v); }} style={{ textDecoration: 'none', display: 'block', textAlign: 'right', padding: '13px 10px', border: 'none', borderRadius: 12, background: current === n.v ? colors.primaryTint : 'none', fontFamily: 'inherit', fontSize: 16, fontWeight: current === n.v ? 700 : 500, color: colors.ink, cursor: 'pointer' }}>{n.l}</a>
           ))}
           {vp.isPhone && <button onClick={onLogin} style={{ ...btn(false), marginTop: 8, height: 48 }}>تسجيل الدخول</button>}
         </div>
@@ -77,7 +78,7 @@ export function PublicNav({ current, navigate, onLogin, onRegister }) {
 
 export function PublicFooter({ sc, navigate }) {
   const go = (v) => { navigate(v); window.scrollTo({ top: 0 }); };
-  const col = { fontSize: 14, color: '#BFD6E5', padding: '5px 0', cursor: 'pointer', background: 'none', border: 'none', fontFamily: 'inherit', textAlign: 'right', display: 'block' };
+  const col = { fontSize: 14, color: '#BFD6E5', padding: '5px 0', cursor: 'pointer', background: 'none', border: 'none', fontFamily: 'inherit', textAlign: 'right', display: 'block', textDecoration: 'none' };
   return (
     <footer style={{ background: colors.ink, color: '#fff', position: 'relative', overflow: 'hidden' }}>
       <RosetteShape size={380} color="#FFFFFF" opacity={0.05} style={{ position: 'absolute', left: -110, top: -90 }} />
@@ -88,11 +89,11 @@ export function PublicFooter({ sc, navigate }) {
         </div>
         <div>
           <h4 style={{ color: '#fff', fontSize: 15, marginBottom: 12 }}>روابط سريعة</h4>
-          {LINKS.slice(0, 4).map((n) => <button key={n.v} onClick={() => go(n.v)} style={col}>{n.l}</button>)}
+          {LINKS.slice(0, 4).map((n) => <a key={n.v} href={PUBLIC_PATHS[n.v]} onClick={(e) => { e.preventDefault(); go(n.v); }} style={col}>{n.l}</a>)}
         </div>
         <div>
           <h4 style={{ color: '#fff', fontSize: 15, marginBottom: 12 }}>الخدمات</h4>
-          {['التخطيط الاستراتيجي', 'التخطيط التشغيلي', 'السياسات واللوائح'].map((l) => <button key={l} onClick={() => go('services')} style={col}>{l}</button>)}
+          {['التخطيط الاستراتيجي', 'التخطيط التشغيلي', 'السياسات واللوائح'].map((l) => <a key={l} href={PUBLIC_PATHS.services} onClick={(e) => { e.preventDefault(); go('services'); }} style={col}>{l}</a>)}
         </div>
         <div>
           <h4 style={{ color: '#fff', fontSize: 15, marginBottom: 12 }}>تواصل معنا</h4>

@@ -2,17 +2,112 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>منصة دفة | التخطيط الاستراتيجي والتشغيلي وصناعة السياسات للمنظمات غير الربحية</title>
+    <meta name="description" content="منصة دفة تساعد الجمعيات والمؤسسات غير الربحية على بناء الخطة الاستراتيجية والخطة التشغيلية وإعداد السياسات واللوائح خطوة بخطوة، مع مراجعة واعتماد من مستشار متخصص." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://daffah.org/" />
+    <meta name="theme-color" content="#0E2A3D" />
+    <meta name="application-name" content="منصة دفة" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0E2A3D" />
-    <meta name="description" content="منصة دفة — ابنِ خطة منظمتك الاستراتيجية والتشغيلية وسياساتها خطوة بخطوة، بإشراف مستشار متخصص." />
-    <title>منصة دفة — للتخطيط الاستراتيجي وصناعة السياسات</title>
+
+    <!-- الخطوط الأساسية تُحمَّل مبكرًا لتقليل وقت ظهور النص بخطّه النهائي -->
+    <link rel="preload" href="/fonts/Alexandria-VF.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/IBMPlexSansArabic-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/IBMPlexSansArabic-Bold.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- بطاقات المشاركة (Open Graph / Twitter) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="منصة دفة" />
+    <meta property="og:locale" content="ar_SA" />
+    <meta property="og:title" content="منصة دفة | التخطيط الاستراتيجي والتشغيلي وصناعة السياسات للمنظمات غير الربحية" />
+    <meta property="og:description" content="ابنِ خطة منظمتك الاستراتيجية والتشغيلية وسياساتها خطوة بخطوة، بإشراف مستشار متخصص." />
+    <meta property="og:url" content="https://daffah.org/" />
+    <meta property="og:image" content="https://daffah.org/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="شعار منصة دفة" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="منصة دفة | التخطيط الاستراتيجي وصناعة السياسات" />
+    <meta name="twitter:description" content="ابنِ خطة منظمتك الاستراتيجية والتشغيلية وسياساتها خطوة بخطوة، بإشراف مستشار متخصص." />
+    <meta name="twitter:image" content="https://daffah.org/og-image.png" />
+
+    <!-- بيانات منظّمة لمحركات البحث -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://daffah.org/#organization",
+          "name": "منصة دفة",
+          "url": "https://daffah.org/",
+          "logo": "https://daffah.org/logo.png",
+          "description": "منصة للتخطيط الاستراتيجي والتشغيلي وصناعة السياسات للمنظمات غير الربحية بإشراف مستشارين متخصصين."
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://daffah.org/#website",
+          "url": "https://daffah.org/",
+          "name": "منصة دفة",
+          "inLanguage": "ar",
+          "publisher": { "@id": "https://daffah.org/#organization" }
+        }
+      ]
+    }
+    </script>
+
+    <!-- هيكل أولي يظهر فورًا قبل تحميل JavaScript، ويستبدله التطبيق عند تشغيله -->
+    <style>
+      html { background: #FBF9F5; }
+      body { margin: 0; font-family: 'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif; color: #0E2A3D; }
+      .df-shell { min-height: 100vh; display: flex; flex-direction: column; }
+      .df-shell-nav { height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 clamp(16px, 4vw, 40px); max-width: 1280px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+      .df-shell-nav a { color: #0E2A3D; text-decoration: none; font-weight: 600; font-size: 15px; padding: 8px 14px; }
+      .df-shell-nav .brand { font-family: 'Alexandria', 'IBM Plex Sans Arabic', sans-serif; font-weight: 800; font-size: 20px; padding: 0; }
+      .df-shell-nav nav { display: flex; gap: 2px; }
+      .df-shell-hero { flex: 1; background: radial-gradient(1200px 500px at 85% -10%, #0E2A3D 0%, transparent 60%), #0E2A3D; color: #fff; padding: 72px clamp(16px, 4vw, 40px) 96px; }
+      .df-shell-hero .in { max-width: 1180px; margin: 0 auto; }
+      .df-shell-hero h1 { font-family: 'Alexandria', 'IBM Plex Sans Arabic', sans-serif; font-size: clamp(28px, 3.6vw, 44px); font-weight: 800; line-height: 1.35; margin: 0; max-width: 640px; }
+      .df-shell-hero p { font-size: clamp(16px, 1.6vw, 19px); color: #D6E4EE; margin: 18px 0 0; line-height: 1.9; max-width: 560px; }
+      .df-shell-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
+      .df-shell-cta a { display: inline-flex; align-items: center; height: 54px; padding: 0 30px; border-radius: 14px; font-weight: 700; font-size: 16.5px; text-decoration: none; }
+      .df-shell-cta .primary { background: #EF6A2C; color: #0E2A3D; }
+      .df-shell-cta .ghost { color: #fff; border: 1.5px solid rgba(255,255,255,0.35); }
+      @media (max-width: 760px) { .df-shell-nav { height: 64px; } .df-shell-nav nav { display: none; } }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="df-shell">
+        <header class="df-shell-nav">
+          <a class="brand" href="/" aria-label="منصة دفة — الرئيسية">منصة دفة</a>
+          <nav aria-label="روابط الموقع">
+            <a href="/about">عن دفة</a>
+            <a href="/services">الخدمات</a>
+            <a href="/pricing">الأسعار</a>
+            <a href="/contact">تواصل معنا</a>
+            <a href="/login">تسجيل الدخول</a>
+          </nav>
+        </header>
+        <main class="df-shell-hero">
+          <div class="in">
+            <h1>نظام البناء الاستراتيجي والتشغيلي للمنظمات غير الربحية</h1>
+            <p>ابنِ خطة منظمتك الاستراتيجية والتشغيلية وسياساتها خطوة بخطوة، مع فيديوهات ونماذج عمل، ومراجعة واعتماد من مستشار متخصص عن بعد.</p>
+            <div class="df-shell-cta">
+              <a class="primary" href="/register">أنشئ حسابًا مجانًا</a>
+              <a class="ghost" href="/services">استعرض الخدمات</a>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <noscript>
+      <p style="padding:16px;text-align:center;font-family:system-ui,sans-serif">يحتاج هذا الموقع إلى تفعيل JavaScript في المتصفح لعرض المنصة كاملة.</p>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

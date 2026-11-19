@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\Api\PolicyController;
+use App\Http\Controllers\Controller;
 use App\Models\OperationalUnit;
 use App\Models\PolicyTypeContent;
 use App\Models\StrategicUnit;
 use App\Support\OperationalContent;
 use App\Support\PolicyCatalog;
+use App\Support\PublicCache;
 use App\Support\StrategicContent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -18,15 +19,15 @@ class ContentController extends Controller
     private function policyRules(): array
     {
         return [
-            'name'                 => 'nullable|string|max:255',
-            'description'          => 'nullable|string',
-            'price'                => 'nullable|numeric|min:0',
-            'overview'             => 'nullable|string',
-            'written_description'  => 'nullable|string',
-            'tip'                  => 'nullable|string',
-            'video_url'            => 'nullable|string|max:500',
-            'video_url_alt'        => 'nullable|string|max:500',
-            'video_duration'       => 'nullable|string|max:20',
+            'name' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'nullable|numeric|min:0',
+            'overview' => 'nullable|string',
+            'written_description' => 'nullable|string',
+            'tip' => 'nullable|string',
+            'video_url' => 'nullable|string|max:500',
+            'video_url_alt' => 'nullable|string|max:500',
+            'video_duration' => 'nullable|string|max:20',
         ];
     }
 
@@ -42,17 +43,17 @@ class ContentController extends Controller
     private function strategicPayload(StrategicUnit $u): array
     {
         return [
-            'id'             => $u->id,
-            'unit_number'    => $u->unit_number,
-            'name'           => $u->name,
-            'template_type'  => $u->template_type,
-            'table_rows'     => $u->table_rows,
-            'video_url'      => $u->video_url,
-            'video_url_alt'  => $u->video_url_alt,
+            'id' => $u->id,
+            'unit_number' => $u->unit_number,
+            'name' => $u->name,
+            'template_type' => $u->template_type,
+            'table_rows' => $u->table_rows,
+            'video_url' => $u->video_url,
+            'video_url_alt' => $u->video_url_alt,
             'video_duration' => $u->video_duration,
-            'content'        => $u->content,
-            'pdf_urls'       => StrategicContent::pdfUrls($u->content),
-            'has_default'    => StrategicContent::defaultFor($u->template_type) !== null,
+            'content' => $u->content,
+            'pdf_urls' => StrategicContent::pdfUrls($u->content),
+            'has_default' => StrategicContent::defaultFor($u->template_type) !== null,
         ];
     }
 
@@ -61,11 +62,11 @@ class ContentController extends Controller
     public function updateStrategic(Request $request, int $id)
     {
         $request->validate([
-            'name'           => 'sometimes|required|string|max:255',
-            'video_url'      => 'nullable|string|max:500',
-            'video_url_alt'  => 'nullable|string|max:500',
+            'name' => 'sometimes|required|string|max:255',
+            'video_url' => 'nullable|string|max:500',
+            'video_url_alt' => 'nullable|string|max:500',
             'video_duration' => 'nullable|string|max:20',
-            'content'        => 'sometimes|array',
+            'content' => 'sometimes|array',
         ]);
 
         $unit = StrategicUnit::findOrFail($id);
@@ -88,7 +89,7 @@ class ContentController extends Controller
     // المحتوى المعتمد الأصلي للوحدة (لزر «استعادة المحتوى المعتمد» — يُحمَّل في المحرر ولا يُحفظ إلا بالحفظ)
     public function strategicDefault(int $id)
     {
-        $unit    = StrategicUnit::findOrFail($id);
+        $unit = StrategicUnit::findOrFail($id);
         $default = StrategicContent::defaultFor($unit->template_type);
         abort_unless($default, 404);
 
@@ -102,17 +103,17 @@ class ContentController extends Controller
         abort_unless(in_array($kind, StrategicContent::PDF_KINDS, true), 404);
         $request->validate(['file' => 'required|file|mimes:pdf|max:51200']);
 
-        $unit    = StrategicUnit::findOrFail($id);
+        $unit = StrategicUnit::findOrFail($id);
         $content = $unit->content ?: [];
-        $prefix  = $kind === 'guidelines' ? 'الإرشادات التفصيلية' : 'الشرح التفصيلي';
-        $name    = StrategicContent::safePdfName(
+        $prefix = $kind === 'guidelines' ? 'الإرشادات التفصيلية' : 'الشرح التفصيلي';
+        $name = StrategicContent::safePdfName(
             $request->input('file_name') ?: $request->file('file')->getClientOriginalName(),
             "{$prefix} — {$unit->name}"
         );
 
-        $dir  = "strategic-guides/{$unit->template_type}/{$kind}/" . now()->format('YmdHis');
+        $dir = "strategic-guides/{$unit->template_type}/{$kind}/".now()->format('YmdHis');
         $path = $request->file('file')->storeAs($dir, $name, 'public');
-        if (!$path) {
+        if (! $path) {
             return response()->json(['message' => 'تعذّر حفظ الملف.'], 500);
         }
 
@@ -130,7 +131,7 @@ class ContentController extends Controller
     {
         abort_unless(in_array($kind, StrategicContent::PDF_KINDS, true), 404);
 
-        $unit    = StrategicUnit::findOrFail($id);
+        $unit = StrategicUnit::findOrFail($id);
         $content = $unit->content ?: [];
 
         $this->deleteStrategicPdf($content[$kind]['pdf_file'] ?? null);
@@ -142,7 +143,7 @@ class ContentController extends Controller
 
     private function deleteStrategicPdf(?string $path): void
     {
-        if (!$path || !str_starts_with($path, 'strategic-guides/')) {
+        if (! $path || ! str_starts_with($path, 'strategic-guides/')) {
             return;
         }
         $disk = Storage::disk('public');
@@ -165,15 +166,15 @@ class ContentController extends Controller
     private function operationalPayload(OperationalUnit $u): array
     {
         return [
-            'id'             => $u->id,
-            'unit_number'    => $u->unit_number,
-            'name'           => $u->name,
-            'template_type'  => $u->template_type,
-            'video_url'      => $u->video_url,
-            'video_url_alt'  => $u->video_url_alt,
+            'id' => $u->id,
+            'unit_number' => $u->unit_number,
+            'name' => $u->name,
+            'template_type' => $u->template_type,
+            'video_url' => $u->video_url,
+            'video_url_alt' => $u->video_url_alt,
             'video_duration' => $u->video_duration,
-            'content'        => $u->content,
-            'has_default'    => OperationalContent::defaultFor($u->template_type) !== null,
+            'content' => $u->content,
+            'has_default' => OperationalContent::defaultFor($u->template_type) !== null,
         ];
     }
 
@@ -182,11 +183,11 @@ class ContentController extends Controller
     public function updateOperational(Request $request, int $id)
     {
         $request->validate([
-            'name'           => 'sometimes|required|string|max:255',
-            'video_url'      => 'nullable|string|max:500',
-            'video_url_alt'  => 'nullable|string|max:500',
+            'name' => 'sometimes|required|string|max:255',
+            'video_url' => 'nullable|string|max:500',
+            'video_url_alt' => 'nullable|string|max:500',
             'video_duration' => 'nullable|string|max:20',
-            'content'        => 'sometimes|array',
+            'content' => 'sometimes|array',
         ]);
 
         $unit = OperationalUnit::findOrFail($id);
@@ -209,7 +210,7 @@ class ContentController extends Controller
     // المحتوى المعتمد الأصلي للوحدة (يُحمَّل في المحرر ولا يُحفظ إلا بالحفظ)
     public function operationalDefault(int $id)
     {
-        $unit    = OperationalUnit::findOrFail($id);
+        $unit = OperationalUnit::findOrFail($id);
         $default = OperationalContent::defaultFor($unit->template_type);
         abort_unless($default, 404);
 
@@ -219,7 +220,7 @@ class ContentController extends Controller
     // ── GET /api/admin/content/policies ──────────────────────────────────────
     public function policyTypes()
     {
-        $types    = collect(PolicyController::policyTypes());
+        $types = collect(PolicyController::policyTypes());
         $contents = PolicyTypeContent::all()->keyBy('policy_type_id');
 
         // policyTypes() already merges admin overrides over the catalog defaults
@@ -231,10 +232,11 @@ class ContentController extends Controller
     }
 
     // ── GET /api/public/policy-types — السياسات المتاحة للشراء فقط ───────────
+    // أنواع السياسات الفعّالة للصفحات العامة — من كاش الملفات؛ يُلغى عند تعديل سياسة أو محتوى الموقع
     public function publicPolicyTypes()
     {
         return response()->json(
-            collect(PolicyController::policyTypes())->where('active', true)->values()
+            PublicCache::remember(PublicCache::POLICY_TYPES, fn () => collect(PolicyController::policyTypes())->where('active', true)->values()->all())
         );
     }
 
@@ -249,6 +251,7 @@ class ContentController extends Controller
             ['policy_type_id' => $typeId],
             $request->only(array_keys($this->policyRules()))
         );
+        PublicCache::forget(PublicCache::POLICY_TYPES);
 
         return response()->json($content);
     }

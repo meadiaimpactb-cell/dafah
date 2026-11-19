@@ -2,7 +2,7 @@
 //  • <Help>      زر «؟» صغير يفتح شرحًا مبسّطًا لمصطلح أو قسم (نافذة صغيرة، وعلى الجوال لوحة سفلية).
 //  • <TipLayer>  يُركَّب مرة واحدة: يحوّل كل title / data-tip إلى تلميح موحّد الشكل،
 //                ويدير «وضع الشرح» الذي يضع علامة ؟ على كل أيقونة ويشرحها عند الضغط.
-import React, { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { GLOSSARY } from '../../theme/glossary';
 

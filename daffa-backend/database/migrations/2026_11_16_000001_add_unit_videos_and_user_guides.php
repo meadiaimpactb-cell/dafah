@@ -11,10 +11,12 @@ use Illuminate\Support\Facades\Schema;
  * - روابط الفيديوهات المستضافة على المنصة (/media/...) تُضبط فقط حيث لا يوجد رابط — لا يُستبدل رابط وضعه المدير.
  * - روابط أدلة الاستخدام وفيديوهاتها لكل دور، وفيديو رحلة السياسات، في «محتوى الموقع» (مجموعة guides) ليعدّلها المدير.
  */
-return new class extends Migration {
+return new class extends Migration
+{
     private const TABLES = ['strategic_units', 'operational_units', 'policy_type_contents'];
 
     private const STRATEGIC = ['swot', 'pestel', 'needs', 'toc', 'tows', 'directions', 'initiatives', 'bmc', 'kpis', 'orgchart', 'document'];
+
     private const OPERATIONAL = ['op_import', 'op_activities', 'op_gantt', 'op_responsible', 'op_budget'];
 
     private const GUIDES = [
@@ -31,7 +33,7 @@ return new class extends Migration {
     public function up(): void
     {
         foreach (self::TABLES as $table) {
-            if (Schema::hasTable($table) && !Schema::hasColumn($table, 'video_url_alt')) {
+            if (Schema::hasTable($table) && ! Schema::hasColumn($table, 'video_url_alt')) {
                 Schema::table($table, fn (Blueprint $t) => $t->string('video_url_alt', 500)->nullable()->after('video_url'));
             }
         }
@@ -47,7 +49,7 @@ return new class extends Migration {
         }
 
         foreach (self::GUIDES as [$key, $label, $value]) {
-            if (!DB::table('site_contents')->where('key', $key)->exists()) {
+            if (! DB::table('site_contents')->where('key', $key)->exists()) {
                 DB::table('site_contents')->insert([
                     'group' => 'guides', 'key' => $key, 'label' => $label, 'type' => 'text', 'value' => $value,
                     'created_at' => now(), 'updated_at' => now(),

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /*
  * هوية الدفع الموحّدة في منصة دفة: شعارات طرق الدفع الرسمية (public/payments)،

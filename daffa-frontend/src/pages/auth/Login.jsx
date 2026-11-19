@@ -1,5 +1,5 @@
 import DfIcon from '../../components/ui/DfIcon';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import api from '../../api/axios';
 import OtpVerification from './OtpVerification';
 import SocialButtons from './SocialButtons';

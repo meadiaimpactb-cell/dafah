@@ -1,5 +1,5 @@
 // مركز المخرجات — كل ما كتبه العملاء في الأنظمة الثلاثة، وكل قرارات المستشارين، في مكان واحد.
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { adminApi } from '../../api/admin';
 import { colors, systems, font, tones } from '../../theme/tokens';
@@ -7,6 +7,7 @@ import { Badge, Btn, Card, ProgressBar, Loading, EmptyState, MetricCard, Tab } f
 import { Help } from '../../components/ui/Help';
 import FormDataViewer from '../consultant/FormDataViewer';
 import { IcSearch, IcDownload, IcXMark, IcCheckCircle, IcArrowPath, IcClock, IcUsers, IcDocument, IcStar, IcChat } from '../../utils/icons';
+import { asArray, asObject } from '../../utils/apiData';
 
 const ITEM_STATUS = {
   not_started: { t: 'لم تبدأ', c: 'gray' },
@@ -40,8 +41,10 @@ function OutputDrawer({ row, onClose }) {
   useEffect(() => {
     setD(null); setErr(false);
     adminApi.getOutput(row.system, row.id).then((r) => {
-      setD(r.data);
-      const first = r.data.items.find((i) => ['submitted', 'reviewing', 'revision'].includes(i.status)) || r.data.items.find((i) => i.form_data);
+      const d = asObject(r.data, { items: [] });
+      d.items = asArray(d.items);
+      setD(d);
+      const first = d.items.find((i) => ['submitted', 'reviewing', 'revision'].includes(i.status)) || d.items.find((i) => i.form_data);
       setOpen(first?.number ?? null);
     }).catch(() => setErr(true));
   }, [row]);
@@ -144,7 +147,7 @@ function ConsultantDrawer({ c, onClose }) {
     document.body.style.overflow = 'hidden';
     return () => { document.removeEventListener('keydown', k); document.body.style.overflow = ''; };
   }, [onClose]);
-  useEffect(() => { adminApi.getConsultantReviews(c.id).then((r) => setD(r.data)).catch(() => setD({ data: [], ratings: [] })); }, [c]);
+  useEffect(() => { adminApi.getConsultantReviews(c.id).then((r) => setD(asObject(r.data, { data: [], ratings: [] }))).catch(() => setD({ data: [], ratings: [] })); }, [c]);
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 800 }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(10,31,46,0.5)' }} />
@@ -334,7 +337,7 @@ export default function AdminOutputs() {
                     ['طلبات تعديل', c.revisions, IcArrowPath],
                     ['متوسط الرد', c.avg_response_hours != null ? `${c.avg_response_hours} س` : '—', IcClock],
                     ['التقييم', c.rating ? `${c.rating}` : '—', IcStar],
-                  ].map(([l, v, Ic]) => (
+                  ].map(([l, v]) => (
                     <div key={l} style={{ background: colors.bg, borderRadius: 12, padding: '8px 10px' }}>
                       <div style={{ fontFamily: font.display, fontSize: 17, fontWeight: 700, color: l === 'بانتظاره' && c.pending_review > 0 ? tones.blue.text : colors.ink }}>{v}</div>
                       <div style={{ fontSize: 11.5, color: colors.gray }}>{l}</div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /*
  * اختيار المستشار لخطة مستقلة (تشغيلي / سياسات) حين لا يوجد مستشار موروث من خطة أخرى.

@@ -22,11 +22,12 @@ class OperationalUnitContentSeeder extends Seeder
 
         foreach (OperationalContent::defaults() as $type => $content) {
             $unit = OperationalUnit::where('template_type', $type)->first();
-            if (!$unit) {
+            if (! $unit) {
                 continue;
             }
-            if (!empty($unit->content) && !$force) {
+            if (! empty($unit->content) && ! $force) {
                 $this->command?->line("  تخطّي {$type}: المحتوى موجود (يُدار من لوحة التحكم)");
+
                 continue;
             }
             $unit->update(['content' => OperationalContent::normalize($content)]);

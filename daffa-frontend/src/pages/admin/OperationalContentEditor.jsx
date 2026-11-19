@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
 import { C, clone, norm, inputStyle, Field, SmallBtn, StrList, ObjList, Optional, Section, TableEditor } from './StrategicContentEditor';

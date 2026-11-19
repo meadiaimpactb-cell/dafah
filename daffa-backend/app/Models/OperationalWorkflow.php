@@ -17,8 +17,8 @@ class OperationalWorkflow extends Model
     ];
 
     protected $casts = [
-        'paid_at'      => 'datetime',
-        'started_at'   => 'datetime',
+        'paid_at' => 'datetime',
+        'started_at' => 'datetime',
         'completed_at' => 'datetime',
     ];
 

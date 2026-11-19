@@ -14,9 +14,9 @@ class PolicySelection extends Model
     ];
 
     protected $casts = [
-        'form_data'    => 'array',
+        'form_data' => 'array',
         'submitted_at' => 'datetime',
-        'reviewed_at'  => 'datetime',
+        'reviewed_at' => 'datetime',
     ];
 
     public function workflow(): BelongsTo

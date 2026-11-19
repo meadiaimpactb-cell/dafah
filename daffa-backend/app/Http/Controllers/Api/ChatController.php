@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\Notification;
-use App\Models\Consultant;
 use App\Models\OperationalWorkflow;
 use App\Models\PolicyWorkflow;
 use App\Models\StrategicWorkflow;
@@ -27,14 +26,14 @@ class ChatController extends Controller
                 ->where('consultant_user_id', $user->id)
                 ->orderByDesc('last_at')
                 ->get()
-                ->map(fn($c) => $this->formatConversation($c, $user->id));
+                ->map(fn ($c) => $this->formatConversation($c, $user->id));
 
         } elseif ($user->role === 'admin') {
             // المدير يرى جميع المحادثات
             $conversations = Conversation::with(['client', 'consultantUser'])
                 ->orderByDesc('last_at')
                 ->get()
-                ->map(fn($c) => $this->formatConversation($c, $user->id));
+                ->map(fn ($c) => $this->formatConversation($c, $user->id));
 
         } else {
             // العميل يرى محادثاته مع مستشاريه
@@ -42,7 +41,7 @@ class ChatController extends Controller
                 ->where('client_id', $user->id)
                 ->orderByDesc('last_at')
                 ->get()
-                ->map(fn($c) => $this->formatConversation($c, $user->id));
+                ->map(fn ($c) => $this->formatConversation($c, $user->id));
         }
 
         return response()->json($conversations);
@@ -60,7 +59,7 @@ class ChatController extends Controller
             ->where('conversation_id', $id)
             ->orderBy('created_at')
             ->get()
-            ->map(fn($m) => $this->formatMessage($m, $user->id));
+            ->map(fn ($m) => $this->formatMessage($m, $user->id));
 
         // تعليم الرسائل الواردة كمقروءة
         Message::where('conversation_id', $id)
@@ -88,18 +87,18 @@ class ChatController extends Controller
 
         $message = Message::create([
             'conversation_id' => $id,
-            'sender_id'       => $user->id,
-            'body'            => $request->body,
+            'sender_id' => $user->id,
+            'body' => $request->body,
         ]);
 
         $conv->update([
             'last_message' => mb_substr($request->body, 0, 100),
-            'last_at'      => now(),
+            'last_at' => now(),
         ]);
 
         // Notify the other party
         $recipientId = ($conv->client_id === $user->id) ? $conv->consultant_user_id : $conv->client_id;
-        $senderName  = $user->org_name ?? $user->rep_name ?? $user->email;
+        $senderName = $user->org_name ?? $user->rep_name ?? $user->email;
         Notification::notify($recipientId, 'message', "رسالة جديدة من {$senderName}", mb_substr($request->body, 0, 80));
 
         return response()->json($this->formatMessage($message->load('sender'), $user->id), 201);
@@ -118,7 +117,7 @@ class ChatController extends Controller
             // مستشار العميل من أي نظام من الأنظمة الثلاثة (الأحدث تعيينًا) — لا يُشترط وجود خطة استراتيجية
             $consultantUserId = $this->clientConsultantUserId($user->id);
 
-            if (!$consultantUserId) {
+            if (! $consultantUserId) {
                 return response()->json(['message' => 'لم يتم تعيين مستشار لك بعد — يُعيَّن المستشار عند بدء أي خطة (استراتيجية أو تشغيلية أو سياسات).'], 422);
             }
 
@@ -143,10 +142,11 @@ class ChatController extends Controller
                 $candidates[] = [$wf->updated_at, (int) $wf->consultant->user_id];
             }
         }
-        if (!$candidates) {
+        if (! $candidates) {
             return null;
         }
         usort($candidates, fn ($a, $b) => $b[0] <=> $a[0]);
+
         return $candidates[0][1];
     }
 
@@ -155,7 +155,7 @@ class ChatController extends Controller
     // ─────────────────────────────────────────────────────────────────────────
     public function unread(Request $request)
     {
-        $user   = $request->user();
+        $user = $request->user();
         $convIds = Conversation::where('client_id', $user->id)
             ->orWhere('consultant_user_id', $user->id)
             ->pluck('id');
@@ -175,14 +175,14 @@ class ChatController extends Controller
     {
         return Conversation::where(function ($q) use ($userId) {
             $q->where('client_id', $userId)
-              ->orWhere('consultant_user_id', $userId);
+                ->orWhere('consultant_user_id', $userId);
         })->findOrFail($id);
     }
 
     private function formatConversation(Conversation $c, int $myId): array
     {
         $isClient = $c->client_id === $myId;
-        $other    = $isClient ? $c->consultantUser : $c->client;
+        $other = $isClient ? $c->consultantUser : $c->client;
 
         $unread = Message::where('conversation_id', $c->id)
             ->where('sender_id', '!=', $myId)
@@ -190,27 +190,28 @@ class ChatController extends Controller
             ->count();
 
         return [
-            'id'          => $c->id,
-            'other_name'  => $other->org_name ?? $other->rep_name ?? $other->email ?? 'مجهول',
-            'other_role'  => $isClient ? 'مستشار' : 'عميل',
-            'avatar'      => mb_substr($other->org_name ?? $other->rep_name ?? '?', 0, 1),
-            'last_message'=> $c->last_message ?? '',
-            'last_at'     => $c->last_at?->diffForHumans() ?? '',
-            'unread'      => $unread,
+            'id' => $c->id,
+            'other_name' => $other->org_name ?? $other->rep_name ?? $other->email ?? 'مجهول',
+            'other_role' => $isClient ? 'مستشار' : 'عميل',
+            'avatar' => mb_substr($other->org_name ?? $other->rep_name ?? '?', 0, 1),
+            'last_message' => $c->last_message ?? '',
+            'last_at' => $c->last_at?->diffForHumans() ?? '',
+            'unread' => $unread,
         ];
     }
 
     private function formatMessage(Message $m, int $myId): array
     {
         $sender = $m->sender;
+
         return [
-            'id'          => $m->id,
-            'sender_id'   => $m->sender_id,
-            'is_mine'     => $m->sender_id === $myId,
+            'id' => $m->id,
+            'sender_id' => $m->sender_id,
+            'is_mine' => $m->sender_id === $myId,
             'sender_name' => $sender->org_name ?? $sender->rep_name ?? $sender->email ?? 'مجهول',
-            'body'        => $m->body,
-            'time'        => $m->created_at->format('H:i'),
-            'read_at'     => $m->read_at,
+            'body' => $m->body,
+            'time' => $m->created_at->format('H:i'),
+            'read_at' => $m->read_at,
         ];
     }
 }

@@ -19,7 +19,7 @@ class OperationalPlanSync
 
     public static function newId(): string
     {
-        return 'act_' . Str::lower(Str::random(12));
+        return 'act_'.Str::lower(Str::random(12));
     }
 
     private static function norm($s): string
@@ -31,24 +31,25 @@ class OperationalPlanSync
     {
         $m = is_array($m) ? array_values($m) : [];
         $m = array_map(fn ($v) => $v ? 1 : 0, array_slice($m, 0, self::MONTHS));
+
         return array_pad($m, self::MONTHS, 0);
     }
 
     /** يضمن معرّفًا فريدًا لكل نشاط في op_activities. يعيد [formData, changed] */
     public static function ensureActivityIds(array $data): array
     {
-        if (!is_array($data['groups'] ?? null)) {
+        if (! is_array($data['groups'] ?? null)) {
             return [$data, false];
         }
         $changed = false;
-        $seen    = [];
-        $groups  = $data['groups'];
+        $seen = [];
+        $groups = $data['groups'];
         foreach ($groups as $gi => $g) {
-            if (!is_array($g) || !is_array($g['activities'] ?? null)) {
+            if (! is_array($g) || ! is_array($g['activities'] ?? null)) {
                 continue;
             }
             foreach ($g['activities'] as $ai => $a) {
-                if (!is_array($a)) {
+                if (! is_array($a)) {
                     continue;
                 }
                 $id = is_string($a['id'] ?? null) ? trim($a['id']) : '';
@@ -63,6 +64,7 @@ class OperationalPlanSync
         if ($changed) {
             $data['groups'] = $groups;
         }
+
         return [$data, $changed];
     }
 
@@ -71,22 +73,23 @@ class OperationalPlanSync
     {
         $out = [];
         foreach ((array) ($data['groups'] ?? []) as $g) {
-            if (!is_array($g)) {
+            if (! is_array($g)) {
                 continue;
             }
             $initiative = self::norm($g['initiative'] ?? '');
             foreach ((array) ($g['activities'] ?? []) as $a) {
-                if (!is_array($a)) {
+                if (! is_array($a)) {
                     continue;
                 }
                 $name = self::norm($a['name'] ?? '');
-                $id   = $a['id'] ?? null;
-                if ($name === '' || !is_string($id) || $id === '') {
+                $id = $a['id'] ?? null;
+                if ($name === '' || ! is_string($id) || $id === '') {
                     continue;
                 }
                 $out[] = ['id' => $id, 'name' => $name, 'initiative' => $initiative];
             }
         }
+
         return $out;
     }
 
@@ -101,13 +104,13 @@ class OperationalPlanSync
         $stats = ['added' => 0, 'linked' => 0, 'renamed' => 0, 'missing' => 0];
 
         // تنظيف الصفوف ودمج أي تكرار لنفس النشاط في صف واحد (مع الإبقاء على كل الأشهر المحددة)
-        $rows  = [];
+        $rows = [];
         $first = [];
         foreach ((array) ($gantt['activities'] ?? []) as $r) {
-            if (!is_array($r)) {
+            if (! is_array($r)) {
                 continue;
             }
-            $r['name']   = is_string($r['name'] ?? null) ? $r['name'] : '';
+            $r['name'] = is_string($r['name'] ?? null) ? $r['name'] : '';
             $r['months'] = self::months($r['months'] ?? null);
             $sid = is_string($r['source_id'] ?? null) ? $r['source_id'] : '';
             if ($sid === '') {
@@ -118,6 +121,7 @@ class OperationalPlanSync
                 foreach ($r['months'] as $mi => $v) {
                     $rows[$k]['months'][$mi] = ($rows[$k]['months'][$mi] || $v) ? 1 : 0;
                 }
+
                 continue;
             }
             if ($sid !== '') {
@@ -126,14 +130,14 @@ class OperationalPlanSync
             $rows[] = $r;
         }
 
-        $used   = [];
+        $used = [];
         $linked = [];
         foreach ($acts as $a) {
             $i = $first[$a['id']] ?? null;
             if ($i === null) {
                 // خطة قائمة قبل الربط: صف يدوي بالاسم نفسه يُربط بنشاطه بدل إضافة صف مكرر
                 foreach ($rows as $j => $r) {
-                    if (!isset($used[$j]) && !isset($r['source_id']) && self::norm($r['name']) === $a['name']) {
+                    if (! isset($used[$j]) && ! isset($r['source_id']) && self::norm($r['name']) === $a['name']) {
                         $i = $j;
                         $stats['linked']++;
                         break;
@@ -142,12 +146,13 @@ class OperationalPlanSync
             }
             if ($i === null) {
                 $linked[] = [
-                    'source_id'  => $a['id'],
+                    'source_id' => $a['id'],
                     'initiative' => $a['initiative'],
-                    'name'       => $a['name'],
-                    'months'     => array_fill(0, self::MONTHS, 0),
+                    'name' => $a['name'],
+                    'months' => array_fill(0, self::MONTHS, 0),
                 ];
                 $stats['added']++;
+
                 continue;
             }
             $row = $rows[$i];
@@ -155,9 +160,9 @@ class OperationalPlanSync
                 $stats['renamed']++;
             }
             unset($row['source_missing']);
-            $row['source_id']  = $a['id'];
+            $row['source_id'] = $a['id'];
             $row['initiative'] = $a['initiative'];
-            $row['name']       = $a['name'];
+            $row['name'] = $a['name'];
             $used[$i] = true;
             $linked[] = $row;
         }
@@ -176,6 +181,7 @@ class OperationalPlanSync
         }
 
         $gantt['activities'] = array_merge($linked, $rest);
+
         return [$gantt, $stats];
     }
 
@@ -184,14 +190,15 @@ class OperationalPlanSync
     {
         $out = [];
         foreach ((array) ($import['items'] ?? []) as $it) {
-            if (!is_array($it) || empty($it['checked'])) {
+            if (! is_array($it) || empty($it['checked'])) {
                 continue;
             }
             $name = self::norm($it['name'] ?? '');
-            if ($name !== '' && !in_array($name, $out, true)) {
+            if ($name !== '' && ! in_array($name, $out, true)) {
                 $out[] = $name;
             }
         }
+
         return $out;
     }
 
@@ -202,8 +209,8 @@ class OperationalPlanSync
     public static function syncActivityGroups(?array $activities, array $selected): array
     {
         $activities = $activities ?: [];
-        $groups     = array_values(array_filter((array) ($activities['groups'] ?? []), 'is_array'));
-        $existing   = [];
+        $groups = array_values(array_filter((array) ($activities['groups'] ?? []), 'is_array'));
+        $existing = [];
         foreach ($groups as $g) {
             $existing[self::norm($g['initiative'] ?? '')] = true;
         }
@@ -220,6 +227,7 @@ class OperationalPlanSync
             $added++;
         }
         $activities['groups'] = $groups;
+
         return [$activities, $added];
     }
 }

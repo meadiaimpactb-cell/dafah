@@ -1,5 +1,4 @@
 // الصفحة الرئيسية — كل النصوص قابلة للتعديل من «محتوى الموقع» في لوحة الأدمن (sc).
-import React from 'react';
 import { colors, systems, font } from '../../theme/tokens';
 import { RosetteShape } from '../../components/brand/Logo';
 import { IcTarget, IcCog, IcClipboard, IcCheckCircle, IcLightbulb, IcChat, IcDocument } from '../../utils/icons';

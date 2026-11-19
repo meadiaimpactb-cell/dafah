@@ -9,18 +9,19 @@ use App\Models\DiscountCode;
 use App\Models\OperationalWorkflow;
 use App\Models\Order;
 use App\Models\PolicySelection;
-use App\Support\PolicyCompletion;
 use App\Models\PolicyTypeContent;
 use App\Models\PolicyWorkflow;
 use App\Models\QuestionnaireSection;
 use App\Models\ServiceSetting;
 use App\Models\SiteContent;
 use App\Models\StrategicWorkflow;
+use App\Support\PdfBrand;
 use App\Support\PolicyCatalog;
+use App\Support\PolicyCompletion;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Mpdf\Mpdf;
 
 class PolicyController extends Controller
@@ -34,17 +35,18 @@ class PolicyController extends Controller
 
         return collect(PolicyCatalog::all())->map(function ($t) use ($overrides, $site) {
             $o = $overrides->get($t['id']);
+
             return array_merge($t, [
-                'name'                => ($o && $o->name)             ? $o->name             : $t['name'],
-                'description'         => ($o && $o->description)      ? $o->description      : $t['description'],
-                'price'               => ($o && $o->price !== null)   ? (float) $o->price    : $t['price'],
-                'overview'            => ($o && $o->overview)         ? $o->overview         : $t['overview'],
+                'name' => ($o && $o->name) ? $o->name : $t['name'],
+                'description' => ($o && $o->description) ? $o->description : $t['description'],
+                'price' => ($o && $o->price !== null) ? (float) $o->price : $t['price'],
+                'overview' => ($o && $o->overview) ? $o->overview : $t['overview'],
                 'written_description' => $o?->written_description,
-                'tip'                 => ($o && $o->tip)              ? $o->tip              : $t['tip'],
-                'video_url'           => $o?->video_url ?: ($site['policies_video_url'] ?? null),
-                'video_url_alt'       => $o?->video_url ? $o->video_url_alt : ($site['policies_video_url_alt'] ?? null),
-                'video_duration'      => $o?->video_duration,
-                'has_template'        => (bool) PolicyCatalog::templatePath($t['template'], 'docx'),
+                'tip' => ($o && $o->tip) ? $o->tip : $t['tip'],
+                'video_url' => $o?->video_url ?: ($site['policies_video_url'] ?? null),
+                'video_url_alt' => $o?->video_url ? $o->video_url_alt : ($site['policies_video_url_alt'] ?? null),
+                'video_duration' => $o?->video_duration,
+                'has_template' => (bool) PolicyCatalog::templatePath($t['template'], 'docx'),
             ]);
         })->values()->toArray();
     }
@@ -62,7 +64,7 @@ class PolicyController extends Controller
     // ── GET /api/policies/workflows ───────────────────────────────────────────
     public function index(Request $request)
     {
-        $uid     = $request->user()->id;
+        $uid = $request->user()->id;
         $typeMap = collect(self::policyTypes())->keyBy('id');
 
         // Fetch oldest-first for sequential numbering, then reverse for display
@@ -72,30 +74,29 @@ class PolicyController extends Controller
             ->get();
 
         // Incomplete = not completed AND questionnaires not yet all submitted (step < 4)
-        $hasIncomplete = $rows->filter(fn($wf) =>
-            $wf->status !== 'completed' && $wf->current_step < 4
+        $hasIncomplete = $rows->filter(fn ($wf) => $wf->status !== 'completed' && $wf->current_step < 4
         )->isNotEmpty();
 
-        $workflows = $rows->reverse()->values()->map(function ($wf, $displayIndex) use ($typeMap, $rows, $hasIncomplete) {
-            $sels          = $wf->selections;
+        $workflows = $rows->reverse()->values()->map(function ($wf, $displayIndex) use ($typeMap, $rows) {
+            $sels = $wf->selections;
             $approvedNames = $sels->where('status', 'approved')
-                ->map(fn($s) => $typeMap->get($s->policy_type_id)['name'] ?? '—')
+                ->map(fn ($s) => $typeMap->get($s->policy_type_id)['name'] ?? '—')
                 ->values();
 
             // Sequential number = position in oldest-first list (1-based)
-            $planNumber = $rows->search(fn($r) => $r->id === $wf->id) + 1;
+            $planNumber = $rows->search(fn ($r) => $r->id === $wf->id) + 1;
 
             return array_merge($wf->toArray(), [
-                'plan_number'      => $planNumber,
+                'plan_number' => $planNumber,
                 'selections_count' => $sels->count(),
-                'approved_count'   => $sels->where('status', 'approved')->count(),
-                'approved_names'   => $approvedNames,
+                'approved_count' => $sels->where('status', 'approved')->count(),
+                'approved_names' => $approvedNames,
             ]);
         });
 
         return response()->json([
-            'workflows'      => $workflows,
-            'can_create_new' => !$hasIncomplete,
+            'workflows' => $workflows,
+            'can_create_new' => ! $hasIncomplete,
         ]);
     }
 
@@ -121,7 +122,7 @@ class PolicyController extends Controller
         $workflow = $workflowQuery->first();
 
         // الأنظمة مستقلة: خطة بلا مستشار تأخذ مستشار آخر خطة تشغيلية/استراتيجية مكتملة إن وُجدت (افتراضي فقط)
-        if ($workflow && !$workflow->consultant_id && ($defaultId = $this->defaultConsultantId($user->id))) {
+        if ($workflow && ! $workflow->consultant_id && ($defaultId = $this->defaultConsultantId($user->id))) {
             $workflow->update(['consultant_id' => $defaultId]);
             $workflow->load(['consultant', 'selections', 'user']);
         }
@@ -132,44 +133,44 @@ class PolicyController extends Controller
         if ($workflow) {
             $typeMap = collect(self::policyTypes())->keyBy('id');
             $selectionsWithTypes = $workflow->selections->map(
-                fn($s) => self::selectionPayload($s, $typeMap)
+                fn ($s) => self::selectionPayload($s, $typeMap)
             );
         }
 
-        $s         = ServiceSetting::map();
+        $s = ServiceSetting::map();
         $designFee = (float) ($s['policy_design'] ?? 1500);
-        $taxRate   = (float) ($s['tax_rate']       ?? 15) / 100;
+        $taxRate = (float) ($s['tax_rate'] ?? 15) / 100;
         $designTax = round($designFee * $taxRate, 2);
 
         $designFileUrl = null;
         if ($workflow?->design_file) {
-            $designFileUrl = url('storage/' . $workflow->design_file);
+            $designFileUrl = url('storage/'.$workflow->design_file);
         }
 
         return response()->json([
-            'workflow'                => $workflow,
-            'selections'              => $selectionsWithTypes,
-            'policy_types'            => self::policyTypes(),
-            'operational_completed'   => (bool) $operationalWorkflow,
-            'operational_consultant'  => $operationalConsultant,
-            'design_price'            => $designFee,
-            'design_tax'              => $designTax,
-            'design_total'            => $designFee + $designTax,
-            'design_file_url'         => $designFileUrl,
+            'workflow' => $workflow,
+            'selections' => $selectionsWithTypes,
+            'policy_types' => self::policyTypes(),
+            'operational_completed' => (bool) $operationalWorkflow,
+            'operational_consultant' => $operationalConsultant,
+            'design_price' => $designFee,
+            'design_tax' => $designTax,
+            'design_total' => $designFee + $designTax,
+            'design_file_url' => $designFileUrl,
         ]);
     }
 
     // ── POST /api/policies/workflow/start ─────────────────────────────────────
     public function start(Request $request)
     {
-        $user     = $request->user();
+        $user = $request->user();
         $forceNew = $request->boolean('force_new');
 
         // Resume existing active plan (no force_new)
-        if (!$forceNew) {
+        if (! $forceNew) {
             $existing = PolicyWorkflow::where('user_id', $user->id)
                 ->where('status', '!=', 'completed')
-                ->orderByRaw("current_step DESC")
+                ->orderByRaw('current_step DESC')
                 ->orderBy('id', 'desc')
                 ->first();
 
@@ -193,12 +194,12 @@ class PolicyController extends Controller
         }
 
         $workflow = PolicyWorkflow::create([
-            'user_id'       => $user->id,
+            'user_id' => $user->id,
             // مستقلة عن التخطيط التشغيلي والاستراتيجي: مستشارهما (إن وُجد) افتراضي، وإلا يختار العميل مستشاره قبل الدفع
             'consultant_id' => $this->defaultConsultantId($user->id),
-            'current_step'  => 0,
-            'status'        => 'pending',
-            'started_at'    => now(),
+            'current_step' => 0,
+            'status' => 'pending',
+            'started_at' => now(),
         ]);
 
         return response()->json(['workflow' => $workflow->load('consultant')], 201);
@@ -209,8 +210,8 @@ class PolicyController extends Controller
     public function selectPolicies(Request $request)
     {
         $request->validate([
-            'policy_type_ids'    => 'required|array|min:1',
-            'policy_type_ids.*'  => ['integer', 'distinct', Rule::in(PolicyCatalog::activeIds())],
+            'policy_type_ids' => 'required|array|min:1',
+            'policy_type_ids.*' => ['integer', 'distinct', Rule::in(PolicyCatalog::activeIds())],
         ]);
 
         $workflow = $this->userWorkflow($request);
@@ -218,22 +219,22 @@ class PolicyController extends Controller
         // بعد الدفع لا يُغيَّر اختيار السياسات (كان يعيد الخطة للخطوة 1 فتعلق عند «تم الدفع مسبقاً»)
         if ($workflow->payment_status === 'paid') {
             return response()->json([
-                'message'  => 'تم الدفع لهذه الخطة، ولا يمكن تغيير السياسات المختارة. لإضافة سياسات أخرى أنشئ خطة جديدة بعد اكتمال هذه الخطة.',
+                'message' => 'تم الدفع لهذه الخطة، ولا يمكن تغيير السياسات المختارة. لإضافة سياسات أخرى أنشئ خطة جديدة بعد اكتمال هذه الخطة.',
                 'workflow' => $workflow->fresh(),
             ], 422);
         }
 
-        $types    = collect(self::policyTypes())->whereIn('id', $request->policy_type_ids);
+        $types = collect(self::policyTypes())->whereIn('id', $request->policy_type_ids);
         $subtotal = $types->sum('price');
-        $s        = ServiceSetting::map();
-        $tax      = round($subtotal * ((float) ($s['tax_rate'] ?? 15) / 100), 2);
+        $s = ServiceSetting::map();
+        $tax = round($subtotal * ((float) ($s['tax_rate'] ?? 15) / 100), 2);
 
         $workflow->update([
-            'current_step'     => 1,
-            'selected_policies'=> $request->policy_type_ids,
-            'subtotal'         => $subtotal,
-            'tax_amount'       => $tax,
-            'total'            => $subtotal + $tax,
+            'current_step' => 1,
+            'selected_policies' => $request->policy_type_ids,
+            'subtotal' => $subtotal,
+            'tax_amount' => $tax,
+            'total' => $subtotal + $tax,
         ]);
 
         return response()->json(['workflow' => $workflow->fresh()]);
@@ -243,11 +244,11 @@ class PolicyController extends Controller
     public function pay(Request $request)
     {
         $request->validate([
-            'payment_method'       => 'required|in:card,mada,apple_pay,bank_transfer',
-            'policy_type_ids'      => 'required|array|min:1',
-            'policy_type_ids.*'    => ['integer', 'distinct', Rule::in(PolicyCatalog::activeIds())],
-            'discount_code'        => 'nullable|string|max:50',
-            'include_arbitration'  => 'nullable|boolean',
+            'payment_method' => 'required|in:card,mada,apple_pay,bank_transfer',
+            'policy_type_ids' => 'required|array|min:1',
+            'policy_type_ids.*' => ['integer', 'distinct', Rule::in(PolicyCatalog::activeIds())],
+            'discount_code' => 'nullable|string|max:50',
+            'include_arbitration' => 'nullable|boolean',
         ]);
 
         $workflow = $this->userWorkflow($request);
@@ -257,11 +258,11 @@ class PolicyController extends Controller
         }
 
         // لا تبدأ خطة دون مستشار يراجع السياسات
-        if (!$workflow->consultant_id) {
+        if (! $workflow->consultant_id) {
             return response()->json(['message' => 'اختر المستشار قبل إتمام الدفع.'], 422);
         }
 
-        $types    = collect(self::policyTypes())->whereIn('id', $request->policy_type_ids);
+        $types = collect(self::policyTypes())->whereIn('id', $request->policy_type_ids);
         $subtotal = $types->sum('price');
 
         $s = ServiceSetting::map();
@@ -280,42 +281,42 @@ class PolicyController extends Controller
 
         $taxRate = (float) ($s['tax_rate'] ?? 15) / 100;
         $taxable = $subtotal - $discount;
-        $tax     = round($taxable * $taxRate, 2);
-        $total   = $taxable + $tax;
+        $tax = round($taxable * $taxRate, 2);
+        $total = $taxable + $tax;
 
-        $commissionRate  = (float) (ServiceSetting::val('consultant_commission_rate', 80)) / 100;
+        $commissionRate = (float) (ServiceSetting::val('consultant_commission_rate', 80)) / 100;
         $consultantShare = round($taxable * $commissionRate, 2);
 
         $order = Order::create([
-            'user_id'          => $request->user()->id,
-            'order_number'     => 'POL-' . strtoupper(Str::random(8)),
-            'service_type'     => 'policies',
-            'workflow_id'      => $workflow->id,
-            'consultant_id'    => $workflow->consultant_id,
-            'subtotal'         => $subtotal,
-            'tax_amount'       => $tax,
-            'discount_code'    => $request->discount_code,
-            'discount_amount'  => $discount,
-            'total'            => $total,
+            'user_id' => $request->user()->id,
+            'order_number' => 'POL-'.strtoupper(Str::random(8)),
+            'service_type' => 'policies',
+            'workflow_id' => $workflow->id,
+            'consultant_id' => $workflow->consultant_id,
+            'subtotal' => $subtotal,
+            'tax_amount' => $tax,
+            'discount_code' => $request->discount_code,
+            'discount_amount' => $discount,
+            'total' => $total,
             'consultant_share' => $consultantShare,
-            'payment_method'   => $request->payment_method,
-            'payment_status'   => 'paid',
-            'paid_at'          => now(),
+            'payment_method' => $request->payment_method,
+            'payment_status' => 'paid',
+            'paid_at' => now(),
         ]);
 
         $workflow->update([
-            'current_step'        => 3,
-            'status'              => 'active',
-            'selected_policies'   => $request->policy_type_ids,
-            'subtotal'            => $subtotal,
-            'tax_amount'          => $tax,
-            'discount_code'       => $request->discount_code,
-            'discount_amount'     => $discount,
+            'current_step' => 3,
+            'status' => 'active',
+            'selected_policies' => $request->policy_type_ids,
+            'subtotal' => $subtotal,
+            'tax_amount' => $tax,
+            'discount_code' => $request->discount_code,
+            'discount_amount' => $discount,
             'include_arbitration' => $request->boolean('include_arbitration'),
-            'total'               => $total,
-            'payment_method'      => $request->payment_method,
-            'payment_status'      => 'paid',
-            'paid_at'             => now(),
+            'total' => $total,
+            'payment_method' => $request->payment_method,
+            'payment_status' => 'paid',
+            'paid_at' => now(),
         ]);
 
         foreach ($request->policy_type_ids as $typeId) {
@@ -328,12 +329,12 @@ class PolicyController extends Controller
         $typeMap = collect(self::policyTypes())->keyBy('id');
         $selections = PolicySelection::where('workflow_id', $workflow->id)
             ->get()
-            ->map(fn($s) => self::selectionPayload($s, $typeMap));
+            ->map(fn ($s) => self::selectionPayload($s, $typeMap));
 
         return response()->json([
-            'workflow'   => $workflow->fresh(),
+            'workflow' => $workflow->fresh(),
             'selections' => $selections,
-            'order'      => $order,
+            'order' => $order,
         ]);
     }
 
@@ -341,11 +342,11 @@ class PolicyController extends Controller
     public function selections(Request $request)
     {
         $workflow = $this->userWorkflow($request);
-        $typeMap  = collect(self::policyTypes())->keyBy('id');
+        $typeMap = collect(self::policyTypes())->keyBy('id');
 
         $selections = PolicySelection::where('workflow_id', $workflow->id)
             ->get()
-            ->map(fn($s) => self::selectionPayload($s, $typeMap));
+            ->map(fn ($s) => self::selectionPayload($s, $typeMap));
 
         return response()->json(['selections' => $selections, 'policy_types' => self::policyTypes()]);
     }
@@ -353,8 +354,8 @@ class PolicyController extends Controller
     // ── GET /api/policies/selections/{id} ────────────────────────────────────
     public function selection(Request $request, int $id)
     {
-        $workflow  = $this->userWorkflow($request);
-        $typeMap   = collect(self::policyTypes())->keyBy('id');
+        $workflow = $this->userWorkflow($request);
+        $typeMap = collect(self::policyTypes())->keyBy('id');
         $selection = PolicySelection::where('workflow_id', $workflow->id)->where('id', $id)->firstOrFail();
 
         return response()->json([
@@ -367,7 +368,7 @@ class PolicyController extends Controller
     {
         $request->validate(['form_data' => 'present|array']);
 
-        $workflow  = $this->userWorkflow($request);
+        $workflow = $this->userWorkflow($request);
         $selection = PolicySelection::where('workflow_id', $workflow->id)->where('id', $id)->firstOrFail();
 
         if ($selection->status === 'approved') {
@@ -387,10 +388,10 @@ class PolicyController extends Controller
     {
         $request->validate(['form_data' => 'present|array']);
 
-        $workflow  = $this->userWorkflow($request);
+        $workflow = $this->userWorkflow($request);
 
         // Auto-heal: خطة بلا مستشار تأخذ مستشار آخر خطة تشغيلية/استراتيجية مكتملة إن وُجدت
-        if (!$workflow->consultant_id && ($defaultId = $this->defaultConsultantId($workflow->user_id))) {
+        if (! $workflow->consultant_id && ($defaultId = $this->defaultConsultantId($workflow->user_id))) {
             $workflow->update(['consultant_id' => $defaultId]);
         }
 
@@ -400,39 +401,40 @@ class PolicyController extends Controller
             return response()->json(['message' => 'السياسة معتمدة بالفعل.'], 422);
         }
 
-        if (!in_array((int) $workflow->current_step, [3, 4, 5], true) || $workflow->payment_status !== 'paid') {
+        if (! in_array((int) $workflow->current_step, [3, 4, 5], true) || $workflow->payment_status !== 'paid') {
             return response()->json(['message' => 'لا يمكن إرسال الاستمارة في هذه المرحلة من الخطة.'], 422);
         }
 
         $completion = PolicyCompletion::of($selection, $request->form_data);
-        if (!$completion['complete']) {
+        if (! $completion['complete']) {
             // نحفظ ما عُبّئ حتى لا يضيع، ونوضّح ما ينقص
             $selection->update([
                 'form_data' => $request->form_data,
-                'status'    => in_array($selection->status, ['not_started', 'revision'], true) ? 'in_progress' : $selection->status,
+                'status' => in_array($selection->status, ['not_started', 'revision'], true) ? 'in_progress' : $selection->status,
             ]);
+
             return response()->json([
-                'message'    => $completion['total'] === 0
+                'message' => $completion['total'] === 0
                     ? 'لم تُعدّ أسئلة هذه السياسة بعد — تواصل مع الإدارة.'
-                    : 'بقيت ' . $completion['required_missing'] . ' أسئلة مطلوبة دون إجابة في: ' . implode('، ', $completion['missing_sections']) . '.',
+                    : 'بقيت '.$completion['required_missing'].' أسئلة مطلوبة دون إجابة في: '.implode('، ', $completion['missing_sections']).'.',
                 'completion' => $completion,
             ], 422);
         }
 
         $wasSubmitted = in_array($selection->status, ['submitted', 'reviewing'], true);
         $selection->update([
-            'form_data'    => $request->form_data,
-            'status'       => 'submitted',
+            'form_data' => $request->form_data,
+            'status' => 'submitted',
             'submitted_at' => now(),
         ]);
 
         $typeName = collect(self::policyTypes())->firstWhere('id', $selection->policy_type_id)['name'] ?? 'سياسة';
         ActivityLog::record($request->user()->id, $wasSubmitted ? 'إعادة إرسال سياسة للمراجعة' : 'إرسال سياسة للمراجعة', 'review', 'client',
-            $typeName . ' — ' . ($request->user()->org_name ?: $request->user()->email));
+            $typeName.' — '.($request->user()->org_name ?: $request->user()->email));
 
         $workflow->load('selections');
         $allSubmitted = $workflow->selections->every(
-            fn($s) => in_array($s->status, ['submitted', 'reviewing', 'revision', 'approved'])
+            fn ($s) => in_array($s->status, ['submitted', 'reviewing', 'revision', 'approved'])
         );
 
         if ($allSubmitted && $workflow->current_step === 3) {
@@ -447,7 +449,7 @@ class PolicyController extends Controller
     {
         return array_merge($s->toArray(), [
             'policy_type' => $typeMap->get($s->policy_type_id),
-            'completion'  => PolicyCompletion::of($s),
+            'completion' => PolicyCompletion::of($s),
         ]);
     }
 
@@ -457,8 +459,8 @@ class PolicyController extends Controller
     {
         $request->validate([
             'payment_method' => 'required|in:card,mada,apple_pay,bank_transfer',
-            'want_design'    => 'required|boolean',
-            'design_logo'    => 'nullable|file|mimes:png,jpg,jpeg,svg,webp|max:5120',
+            'want_design' => 'required|boolean',
+            'design_logo' => 'nullable|file|mimes:png,jpg,jpeg,svg,webp|max:5120',
         ]);
 
         $workflow = $this->userWorkflow($request);
@@ -476,43 +478,43 @@ class PolicyController extends Controller
                 $brief = json_decode($request->input('design_brief'), true);
             }
 
-            $s         = ServiceSetting::map();
+            $s = ServiceSetting::map();
             $designFee = (float) ($s['policy_design'] ?? 1500);
-            $taxRate   = (float) ($s['tax_rate'] ?? 15) / 100;
-            $tax       = round($designFee * $taxRate, 2);
+            $taxRate = (float) ($s['tax_rate'] ?? 15) / 100;
+            $tax = round($designFee * $taxRate, 2);
 
-            $designCommissionRate  = (float) (ServiceSetting::val('consultant_commission_rate', 80)) / 100;
+            $designCommissionRate = (float) (ServiceSetting::val('consultant_commission_rate', 80)) / 100;
             $designConsultantShare = round($designFee * $designCommissionRate, 2);
 
             Order::create([
-                'user_id'          => $request->user()->id,
-                'order_number'     => 'DES-' . strtoupper(Str::random(8)),
-                'service_type'     => 'policies',
-                'workflow_id'      => $workflow->id,
-                'consultant_id'    => $workflow->consultant_id,
-                'subtotal'         => $designFee,
-                'tax_amount'       => $tax,
-                'total'            => $designFee + $tax,
+                'user_id' => $request->user()->id,
+                'order_number' => 'DES-'.strtoupper(Str::random(8)),
+                'service_type' => 'policies',
+                'workflow_id' => $workflow->id,
+                'consultant_id' => $workflow->consultant_id,
+                'subtotal' => $designFee,
+                'tax_amount' => $tax,
+                'total' => $designFee + $tax,
                 'consultant_share' => $designConsultantShare,
-                'payment_method'   => $request->payment_method,
-                'payment_status'   => 'paid',
-                'paid_at'          => now(),
+                'payment_method' => $request->payment_method,
+                'payment_status' => 'paid',
+                'paid_at' => now(),
             ]);
 
             $workflow->update([
-                'want_design'           => true,
-                'design_fee'            => $designFee,
+                'want_design' => true,
+                'design_fee' => $designFee,
                 'design_payment_status' => 'paid',
-                'design_paid_at'        => now(),
-                'design_status'         => 'pending',
-                'status'                => 'design_in_progress',
-                'design_brief'          => $brief,
-                'design_logo'           => $logoPath,
+                'design_paid_at' => now(),
+                'design_status' => 'pending',
+                'status' => 'design_in_progress',
+                'design_brief' => $brief,
+                'design_logo' => $logoPath,
             ]);
         } else {
             $workflow->update([
-                'want_design'  => false,
-                'status'       => 'completed',
+                'want_design' => false,
+                'status' => 'completed',
                 'completed_at' => now(),
             ]);
         }
@@ -529,10 +531,10 @@ class PolicyController extends Controller
         abort_if($workflow->design_status !== 'uploaded', 422, 'التصميم غير جاهز للاعتماد بعد.');
 
         $workflow->update([
-            'design_status'     => 'approved',
-            'design_approved_at'=> now(),
-            'status'            => 'completed',
-            'completed_at'      => now(),
+            'design_status' => 'approved',
+            'design_approved_at' => now(),
+            'status' => 'completed',
+            'completed_at' => now(),
         ]);
 
         return response()->json(['workflow' => $workflow->fresh()->load(['consultant', 'user'])]);
@@ -549,10 +551,10 @@ class PolicyController extends Controller
         abort_if($workflow->design_status !== 'uploaded', 422, 'لا يوجد تصميم لطلب تعديله.');
 
         $workflow->update([
-            'design_status'         => 'revision_requested',
+            'design_status' => 'revision_requested',
             'design_revision_notes' => $request->notes,
-            'design_file'           => null,
-            'design_uploaded_at'    => null,
+            'design_file' => null,
+            'design_uploaded_at' => null,
         ]);
 
         return response()->json(['workflow' => $workflow->fresh()->load(['consultant', 'user'])]);
@@ -561,7 +563,7 @@ class PolicyController extends Controller
     // ── GET /api/policies/workflow/pdf-link/{selectionId} ────────────────────
     public function getPdfLink(Request $request, int $selectionId)
     {
-        $workflow  = $this->userWorkflow($request);
+        $workflow = $this->userWorkflow($request);
         PolicySelection::where('workflow_id', $workflow->id)->where('id', $selectionId)->firstOrFail();
 
         $url = URL::temporarySignedRoute(
@@ -576,25 +578,25 @@ class PolicyController extends Controller
     // ── GET /pdf/policy (signed, web route) ───────────────────────────────────
     public function downloadPDFSigned(Request $request)
     {
-        if (!$request->hasValidSignature()) {
+        if (! $request->hasValidSignature()) {
             abort(403, 'الرابط منتهي الصلاحية أو غير صالح.');
         }
 
-        $userId      = (int) $request->user_id;
+        $userId = (int) $request->user_id;
         $selectionId = (int) $request->selection_id;
-        $workflowId  = (int) ($request->workflow_id ?? 0);
+        $workflowId = (int) ($request->workflow_id ?? 0);
 
         $wfQuery = PolicyWorkflow::with(['user', 'consultant'])->where('user_id', $userId);
         $workflow = $workflowId
             ? $wfQuery->where('id', $workflowId)->firstOrFail()
             : $wfQuery->latest()->firstOrFail();
 
-        $typeMap   = collect(self::policyTypes())->keyBy('id');
+        $typeMap = collect(self::policyTypes())->keyBy('id');
         $selection = PolicySelection::where('workflow_id', $workflow->id)
             ->where('id', $selectionId)
             ->firstOrFail();
 
-        $policyType    = $typeMap->get($selection->policy_type_id);
+        $policyType = $typeMap->get($selection->policy_type_id);
         $questionnaire = self::questionnaireFor($selection->policy_type_id);
 
         return view('pdf.policy', compact('workflow', 'selection', 'policyType', 'questionnaire'));
@@ -603,50 +605,50 @@ class PolicyController extends Controller
     // ── GET /api/policies/workflow/pdf/{selectionId} (direct mPDF) ────────────
     public function downloadPDF(Request $request, int $selectionId)
     {
-        $userId     = $request->user()->id;
+        $userId = $request->user()->id;
         $workflowId = (int) ($request->query('workflow_id') ?? 0);
-        $wfQuery    = PolicyWorkflow::with(['user', 'consultant'])->where('user_id', $userId);
-        $workflow   = $workflowId
+        $wfQuery = PolicyWorkflow::with(['user', 'consultant'])->where('user_id', $userId);
+        $workflow = $workflowId
             ? $wfQuery->where('id', $workflowId)->firstOrFail()
             : $wfQuery->latest()->firstOrFail();
 
-        $typeMap    = collect(self::policyTypes())->keyBy('id');
-        $selection  = PolicySelection::where('workflow_id', $workflow->id)
+        $typeMap = collect(self::policyTypes())->keyBy('id');
+        $selection = PolicySelection::where('workflow_id', $workflow->id)
             ->where('id', $selectionId)
             ->firstOrFail();
-        $policyType    = $typeMap->get($selection->policy_type_id);
+        $policyType = $typeMap->get($selection->policy_type_id);
         $questionnaire = self::questionnaireFor($selection->policy_type_id);
 
         $html = view('pdf.policy', compact('workflow', 'selection', 'policyType', 'questionnaire'))->render();
 
-        set_error_handler(fn() => true, E_WARNING | E_NOTICE);
+        set_error_handler(fn () => true, E_WARNING | E_NOTICE);
         try {
-            $mpdf = new Mpdf(\App\Support\PdfBrand::config([
-                'mode'              => 'utf-8',
-                'format'            => 'A4',
-                'default_font'      => 'dejavusans',
+            $mpdf = new Mpdf(PdfBrand::config([
+                'mode' => 'utf-8',
+                'format' => 'A4',
+                'default_font' => 'dejavusans',
                 'default_font_size' => 11,
-                'margin_left'       => 12,
-                'margin_right'      => 12,
-                'margin_top'        => 10,
-                'margin_bottom'     => 10,
-                'autoLangToFont'    => false,
-                'autoScriptToLang'  => false,
-                'useSubstitutions'  => false,
-                'tempDir'           => storage_path('app/mpdf-tmp'),
+                'margin_left' => 12,
+                'margin_right' => 12,
+                'margin_top' => 10,
+                'margin_bottom' => 10,
+                'autoLangToFont' => false,
+                'autoScriptToLang' => false,
+                'useSubstitutions' => false,
+                'tempDir' => storage_path('app/mpdf-tmp'),
             ]));
             $mpdf->WriteHTML($html);
-            $filename   = 'policy-' . $selection->policy_type_id . '-' . now()->format('Y-m-d') . '.pdf';
+            $filename = 'policy-'.$selection->policy_type_id.'-'.now()->format('Y-m-d').'.pdf';
             $pdfContent = $mpdf->Output('', 'S');
         } finally {
             restore_error_handler();
         }
 
         return response($pdfContent, 200, [
-            'Content-Type'        => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-            'Content-Length'      => strlen($pdfContent),
-            'Cache-Control'       => 'no-cache, no-store, must-revalidate',
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            'Content-Length' => strlen($pdfContent),
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
         ]);
     }
 
@@ -656,16 +658,16 @@ class PolicyController extends Controller
     {
         $request->validate(['format' => 'nullable|in:docx,pdf']);
 
-        $workflow  = $this->userWorkflow($request);
+        $workflow = $this->userWorkflow($request);
         $selection = PolicySelection::where('workflow_id', $workflow->id)->where('id', $id)->firstOrFail();
 
         abort_if($selection->status !== 'approved', 403, 'يُتاح النموذج المرجعي بعد اعتماد المستشار للسياسة.');
 
-        $type   = PolicyCatalog::find($selection->policy_type_id);
+        $type = PolicyCatalog::find($selection->policy_type_id);
         $format = $request->query('format', 'docx');
-        $path   = PolicyCatalog::templatePath($type['template'] ?? null, $format);
+        $path = PolicyCatalog::templatePath($type['template'] ?? null, $format);
 
-        abort_if(!$path, 404, 'لا يتوفر نموذج مرجعي لهذه السياسة.');
+        abort_if(! $path, 404, 'لا يتوفر نموذج مرجعي لهذه السياسة.');
 
         $filename = "{$type['code']} - {$type['name']} v{$type['version']}.{$format}";
 
@@ -677,7 +679,7 @@ class PolicyController extends Controller
     private function defaultConsultantId(int $userId): ?int
     {
         return OperationalWorkflow::where('user_id', $userId)->where('status', 'completed')
-                ->whereNotNull('consultant_id')->latest()->value('consultant_id')
+            ->whereNotNull('consultant_id')->latest()->value('consultant_id')
             ?? StrategicWorkflow::where('user_id', $userId)->where('status', 'completed')
                 ->whereNotNull('consultant_id')->latest()->value('consultant_id');
     }
@@ -701,7 +703,7 @@ class PolicyController extends Controller
         }
 
         $consultant = Consultant::findOrFail($request->consultant_id);
-        if (!$consultant->available) {
+        if (! $consultant->available) {
             return response()->json(['message' => 'المستشار غير متاح حالياً.'], 422);
         }
 
@@ -722,7 +724,7 @@ class PolicyController extends Controller
 
         return PolicyWorkflow::where('user_id', $uid)
             ->orderByRaw("(status = 'completed') DESC")
-            ->orderByRaw("current_step DESC")
+            ->orderByRaw('current_step DESC')
             ->orderBy('id', 'desc')
             ->firstOrFail();
     }

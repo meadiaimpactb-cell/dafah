@@ -1,5 +1,5 @@
 // جولة تعريفية قصيرة لكل دور — تظهر مرة واحدة تلقائيًا، ويمكن إعادتها من القائمة.
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { colors, font } from '../../theme/tokens';
 import { LogoMark, RosetteShape } from '../brand/Logo';
 

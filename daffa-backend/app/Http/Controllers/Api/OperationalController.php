@@ -15,6 +15,7 @@ use App\Models\StrategicUnit;
 use App\Models\StrategicWorkflow;
 use App\Models\UnitSubmission;
 use App\Support\OperationalPlanSync;
+use App\Support\PdfBrand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -28,7 +29,7 @@ class OperationalController extends Controller
         $workflows = OperationalWorkflow::with('consultant')
             ->where('user_id', $request->user()->id)
             ->withCount([
-                'submissions as approved_count' => fn($q) => $q->where('status', 'approved'),
+                'submissions as approved_count' => fn ($q) => $q->where('status', 'approved'),
                 'submissions as total_count',
             ])
             ->orderBy('created_at', 'desc')
@@ -42,12 +43,12 @@ class OperationalController extends Controller
     {
         $workflow = $this->resolveWorkflow($request);
 
-        if (!$workflow) {
+        if (! $workflow) {
             return response()->json(['workflow' => null]);
         }
 
         return response()->json([
-            'workflow'    => $workflow,
+            'workflow' => $workflow,
             'submissions' => $workflow->submissions->keyBy('unit_number'),
         ]);
     }
@@ -70,12 +71,12 @@ class OperationalController extends Controller
 
         // الأنظمة مستقلة: مستشار الخطة الاستراتيجية (إن وُجدت) افتراضي فقط لخطة بلا مستشار،
         // ولا يستبدل مستشارًا اختاره العميل لهذه الخطة
-        if ($workflow && !$workflow->consultant_id && $strategicWorkflow?->consultant_id) {
+        if ($workflow && ! $workflow->consultant_id && $strategicWorkflow?->consultant_id) {
             $workflow->update(['consultant_id' => $strategicWorkflow->consultant_id]);
             $workflow->load(['consultant', 'submissions.unit', 'user']);
         }
 
-        $units       = null;
+        $units = null;
         $submissions = null;
 
         if ($workflow) {
@@ -83,34 +84,35 @@ class OperationalController extends Controller
 
             // دائماً أرجع الوحدات بعد بدء مرحلة العمل — للسماح بمراجعة الخطوات السابقة
             if ($workflow->current_step >= 3) {
-                $allUnits  = OperationalUnit::orderBy('unit_number')->get();
+                $allUnits = OperationalUnit::orderBy('unit_number')->get();
                 $subsByNum = OperationalSubmission::where('workflow_id', $workflow->id)
                     ->get()->keyBy('unit_number');
 
                 $units = $allUnits->map(function ($unit) use ($subsByNum) {
                     $sub = $subsByNum->get($unit->unit_number);
+
                     return array_merge($unit->toArray(), [
                         'submission_status' => $sub?->status ?? 'not_started',
-                        'submission_id'     => $sub?->id,
-                        'consultant_notes'  => $sub?->consultant_notes,
+                        'submission_id' => $sub?->id,
+                        'consultant_notes' => $sub?->consultant_notes,
                     ]);
                 });
             }
         }
 
-        $s       = ServiceSetting::map();
+        $s = ServiceSetting::map();
         $catalog = OperationalUnit::orderBy('unit_number')->get(['unit_number', 'name']);
 
         return response()->json([
-            'workflow'              => $workflow,
-            'submissions'           => $submissions,
-            'units'                 => $units,
-            'strategic_completed'   => (bool) $strategicWorkflow,
-            'strategic_consultant'  => $strategicConsultant,
-            'catalog'               => $catalog,
-            'pricing'               => [
-                'base'     => (float) ($s['operational_base'] ?? 3500),
-                'tax_rate' => (float) ($s['tax_rate']         ?? 15),
+            'workflow' => $workflow,
+            'submissions' => $submissions,
+            'units' => $units,
+            'strategic_completed' => (bool) $strategicWorkflow,
+            'strategic_consultant' => $strategicConsultant,
+            'catalog' => $catalog,
+            'pricing' => [
+                'base' => (float) ($s['operational_base'] ?? 3500),
+                'tax_rate' => (float) ($s['tax_rate'] ?? 15),
             ],
         ]);
     }
@@ -137,27 +139,27 @@ class OperationalController extends Controller
             ->latest()
             ->first();
 
-        $s            = ServiceSetting::map();
-        $subtotal     = (float) ($s['operational_base'] ?? 3500);
-        $taxRate      = (float) ($s['tax_rate'] ?? 15) / 100;
-        $tax          = round($subtotal * $taxRate, 2);
-        $total        = $subtotal + $tax;
+        $s = ServiceSetting::map();
+        $subtotal = (float) ($s['operational_base'] ?? 3500);
+        $taxRate = (float) ($s['tax_rate'] ?? 15) / 100;
+        $tax = round($subtotal * $taxRate, 2);
+        $total = $subtotal + $tax;
         // استخدام مستشار الخطة الاستراتيجية إن وُجد، وإلا null
         $consultantId = $strategicWorkflow?->consultant_id;
 
         $workflow = OperationalWorkflow::create([
-            'user_id'       => $user->id,
+            'user_id' => $user->id,
             'consultant_id' => $consultantId,
-            'current_step'  => 2,   // تخطى اختيار المستشار مباشرةً للدفع
-            'status'        => 'pending',
-            'subtotal'      => $subtotal,
-            'tax_amount'    => $tax,
-            'total'         => $total,
-            'started_at'    => now(),
+            'current_step' => 2,   // تخطى اختيار المستشار مباشرةً للدفع
+            'status' => 'pending',
+            'subtotal' => $subtotal,
+            'tax_amount' => $tax,
+            'total' => $total,
+            'started_at' => now(),
         ]);
 
         ActivityLog::record($user->id, 'بدء التخطيط التشغيلي', 'workflow', 'client',
-            'المنظمة: ' . ($user->org_name ?: $user->email));
+            'المنظمة: '.($user->org_name ?: $user->email));
 
         return response()->json(['workflow' => $workflow->load('consultant')], 201);
     }
@@ -183,13 +185,13 @@ class OperationalController extends Controller
         }
 
         $consultant = Consultant::findOrFail($request->consultant_id);
-        if (!$consultant->available) {
+        if (! $consultant->available) {
             return response()->json(['message' => 'المستشار غير متاح حالياً.'], 422);
         }
 
         $workflow->update([
             'consultant_id' => $consultant->id,
-            'current_step'  => max((int) $workflow->current_step, 2),
+            'current_step' => max((int) $workflow->current_step, 2),
         ]);
 
         return response()->json(['workflow' => $workflow->fresh('consultant')]);
@@ -200,7 +202,7 @@ class OperationalController extends Controller
     {
         $request->validate([
             'payment_method' => 'required|in:card,mada,apple_pay,bank_transfer',
-            'discount_code'  => 'nullable|string|max:50',
+            'discount_code' => 'nullable|string|max:50',
         ]);
 
         $workflow = $this->userWorkflow($request);
@@ -210,7 +212,7 @@ class OperationalController extends Controller
         }
 
         // لا تبدأ خطة دون مستشار يراجعها
-        if (!$workflow->consultant_id) {
+        if (! $workflow->consultant_id) {
             return response()->json(['message' => 'اختر المستشار قبل إتمام الدفع.'], 422);
         }
 
@@ -225,35 +227,35 @@ class OperationalController extends Controller
 
         $total = $workflow->subtotal - $discount + $workflow->tax_amount;
 
-        $commissionRate  = (float) (ServiceSetting::val('consultant_commission_rate', 80)) / 100;
+        $commissionRate = (float) (ServiceSetting::val('consultant_commission_rate', 80)) / 100;
         $consultantShare = round(($workflow->subtotal - $discount) * $commissionRate, 2);
 
         $order = Order::create([
-            'user_id'          => $request->user()->id,
-            'order_number'     => 'OPR-' . strtoupper(Str::random(8)),
-            'service_type'     => 'operational',
-            'workflow_id'      => $workflow->id,
-            'consultant_id'    => $workflow->consultant_id,
-            'subtotal'         => $workflow->subtotal,
-            'tax_amount'       => $workflow->tax_amount,
-            'discount_code'    => $request->discount_code,
-            'discount_amount'  => $discount,
-            'total'            => $total,
+            'user_id' => $request->user()->id,
+            'order_number' => 'OPR-'.strtoupper(Str::random(8)),
+            'service_type' => 'operational',
+            'workflow_id' => $workflow->id,
+            'consultant_id' => $workflow->consultant_id,
+            'subtotal' => $workflow->subtotal,
+            'tax_amount' => $workflow->tax_amount,
+            'discount_code' => $request->discount_code,
+            'discount_amount' => $discount,
+            'total' => $total,
             'consultant_share' => $consultantShare,
-            'payment_method'   => $request->payment_method,
-            'payment_status'   => 'paid',
-            'paid_at'          => now(),
+            'payment_method' => $request->payment_method,
+            'payment_status' => 'paid',
+            'paid_at' => now(),
         ]);
 
         $workflow->update([
-            'current_step'    => 3,
-            'status'          => 'active',
-            'payment_status'  => 'paid',
-            'payment_method'  => $request->payment_method,
-            'paid_at'         => now(),
-            'discount_code'   => $request->discount_code,
+            'current_step' => 3,
+            'status' => 'active',
+            'payment_status' => 'paid',
+            'payment_method' => $request->payment_method,
+            'paid_at' => now(),
+            'discount_code' => $request->discount_code,
             'discount_amount' => $discount,
-            'total'           => $total,
+            'total' => $total,
         ]);
 
         // إنشاء submissions للـ 5 وحدات
@@ -261,20 +263,20 @@ class OperationalController extends Controller
         foreach ($units as $unit) {
             OperationalSubmission::firstOrCreate([
                 'workflow_id' => $workflow->id,
-                'unit_id'     => $unit->id,
+                'unit_id' => $unit->id,
             ], [
                 'unit_number' => $unit->unit_number,
-                'status'      => 'not_started',
-                'form_data'   => null,
+                'status' => 'not_started',
+                'form_data' => null,
             ]);
         }
 
         ActivityLog::record($request->user()->id, 'دفع — تشغيلي', 'payment', 'client',
-            number_format($total, 2) . ' ر.س — ' . ($request->user()->org_name ?: $request->user()->email) . ' — ' . $order->order_number);
+            number_format($total, 2).' ر.س — '.($request->user()->org_name ?: $request->user()->email).' — '.$order->order_number);
 
         return response()->json([
             'workflow' => $workflow->fresh(),
-            'order'    => $order,
+            'order' => $order,
         ]);
     }
 
@@ -282,17 +284,18 @@ class OperationalController extends Controller
     public function units(Request $request)
     {
         $workflow = $this->userWorkflow($request);
-        $units    = OperationalUnit::orderBy('unit_number')->get();
+        $units = OperationalUnit::orderBy('unit_number')->get();
 
         $submissions = OperationalSubmission::where('workflow_id', $workflow->id)
             ->get()->keyBy('unit_number');
 
         $data = $units->map(function ($unit) use ($submissions) {
             $sub = $submissions->get($unit->unit_number);
+
             return array_merge($unit->toArray(), [
                 'submission_status' => $sub?->status ?? 'not_started',
-                'submission_id'     => $sub?->id,
-                'consultant_notes'  => $sub?->consultant_notes,
+                'submission_id' => $sub?->id,
+                'consultant_notes' => $sub?->consultant_notes,
             ]);
         });
 
@@ -303,7 +306,7 @@ class OperationalController extends Controller
     public function unit(Request $request, int $unitNumber)
     {
         $workflow = $this->userWorkflow($request);
-        $unit     = OperationalUnit::where('unit_number', $unitNumber)->firstOrFail();
+        $unit = OperationalUnit::where('unit_number', $unitNumber)->firstOrFail();
 
         $submission = OperationalSubmission::where('workflow_id', $workflow->id)
             ->where('unit_id', $unit->id)
@@ -311,12 +314,12 @@ class OperationalController extends Controller
 
         // ربط الأجزاء ضمن الخطة نفسها: يُعرض الدمج للمستخدم ويُحفظ عند الحفظ (الوحدة المعتمدة تبقى كما هي)
         $payload = $submission?->toArray();
-        $sync    = null;
+        $sync = null;
 
         if ($unit->template_type === 'op_activities') {
             $this->activitiesSubmission($workflow); // تثبيت معرّفات الأنشطة قبل أي عرض
             $submission = $submission?->fresh();
-            $payload    = $submission?->toArray();
+            $payload = $submission?->toArray();
             if ($submission && $submission->status !== 'approved') {
                 $import = $this->submissionByType($workflow, 'op_import');
                 [$data, $added] = OperationalPlanSync::syncActivityGroups(
@@ -334,9 +337,9 @@ class OperationalController extends Controller
         }
 
         return response()->json([
-            'unit'       => $unit,
+            'unit' => $unit,
             'submission' => $payload,
-            'sync'       => $sync,
+            'sync' => $sync,
         ]);
     }
 
@@ -344,6 +347,7 @@ class OperationalController extends Controller
     private function submissionByType(OperationalWorkflow $workflow, string $type): ?OperationalSubmission
     {
         $unitId = OperationalUnit::where('template_type', $type)->value('id');
+
         return $unitId
             ? OperationalSubmission::where('workflow_id', $workflow->id)->where('unit_id', $unitId)->first()
             : null;
@@ -356,12 +360,13 @@ class OperationalController extends Controller
         if ($sub && is_array($sub->form_data)) {
             [$data, $changed] = OperationalPlanSync::ensureActivityIds($sub->form_data);
             if ($changed) {
-                $sub->form_data  = $data;
+                $sub->form_data = $data;
                 $sub->timestamps = false;
                 $sub->save();
                 $sub->timestamps = true;
             }
         }
+
         return $sub;
     }
 
@@ -371,6 +376,7 @@ class OperationalController extends Controller
         if ($unit->template_type === 'op_activities') {
             [$formData] = OperationalPlanSync::ensureActivityIds($formData);
         }
+
         return $formData;
     }
 
@@ -385,12 +391,12 @@ class OperationalController extends Controller
         }
         $gantt = $this->submissionByType($workflow, 'op_gantt');
         // جدول لم يُفتح/يُحفظ بعد: يُنقل عند فتحه (ويرى المستخدم تنبيه النقل)
-        if (!$gantt || $gantt->status === 'approved' || empty($gantt->form_data)) {
+        if (! $gantt || $gantt->status === 'approved' || empty($gantt->form_data)) {
             return;
         }
         [$data] = OperationalPlanSync::syncGantt($gantt->form_data, OperationalPlanSync::activities($activitiesData));
         if ($data != $gantt->form_data) {
-            $gantt->form_data  = $data;
+            $gantt->form_data = $data;
             $gantt->timestamps = false;
             $gantt->save();
             $gantt->timestamps = true;
@@ -403,7 +409,7 @@ class OperationalController extends Controller
         $request->validate(['form_data' => 'present|array']);
 
         $workflow = $this->userWorkflow($request);
-        $unit     = OperationalUnit::where('unit_number', $unitNumber)->firstOrFail();
+        $unit = OperationalUnit::where('unit_number', $unitNumber)->firstOrFail();
 
         $submission = OperationalSubmission::where('workflow_id', $workflow->id)
             ->where('unit_id', $unit->id)
@@ -419,7 +425,7 @@ class OperationalController extends Controller
 
         $submission->update([
             'form_data' => $this->prepareFormData($unit, $request->form_data),
-            'status'    => $newStatus,
+            'status' => $newStatus,
         ]);
         $this->syncSavedGantt($workflow, $unit, $submission->form_data);
 
@@ -432,7 +438,7 @@ class OperationalController extends Controller
         $request->validate(['form_data' => 'present|array']);
 
         $workflow = $this->userWorkflow($request);
-        $unit     = OperationalUnit::where('unit_number', $unitNumber)->firstOrFail();
+        $unit = OperationalUnit::where('unit_number', $unitNumber)->firstOrFail();
 
         $submission = OperationalSubmission::where('workflow_id', $workflow->id)
             ->where('unit_id', $unit->id)
@@ -456,8 +462,8 @@ class OperationalController extends Controller
         }
 
         $submission->update([
-            'form_data'    => $this->prepareFormData($unit, $request->form_data),
-            'status'       => 'submitted',
+            'form_data' => $this->prepareFormData($unit, $request->form_data),
+            'status' => 'submitted',
             'submitted_at' => now(),
         ]);
         $this->syncSavedGantt($workflow, $unit, $submission->form_data);
@@ -465,7 +471,7 @@ class OperationalController extends Controller
         // التحقق إذا كل الوحدات مُرسَلة → ننتقل لخطوة المراجعة
         $workflow->load('submissions');
         $allSubmitted = $workflow->submissions->every(
-            fn($s) => in_array($s->status, ['submitted', 'reviewing', 'revision', 'approved'])
+            fn ($s) => in_array($s->status, ['submitted', 'reviewing', 'revision', 'approved'])
         );
 
         if ($allSubmitted && $workflow->current_step === 3) {
@@ -473,7 +479,7 @@ class OperationalController extends Controller
         }
 
         ActivityLog::record($request->user()->id, 'إرسال وحدة للمراجعة — تشغيلي', 'review', 'client',
-            'الوحدة ' . $unitNumber . ': ' . $unit->name . ' — ' . ($request->user()->org_name ?: $request->user()->email));
+            'الوحدة '.$unitNumber.': '.$unit->name.' — '.($request->user()->org_name ?: $request->user()->email));
 
         return response()->json(['submission' => $submission->fresh()]);
     }
@@ -482,16 +488,16 @@ class OperationalController extends Controller
     public function progress(Request $request)
     {
         $workflow = $this->userWorkflow($request);
-        $total    = OperationalSubmission::where('workflow_id', $workflow->id)->count();
+        $total = OperationalSubmission::where('workflow_id', $workflow->id)->count();
         $approved = OperationalSubmission::where('workflow_id', $workflow->id)
             ->where('status', 'approved')->count();
-        $percent  = $total > 0 ? round(($approved / $total) * 100) : 0;
+        $percent = $total > 0 ? round(($approved / $total) * 100) : 0;
 
         return response()->json([
-            'total_units'     => $total,
-            'approved_units'  => $approved,
-            'progress_percent'=> $percent,
-            'status'          => $workflow->status,
+            'total_units' => $total,
+            'approved_units' => $approved,
+            'progress_percent' => $percent,
+            'status' => $workflow->status,
         ]);
     }
 
@@ -512,11 +518,11 @@ class OperationalController extends Controller
     // ── GET /pdf/operational (web route — signed URL) ─────────────────────────
     public function downloadPDFSigned(Request $request)
     {
-        if (!$request->hasValidSignature()) {
+        if (! $request->hasValidSignature()) {
             abort(403, 'الرابط منتهي الصلاحية أو غير صالح.');
         }
 
-        $userId     = (int) $request->user_id;
+        $userId = (int) $request->user_id;
         $workflowId = $request->workflow_id ? (int) $request->workflow_id : null;
 
         $query = OperationalWorkflow::with(['consultant', 'submissions.unit', 'user'])
@@ -527,7 +533,7 @@ class OperationalController extends Controller
             : $query->latest()->firstOrFail();
 
         $submissions = $workflow->submissions
-            ->filter(fn($s) => !empty($s->form_data))
+            ->filter(fn ($s) => ! empty($s->form_data))
             ->sortBy('unit_number')
             ->values();
 
@@ -537,7 +543,7 @@ class OperationalController extends Controller
     // ── GET /api/operational/workflow/pdf ─────────────────────────────────────
     public function downloadPDF(Request $request)
     {
-        $userId     = $request->user()->id;
+        $userId = $request->user()->id;
         $workflowId = $request->input('workflow_id') ? (int) $request->input('workflow_id') : null;
 
         $query = OperationalWorkflow::with(['consultant', 'submissions.unit', 'user'])
@@ -548,42 +554,42 @@ class OperationalController extends Controller
             : $query->latest()->firstOrFail();
 
         $submissions = $workflow->submissions
-            ->filter(fn($s) => !empty($s->form_data))
+            ->filter(fn ($s) => ! empty($s->form_data))
             ->sortBy('unit_number')
             ->values();
 
         $html = view('pdf.operational', compact('workflow', 'submissions'))->render();
 
-        set_error_handler(fn() => true, E_WARNING | E_NOTICE);
+        set_error_handler(fn () => true, E_WARNING | E_NOTICE);
         try {
-            $mpdf = new Mpdf(\App\Support\PdfBrand::config([
-                'mode'              => 'utf-8',
-                'format'            => 'A4',
-                'default_font'      => 'dejavusans',
+            $mpdf = new Mpdf(PdfBrand::config([
+                'mode' => 'utf-8',
+                'format' => 'A4',
+                'default_font' => 'dejavusans',
                 'default_font_size' => 11,
-                'margin_left'       => 12,
-                'margin_right'      => 12,
-                'margin_top'        => 10,
-                'margin_bottom'     => 10,
-                'autoLangToFont'    => false,
-                'autoScriptToLang'  => false,
-                'useSubstitutions'  => false,
-                'tempDir'           => storage_path('app/mpdf-tmp'),
+                'margin_left' => 12,
+                'margin_right' => 12,
+                'margin_top' => 10,
+                'margin_bottom' => 10,
+                'autoLangToFont' => false,
+                'autoScriptToLang' => false,
+                'useSubstitutions' => false,
+                'tempDir' => storage_path('app/mpdf-tmp'),
             ]));
 
             $mpdf->WriteHTML($html);
 
-            $filename   = 'operational-plan-' . now()->format('Y-m-d') . '.pdf';
+            $filename = 'operational-plan-'.now()->format('Y-m-d').'.pdf';
             $pdfContent = $mpdf->Output('', 'S');
         } finally {
             restore_error_handler();
         }
 
         return response($pdfContent, 200, [
-            'Content-Type'        => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-            'Content-Length'      => strlen($pdfContent),
-            'Cache-Control'       => 'no-cache, no-store, must-revalidate',
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            'Content-Length' => strlen($pdfContent),
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
         ]);
     }
 
@@ -596,7 +602,7 @@ class OperationalController extends Controller
             ->latest()
             ->first();
 
-        if (!$strategicWorkflow) {
+        if (! $strategicWorkflow) {
             return response()->json(['initiatives' => [], 'message' => 'لا توجد خطة استراتيجية مكتملة.']);
         }
 
@@ -610,20 +616,20 @@ class OperationalController extends Controller
         $initiatives = [];
 
         // استخراج المبادرات من البيانات المحفوظة
-        if (!empty($formData['rows'])) {
+        if (! empty($formData['rows'])) {
             $initiatives = collect($formData['rows'])
-                ->filter(fn($r) => !empty($r['initiative'] ?? $r['المبادرة'] ?? $r[0] ?? ''))
-                ->map(fn($r) => $r['initiative'] ?? $r['المبادرة'] ?? (is_array($r) ? implode(' - ', array_values($r)) : $r))
+                ->filter(fn ($r) => ! empty($r['initiative'] ?? $r['المبادرة'] ?? $r[0] ?? ''))
+                ->map(fn ($r) => $r['initiative'] ?? $r['المبادرة'] ?? (is_array($r) ? implode(' - ', array_values($r)) : $r))
                 ->values()
                 ->toArray();
-        } elseif (!empty($formData['initiatives'])) {
+        } elseif (! empty($formData['initiatives'])) {
             // بطاقات المبادرات كائنات؛ الواجهة التشغيلية تحتاج أسماءها فقط
             $initiatives = collect($formData['initiatives'])
-                ->map(fn($r) => is_array($r) ? trim((string) ($r['name'] ?? '')) : trim((string) $r))
+                ->map(fn ($r) => is_array($r) ? trim((string) ($r['name'] ?? '')) : trim((string) $r))
                 ->filter()
                 ->values()
                 ->toArray();
-        } elseif (!empty($formData)) {
+        } elseif (! empty($formData)) {
             // محاولة استخراج أي نص كمبادرة
             foreach ($formData as $key => $value) {
                 if (is_string($value) && strlen($value) > 5) {
@@ -661,7 +667,7 @@ class OperationalController extends Controller
 
         // Only mark fully complete when payment is done (step 3)
         if ($request->arbitration_step === 3) {
-            $data['status']       = 'completed';
+            $data['status'] = 'completed';
             $data['completed_at'] = now();
         }
 
@@ -698,7 +704,7 @@ class OperationalController extends Controller
 
         return $query
             ->orderByRaw("(status = 'completed') DESC")
-            ->orderByRaw("current_step DESC")
+            ->orderByRaw('current_step DESC')
             ->orderBy('id', 'desc')
             ->firstOrFail();
     }

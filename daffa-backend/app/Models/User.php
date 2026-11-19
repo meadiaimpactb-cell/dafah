@@ -31,7 +31,7 @@ class User extends Authenticatable
 
     public function consultant()
     {
-        return $this->hasOne(\App\Models\Consultant::class);
+        return $this->hasOne(Consultant::class);
     }
 
     protected $hidden = [
@@ -43,9 +43,9 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
-            'is_active'         => 'boolean',
-            'permissions'       => 'array',
+            'password' => 'hashed',
+            'is_active' => 'boolean',
+            'permissions' => 'array',
         ];
     }
 }

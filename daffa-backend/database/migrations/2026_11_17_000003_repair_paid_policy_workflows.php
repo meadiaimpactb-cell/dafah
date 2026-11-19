@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Log;
  *  - المبالغ = طلب الدفع (POL-) المسجّل للخطة.
  *  - الخطوة = 5 إن اكتملت/اعتُمد الكل، 4 إن أُرسل الكل، وإلا 3 (التعبئة).
  */
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         $rows = DB::table('policy_workflows')->where('payment_status', 'paid')->where('current_step', '<', 3)->get();
@@ -29,24 +30,24 @@ return new class extends Migration {
                 : ($statuses->every(fn ($s) => in_array($s, ['submitted', 'reviewing', 'revision', 'approved'], true)) ? 4 : 3);
 
             $update = [
-                'current_step'      => $step,
+                'current_step' => $step,
                 'selected_policies' => json_encode($selections->pluck('policy_type_id')->map(fn ($id) => (int) $id)->sort()->values()->all()),
-                'updated_at'        => now(),
+                'updated_at' => now(),
             ];
 
             $order = DB::table('orders')->where('service_type', 'policies')->where('workflow_id', $wf->id)
                 ->where('payment_status', 'paid')->where('order_number', 'like', 'POL-%')->orderByDesc('id')->first();
             if ($order) {
                 $update += [
-                    'subtotal'        => $order->subtotal,
-                    'tax_amount'      => $order->tax_amount,
+                    'subtotal' => $order->subtotal,
+                    'tax_amount' => $order->tax_amount,
                     'discount_amount' => $order->discount_amount,
-                    'total'           => $order->total,
+                    'total' => $order->total,
                 ];
             }
 
             DB::table('policy_workflows')->where('id', $wf->id)->update($update);
-            Log::info("policy workflow {$wf->id} repaired: step {$wf->current_step} → {$step}" . ($order ? " (amounts from {$order->order_number})" : ''));
+            Log::info("policy workflow {$wf->id} repaired: step {$wf->current_step} → {$step}".($order ? " (amounts from {$order->order_number})" : ''));
         }
     }
 

@@ -24,13 +24,13 @@ class UserController extends Controller
             $s = $request->search;
             $query->where(function ($q) use ($s) {
                 $q->where('rep_name', 'like', "%$s%")
-                  ->orWhere('org_name', 'like', "%$s%")
-                  ->orWhere('email',    'like', "%$s%");
+                    ->orWhere('org_name', 'like', "%$s%")
+                    ->orWhere('email', 'like', "%$s%");
             });
         }
 
         return response()->json(
-            $query->with('consultant')->get()->map(fn($u) => $this->format($u))
+            $query->with('consultant')->get()->map(fn ($u) => $this->format($u))
         );
     }
 
@@ -40,10 +40,10 @@ class UserController extends Controller
         $request->merge(['email' => RealEmail::normalize($request->input('email'))]);
         $request->validate([
             'rep_name' => 'required|string|max:255',
-            'email'    => RealEmail::rules(),
-            'role'     => 'required|in:admin,consultant,client',
+            'email' => RealEmail::rules(),
+            'role' => 'required|in:admin,consultant,client',
             'password' => 'required|string|min:8',
-            'phone'    => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20',
             'org_name' => 'nullable|string|max:255',
         ], RealEmail::messages());
         // الحساب الجديد يؤكد بريده برمز عند أول دخول (email_verified_at = null)
@@ -52,10 +52,10 @@ class UserController extends Controller
             'rep_name' => $request->rep_name,
             'org_name' => $request->org_name ?: $request->rep_name,
             'org_type' => $request->role === 'consultant' ? 'مستشار' : ($request->org_type ?: 'غير محدد'),
-            'email'    => $request->email,
-            'phone'    => $request->phone ?: '0000000000',
+            'email' => $request->email,
+            'phone' => $request->phone ?: '0000000000',
             'password' => Hash::make($request->password),
-            'role'     => $request->role,
+            'role' => $request->role,
         ]);
 
         return response()->json($this->format($user->load('consultant')), 201);
@@ -71,23 +71,23 @@ class UserController extends Controller
         }
         $request->validate([
             'rep_name' => 'sometimes|string|max:255',
-            'email'    => array_merge(['sometimes'], RealEmail::rules($id)),
-            'role'     => 'sometimes|in:admin,consultant,client',
-            'phone'    => 'nullable|string|max:20',
+            'email' => array_merge(['sometimes'], RealEmail::rules($id)),
+            'role' => 'sometimes|in:admin,consultant,client',
+            'phone' => 'nullable|string|max:20',
             'org_name' => 'nullable|string|max:255',
             'password' => 'nullable|string|min:8',
         ], RealEmail::messages());
 
         $data = $request->only(['rep_name', 'email', 'role', 'phone', 'org_name', 'org_type', 'is_active']);
         // تغيير البريد من لوحة التحكم: يؤكده صاحبه برمز عند دخوله القادم
-        if (!empty($data['email']) && mb_strtolower($data['email']) !== mb_strtolower($user->email)) {
+        if (! empty($data['email']) && mb_strtolower($data['email']) !== mb_strtolower($user->email)) {
             $user->email_verified_at = null;
         }
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }
 
-        $user->update(array_filter($data, fn($v) => $v !== null));
+        $user->update(array_filter($data, fn ($v) => $v !== null));
 
         return response()->json($this->format($user->fresh(['consultant'])));
     }
@@ -96,7 +96,8 @@ class UserController extends Controller
     public function toggle(int $id)
     {
         $user = User::findOrFail($id);
-        $user->update(['is_active' => !$user->is_active]);
+        $user->update(['is_active' => ! $user->is_active]);
+
         return response()->json($this->format($user->fresh(['consultant'])));
     }
 
@@ -109,6 +110,7 @@ class UserController extends Controller
             return response()->json(['message' => 'لا يمكن حذف حسابك الشخصي'], 422);
         }
         $user->delete();
+
         return response()->json(['message' => 'تم حذف المستخدم']);
     }
 
@@ -121,8 +123,8 @@ class UserController extends Controller
             'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
         ], [
             'avatar.required' => 'يرجى اختيار صورة',
-            'avatar.image'    => 'يجب أن يكون الملف صورة',
-            'avatar.max'      => 'حجم الصورة يجب أن لا يتجاوز 2 ميغابايت',
+            'avatar.image' => 'يجب أن يكون الملف صورة',
+            'avatar.max' => 'حجم الصورة يجب أن لا يتجاوز 2 ميغابايت',
         ]);
 
         if ($user->logo) {
@@ -138,18 +140,18 @@ class UserController extends Controller
     private function format(User $u): array
     {
         return [
-            'id'         => $u->id,
-            'name'       => $u->rep_name ?: ($u->org_name ?: $u->email),
-            'org_name'   => $u->org_name,
-            'rep_name'   => $u->rep_name,
-            'email'      => $u->email,
-            'phone'      => $u->phone,
-            'role'       => $u->role,
-            'is_active'  => $u->is_active ?? true,
+            'id' => $u->id,
+            'name' => $u->rep_name ?: ($u->org_name ?: $u->email),
+            'org_name' => $u->org_name,
+            'rep_name' => $u->rep_name,
+            'email' => $u->email,
+            'phone' => $u->phone,
+            'role' => $u->role,
+            'is_active' => $u->is_active ?? true,
             'created_at' => $u->created_at?->format('Y/m/d'),
             'last_login' => $u->updated_at?->diffForHumans(),
-            'avatar'     => mb_substr($u->rep_name ?? $u->org_name ?? $u->email ?? '?', 0, 1),
-            'avatar_url'  => $u->logo
+            'avatar' => mb_substr($u->rep_name ?? $u->org_name ?? $u->email ?? '?', 0, 1),
+            'avatar_url' => $u->logo
                 ? Storage::disk('public')->url($u->logo)
                 : ($u->consultant?->avatar ? Storage::disk('public')->url($u->consultant->avatar) : null),
             'permissions' => $u->permissions ?? [],
@@ -162,7 +164,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $request->validate([
-            'permissions'   => 'present|array',
+            'permissions' => 'present|array',
             'permissions.*' => 'string',
         ]);
 

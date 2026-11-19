@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Support\SocialLogin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -29,7 +30,7 @@ class SocialAuthController extends Controller
     public function redirect(Request $request, string $provider)
     {
         $intent = $request->query('intent') === 'register' ? 'register' : 'login';
-        if (!SocialLogin::enabled($provider)) {
+        if (! SocialLogin::enabled($provider)) {
             return $this->backToApp(['social_error' => 'الدخول عبر هذه الخدمة غير مفعّل حاليًا.', 'social_intent' => $intent]);
         }
 
@@ -45,13 +46,13 @@ class SocialAuthController extends Controller
         $saved = $state !== '' ? Cache::pull("social_state:$state") : null;
         $intent = $saved['intent'] ?? 'login';
 
-        if (!$saved || ($saved['provider'] ?? null) !== $provider || !SocialLogin::enabled($provider)) {
+        if (! $saved || ($saved['provider'] ?? null) !== $provider || ! SocialLogin::enabled($provider)) {
             return $this->backToApp(['social_error' => 'انتهت صلاحية محاولة الدخول. حاول مرة أخرى.', 'social_intent' => $intent]);
         }
 
         // المستخدم ألغى أو رفض الإذن لدى المزوّد
-        if ($request->filled('error') || !$request->filled('code')) {
-            return $this->backToApp(['social_error' => 'لم يكتمل الدخول عبر ' . SocialLogin::LABELS[$provider] . '.', 'social_intent' => $intent]);
+        if ($request->filled('error') || ! $request->filled('code')) {
+            return $this->backToApp(['social_error' => 'لم يكتمل الدخول عبر '.SocialLogin::LABELS[$provider].'.', 'social_intent' => $intent]);
         }
 
         try {
@@ -60,8 +61,9 @@ class SocialAuthController extends Controller
         } catch (RuntimeException $e) {
             return $this->backToApp(['social_error' => $e->getMessage(), 'social_intent' => $intent]);
         } catch (Throwable $e) {
-            Log::warning("social login [$provider] failed: " . $e->getMessage());
-            return $this->backToApp(['social_error' => 'تعذّر الدخول عبر ' . SocialLogin::LABELS[$provider] . '. حاول مرة أخرى.', 'social_intent' => $intent]);
+            Log::warning("social login [$provider] failed: ".$e->getMessage());
+
+            return $this->backToApp(['social_error' => 'تعذّر الدخول عبر '.SocialLogin::LABELS[$provider].'. حاول مرة أخرى.', 'social_intent' => $intent]);
         }
 
         $code = Str::random(64);
@@ -73,13 +75,13 @@ class SocialAuthController extends Controller
     public function exchange(Request $request)
     {
         $request->validate(['code' => 'required|string|max:100']);
-        $data = Cache::pull('social_login:' . $request->input('code'));
-        $user = $data ? \App\Models\User::find($data['user_id']) : null;
+        $data = Cache::pull('social_login:'.$request->input('code'));
+        $user = $data ? User::find($data['user_id']) : null;
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'انتهت صلاحية رابط الدخول. حاول مرة أخرى.'], 422);
         }
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             return response()->json(['message' => 'الحساب موقوف، تواصل مع الإدارة.'], 403);
         }
 
@@ -88,6 +90,6 @@ class SocialAuthController extends Controller
 
     private function backToApp(array $params)
     {
-        return redirect()->away(SocialLogin::frontendUrl() . '/?' . http_build_query($params));
+        return redirect()->away(SocialLogin::frontendUrl().'/?'.http_build_query($params));
     }
 }

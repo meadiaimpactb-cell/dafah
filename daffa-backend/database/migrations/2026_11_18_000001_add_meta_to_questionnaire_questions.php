@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Schema;
  * حقل «أخرى» بتوضيح، الأسئلة المركّبة بعدة خانات، وجداول معلومات مرجعية.
  * يقرؤها App\Support\QuestionRules (الخادم) و questionRules.js (الواجهة) بالدلالة نفسها.
  */
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::table('questionnaire_questions', function (Blueprint $table) {

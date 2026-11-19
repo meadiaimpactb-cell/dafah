@@ -6,8 +6,8 @@ import { chatApi } from '../../api/chat';
 import { ConsultantRating } from '../strategic/steps/StepApproval';
 import { PaymentReceipt } from '../strategic/steps/StepPayment';
 import ConsultantPicker from '../shared/ConsultantPicker';
-import { PayLogo, PaymentMethodPicker, ApplePayButton, SecurePaymentBadge, CardNetworkLogo, detectCardNetwork } from '../shared/PaymentBrand';
-import { IcClock, IcUpload, IcCheckCircle, IcArrowPath, IcSearch, IcWarning, IcLock, IcCog, IcLightbulb, IcSave, IcDocument, IcUser, IcCalendar, IcSparkles, IcCheck, IcChat, IcMoney, IcXMark, IcBeaker } from '../../utils/icons';
+import { PaymentMethodPicker, ApplePayButton, SecurePaymentBadge, CardNetworkLogo, detectCardNetwork } from '../shared/PaymentBrand';
+import { IcClock, IcUpload, IcCheckCircle, IcArrowPath, IcSearch, IcWarning, IcLock, IcCog, IcLightbulb, IcSave, IcDocument, IcUser, IcCalendar, IcSparkles, IcCheck, IcChat, IcXMark, IcBeaker } from '../../utils/icons';
 import { OpSection, OpFormIntro, OpLabel, hasOpSection } from './OpContent';
 import UnitVideo from '../shared/UnitVideo';
 
@@ -179,13 +179,6 @@ const Card = ({ children, accent, onClick, style }) => (
   </div>
 );
 
-const Input = ({ label, placeholder, type = "text", value, onChange }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-    {label && <label style={{ fontSize: 13, fontWeight: 600, color: colors.ink }}>{label}</label>}
-    <input type={type} placeholder={placeholder} value={value} onChange={onChange} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit", outline: "none" }} />
-  </div>
-);
-
 // ─── Payment method icons ───────────────────────────────────────────
 const PAY_METHODS = [
   {
@@ -344,7 +337,7 @@ const BankTransferInfo = () => (
 );
 
 // ─── Embedded Chat ──────────────────────────────────────────────────────────
-const EmbeddedChat = ({ consultantName }) => {
+const EmbeddedChat = () => {
   const [conv,     setConv]    = useState(null);
   const [messages, setMsgs]   = useState([]);
   const [body,     setBody]   = useState('');
@@ -1311,7 +1304,7 @@ const OpStepInfo = ({ strategicCompleted, units, catalog, pricing, consultant, o
 };
 
 // ─── Step 1: OpStepPayment ───────────────────────────────────────
-const OpStepPayment = ({ workflow, setOpStep, onPay, strategicConsultant, onWorkflowUpdate }) => {
+const OpStepPayment = ({ workflow, setOpStep, onPay, onWorkflowUpdate }) => {
   const EMPTY_CARD = { number: '', expiry: '', cvv: '', name: '' };
   const [payMethod,     setPayMethod]     = useState(0);
   const [card,          setCard]          = useState(EMPTY_CARD);

@@ -4,27 +4,27 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Consultant;
-use App\Models\Order;
-use App\Models\StrategicWorkflow;
-use App\Models\OperationalWorkflow;
-use App\Models\PolicyWorkflow;
-use App\Models\UnitSubmission;
 use App\Models\OperationalSubmission;
+use App\Models\OperationalWorkflow;
+use App\Models\Order;
 use App\Models\PolicySelection;
+use App\Models\PolicyWorkflow;
+use App\Models\StrategicWorkflow;
+use App\Models\UnitSubmission;
 
 class FinanceController extends Controller
 {
     public function index()
     {
         $serviceLabel = [
-            'strategic'   => 'استراتيجي',
+            'strategic' => 'استراتيجي',
             'operational' => 'تشغيلي',
-            'policies'    => 'سياسات',
+            'policies' => 'سياسات',
         ];
 
         // ── Totals ────────────────────────────────────────────────────────────
-        $totalRevenue   = Order::where('payment_status', 'paid')->sum('total');
-        $monthRevenue   = Order::where('payment_status', 'paid')
+        $totalRevenue = Order::where('payment_status', 'paid')->sum('total');
+        $monthRevenue = Order::where('payment_status', 'paid')
             ->where('paid_at', '>=', now()->startOfMonth())->sum('total');
         $pendingRevenue = Order::where('payment_status', 'pending')->sum('total');
 
@@ -34,13 +34,13 @@ class FinanceController extends Controller
             ->orderByDesc('paid_at')
             ->limit(20)
             ->get()
-            ->map(fn($o) => [
-                'id'           => $o->id,
+            ->map(fn ($o) => [
+                'id' => $o->id,
                 'order_number' => $o->order_number,
-                'org_name'     => $o->user?->org_name ?: $o->user?->rep_name ?: $o->user?->email,
-                'service'      => $serviceLabel[$o->service_type] ?? $o->service_type,
-                'total'        => $o->total,
-                'date'         => $o->paid_at?->format('Y/m/d') ?? '—',
+                'org_name' => $o->user?->org_name ?: $o->user?->rep_name ?: $o->user?->email,
+                'service' => $serviceLabel[$o->service_type] ?? $o->service_type,
+                'total' => $o->total,
+                'date' => $o->paid_at?->format('Y/m/d') ?? '—',
             ]);
 
         // ── Monthly revenue chart (last 12 months) ────────────────────────────
@@ -61,8 +61,8 @@ class FinanceController extends Controller
             ->orderBy('name')
             ->get()
             ->map(function ($c) {
-                $stIds  = StrategicWorkflow::where('consultant_id', $c->id)->pluck('id');
-                $opIds  = OperationalWorkflow::where('consultant_id', $c->id)->pluck('id');
+                $stIds = StrategicWorkflow::where('consultant_id', $c->id)->pluck('id');
+                $opIds = OperationalWorkflow::where('consultant_id', $c->id)->pluck('id');
                 $polIds = PolicyWorkflow::where('consultant_id', $c->id)->pluck('id');
 
                 $reviews = UnitSubmission::whereIn('workflow_id', $stIds)->where('status', 'approved')->count()
@@ -70,20 +70,20 @@ class FinanceController extends Controller
                     + PolicySelection::whereIn('workflow_id', $polIds)->where('status', 'approved')->count();
 
                 return [
-                    'id'      => $c->id,
-                    'name'    => $c->name,
-                    'rating'  => $c->rating,
+                    'id' => $c->id,
+                    'name' => $c->name,
+                    'rating' => $c->rating,
                     'reviews' => $reviews,
                 ];
             });
 
         return response()->json([
-            'total_revenue'   => (float) $totalRevenue,
-            'month_revenue'   => (float) $monthRevenue,
+            'total_revenue' => (float) $totalRevenue,
+            'month_revenue' => (float) $monthRevenue,
             'pending_revenue' => (float) $pendingRevenue,
-            'transactions'    => $transactions,
-            'monthly_chart'   => $months,
-            'consultants'     => $consultants,
+            'transactions' => $transactions,
+            'monthly_chart' => $months,
+            'consultants' => $consultants,
         ]);
     }
 }

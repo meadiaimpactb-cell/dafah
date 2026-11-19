@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Schema;
  * - عمود content لمحتوى النبذة والشرح والإرشادات وتعليمات النماذج المنظَّم.
  * تُنقل أرقام وحدات الخطط القائمة مع وحداتها، فلا تُفقد أي بيانات.
  */
-return new class extends Migration {
+return new class extends Migration
+{
     public const ORDER = [
         'swot' => 1, 'pestel' => 2, 'needs' => 3, 'toc' => 4, 'tows' => 5, 'directions' => 6,
         'initiatives' => 7, 'bmc' => 8, 'kpis' => 9, 'orgchart' => 10, 'document' => 11,
@@ -20,7 +21,7 @@ return new class extends Migration {
 
     public function up(): void
     {
-        if (!Schema::hasColumn('strategic_units', 'content')) {
+        if (! Schema::hasColumn('strategic_units', 'content')) {
             Schema::table('strategic_units', function (Blueprint $table) {
                 $table->json('content')->nullable()->after('tip');
             });
@@ -39,7 +40,7 @@ return new class extends Migration {
             }
         });
 
-        (new StrategicUnitContentSeeder())->run();
+        (new StrategicUnitContentSeeder)->run();
     }
 
     public function down(): void

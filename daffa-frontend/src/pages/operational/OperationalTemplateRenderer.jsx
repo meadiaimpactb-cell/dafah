@@ -1,5 +1,5 @@
 import DfIcon from '../../components/ui/DfIcon';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { operationalApi } from '../../api/operational';
 
 const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C' };

@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Api\Consultant;
 
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\Api\PolicyController;
+use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Consultant;
 use App\Models\Notification;
 use App\Models\OperationalSubmission;
 use App\Models\OperationalWorkflow;
+use App\Models\Order;
 use App\Models\PolicySelection;
 use App\Models\PolicyWorkflow;
-use App\Models\UnitSubmission;
+use App\Models\ServiceSetting;
 use App\Models\StrategicWorkflow;
+use App\Models\UnitSubmission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -28,14 +30,14 @@ class PortalController extends Controller
     {
         $consultant = $this->consultant($request);
 
-        $stIds  = StrategicWorkflow::where('consultant_id', $consultant->id)->pluck('id');
-        $opIds  = OperationalWorkflow::where('consultant_id', $consultant->id)->pluck('id');
+        $stIds = StrategicWorkflow::where('consultant_id', $consultant->id)->pluck('id');
+        $opIds = OperationalWorkflow::where('consultant_id', $consultant->id)->pluck('id');
         $polIds = PolicyWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         // إجمالي العملاء النشطين عبر كل الخدمات
         $activeClients =
             StrategicWorkflow::where('consultant_id', $consultant->id)
-                ->whereHas('user', fn($q) => $q->where('role', 'client'))
+                ->whereHas('user', fn ($q) => $q->where('role', 'client'))
                 ->whereIn('status', ['active', 'review'])->count()
             + OperationalWorkflow::where('consultant_id', $consultant->id)
                 ->whereIn('status', ['active', 'review'])->count()
@@ -60,22 +62,22 @@ class PortalController extends Controller
             ->whereIn('status', ['submitted', 'reviewing'])
             ->orderBy('submitted_at')
             ->take(5)->get()
-            ->map(fn($s) => $this->formatSubmission($s));
+            ->map(fn ($s) => $this->formatSubmission($s));
 
         $opPending = OperationalSubmission::with(['workflow.user', 'unit'])
             ->whereIn('workflow_id', $opIds)
             ->whereIn('status', ['submitted', 'reviewing'])
             ->orderBy('submitted_at')
             ->take(5)->get()
-            ->map(fn($s) => $this->formatOpSubmission($s));
+            ->map(fn ($s) => $this->formatOpSubmission($s));
 
-        $polTypes   = collect(PolicyController::policyTypes())->keyBy('id');
+        $polTypes = collect(PolicyController::policyTypes())->keyBy('id');
         $polPending = PolicySelection::with(['workflow.user'])
             ->whereIn('workflow_id', $polIds)
             ->whereIn('status', ['submitted', 'reviewing'])
             ->orderBy('submitted_at')
             ->take(5)->get()
-            ->map(fn($s) => $this->formatPolSelection($s, $polTypes));
+            ->map(fn ($s) => $this->formatPolSelection($s, $polTypes));
 
         $pending = $stPending->concat($opPending)->concat($polPending)
             ->sortBy('submitted_at')
@@ -83,9 +85,9 @@ class PortalController extends Controller
             ->values();
 
         return response()->json([
-            'consultant'      => $consultant,
-            'active_clients'  => $activeClients,
-            'pending_count'   => $pendingCount,
+            'consultant' => $consultant,
+            'active_clients' => $activeClients,
+            'pending_count' => $pendingCount,
             'completed_count' => $completedCount,
             'pending_reviews' => $pending,
         ]);
@@ -96,22 +98,22 @@ class PortalController extends Controller
     public function clients(Request $request)
     {
         $consultant = $this->consultant($request);
-        $cid        = $consultant->id;
+        $cid = $consultant->id;
 
         // جلب جميع الـ workflows عبر الأنظمة الثلاثة
-        $stWfs  = StrategicWorkflow::with(['user', 'submissions'])
+        $stWfs = StrategicWorkflow::with(['user', 'submissions'])
             ->where('consultant_id', $cid)
-            ->whereHas('user', fn($q) => $q->where('role', 'client'))
+            ->whereHas('user', fn ($q) => $q->where('role', 'client'))
             ->get();
 
-        $opWfs  = OperationalWorkflow::with(['user', 'submissions'])
+        $opWfs = OperationalWorkflow::with(['user', 'submissions'])
             ->where('consultant_id', $cid)
-            ->whereHas('user', fn($q) => $q->where('role', 'client'))
+            ->whereHas('user', fn ($q) => $q->where('role', 'client'))
             ->get();
 
         $polWfs = PolicyWorkflow::with(['user', 'selections'])
             ->where('consultant_id', $cid)
-            ->whereHas('user', fn($q) => $q->where('role', 'client'))
+            ->whereHas('user', fn ($q) => $q->where('role', 'client'))
             ->get();
 
         // تجميع المستخدمين الفريدين عبر الأنظمة الثلاثة
@@ -124,28 +126,30 @@ class PortalController extends Controller
 
         // دالة مساعدة: تجمع بيانات كل الخطط (لا الأخيرة فقط)
         $aggregateService = function ($allWfs, string $itemsRelation) {
-            if ($allWfs->isEmpty()) return null;
+            if ($allWfs->isEmpty()) {
+                return null;
+            }
 
             // جمع كل الوحدات/الاستبيانات من جميع الخطط
-            $allItems = $allWfs->flatMap(fn($wf) => $wf->{$itemsRelation});
+            $allItems = $allWfs->flatMap(fn ($wf) => $wf->{$itemsRelation});
 
             // الحالة = أول خطة نشطة، وإلا completed
-            $activeWf   = $allWfs->filter(fn($wf) => $wf->status !== 'completed')->sortByDesc('id')->first();
-            $latestWf   = $allWfs->sortByDesc('id')->first();
+            $activeWf = $allWfs->filter(fn ($wf) => $wf->status !== 'completed')->sortByDesc('id')->first();
+            $latestWf = $allWfs->sortByDesc('id')->first();
             $overallSts = $activeWf ? $activeWf->status : 'completed';
 
             return [
-                'status'       => $overallSts,
-                'total'        => $allItems->count(),
-                'approved'     => $allItems->where('status', 'approved')->count(),
-                'pending'      => $allItems->whereIn('status', ['submitted', 'reviewing'])->count(),
-                'revision'     => $allItems->where('status', 'revision')->count(),
-                'progress'     => $allItems->count() > 0
+                'status' => $overallSts,
+                'total' => $allItems->count(),
+                'approved' => $allItems->where('status', 'approved')->count(),
+                'pending' => $allItems->whereIn('status', ['submitted', 'reviewing'])->count(),
+                'revision' => $allItems->where('status', 'revision')->count(),
+                'progress' => $allItems->count() > 0
                     ? round(($allItems->where('status', 'approved')->count() / $allItems->count()) * 100)
                     : 0,
-                'workflow_id'  => $latestWf->id,
-                'started_at'   => $allWfs->min('started_at')?->format('Y-m-d'),
-                'plans_count'  => $allWfs->count(),  // عدد الخطط الإجمالي
+                'workflow_id' => $latestWf->id,
+                'started_at' => $allWfs->min('started_at')?->format('Y-m-d'),
+                'plans_count' => $allWfs->count(),  // عدد الخطط الإجمالي
             ];
         };
 
@@ -153,33 +157,33 @@ class PortalController extends Controller
             $uid = $user->id;
 
             // استراتيجي — كل الخطط مجمّعة
-            $stData  = $aggregateService($stWfs->where('user_id', $uid),  'submissions');
+            $stData = $aggregateService($stWfs->where('user_id', $uid), 'submissions');
 
             // تشغيلي — كل الخطط مجمّعة
-            $opData  = $aggregateService($opWfs->where('user_id', $uid),  'submissions');
+            $opData = $aggregateService($opWfs->where('user_id', $uid), 'submissions');
 
             // سياسات — كل الخطط مجمّعة (selections وليس submissions)
             $polData = $aggregateService($polWfs->where('user_id', $uid), 'selections');
 
             $totalPending =
-                ($stData['pending']  ?? 0) +
-                ($opData['pending']  ?? 0) +
+                ($stData['pending'] ?? 0) +
+                ($opData['pending'] ?? 0) +
                 ($polData['pending'] ?? 0);
 
             return [
-                'user_id'       => $uid,
-                'org_name'      => $user->org_name,
-                'org_type'      => $user->org_type,
-                'rep_name'      => $user->rep_name,
-                'avatar'        => mb_substr($user->org_name ?? '؟', 0, 1),
-                'strategic'     => $stData,
-                'operational'   => $opData,
-                'policies'      => $polData,
+                'user_id' => $uid,
+                'org_name' => $user->org_name,
+                'org_type' => $user->org_type,
+                'rep_name' => $user->rep_name,
+                'avatar' => mb_substr($user->org_name ?? '؟', 0, 1),
+                'strategic' => $stData,
+                'operational' => $opData,
+                'policies' => $polData,
                 'total_pending' => $totalPending,
             ];
         })
-        ->sortByDesc('total_pending')   // العملاء ذوو المهام المعلقة أولاً
-        ->values();
+            ->sortByDesc('total_pending')   // العملاء ذوو المهام المعلقة أولاً
+            ->values();
 
         return response()->json($clients);
     }
@@ -187,7 +191,7 @@ class PortalController extends Controller
     // GET /api/consultant/reviews/pending
     public function pendingReviews(Request $request)
     {
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = StrategicWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         // تشمل 'revision' حتى تبقى الوحدة مرئية للمستشار بانتظار تعديل العميل
@@ -197,7 +201,7 @@ class PortalController extends Controller
             ->orderByRaw("FIELD(status, 'submitted', 'reviewing', 'revision')")
             ->orderBy('submitted_at')
             ->get()
-            ->map(fn($s) => $this->formatSubmission($s));
+            ->map(fn ($s) => $this->formatSubmission($s));
 
         return response()->json($submissions);
     }
@@ -205,7 +209,7 @@ class PortalController extends Controller
     // GET /api/consultant/reviews/completed
     public function completedReviews(Request $request)
     {
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = StrategicWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         $submissions = UnitSubmission::with(['workflow.user', 'unit'])
@@ -213,7 +217,7 @@ class PortalController extends Controller
             ->where('status', 'approved')
             ->orderByDesc('reviewed_at')
             ->get()
-            ->map(fn($s) => $this->formatSubmission($s));
+            ->map(fn ($s) => $this->formatSubmission($s));
 
         return response()->json($submissions);
     }
@@ -221,7 +225,7 @@ class PortalController extends Controller
     // GET /api/consultant/submissions/{id}
     public function submission(Request $request, int $id)
     {
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = StrategicWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         $sub = UnitSubmission::with(['workflow.user', 'unit'])
@@ -238,17 +242,17 @@ class PortalController extends Controller
     {
         $request->validate(['notes' => 'nullable|string|max:1000']);
 
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = StrategicWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         $sub = UnitSubmission::with('workflow.user', 'unit')->whereIn('workflow_id', $workflowIds)->findOrFail($id);
         $sub->update([
-            'status'           => 'approved',
+            'status' => 'approved',
             'consultant_notes' => $request->notes,
-            'reviewed_at'      => now(),
+            'reviewed_at' => now(),
         ]);
 
-        $userId   = $sub->workflow->user_id;
+        $userId = $sub->workflow->user_id;
         $unitName = $sub->unit?->name ?? "الوحدة {$sub->unit_number}";
         Notification::notify($userId, 'unit_approved', "تم اعتماد {$unitName}", $request->notes ?: null);
 
@@ -261,7 +265,7 @@ class PortalController extends Controller
         }
 
         ActivityLog::record($request->user()->id, 'اعتماد وحدة — استراتيجي', 'review', 'consultant',
-            $unitName . ' — ' . ($sub->workflow->user->org_name ?: $sub->workflow->user->email));
+            $unitName.' — '.($sub->workflow->user->org_name ?: $sub->workflow->user->email));
 
         return response()->json(['submission' => $this->formatSubmission($sub->fresh(['workflow.user', 'unit']))]);
     }
@@ -271,22 +275,22 @@ class PortalController extends Controller
     {
         $request->validate(['notes' => 'required|string|max:1000']);
 
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = StrategicWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         $sub = UnitSubmission::with('workflow.user', 'unit')->whereIn('workflow_id', $workflowIds)->findOrFail($id);
         $sub->update([
-            'status'           => 'revision',
+            'status' => 'revision',
             'consultant_notes' => $request->notes,
-            'reviewed_at'      => now(),
-            'revision_count'   => $sub->revision_count + 1,
+            'reviewed_at' => now(),
+            'revision_count' => $sub->revision_count + 1,
         ]);
 
         $unitName = $sub->unit?->name ?? "الوحدة {$sub->unit_number}";
         Notification::notify($sub->workflow->user_id, 'unit_revision', "طلب تعديل على {$unitName}", $request->notes);
 
         ActivityLog::record($request->user()->id, 'طلب تعديل — استراتيجي', 'review', 'consultant',
-            $unitName . ' — ' . ($sub->workflow->user->org_name ?: $sub->workflow->user->email));
+            $unitName.' — '.($sub->workflow->user->org_name ?: $sub->workflow->user->email));
 
         return response()->json(['submission' => $this->formatSubmission($sub->fresh(['workflow.user', 'unit']))]);
     }
@@ -296,7 +300,7 @@ class PortalController extends Controller
     // GET /api/consultant/operational/reviews/pending
     public function opPendingReviews(Request $request)
     {
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = OperationalWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         $submissions = OperationalSubmission::with(['workflow.user', 'unit'])
@@ -305,7 +309,7 @@ class PortalController extends Controller
             ->orderByRaw("FIELD(status, 'submitted', 'reviewing', 'revision')")
             ->orderBy('submitted_at')
             ->get()
-            ->map(fn($s) => $this->formatOpSubmission($s));
+            ->map(fn ($s) => $this->formatOpSubmission($s));
 
         return response()->json($submissions);
     }
@@ -313,7 +317,7 @@ class PortalController extends Controller
     // GET /api/consultant/operational/reviews/completed
     public function opCompletedReviews(Request $request)
     {
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = OperationalWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         $submissions = OperationalSubmission::with(['workflow.user', 'unit'])
@@ -321,7 +325,7 @@ class PortalController extends Controller
             ->where('status', 'approved')
             ->orderByDesc('reviewed_at')
             ->get()
-            ->map(fn($s) => $this->formatOpSubmission($s));
+            ->map(fn ($s) => $this->formatOpSubmission($s));
 
         return response()->json($submissions);
     }
@@ -329,7 +333,7 @@ class PortalController extends Controller
     // GET /api/consultant/operational/submissions/{id}
     public function opSubmission(Request $request, int $id)
     {
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = OperationalWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         $sub = OperationalSubmission::with(['workflow.user', 'unit'])
@@ -346,17 +350,17 @@ class PortalController extends Controller
     {
         $request->validate(['notes' => 'nullable|string|max:1000']);
 
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = OperationalWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         $sub = OperationalSubmission::with('workflow.user', 'unit')->whereIn('workflow_id', $workflowIds)->findOrFail($id);
         $sub->update([
-            'status'           => 'approved',
+            'status' => 'approved',
             'consultant_notes' => $request->notes,
-            'reviewed_at'      => now(),
+            'reviewed_at' => now(),
         ]);
 
-        $userId   = $sub->workflow->user_id;
+        $userId = $sub->workflow->user_id;
         $unitName = $sub->unit?->name ?? "الوحدة {$sub->unit_number}";
         Notification::notify($userId, 'op_approved', "تم اعتماد {$unitName}", $request->notes ?: null);
 
@@ -368,7 +372,7 @@ class PortalController extends Controller
         }
 
         ActivityLog::record($request->user()->id, 'اعتماد وحدة — تشغيلي', 'review', 'consultant',
-            $unitName . ' — ' . ($sub->workflow->user->org_name ?: $sub->workflow->user->email));
+            $unitName.' — '.($sub->workflow->user->org_name ?: $sub->workflow->user->email));
 
         return response()->json(['submission' => $this->formatOpSubmission($sub->fresh(['workflow.user', 'unit']))]);
     }
@@ -378,22 +382,22 @@ class PortalController extends Controller
     {
         $request->validate(['notes' => 'required|string|max:1000']);
 
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = OperationalWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         $sub = OperationalSubmission::with('workflow.user', 'unit')->whereIn('workflow_id', $workflowIds)->findOrFail($id);
         $sub->update([
-            'status'           => 'revision',
+            'status' => 'revision',
             'consultant_notes' => $request->notes,
-            'reviewed_at'      => now(),
-            'revision_count'   => $sub->revision_count + 1,
+            'reviewed_at' => now(),
+            'revision_count' => $sub->revision_count + 1,
         ]);
 
         $unitName = $sub->unit?->name ?? "الوحدة {$sub->unit_number}";
         Notification::notify($sub->workflow->user_id, 'op_revision', "طلب تعديل على {$unitName}", $request->notes);
 
         ActivityLog::record($request->user()->id, 'طلب تعديل — تشغيلي', 'review', 'consultant',
-            $unitName . ' — ' . ($sub->workflow->user->org_name ?: $sub->workflow->user->email));
+            $unitName.' — '.($sub->workflow->user->org_name ?: $sub->workflow->user->email));
 
         return response()->json(['submission' => $this->formatOpSubmission($sub->fresh(['workflow.user', 'unit']))]);
     }
@@ -409,7 +413,7 @@ class PortalController extends Controller
     // GET /api/consultant/policies/reviews/pending
     public function polPendingReviews(Request $request)
     {
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = PolicyWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         $typeMap = collect(PolicyController::policyTypes())->keyBy('id');
@@ -420,7 +424,7 @@ class PortalController extends Controller
             ->orderByRaw("FIELD(status, 'submitted', 'reviewing', 'revision')")
             ->orderBy('submitted_at')
             ->get()
-            ->map(fn($s) => $this->formatPolSelection($s, $typeMap));
+            ->map(fn ($s) => $this->formatPolSelection($s, $typeMap));
 
         return response()->json($selections);
     }
@@ -428,7 +432,7 @@ class PortalController extends Controller
     // GET /api/consultant/policies/reviews/completed
     public function polCompletedReviews(Request $request)
     {
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = PolicyWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         $typeMap = collect(PolicyController::policyTypes())->keyBy('id');
@@ -438,7 +442,7 @@ class PortalController extends Controller
             ->where('status', 'approved')
             ->orderByDesc('reviewed_at')
             ->get()
-            ->map(fn($s) => $this->formatPolSelection($s, $typeMap));
+            ->map(fn ($s) => $this->formatPolSelection($s, $typeMap));
 
         return response()->json($selections);
     }
@@ -446,9 +450,9 @@ class PortalController extends Controller
     // GET /api/consultant/policies/selections/{id}
     public function polSelection(Request $request, int $id)
     {
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = PolicyWorkflow::where('consultant_id', $consultant->id)->pluck('id');
-        $typeMap     = collect(PolicyController::policyTypes())->keyBy('id');
+        $typeMap = collect(PolicyController::policyTypes())->keyBy('id');
 
         $sel = PolicySelection::with(['workflow.user'])
             ->whereIn('workflow_id', $workflowIds)
@@ -464,25 +468,25 @@ class PortalController extends Controller
     {
         $request->validate(['notes' => 'nullable|string|max:1000']);
 
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = PolicyWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         $typeMap = collect(PolicyController::policyTypes())->keyBy('id');
         $sel = PolicySelection::with('workflow.user')->whereIn('workflow_id', $workflowIds)->findOrFail($id);
         $sel->update([
-            'status'           => 'approved',
+            'status' => 'approved',
             'consultant_notes' => $request->notes,
-            'reviewed_at'      => now(),
+            'reviewed_at' => now(),
         ]);
 
-        $userId     = $sel->workflow->user_id;
+        $userId = $sel->workflow->user_id;
         $policyName = $typeMap->get($sel->policy_type_id)['name'] ?? 'السياسة';
         Notification::notify($userId, 'policy_approved', "تم اعتماد {$policyName}", $request->notes ?: null);
 
         $this->checkPolWorkflowCompletion($sel->workflow_id);
 
         ActivityLog::record($request->user()->id, 'اعتماد سياسة', 'review', 'consultant',
-            $policyName . ' — ' . ($sel->workflow->user->org_name ?: $sel->workflow->user->email));
+            $policyName.' — '.($sel->workflow->user->org_name ?: $sel->workflow->user->email));
 
         return response()->json(['selection' => $this->formatPolSelection($sel->fresh(['workflow.user']), $typeMap)]);
     }
@@ -492,23 +496,23 @@ class PortalController extends Controller
     {
         $request->validate(['notes' => 'required|string|max:1000']);
 
-        $consultant  = $this->consultant($request);
+        $consultant = $this->consultant($request);
         $workflowIds = PolicyWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         $typeMap = collect(PolicyController::policyTypes())->keyBy('id');
         $sel = PolicySelection::with('workflow.user')->whereIn('workflow_id', $workflowIds)->findOrFail($id);
         $sel->update([
-            'status'           => 'revision',
+            'status' => 'revision',
             'consultant_notes' => $request->notes,
-            'reviewed_at'      => now(),
-            'revision_count'   => $sel->revision_count + 1,
+            'reviewed_at' => now(),
+            'revision_count' => $sel->revision_count + 1,
         ]);
 
         $policyName = $typeMap->get($sel->policy_type_id)['name'] ?? 'السياسة';
         Notification::notify($sel->workflow->user_id, 'policy_revision', "طلب تعديل على {$policyName}", $request->notes);
 
         ActivityLog::record($request->user()->id, 'طلب تعديل — سياسة', 'review', 'consultant',
-            $policyName . ' — ' . ($sel->workflow->user->org_name ?: $sel->workflow->user->email));
+            $policyName.' — '.($sel->workflow->user->org_name ?: $sel->workflow->user->email));
 
         return response()->json(['selection' => $this->formatPolSelection($sel->fresh(['workflow.user']), $typeMap)]);
     }
@@ -520,24 +524,24 @@ class PortalController extends Controller
             : null;
 
         return [
-            'id'               => $s->id,
-            'workflow_id'      => $s->workflow_id,
-            'unit_number'      => $s->unit_number,
-            'unit_name'        => $s->unit?->name,
-            'unit_template'    => $s->unit?->template_type,
-            'status'           => $s->status,
-            'form_data'        => $s->form_data,
+            'id' => $s->id,
+            'workflow_id' => $s->workflow_id,
+            'unit_number' => $s->unit_number,
+            'unit_name' => $s->unit?->name,
+            'unit_template' => $s->unit?->template_type,
+            'status' => $s->status,
+            'form_data' => $s->form_data,
             'consultant_notes' => $s->consultant_notes,
-            'revision_count'   => $s->revision_count,
-            'submitted_at'     => $s->submitted_at?->diffForHumans(),
-            'reviewed_at'      => $s->reviewed_at?->diffForHumans(),
-            'days_pending'     => $daysPending,
-            'is_late'          => $daysPending >= 3,
-            'user_id'          => $s->workflow?->user?->id,
-            'org_name'         => $s->workflow?->user?->org_name,
-            'org_type'         => $s->workflow?->user?->org_type,
-            'avatar'           => mb_substr($s->workflow?->user?->org_name ?? '?', 0, 1),
-            'service_type'     => 'operational',
+            'revision_count' => $s->revision_count,
+            'submitted_at' => $s->submitted_at?->diffForHumans(),
+            'reviewed_at' => $s->reviewed_at?->diffForHumans(),
+            'days_pending' => $daysPending,
+            'is_late' => $daysPending >= 3,
+            'user_id' => $s->workflow?->user?->id,
+            'org_name' => $s->workflow?->user?->org_name,
+            'org_type' => $s->workflow?->user?->org_type,
+            'avatar' => mb_substr($s->workflow?->user?->org_name ?? '?', 0, 1),
+            'service_type' => 'operational',
         ];
     }
 
@@ -550,7 +554,7 @@ class PortalController extends Controller
         if ($allApproved) {
             OperationalWorkflow::find($workflowId)?->update([
                 'current_step' => 5,
-                'status'       => 'completed',
+                'status' => 'completed',
                 'completed_at' => now(),
             ]);
         }
@@ -563,49 +567,50 @@ class PortalController extends Controller
             : null;
 
         return [
-            'id'              => $s->id,
-            'workflow_id'     => $s->workflow_id,
-            'unit_number'     => $s->unit_number,
-            'unit_name'       => $s->unit?->name,
-            'unit_template'   => $s->unit?->template_type,
-            'status'          => $s->status,
-            'form_data'       => $s->form_data,
-            'consultant_notes'=> $s->consultant_notes,
-            'revision_count'  => $s->revision_count,
-            'submitted_at'    => $s->submitted_at?->diffForHumans(),
-            'reviewed_at'     => $s->reviewed_at?->diffForHumans(),
-            'days_pending'    => $daysPending,
-            'is_late'         => $daysPending >= 3,
-            'user_id'         => $s->workflow?->user?->id,
-            'org_name'        => $s->workflow?->user?->org_name,
-            'org_type'        => $s->workflow?->user?->org_type,
-            'avatar'          => mb_substr($s->workflow?->user?->org_name ?? '?', 0, 1),
-            'service_type'    => 'strategic',
+            'id' => $s->id,
+            'workflow_id' => $s->workflow_id,
+            'unit_number' => $s->unit_number,
+            'unit_name' => $s->unit?->name,
+            'unit_template' => $s->unit?->template_type,
+            'status' => $s->status,
+            'form_data' => $s->form_data,
+            'consultant_notes' => $s->consultant_notes,
+            'revision_count' => $s->revision_count,
+            'submitted_at' => $s->submitted_at?->diffForHumans(),
+            'reviewed_at' => $s->reviewed_at?->diffForHumans(),
+            'days_pending' => $daysPending,
+            'is_late' => $daysPending >= 3,
+            'user_id' => $s->workflow?->user?->id,
+            'org_name' => $s->workflow?->user?->org_name,
+            'org_type' => $s->workflow?->user?->org_type,
+            'avatar' => mb_substr($s->workflow?->user?->org_name ?? '?', 0, 1),
+            'service_type' => 'strategic',
         ];
     }
 
     private function formatPolSelection(PolicySelection $s, $typeMap): array
     {
         $daysPending = $s->submitted_at ? now()->diffInDays($s->submitted_at) : null;
+
         return [
-            'id'               => $s->id,
-            'workflow_id'      => $s->workflow_id,
-            'policy_type_id'   => $s->policy_type_id,
-            'policy_name'      => $typeMap->get($s->policy_type_id)['name'] ?? '',
-            'policy_icon'      => $typeMap->get($s->policy_type_id)['icon'] ?? '',
-            'status'           => $s->status,
-            'form_data'        => $s->form_data,
+            'id' => $s->id,
+            'workflow_id' => $s->workflow_id,
+            'policy_type_id' => $s->policy_type_id,
+            'policy_name' => $typeMap->get($s->policy_type_id)['name'] ?? '',
+            'policy_icon' => $typeMap->get($s->policy_type_id)['icon'] ?? '',
+            'status' => $s->status,
+            'form_data' => $s->form_data,
             'consultant_notes' => $s->consultant_notes,
-            'revision_count'   => $s->revision_count,
-            'submitted_at'     => $s->submitted_at?->diffForHumans(),
-            'reviewed_at'      => $s->reviewed_at?->diffForHumans(),
-            'days_pending'     => $daysPending,
-            'is_late'          => $daysPending >= 3,
-            'user_id'          => $s->workflow?->user?->id,
-            'org_name'         => $s->workflow?->user?->org_name,
-            'org_type'         => $s->workflow?->user?->org_type,
-            'avatar'           => mb_substr($s->workflow?->user?->org_name ?? '?', 0, 1),
-            'service_type'     => 'policy',
+            'revision_count' => $s->revision_count,
+            'submitted_at' => $s->submitted_at?->diffForHumans(),
+            'reviewed_at' => $s->reviewed_at?->diffForHumans(),
+            'days_pending' => $daysPending,
+            'is_late' => $daysPending >= 3,
+            'user_id' => $s->workflow?->user?->id,
+            'org_name' => $s->workflow?->user?->org_name,
+            'org_type' => $s->workflow?->user?->org_type,
+            'avatar' => mb_substr($s->workflow?->user?->org_name ?? '?', 0, 1),
+            'service_type' => 'policy',
         ];
     }
 
@@ -617,11 +622,13 @@ class PortalController extends Controller
 
         if ($allApproved) {
             $workflow = PolicyWorkflow::find($workflowId);
-            if (!$workflow || $workflow->status === 'completed') return;
+            if (! $workflow || $workflow->status === 'completed') {
+                return;
+            }
 
             $workflow->update([
                 'current_step' => 5,
-                'status'       => 'completed',
+                'status' => 'completed',
                 'completed_at' => now(),
             ]);
 
@@ -643,7 +650,7 @@ class PortalController extends Controller
         if ($allApproved) {
             StrategicWorkflow::find($workflowId)?->update([
                 'current_step' => 5,
-                'status'       => 'completed',
+                'status' => 'completed',
                 'completed_at' => now(),
             ]);
         }
@@ -660,7 +667,7 @@ class PortalController extends Controller
             ->where('status', 'design_in_progress')
             ->orderByRaw("FIELD(design_status, 'revision_requested', 'pending', 'uploaded')")
             ->get()
-            ->map(fn($w) => $this->formatDesignWorkflow($w));
+            ->map(fn ($w) => $this->formatDesignWorkflow($w));
 
         return response()->json(['workflows' => $workflows]);
     }
@@ -687,8 +694,8 @@ class PortalController extends Controller
         $path = $request->file('design_file')->store('designs', 'public');
 
         $workflow->update([
-            'design_status'      => 'uploaded',
-            'design_file'        => $path,
+            'design_status' => 'uploaded',
+            'design_file' => $path,
             'design_uploaded_at' => now(),
             'design_revision_notes' => null,
         ]);
@@ -701,8 +708,8 @@ class PortalController extends Controller
     {
         $consultant = $this->consultant($request);
 
-        $stIds  = StrategicWorkflow::where('consultant_id', $consultant->id)->pluck('id');
-        $opIds  = OperationalWorkflow::where('consultant_id', $consultant->id)->pluck('id');
+        $stIds = StrategicWorkflow::where('consultant_id', $consultant->id)->pluck('id');
+        $opIds = OperationalWorkflow::where('consultant_id', $consultant->id)->pluck('id');
         $polIds = PolicyWorkflow::where('consultant_id', $consultant->id)->pluck('id');
 
         // إجمالي العملاء الفريدين عبر كل الخدمات
@@ -713,8 +720,8 @@ class PortalController extends Controller
             ->unique()->count();
 
         // المراجعات المكتملة لكل خدمة
-        $stDone  = UnitSubmission::whereIn('workflow_id', $stIds)->where('status', 'approved')->count();
-        $opDone  = OperationalSubmission::whereIn('workflow_id', $opIds)->where('status', 'approved')->count();
+        $stDone = UnitSubmission::whereIn('workflow_id', $stIds)->where('status', 'approved')->count();
+        $opDone = OperationalSubmission::whereIn('workflow_id', $opIds)->where('status', 'approved')->count();
         $polDone = PolicySelection::whereIn('workflow_id', $polIds)->where('status', 'approved')->count();
 
         // متوسط وقت المراجعة بالساعات (استراتيجي)
@@ -726,14 +733,14 @@ class PortalController extends Controller
 
         // مراجعات شهرية (آخر 12 شهر) — تشمل كل الخدمات
         $since = now()->subMonths(11)->startOfMonth();
-        $fetchMonthly = fn($query) => $query
+        $fetchMonthly = fn ($query) => $query
             ->where('status', 'approved')
             ->where('reviewed_at', '>=', $since)
             ->selectRaw("DATE_FORMAT(reviewed_at,'%Y-%m') as month, COUNT(*) as cnt")
             ->groupBy('month')->pluck('cnt', 'month');
 
-        $mSt  = $fetchMonthly(UnitSubmission::whereIn('workflow_id', $stIds));
-        $mOp  = $fetchMonthly(OperationalSubmission::whereIn('workflow_id', $opIds));
+        $mSt = $fetchMonthly(UnitSubmission::whereIn('workflow_id', $stIds));
+        $mOp = $fetchMonthly(OperationalSubmission::whereIn('workflow_id', $opIds));
         $mPol = $fetchMonthly(PolicySelection::whereIn('workflow_id', $polIds));
 
         $months = [];
@@ -743,12 +750,12 @@ class PortalController extends Controller
         }
 
         return response()->json([
-            'rating'           => (float) $consultant->rating,
-            'total_clients'    => $allClients,
-            'total_completed'  => $stDone + $opDone + $polDone,
+            'rating' => (float) $consultant->rating,
+            'total_clients' => $allClients,
+            'total_completed' => $stDone + $opDone + $polDone,
             'avg_review_hours' => $avgHours ? round($avgHours, 1) : 0,
-            'by_service'       => ['strategic' => $stDone, 'operational' => $opDone, 'policy' => $polDone],
-            'monthly_reviews'  => $months,
+            'by_service' => ['strategic' => $stDone, 'operational' => $opDone, 'policy' => $polDone],
+            'monthly_reviews' => $months,
         ]);
     }
 
@@ -758,63 +765,62 @@ class PortalController extends Controller
         $consultant = $this->consultant($request);
 
         $serviceLabel = [
-            'strategic'   => 'التخطيط الاستراتيجي',
+            'strategic' => 'التخطيط الاستراتيجي',
             'operational' => 'التخطيط التشغيلي',
-            'policies'    => 'السياسات واللوائح',
+            'policies' => 'السياسات واللوائح',
         ];
 
-        $orders = \App\Models\Order::with('user')
+        $orders = Order::with('user')
             ->where('consultant_id', $consultant->id)
             ->where('payment_status', 'paid')
             ->orderByDesc('paid_at')
             ->get()
-            ->map(fn($o) => [
-                'id'               => $o->id,
-                'order_number'     => $o->order_number,
-                'service_type'     => $o->service_type,
-                'service_label'    => $serviceLabel[$o->service_type] ?? $o->service_type,
-                'org_name'         => $o->user?->org_name ?: $o->user?->rep_name,
-                'total'            => (float) $o->total,
-                'subtotal'         => (float) $o->subtotal,
+            ->map(fn ($o) => [
+                'id' => $o->id,
+                'order_number' => $o->order_number,
+                'service_type' => $o->service_type,
+                'service_label' => $serviceLabel[$o->service_type] ?? $o->service_type,
+                'org_name' => $o->user?->org_name ?: $o->user?->rep_name,
+                'total' => (float) $o->total,
+                'subtotal' => (float) $o->subtotal,
                 'consultant_share' => (float) $o->consultant_share,
-                'date'             => ($o->paid_at ?? $o->created_at)->format('Y-m-d'),
+                'date' => ($o->paid_at ?? $o->created_at)->format('Y-m-d'),
             ]);
 
-        $totalEarnings    = $orders->sum('consultant_share');
-        $commissionRate   = (float) \App\Models\ServiceSetting::val('consultant_commission_rate', 80);
-        $platformRate     = 100 - $commissionRate;
+        $totalEarnings = $orders->sum('consultant_share');
+        $commissionRate = (float) ServiceSetting::val('consultant_commission_rate', 80);
+        $platformRate = 100 - $commissionRate;
 
         // أرباح شهرية (آخر 12 شهر)
         $monthly = [];
         for ($i = 11; $i >= 0; $i--) {
             $key = now()->subMonths($i)->format('Y-m');
-            $monthly[$key] = round($orders->filter(fn($o) =>
-                str_starts_with($o['date'], $key)
+            $monthly[$key] = round($orders->filter(fn ($o) => str_starts_with($o['date'], $key)
             )->sum('consultant_share'), 2);
         }
 
         return response()->json([
-            'total_earnings'   => round($totalEarnings, 2),
-            'commission_rate'  => $commissionRate,
-            'platform_rate'    => $platformRate,
-            'orders_count'     => $orders->count(),
-            'orders'           => $orders,
-            'monthly'          => $monthly,
+            'total_earnings' => round($totalEarnings, 2),
+            'commission_rate' => $commissionRate,
+            'platform_rate' => $platformRate,
+            'orders_count' => $orders->count(),
+            'orders' => $orders,
+            'monthly' => $monthly,
         ]);
     }
 
     private function formatDesignWorkflow(PolicyWorkflow $w): array
     {
         return [
-            'id'                    => $w->id,
-            'org_name'              => $w->user?->org_name,
-            'org_type'              => $w->user?->org_type,
-            'avatar'                => mb_substr($w->user?->org_name ?? '?', 0, 1),
-            'design_status'         => $w->design_status,
-            'design_file'           => $w->design_file ? url('storage/' . $w->design_file) : null,
-            'design_fee'            => $w->design_fee,
-            'design_paid_at'        => $w->design_paid_at?->diffForHumans(),
-            'design_uploaded_at'    => $w->design_uploaded_at?->diffForHumans(),
+            'id' => $w->id,
+            'org_name' => $w->user?->org_name,
+            'org_type' => $w->user?->org_type,
+            'avatar' => mb_substr($w->user?->org_name ?? '?', 0, 1),
+            'design_status' => $w->design_status,
+            'design_file' => $w->design_file ? url('storage/'.$w->design_file) : null,
+            'design_fee' => $w->design_fee,
+            'design_paid_at' => $w->design_paid_at?->diffForHumans(),
+            'design_uploaded_at' => $w->design_uploaded_at?->diffForHumans(),
             'design_revision_notes' => $w->design_revision_notes,
         ];
     }

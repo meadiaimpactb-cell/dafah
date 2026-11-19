@@ -1,5 +1,5 @@
 import DfIcon from '../../components/ui/DfIcon';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { adminApi } from '../../api/admin';
 import { usePermissions } from '../../utils/permissions';
@@ -47,7 +47,7 @@ export default function AdminConsultants() {
     setLoadError(null);
     adminApi.getConsultants()
       .then(r => {
-        setConsultants(r.data);
+        setConsultants(Array.isArray(r.data) ? r.data : []);
         localStorage.setItem(CACHE_KEY, JSON.stringify(r.data));
       })
       .catch(e => {

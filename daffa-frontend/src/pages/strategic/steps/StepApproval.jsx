@@ -1,5 +1,5 @@
 import DfIcon from '../../../components/ui/DfIcon';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { strategicApi } from '../../../api/strategic';
 import api from '../../../api/axios';
 

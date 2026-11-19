@@ -12,15 +12,16 @@ use Illuminate\Support\Facades\Schema;
  * - الاسم الكامل للجزء الأول، وتغيير اسم الجزء الثالث من «شهور التنفيذ» إلى «الجدول الزمني للتنفيذ».
  *   يُغيَّر الاسم فقط إن كان ما يزال الاسم القديم (لا يُستبدل اسم عدّله المدير). لا تُمس بيانات الخطط.
  */
-return new class extends Migration {
+return new class extends Migration
+{
     public const RENAMES = [
         'op_import' => ['المبادرات الاستراتيجية', 'المبادرات الاستراتيجية في التخطيط التشغيلي'],
-        'op_gantt'  => ['شهور التنفيذ', 'الجدول الزمني للتنفيذ'],
+        'op_gantt' => ['شهور التنفيذ', 'الجدول الزمني للتنفيذ'],
     ];
 
     public function up(): void
     {
-        if (!Schema::hasColumn('operational_units', 'content')) {
+        if (! Schema::hasColumn('operational_units', 'content')) {
             Schema::table('operational_units', function (Blueprint $table) {
                 $table->json('content')->nullable()->after('tip');
             });
@@ -30,7 +31,7 @@ return new class extends Migration {
             DB::table('operational_units')->where('template_type', $type)->where('name', $old)->update(['name' => $new]);
         }
 
-        (new OperationalUnitContentSeeder())->run();
+        (new OperationalUnitContentSeeder)->run();
     }
 
     public function down(): void

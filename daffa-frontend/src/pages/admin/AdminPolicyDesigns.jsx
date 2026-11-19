@@ -1,5 +1,5 @@
 import DfIcon from '../../components/ui/DfIcon';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { adminApi } from '../../api/admin';
 
 const C = {
@@ -33,10 +33,6 @@ const exportDesignerBrief = (item) => {
   const scopeMap = { unified: 'تصميم موحد لجميع السياسات', color_coded: 'لون مختلف لكل سياسة (نفس القالب)', per_policy: 'تصميم مستقل لكل سياسة' };
   const styleMap = { modern: 'عصري وبسيط', corporate: 'مؤسسي واحترافي', classic: 'كلاسيكي وأنيق' };
   const langMap  = { arabic: 'عربي فقط', english: 'إنجليزي فقط', bilingual: 'ثنائي اللغة (عربي + إنجليزي)' };
-
-  const colorSwatch = (hex) => hex
-    ? `<span style="display:inline-block;width:18px;height:18px;border-radius:4px;background:${hex};border:1px solid #E8E3DA;vertical-align:middle;margin-left:6px"></span><code style="font-size:12px">${hex}</code>`
-    : '—';
 
   const row = (label, val) => val
     ? `<tr><td style="color:#5E6B78;padding:6px 12px 6px 0;font-size:13px;white-space:nowrap;vertical-align:top">${label}</td><td style="padding:6px 0;font-size:13px;font-weight:600;color:#0E2A3D">${val}</td></tr>`
@@ -231,7 +227,7 @@ export default function AdminPolicyDesigns() {
     else        setLoading(true);
     try {
       const r = await adminApi.getPolicyDesigns();
-      setItems(r.data);
+      setItems(Array.isArray(r.data) ? r.data : []);
       setLastSync(new Date());
     } finally {
       setLoading(false);

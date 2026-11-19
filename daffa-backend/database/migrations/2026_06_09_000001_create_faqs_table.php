@@ -43,7 +43,7 @@ return new class extends Migration
 
         foreach ($rows as $row) {
             DB::table('faqs')->insert(array_merge($row, [
-                'is_active'  => true,
+                'is_active' => true,
                 'created_at' => $now,
                 'updated_at' => $now,
             ]));

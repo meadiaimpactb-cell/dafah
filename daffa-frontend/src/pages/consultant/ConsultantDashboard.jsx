@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { consultantApi } from '../../api/consultant';
 import { consultantPoliciesApi } from '../../api/policies';
 import FormDataViewer from './FormDataViewer';
 import { IcCheckCircle, IcArrowPath, IcClipboard, IcUsers, IcWarning, IcXMark, IcSparkles } from '../../utils/icons';
+import { asObject } from '../../utils/apiData';
 
 const colors = {
   primary: '#235D7F', ink: '#0E2A3D', primaryDeep: '#235D7F',
@@ -110,7 +111,7 @@ const ReviewDetailModal = ({ submissionId, initialData, serviceType = 'strategic
     if (isPol)     call = consultantPoliciesApi.getSelection(submissionId);
     else if (isOp) call = consultantApi.opGetSubmission(submissionId);
     else           call = consultantApi.getSubmission(submissionId);
-    call.then(r => { setSub(r.data); setNotes(r.data.consultant_notes || ''); }).catch(() => {});
+    call.then(r => { const d = asObject(r.data); setSub(d); setNotes(d?.consultant_notes || ''); }).catch(() => {});
   }, [submissionId]);
 
   const doApprove = () => {
@@ -276,8 +277,10 @@ export default function ConsultantDashboard() {
     setError(null);
     consultantApi.dashboard()
       .then(r => {
-        setData(r.data);
-        localStorage.setItem(CACHE_KEY, JSON.stringify(r.data));
+        const d = asObject(r.data);
+        if (!d) return; // استجابة غير صالحة: نبقي آخر بيانات معروضة
+        setData(d);
+        localStorage.setItem(CACHE_KEY, JSON.stringify(d));
       })
       .catch(e => { if (!silent) setError(e.response?.data?.message || 'تعذّر الاتصال بالخادم'); })
       .finally(() => setLoading(false));

@@ -1,6 +1,6 @@
 import { Help } from '../../components/ui/Help';
 import DfIcon from '../../components/ui/DfIcon';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { strategicApi } from '../../api/strategic';
 import TemplateRenderer from './TemplateRenderer';

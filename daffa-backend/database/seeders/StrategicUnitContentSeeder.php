@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\StrategicUnit;
 use App\Support\StrategicContent;
+use Illuminate\Database\Seeder;
 
 /**
  * محتوى الوحدات الاستراتيجية المنظَّم (النبذة، الشرح، الإرشادات، تعليمات النماذج)
@@ -22,11 +22,12 @@ class StrategicUnitContentSeeder extends Seeder
 
         foreach (StrategicContent::defaults() as $type => $content) {
             $unit = StrategicUnit::where('template_type', $type)->first();
-            if (!$unit) {
+            if (! $unit) {
                 continue;
             }
-            if (!empty($unit->content) && !$force) {
+            if (! empty($unit->content) && ! $force) {
                 $this->command?->line("  تخطّي {$type}: المحتوى موجود (يُدار من لوحة التحكم)");
+
                 continue;
             }
             $unit->update(['content' => StrategicContent::normalize($content, $unit->content)]);

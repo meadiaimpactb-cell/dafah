@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../../api/axios';
 
 /** يقبل الأرقام العربية-الهندية (٠-٩) والفارسية (۰-۹) ويحوّلها إلى أرقام لاتينية */
