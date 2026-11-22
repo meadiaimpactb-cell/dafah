@@ -208,7 +208,7 @@ const AdminQuestionnaire = () => {
                       </div>
                     )}
                     <div style={{ marginTop: 6, fontSize: 11, color: colors.gray }}>
-                      {q.meta?.show_if ? `يظهر بشرط إجابة السؤال ${q.meta.show_if.q}` : q.display_condition ? `شرط: ${q.display_condition}` : "يظهر دائماً"}{q.meta?.input ? ` | إدخال: ${q.meta.input}` : ""}{q.meta?.fields ? ` | ${q.meta.fields.length} خانات` : ""}{q.hint ? ` | تلميح: ${q.hint}` : ""}
+                      {q.meta?.show_if ? `يظهر بشرط إجابة ${q.meta.show_if.q ? `السؤال ${q.meta.show_if.q}` : 'أسئلة أخرى'}` : q.display_condition ? `شرط: ${q.display_condition}` : "يظهر دائماً"}{q.meta?.input ? ` | إدخال: ${q.meta.input}` : ""}{q.meta?.fields ? ` | ${q.meta.fields.length} خانات` : ""}{q.hint ? ` | تلميح: ${q.hint}` : ""}
                     </div>
                   </div>
                 ))
@@ -279,7 +279,7 @@ const AdminQuestionnaire = () => {
             <div style={{ marginBottom: 20 }}>
               <label style={{ fontSize: 12, fontWeight: 600, color: "#334452", display: "block", marginBottom: 6 }}>إعدادات متقدمة (JSON — اختياري)</label>
               <textarea value={qForm.metaText} onChange={e => setQForm(f => ({ ...f, metaText: e.target.value }))} rows={4} dir="ltr" placeholder={'{"input":"number","min":0,"unit":"ريال"} / {"show_if":{"q":501,"in":["نعم"]}} / {"other":{"options":["أخرى (حدّدها أدناه)"],"label":"اذكر الجهة"}}'} style={{ ...inputS, fontFamily: "monospace", fontSize: 12, resize: "vertical" }} />
-              <div style={{ fontSize: 11, color: "#8C97A3", marginTop: 4 }}>المفاتيح: input (date/number) min max integer unit · exclusive · other · show_if · fields · checks · force · info</div>
+              <div style={{ fontSize: 11, color: "#8C97A3", marginTop: 4 }}>المفاتيح: input (date/number/phone) min max integer unit · no_negative · exclusive · other (optional) · show_if (any/all) · fields · checks (lte/eq_product/sum_eq/lte_q) · force · require · conflicts · info</div>
             </div>
 
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>

@@ -607,6 +607,7 @@ const buildDemoAnswers = (apiSections) => {
     if (spec.input === 'date') return new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10);
     if (spec.input === 'number') { const lo = spec.min ?? 0; const hi = spec.max ?? Math.max(lo + 10, 100); return String(Math.min(hi, Math.max(lo, lo + Math.round((hi - lo) / 2)))); }
     if (spec.input === 'select') return spec.options?.[0] ?? '';
+    if (spec.input === 'phone') return '1234';
     return "إجابة تجريبية على هذا السؤال لأغراض الاختبار";
   };
   const questions = apiSections.flatMap(sec => sec.questions || []);
@@ -621,17 +622,31 @@ const buildDemoAnswers = (apiSections) => {
         (m.checks || []).forEach(c => {
           if (c.lte) { const [a, b] = c.lte; if (parts[a] !== undefined && parts[b] !== undefined) parts[b] = String(Math.max(Number(parts[b]), Number(parts[a]))); }
           if (c.eq_product) { const [a, b, cc] = c.eq_product; parts[b] = '100'; parts[cc] = '10'; parts[a] = '1000'; }
+          if (c.sum_eq) { const [keys, total] = c.sum_eq; const each = Math.floor(total / keys.length); keys.forEach((k, i) => { parts[k] = String(i === keys.length - 1 ? total - each * (keys.length - 1) : each); }); }
+          if (c.lte_q) { const [a] = c.lte_q; if (parts[a] !== undefined) parts[a] = '0'; }
         });
         data[`${key}__parts`] = parts; data[key] = assembleParts(q, data, parts); return;
       }
-      const nonOther = (q.options || []).filter(o => !(m.other?.options || []).includes(o));
+      // الخيارات التي تستلزم توضيحًا إلزاميًا تُتجنب في التعبئة التجريبية؛ أما التوضيح الاختياري فلا يمنع اختيارها
+      const nonOther = (q.options || []).filter(o => m.other?.optional || !(m.other?.options || []).includes(o));
       if (q.type === "text")          data[key] = demoVal(m);
       else if (q.type === "single")   data[key] = nonOther[0] ?? q.options?.[0] ?? "نعم";
-      else if (q.type === "multiple") { const forced = forcedOptions(q, data); const pick = nonOther.filter(o => !(m.exclusive || []).includes(o)).slice(0, 2); data[key] = Array.from(new Set([...forced, ...pick])); }
+      else if (q.type === "multiple") { const forced = forcedOptions(q, data); const pick = nonOther.filter(o => !(m.exclusive || []).includes(o)).slice(0, 2); data[key] = Array.from(new Set([...forced, ...(m.require?.all || []), ...pick])); }
       else if (q.type === "yesno")    data[key] = "نعم";
       else if (q.type === "scale")    data[key] = "3";
+      // توضيح «أخرى» أو التفاصيل المرتبطة بالخيار المختار
+      if (m.other?.options?.length) {
+        const v = data[key]; const chosen = Array.isArray(v) ? v.some(x => m.other.options.includes(x)) : m.other.options.includes(String(v ?? ''));
+        if (chosen) data[`${key}__other`] = demoVal({ input: m.other.input, min: m.other.min, max: m.other.max });
+      }
     });
   }
+  // إجابة تتعارض مع سؤال آخر: نجرّب بقية الخيارات حتى تتسق
+  questions.forEach(q => {
+    if (q.type !== 'single' || !isVisible(q, data) || evaluate(q, data).status !== 'invalid') return;
+    const alt = (q.options || []).find(o => evaluate(q, { ...data, [`q${q.id}`]: o }).status === 'ok');
+    if (alt) data[`q${q.id}`] = alt;
+  });
   return pruneAnswers(questions, data);
 };
 
@@ -840,6 +855,9 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
         {unitTag(spec.unit)}
       </div>
     );
+    if (kind === 'phone') return (
+      <input type="tel" inputMode="tel" value={value || ""} onChange={e => onChange(e.target.value)} placeholder={spec.placeholder || "مثال: 1234 أو 0112345678"} style={{ ...inputBox, direction: "ltr", textAlign: "right", maxWidth: 260 }} aria-label={opts.label} />
+    );
     if (kind === 'select') return (
       <select value={value || ""} onChange={e => onChange(e.target.value)} style={{ ...inputBox, maxWidth: 320 }} aria-label={opts.label}>
         <option value="">— اختر —</option>
@@ -873,8 +891,8 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
       if (!chosen) return null;
       return (
         <div style={{ marginTop: 8, padding: "10px 12px", background: C.amberSoft, borderRadius: 10, border: `1px dashed ${C.amber}80` }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: C.amberText, marginBottom: 6 }}>{m.other.label || "حدّد المقصود بـ«أخرى»"} <span style={{ color: C.red }}>*</span></div>
-          {renderInput({ input: m.other.input || 'text', placeholder: m.other.placeholder }, answers[`${key}__other`], v2 => setExtra(`${key}__other`, v2), { label: m.other.label })}
+          <div style={{ fontSize: 12, fontWeight: 700, color: C.amberText, marginBottom: 6 }}>{m.other.label || "حدّد المقصود بـ«أخرى»"} {m.other.optional ? <span style={{ color: C.gray, fontWeight: 500 }}>(اختياري)</span> : <span style={{ color: C.red }}>*</span>}</div>
+          {renderInput({ input: m.other.input || 'text', placeholder: m.other.placeholder, unit: m.other.unit, min: m.other.min }, answers[`${key}__other`], v2 => setExtra(`${key}__other`, v2), { label: m.other.label })}
         </div>
       );
     })();
@@ -903,7 +921,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
 
     if (q.type === "text") return (
       <div key={q.id}>{label}{hint}{info}
-        {m.input === 'date' || m.input === 'number'
+        {m.input === 'date' || m.input === 'number' || m.input === 'phone'
           ? renderInput(m, getAns(q.id), v => setAns(q.id, v), { label: q.question })
           : <textarea value={getAns(q.id)} onChange={e => setAns(q.id, e.target.value)} rows={3} style={{ ...inputBox, resize: "vertical", direction: "rtl", textAlign: "right" }} />}
       </div>
@@ -951,6 +969,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
             <span style={{ fontSize: 14, fontWeight: 600 }}>{o}</span>
           </label>
         ))}
+        {otherBox}
       </div>
     );
     if (q.type === "scale") return (
