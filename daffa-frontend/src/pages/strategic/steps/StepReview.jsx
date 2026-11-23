@@ -6,7 +6,7 @@ const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amber: '
 
 const STATUS_MAP = {
   not_started: { label: 'لم يبدأ',      bg: '#F3EFE8', color: '#5E6B78' },
-  in_progress: { label: 'قيد العمل',    bg: '#FDE2D2', color: '#A33F12' },
+  in_progress: { label: 'مسودة',        bg: '#FDE2D2', color: '#A33F12' },
   submitted:   { label: 'بانتظار المراجعة', bg: '#CFE5FA', color: '#1F74C4' },
   reviewing:   { label: 'قيد المراجعة', bg: '#D9E8F1', color: '#235D7F' },
   revision:    { label: 'يحتاج تعديل',  bg: '#F8D3D3', color: '#C53A3A' },

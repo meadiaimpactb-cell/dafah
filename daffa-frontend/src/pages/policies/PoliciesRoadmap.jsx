@@ -423,7 +423,7 @@ const CardInputForm = ({ card, onChange, isMada }) => {
   );
 };
 
-const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate }) => {
+const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate, pricing }) => {
   // خطة مستقلة بلا مستشار موروث: يختار العميل مستشاره قبل الدفع
   const needsConsultant = !workflow?.consultant_id;
   const [pickedHere, setPickedHere] = useState(false);
@@ -437,10 +437,12 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate })
 
   const selected  = (workflow?.selected_policies || []).map(Number);
   const baseTotal = selected.reduce((sum, id) => sum + (policyTypes.find(p => p.id === id)?.price || 0), 0);
-  const arbExtra  = arbitration ? 2000 : 0;
+  // النسبة والمبالغ من إعدادات المنصة نفسها التي تُصدر بها الفاتورة
+  const taxRate   = Number(pricing?.tax_rate ?? 15);
+  const arbExtra  = arbitration ? Number(pricing?.arbitration ?? 2000) : 0;
   const subtotal  = baseTotal + arbExtra;
   const taxable   = subtotal - discAmt;
-  const vat       = Math.round(taxable * 0.15);
+  const vat       = Math.round(taxable * taxRate) / 100;
   const total     = taxable + vat;
   const methodKey = PAY_METHODS[methodIdx]?.key ?? 'card';
 
@@ -550,7 +552,7 @@ const StepPayment = ({ policyTypes, workflow, onPay, onBack, onWorkflowUpdate })
           <div style={{ marginTop: 14, padding: '12px 0', borderTop: `2px solid ${C.grayBorder}` }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}><span>المجموع الفرعي</span><span>{subtotal.toLocaleString('en-US')} ريال</span></div>
             {discAmt > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4, color: C.green }}><span>خصم</span><span>-{discAmt.toLocaleString('en-US')} ريال</span></div>}
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}><span>ضريبة 15%</span><span>{vat.toLocaleString('en-US')} ريال</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}><span>ضريبة القيمة المضافة ({taxRate}%)</span><span>{vat.toLocaleString('en-US')} ريال</span></div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 800, color: C.ink, marginTop: 8 }}><span>الإجمالي</span><span>{total.toLocaleString('en-US')} ريال</span></div>
           </div>
         </Card>
@@ -1487,7 +1489,7 @@ const StepDownload = ({ policyTypes, selections, workflow, onNext, onDownload, o
 // ── Step 7: Design Decision ───────────────────────────────────────────────────
 const StepDesign = ({
   onComplete, onApprove, onRevision, loading,
-  navigate, workflow, selections, designPrice, designTax, designTotal, designFileUrl,
+  navigate, workflow, selections, designPrice, designTax, designTotal, designFileUrl, taxRate = 15,
 }) => {
   const [method,        setMethod]        = useState("card");
   const [card,          setCard]          = useState(EMPTY_CARD);
@@ -1519,7 +1521,7 @@ const StepDesign = ({
   const wantedDesign   = workflow?.want_design;
   const selCount       = selections?.length ?? 0;
   const price          = designPrice  ?? 1500;
-  const tax            = designTax    ?? Math.round(price * 0.15);
+  const tax            = designTax    ?? Math.round(price * taxRate) / 100;
   const total          = designTotal  ?? price + tax;
   const paidAt         = workflow?.design_paid_at
     ? new Date(workflow.design_paid_at).toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -1806,7 +1808,7 @@ const StepDesign = ({
           <div style={{ textAlign: 'center', marginBottom: 12 }}>
             <div style={{ fontSize: 11, color: C.gray }}>لجميع السياسات الـ{selCount}</div>
             <div style={{ fontSize: 20, fontWeight: 800, color: C.amberText }}>{total.toLocaleString('en-US')} ريال</div>
-            <div style={{ fontSize: 10, color: C.gray }}>شامل ضريبة القيمة المضافة 15%</div>
+            <div style={{ fontSize: 10, color: C.gray }}>شامل ضريبة القيمة المضافة ({taxRate}%)</div>
           </div>
           <Btn full onClick={() => { setSubStep('brief'); setBriefPage(1); }}>
             ابدأ وأدخل متطلباتك ←
@@ -2074,7 +2076,7 @@ const StepDesign = ({
             <span>قبل الضريبة</span><span>{price.toLocaleString('en-US')} ريال</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: C.gray, marginBottom: 6 }}>
-            <span>ضريبة 15%</span><span>{tax.toLocaleString('en-US')} ريال</span>
+            <span>ضريبة القيمة المضافة ({taxRate}%)</span><span>{tax.toLocaleString('en-US')} ريال</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 800, color: C.amberText, borderTop: `1px solid ${C.grayBorder}`, paddingTop: 6 }}>
             <span>الإجمالي</span><span>{total.toLocaleString('en-US')} ريال</span>
@@ -2630,7 +2632,7 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
       )}
 
       {displayStep === 2 && (
-        <StepPayment policyTypes={policyTypes} workflow={workflow} onPay={handlePay}
+        <StepPayment policyTypes={policyTypes} workflow={workflow} onPay={handlePay} pricing={pageData?.pricing}
           onBack={() => setStep(1)} loading={actLoading} onWorkflowUpdate={patchWorkflow} />
       )}
 
@@ -2667,6 +2669,7 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
           workflow={workflow}
           selections={selections}
           designPrice={pageData?.design_price}
+          taxRate={pageData?.pricing?.tax_rate ?? 15}
           designTax={pageData?.design_tax}
           designTotal={pageData?.design_total}
           designFileUrl={pageData?.design_file_url}

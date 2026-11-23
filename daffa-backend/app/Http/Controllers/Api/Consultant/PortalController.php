@@ -254,7 +254,7 @@ class PortalController extends Controller
 
         $userId = $sub->workflow->user_id;
         $unitName = $sub->unit?->name ?? "الوحدة {$sub->unit_number}";
-        Notification::notify($userId, 'unit_approved', "تم اعتماد {$unitName}", $request->notes ?: null);
+        Notification::notify($userId, 'unit_approved', "تم اعتماد {$unitName}", $request->notes ?: null, ['system' => 'strategic', 'workflow_id' => $sub->workflow_id, 'unit_number' => $sub->unit_number]);
 
         $this->checkWorkflowCompletion($sub->workflow_id);
 
@@ -287,7 +287,7 @@ class PortalController extends Controller
         ]);
 
         $unitName = $sub->unit?->name ?? "الوحدة {$sub->unit_number}";
-        Notification::notify($sub->workflow->user_id, 'unit_revision', "طلب تعديل على {$unitName}", $request->notes);
+        Notification::notify($sub->workflow->user_id, 'unit_revision', "طلب تعديل على {$unitName}", $request->notes, ['system' => 'strategic', 'workflow_id' => $sub->workflow_id, 'unit_number' => $sub->unit_number]);
 
         ActivityLog::record($request->user()->id, 'طلب تعديل — استراتيجي', 'review', 'consultant',
             $unitName.' — '.($sub->workflow->user->org_name ?: $sub->workflow->user->email));
@@ -362,7 +362,7 @@ class PortalController extends Controller
 
         $userId = $sub->workflow->user_id;
         $unitName = $sub->unit?->name ?? "الوحدة {$sub->unit_number}";
-        Notification::notify($userId, 'op_approved', "تم اعتماد {$unitName}", $request->notes ?: null);
+        Notification::notify($userId, 'op_approved', "تم اعتماد {$unitName}", $request->notes ?: null, ['system' => 'operational', 'workflow_id' => $sub->workflow_id, 'unit_number' => $sub->unit_number]);
 
         $this->checkOpWorkflowCompletion($sub->workflow_id);
 
@@ -394,7 +394,7 @@ class PortalController extends Controller
         ]);
 
         $unitName = $sub->unit?->name ?? "الوحدة {$sub->unit_number}";
-        Notification::notify($sub->workflow->user_id, 'op_revision', "طلب تعديل على {$unitName}", $request->notes);
+        Notification::notify($sub->workflow->user_id, 'op_revision', "طلب تعديل على {$unitName}", $request->notes, ['system' => 'operational', 'workflow_id' => $sub->workflow_id, 'unit_number' => $sub->unit_number]);
 
         ActivityLog::record($request->user()->id, 'طلب تعديل — تشغيلي', 'review', 'consultant',
             $unitName.' — '.($sub->workflow->user->org_name ?: $sub->workflow->user->email));

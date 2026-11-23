@@ -35,6 +35,10 @@ class OperationalController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // رقم ثابت لكل خطة بترتيب إنشائها (لا يتغير عند إنشاء خطة جديدة)
+        $order = $workflows->sortBy([['created_at', 'asc'], ['id', 'asc']])->values()->pluck('id')->flip();
+        $workflows->each(fn ($wf) => $wf->setAttribute('plan_number', ($order[$wf->id] ?? 0) + 1));
+
         return response()->json($workflows);
     }
 
@@ -419,9 +423,8 @@ class OperationalController extends Controller
             return response()->json(['message' => 'الوحدة معتمدة نهائياً ولا يمكن تعديلها.'], 422);
         }
 
-        $newStatus = in_array($submission->status, ['not_started', 'revision'])
-            ? 'in_progress'
-            : $submission->status;
+        // حفظ المسودة لا يغيّر حالة وحدة «تحتاج تعديل»: تبقى الملاحظة والحالة ظاهرتين حتى يعيد العميل الإرسال
+        $newStatus = $submission->status === 'not_started' ? 'in_progress' : $submission->status;
 
         $submission->update([
             'form_data' => $this->prepareFormData($unit, $request->form_data),
@@ -487,17 +490,28 @@ class OperationalController extends Controller
     // ── GET /api/operational/progress ────────────────────────────────────────
     public function progress(Request $request)
     {
-        $workflow = $this->userWorkflow($request);
-        $total = OperationalSubmission::where('workflow_id', $workflow->id)->count();
-        $approved = OperationalSubmission::where('workflow_id', $workflow->id)
-            ->where('status', 'approved')->count();
+        // الخطة الجارية أولًا ثم أحدث مكتملة (لوحة التحكم لا تمرر workflow_id)
+        $workflow = $request->input('workflow_id')
+            ? $this->userWorkflow($request)
+            : OperationalWorkflow::where('user_id', $request->user()->id)->orderByRaw("(status = 'completed') ASC")->orderBy('id', 'desc')->firstOrFail();
+        $subs = OperationalSubmission::with('unit:id,name,unit_number')->where('workflow_id', $workflow->id)->orderBy('unit_number')->get();
+        $total = $subs->count();
+        $approved = $subs->where('status', 'approved')->count();
         $percent = $total > 0 ? round(($approved / $total) * 100) : 0;
+        $brief = fn ($s) => ['unit_number' => $s->unit_number, 'name' => $s->unit?->name, 'status' => $s->status, 'consultant_notes' => $s->consultant_notes, 'revision_count' => (int) $s->revision_count];
 
         return response()->json([
+            'workflow_id' => $workflow->id,
+            'current_step' => $workflow->current_step,
             'total_units' => $total,
             'approved_units' => $approved,
+            'submitted_units' => $subs->whereIn('status', ['submitted', 'reviewing', 'approved'])->count(),
             'progress_percent' => $percent,
             'status' => $workflow->status,
+            // لوحة التحكم تبني «خطوتك التالية» من الحالة الفعلية للوحدات لا من الإشعارات
+            'revision_units' => $subs->where('status', 'revision')->map($brief)->values(),
+            'in_review_units' => $subs->whereIn('status', ['submitted', 'reviewing'])->map($brief)->values(),
+            'next_unit' => ($n = $subs->first(fn ($s) => in_array($s->status, ['not_started', 'in_progress']))) ? $brief($n) : null,
         ]);
     }
 

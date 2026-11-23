@@ -22,8 +22,8 @@ AddType font/woff2 .woff2
     # Block direct access to daffa-backend folder
     RewriteRule ^daffa-backend(/.*)?$ - [F,L]
 
-    # Route /api/* requests to Laravel index.php
-    RewriteCond %{REQUEST_URI} ^/api/
+    # Route /api/* and signed /pdf/* (invoices, plan documents) requests to Laravel index.php
+    RewriteCond %{REQUEST_URI} ^/(api|pdf)/
     RewriteRule ^ index.php [L]
 
     # Serve existing static files directly

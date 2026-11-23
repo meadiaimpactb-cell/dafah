@@ -157,6 +157,7 @@ class PolicyController extends Controller
             'design_tax' => $designTax,
             'design_total' => $designFee + $designTax,
             'design_file_url' => $designFileUrl,
+            'pricing' => ['tax_rate' => (float) ($s['tax_rate'] ?? 15), 'arbitration' => (float) ($s['policy_arbitration'] ?? 2000)],
         ]);
     }
 

@@ -170,6 +170,7 @@ export default function DaffaPlatform() {
   const [strategicWorkflowId, setStrategicWorkflowId] = useState(null);
   const [operationalWorkflowId, setOperationalWorkflowId] = useState(null);
   const [policyWorkflowId, setPolicyWorkflowId] = useState(null);
+  const [opOpenUnit, setOpOpenUnit] = useState(null);
   const [chatAutoStart, setChatAutoStart] = useState(false);
   const [modal, setModal] = useState(null);
   const [dashPhases,     setDashPhases]     = useState(null);
@@ -240,22 +241,23 @@ export default function DaffaPlatform() {
     };
     const load = async () => {
       setDownloadsData(null);
-      const [stPg, opPg, polPg] = await Promise.allSettled([
-        strategicApi.getPageData(),
-        operationalApi.getPageData(),
+      // كل الخطط المكتملة للعميل (لا آخر خطة فقط)، وكل بطاقة تحمل رقم خطتها ورابط وثيقتها المعتمدة
+      const [stList, opList, polPg] = await Promise.allSettled([
+        strategicApi.listWorkflows(),
+        operationalApi.listWorkflows(),
         policiesApi.getPageData(),
       ]);
       const items = [];
-
-      if (stPg.status === 'fulfilled' && stPg.value.data.workflow?.status === 'completed') {
-        const wf = stPg.value.data.workflow;
-        items.push({ id: 'strategic', name: 'الوثيقة الاستراتيجية', icon: 'target', date: fmtDate(wf.completed_at), consultant: wf.consultant?.name || '—' });
-      }
-
-      if (opPg.status === 'fulfilled' && opPg.value.data.workflow?.status === 'completed') {
-        const wf = opPg.value.data.workflow;
-        items.push({ id: 'operational', name: 'الخطة التشغيلية', icon: 'cog', date: fmtDate(wf.completed_at), consultant: wf.consultant?.name || '—' });
-      }
+      const completedOf = (res) => {
+        if (res.status !== 'fulfilled') return [];
+        const d = res.value.data;
+        const list = Array.isArray(d) ? d : Array.isArray(d?.workflows) ? d.workflows : [];
+        return list.filter(w => w.status === 'completed').sort((a, b) => (b.plan_number ?? 0) - (a.plan_number ?? 0));
+      };
+      const stDone = completedOf(stList);
+      stDone.forEach(wf => items.push({ id: 'strategic', workflowId: wf.id, name: `الوثيقة الاستراتيجية${stDone.length > 1 ? ` — الخطة #${wf.plan_number ?? ''}` : ''}`, icon: 'target', date: fmtDate(wf.completed_at), consultant: wf.consultant?.name || '—' }));
+      const opDone = completedOf(opList);
+      opDone.forEach(wf => items.push({ id: 'operational', workflowId: wf.id, name: `الخطة التشغيلية${opDone.length > 1 ? ` — الخطة #${wf.plan_number ?? ''}` : ''}`, icon: 'cog', date: fmtDate(wf.completed_at), consultant: wf.consultant?.name || '—' }));
 
       if (polPg.status === 'fulfilled' && polPg.value.data.workflow) {
         const wf  = polPg.value.data.workflow;
@@ -306,11 +308,11 @@ export default function DaffaPlatform() {
     const win = window.open('', '_blank');
     try {
       let res;
-      if (item.id === 'strategic')          res = await strategicApi.getPdfLink();
-      else if (item.id === 'operational')   res = await operationalApi.getPdfLink();
+      if (item.id === 'strategic')          res = await strategicApi.getPdfLink(item.workflowId);
+      else if (item.id === 'operational')   res = await operationalApi.getPdfLink(item.workflowId);
       else if (item.id.startsWith('policy-')) res = await policiesApi.getPdfLink(item.selId);
       win.location.href = res.data.url;
-    } catch { win.close(); alert('حدث خطأ أثناء التحميل، حاول مرة أخرى.'); }
+    } catch { win.close(); alert('تعذّر تجهيز الوثيقة. حاول مرة أخرى.'); }
   };
 
   useEffect(() => {
@@ -510,6 +512,27 @@ export default function DaffaPlatform() {
     if (view === 'strategic-roadmap') setStrategicWorkflowId(null);
     if (view === 'operational-roadmap') setOperationalWorkflowId(null);
     if (view === 'policies-select') setPolicyWorkflowId(null);
+  };
+
+  // «افتح الملاحظات»: يفتح الوحدة التي أعادها المستشار في الخطة المعنية مباشرة
+  const openUnitDeep = ({ sys, workflowId, unit }) => {
+    if (!unit) return;
+    const target = { unit_number: unit.unit_number, name: unit.name, id: unit.unit_number };
+    if (sys === 'strategic') {
+      setStrategicWorkflowId(workflowId || null);
+      setCurrentView('strategic-roadmap');
+      sessionStorage.setItem('currentView', 'strategic-roadmap');
+      setActiveUnit(target);
+    } else if (sys === 'operational') {
+      setOperationalWorkflowId(workflowId || null);
+      setOpOpenUnit(target);
+      setActiveUnit(null);
+      setCurrentView('operational-roadmap');
+      sessionStorage.setItem('currentView', 'operational-roadmap');
+    } else {
+      navigate('policies-select');
+    }
+    window.scrollTo(0, 0);
   };
 
   const handleUnitNavigate = (target) => {
@@ -908,16 +931,23 @@ export default function DaffaPlatform() {
 
   // ============== CLIENT DASHBOARD ==============
   // ── «خطوتك التالية»: توصية واحدة واضحة لغير المتخصص ──
-  const nextStepFor = (phases, notifs) => {
+  const nextStepFor = (phases) => {
     if (!phases) return null;
-    // الإشعارات قد تصل كمصفوفة أو كصفحة {data:[...]} أو لم تُحمَّل بعد — نطبّعها دائمًا إلى مصفوفة
-    const list = Array.isArray(notifs) ? notifs : Array.isArray(notifs?.data) ? notifs.data : [];
-    const revision = list.find(n => !n.read && /revision/.test(n.type || ''));
     const view = (k) => systems[k].view;
-    if (revision) {
-      const k = /^op_/.test(revision.type) ? 'operational' : /^policy/.test(revision.type) ? 'policies' : 'strategic';
-      return { tone: 'amber', title: 'مستشارك طلب تعديلًا بسيطًا', text: `${revision.title}. اقرأ الملاحظات، عدّل المطلوب، ثم أعد الإرسال — التعديل جزء طبيعي من الرحلة.`, cta: 'افتح الملاحظات', go: view(k), sys: k };
+    const label = (k) => systems[k].label;
+    // 1) وحدة أو سياسة طلب المستشار تعديلها — تبقى الخطوة التالية حتى يُعاد إرسالها فعلًا
+    for (const p of phases) {
+      const r = p.raw;
+      if (!r) continue;
+      if (p.key === 'policies') {
+        const sel = (r.selections || []).find(x => x.status === 'revision');
+        if (sel) return { tone: 'amber', title: 'مستشارك طلب تعديلًا بسيطًا', text: `طلب تعديل على «${sel.policy_type?.name || 'إحدى السياسات'}». اقرأ الملاحظة، عدّل المطلوب، ثم أعد الإرسال — التعديل جزء طبيعي من الرحلة.`, cta: 'افتح الملاحظات', go: view('policies'), sys: 'policies' };
+      } else {
+        const u = (r.revision_units || [])[0];
+        if (u) return { tone: 'amber', title: 'مستشارك طلب تعديلًا بسيطًا', text: `طلب تعديل على «${u.name}» في ${label(p.key)}${u.consultant_notes ? `: ${u.consultant_notes}` : ''}. عدّل المطلوب ثم اضغط «إعادة الإرسال للمراجعة».`, cta: 'افتح الملاحظات', open: { sys: p.key, workflowId: r.workflow_id, unit: u }, go: view(p.key), sys: p.key };
+      }
     }
+    // 2) الخدمة الجارية: اشتراك ناقص، أو وحدة تالية، أو وحدات أُعيد إرسالها وتنتظر المستشار
     for (const p of phases) {
       const r = p.raw;
       if (!r) continue;
@@ -926,16 +956,27 @@ export default function DaffaPlatform() {
       const step = p.key === 'policies' ? r.workflow?.current_step : r.current_step;
       const status = p.key === 'policies' ? r.workflow?.status : r.status;
       if (status === 'completed') continue;
-      if (step && step < 3) return { tone: 'primary', title: `أكمل الاشتراك في ${systems[p.key].label}`, text: 'بقي اختيار مستشارك وإتمام الدفع، ثم تُفتح لك الوحدات مباشرة.', cta: 'أكمل الآن', go: view(p.key), sys: p.key };
-      return { tone: 'primary', title: `تابع ${systems[p.key].label}`, text: `أنجزت ${p.sub}. افتح الوحدة التالية واتبع الشرح والفيديو ثم عبّئ النموذج — يُحفظ عملك تلقائيًا.`, cta: 'تابع من حيث توقفت', go: view(p.key), sys: p.key };
+      if (step && step < 3) return { tone: 'primary', title: `أكمل الاشتراك في ${label(p.key)}`, text: 'بقي اختيار مستشارك وإتمام الدفع، ثم تُفتح لك الوحدات مباشرة.', cta: 'أكمل الآن', go: view(p.key), sys: p.key };
+      if (p.key !== 'policies') {
+        const nextUnit = r.next_unit;
+        const inReview = r.in_review_units || [];
+        if (nextUnit) return { tone: 'primary', title: `تابع ${label(p.key)}`, text: `${nextUnit.status === 'in_progress' ? 'أكمل' : 'ابدأ'} «${nextUnit.name}»: اتبع الشرح والفيديو ثم عبّئ النموذج — يُحفظ عملك تلقائيًا كمسودة.`, cta: nextUnit.status === 'in_progress' ? 'أكمل الوحدة' : 'ابدأ الوحدة', open: { sys: p.key, workflowId: r.workflow_id, unit: nextUnit }, go: view(p.key), sys: p.key };
+        if (inReview.length) {
+          const resent = inReview.find(u => (u.revision_count || 0) > 0);
+          return { tone: 'primary', title: resent ? 'أُعيد إرسال الوحدة. يراجعها المستشار الآن' : 'وحداتك لدى المستشار', text: resent ? `«${resent.name}» وصلت المستشار بعد تعديلك. سيصلك إشعار عند اعتمادها أو عند أي ملاحظة جديدة.` : `المستشار يراجع ${inReview.length === 1 ? 'وحدة واحدة' : `${inReview.length} وحدات`} في ${label(p.key)}. سيصلك إشعار عند الرد.`, cta: 'عرض حالة المراجعة', go: view(p.key), sys: p.key };
+        }
+      }
+      return { tone: 'primary', title: `تابع ${label(p.key)}`, text: `أنجزت ${p.sub}. افتح الوحدة التالية واتبع الشرح والفيديو ثم عبّئ النموذج — يُحفظ عملك تلقائيًا.`, cta: 'تابع من حيث توقفت', go: view(p.key), sys: p.key };
     }
-    const done = phases.filter(p => p.progress >= 100);
+    // 3) خدمات مكتملة: الوثيقة المعتمدة جاهزة
+    const done = phases.filter(p => p.progress >= 100 || (p.key !== 'policies' ? p.raw?.status === 'completed' : p.raw?.workflow?.status === 'completed'));
+    if (done.length === 1) return { tone: 'green', title: `اكتملت ${done[0].key === 'strategic' ? 'خطتك الاستراتيجية' : done[0].key === 'operational' ? 'خطتك التشغيلية' : 'سياساتك ولوائحك'}`, text: 'وثيقتك المعتمدة جاهزة للتنزيل بصيغة PDF من صفحة التحميلات، ويمكنك بدء خدمة أخرى متى شئت.', cta: 'افتح الوثيقة المعتمدة', go: 'client-downloads' };
     if (done.length) return { tone: 'green', title: 'وثائقك المعتمدة جاهزة', text: 'نزّل وثائقك بصيغة PDF من صفحة التحميلات، أو ابدأ خدمة أخرى متى شئت.', cta: 'اذهب إلى التحميلات', go: 'client-downloads' };
     return { tone: 'primary', title: 'ابدأ أول خطوة لمنظمتك', text: 'لا تعرف من أين تبدأ؟ ننصح بالتخطيط الاستراتيجي: يرسم وجهة منظمتك للسنوات القادمة. والخدمات الثلاث مستقلة، فابدأ بما تحتاجه الآن.', cta: 'ابدأ التخطيط الاستراتيجي', go: 'strategic-roadmap', sys: 'strategic' };
   };
 
   const ClientDashboard = () => {
-    const next = nextStepFor(dashPhases, notifications);
+    const next = nextStepFor(dashPhases);
     const firstName = authUser?.org_name || authUser?.rep_name || '';
     const sysIcons = { strategic: Icons.strategic, operational: Icons.operational, policies: Icons.policies };
     const sysDesc = {
@@ -959,7 +1000,7 @@ export default function DaffaPlatform() {
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{next.title}</div>
                 <div style={{ fontSize: 14, lineHeight: 1.9, color: '#D9E8F1' }}>{next.text}</div>
               </div>
-              <Btn large onClick={() => navigate(next.go)} iconEnd={<span style={{ fontSize: 18 }}>←</span>}>{next.cta}</Btn>
+              <Btn large onClick={() => (next.open ? openUnitDeep(next.open) : navigate(next.go))} iconEnd={<span style={{ fontSize: 18 }}>←</span>}>{next.cta}</Btn>
             </div>
           ) : <Loading text="نجهّز لك خطوتك التالية…" pad={20} />}
         </div>
@@ -1166,8 +1207,12 @@ export default function DaffaPlatform() {
                   return (
                     <Card
                       key={n.id}
-                      onClick={() => !n.read && handleMarkRead(n.id)}
-                      style={{ marginBottom: 8, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, cursor: n.read ? "default" : "pointer", borderRight: `3px solid ${meta.border}`, background: n.read ? colors.white : `${meta.border}08`, transition: "background 0.2s" }}
+                      onClick={() => {
+                        if (!n.read) handleMarkRead(n.id);
+                        const d = n.data || {};
+                        if (d.unit_number && (d.system === 'strategic' || d.system === 'operational')) openUnitDeep({ sys: d.system, workflowId: d.workflow_id, unit: { unit_number: d.unit_number, name: (n.title || '').replace(/^(طلب تعديل على|تم اعتماد)\s*/, '') } });
+                      }}
+                      style={{ marginBottom: 8, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, cursor: (!n.read || n.data?.unit_number) ? "pointer" : "default", borderRight: `3px solid ${meta.border}`, background: n.read ? colors.white : `${meta.border}08`, transition: "background 0.2s" }}
                     >
                       <NotifIcon type={n.type} />
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -1202,7 +1247,7 @@ export default function DaffaPlatform() {
               {downloadsData.map((d) => {
                 const dlIconMap = { target: <IcTarget width={24} height={24}/>, cog: <IcCog width={24} height={24}/>, clipboard: <IcClipboard width={24} height={24}/>, palette: <IcPalette width={24} height={24}/> };
                 return (
-                <Card key={d.id} accent style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <Card key={`${d.id}-${d.workflowId || d.selId || ''}`} accent style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                     <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.primaryDeep, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>{dlIconMap[d.icon] || <IcDocument width={24} height={24}/>}</div>
                     <div>
@@ -1423,7 +1468,7 @@ export default function DaffaPlatform() {
           </KeepAlive>
           <KeepAlive active={currentView === 'operational-roadmap'}>
             {currentRole !== 'client' || can('client.operational.view')
-              ? <OperationalRoadmapDynamic navigate={navigate} workflowId={operationalWorkflowId} onWorkflowSelect={setOperationalWorkflowId} />
+              ? <OperationalRoadmapDynamic navigate={navigate} workflowId={operationalWorkflowId} onWorkflowSelect={setOperationalWorkflowId} openUnit={opOpenUnit} onOpenedUnit={() => setOpOpenUnit(null)} />
               : <AccessDenied />}
           </KeepAlive>
           <KeepAlive active={currentView === 'policies-select'}>

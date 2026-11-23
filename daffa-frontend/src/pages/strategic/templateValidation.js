@@ -1,17 +1,25 @@
-import { swotAutoPoints, needsItems } from './TemplateRenderer';
+import { swotAutoPoints, needsItems, stakeholderRows, ORG_SUGGESTED_POSITIONS, initiativeIssues } from './TemplateRenderer';
+import { buildOrgTree } from './OrgChart';
 
 const notEmpty = v => (v || '').trim().length > 0;
 
+export const DATE_ORDER_MSG = 'يجب أن يوافق تاريخ النهاية تاريخ البداية أو يأتي بعده';
+export const ORG_SUGGESTED_MSG = 'راجع بيانات المدير التنفيذي، ثم احتفظ بالصف أو عدّله بما يناسب منظمتك.';
+export const ORG_CYCLE_MSG = 'تعذّر إرسال الهيكل. صحّح علاقات التبعية الموضّحة في الجدول حتى تظهر جميع الوظائف في الخريطة.';
+export const STAKEHOLDERS_EMPTY_MSG = 'اكتملت أوصاف العوامل الخارجية. خريطة أصحاب المصلحة ما زالت فارغة. يمكنك حفظ المسودة والعودة إلى الخريطة قبل الإرسال.';
+
 /**
- * Returns { valid: bool, errors: string[] } for a given template + formData.
+ * Returns { valid, errors, warnings } for a given template + formData.
+ *  - errors   : تمنع «إرسال للمراجعة» فقط (حفظ المسودة متاح دائمًا)
+ *  - warnings : تنبيهات إرشادية لا تمنع الإرسال
  * `unit` is passed so we can read dynamic table_rows from the DB.
  */
 export function validateTemplate(templateType, formData, unit) {
   const errors = [];
+  const warnings = [];
 
   switch (templateType) {
     case 'swot': {
-      // نقاط القوة والضعف تظهر تلقائيًا في الملخص من الجدول
       const matrix = formData.matrix || {};
       if (!swotAutoPoints(unit || {}, formData.table, 'strength').length) errors.push('نقاط القوة (سجّلها في جدول الموارد)');
       if (!swotAutoPoints(unit || {}, formData.table, 'weakness').length) errors.push('نقاط الضعف (سجّلها في جدول الموارد)');
@@ -24,16 +32,20 @@ export function validateTemplate(templateType, formData, unit) {
       const rows = unit?.table_rows || ['سياسي', 'اقتصادي', 'اجتماعي', 'تقني', 'بيئي', 'قانوني'];
       const factors = formData.factors || {};
       rows.forEach(row => {
-        if (!notEmpty(factors[`${row}__desc`]))
-          errors.push(`${row}: وصف العامل`);
+        if (!notEmpty(factors[`${row}__desc`])) { errors.push(`${row}: وصف العامل`); return; }
+        // لا تُقبل قيم جاهزة لم يخترها العميل
+        if (!notEmpty(factors[`${row}__impact`])) errors.push(`${row}: اختر التأثير`);
+        if (!notEmpty(factors[`${row}__level`]))  errors.push(`${row}: اختر المستوى`);
       });
+      const stakes = stakeholderRows(formData);
+      const mapFilled = stakes.some(r => notEmpty(r.impact) || notEmpty(r.interest) || notEmpty(r.strategy));
+      if (errors.length === 0 && !mapFilled) warnings.push(STAKEHOLDERS_EMPTY_MSG);
       break;
     }
 
     case 'needs': {
       if (!notEmpty(formData.target_community)) errors.push('تعريف المجتمع المستهدف');
       if (!notEmpty(formData.gap_analysis))     errors.push('تحليل الفجوات');
-      // لا يُشترط استكمال الصفوف غير المستخدمة؛ يكفي احتياج واحد موصوف
       const items = needsItems(formData, unit || {});
       if (!items.some(it => notEmpty(it.name) && notEmpty(it.desc)))
         errors.push('جدول الاحتياجات: احتياج واحد على الأقل مع وصفه');
@@ -51,12 +63,17 @@ export function validateTemplate(templateType, formData, unit) {
 
     case 'initiatives': {
       const init = formData.initiatives || [];
-      if (init.length === 0) {
-        errors.push('يجب إضافة مبادرة واحدة على الأقل');
+      const blank = row => !notEmpty(row.name) && !notEmpty(row.description) && !notEmpty(row.goal) && !notEmpty(row.outputs) && !notEmpty(row.budget) && !notEmpty(row.owner);
+      if (init.length === 0 || (init.length === 1 && blank(init[0]))) {
+        // البطاقة الأولى ظاهرة دائمًا: المطلوب تعبئتها لا إضافة بطاقة جديدة
+        errors.push('اكتب اسم المبادرة ووصفها في البطاقة الحالية');
       } else {
         init.forEach((row, i) => {
           if (!notEmpty(row.name))        errors.push(`مبادرة ${i + 1}: اسم المبادرة`);
           if (!notEmpty(row.description)) errors.push(`مبادرة ${i + 1}: وصف المبادرة`);
+          const issues = initiativeIssues(row);
+          if (issues.end_date) errors.push(`مبادرة ${i + 1}: ${issues.end_date}`);
+          if (issues.budget)   errors.push(`مبادرة ${i + 1}: ${issues.budget}`);
         });
       }
       break;
@@ -87,7 +104,7 @@ export function validateTemplate(templateType, formData, unit) {
       const fields = [
         ['customer_segments', 'شرائح المستفيدين'],
         ['relationships',     'العلاقة مع المستفيدين'],
-        ['value_proposition', 'القيم المقترحة'],
+        ['value_proposition', 'القيمة المقترحة للمستفيدين'],
         ['key_activities',    'الأنشطة الرئيسة'],
         ['partners',          'الشراكات الرئيسة'],
         ['channels',          'القنوات'],
@@ -103,8 +120,9 @@ export function validateTemplate(templateType, formData, unit) {
 
     case 'kpis': {
       const kpis = formData.kpis || [];
-      if (kpis.length === 0) {
-        errors.push('يجب إضافة مؤشر أداء واحد على الأقل');
+      const blank = row => !notEmpty(row.name) && !notEmpty(row.target) && !notEmpty(row.goal) && !notEmpty(row.measurement);
+      if (kpis.length === 0 || (kpis.length === 1 && blank(kpis[0]))) {
+        errors.push('اكتب اسم المؤشر والمستهدف في الصف الحالي');
       } else {
         kpis.forEach((row, i) => {
           if (!notEmpty(row.name))   errors.push(`مؤشر ${i + 1}: اسم المؤشر`);
@@ -115,9 +133,16 @@ export function validateTemplate(templateType, formData, unit) {
     }
 
     case 'orgchart': {
-      const positions = formData.positions || [];
-      if (!positions.some(p => notEmpty(p.title)))
-        errors.push('يجب إضافة منصب وظيفي واحد على الأقل');
+      // الصف الأول المقترح (المدير التنفيذي) يُعد منصبًا صالحًا بعد مراجعته
+      const suggested = !Array.isArray(formData.positions);
+      const positions = suggested ? ORG_SUGGESTED_POSITIONS : formData.positions;
+      if (!positions.some(p => notEmpty(p.title))) {
+        errors.push('أضف منصبًا وظيفيًا واحدًا على الأقل');
+      } else {
+        const { issues } = buildOrgTree(positions);
+        if (Object.keys(issues).length > 0) errors.push(ORG_CYCLE_MSG);
+      }
+      if (suggested) warnings.push(ORG_SUGGESTED_MSG);
       break;
     }
 
@@ -136,5 +161,18 @@ export function validateTemplate(templateType, formData, unit) {
     }
   }
 
-  return { valid: errors.length === 0, errors };
+  return { valid: errors.length === 0, errors, warnings };
+}
+
+/** هل أدخل العميل أي شيء في النموذج؟ (لتفعيل الحفظ التلقائي للمسودة) */
+export function hasAnyInput(formData) {
+  const walk = (v) => {
+    if (v == null) return false;
+    if (typeof v === 'string') return v.trim().length > 0;
+    if (typeof v === 'number' || typeof v === 'boolean') return true;
+    if (Array.isArray(v)) return v.some(walk);
+    if (typeof v === 'object') return Object.values(v).some(walk);
+    return false;
+  };
+  return walk(formData);
 }

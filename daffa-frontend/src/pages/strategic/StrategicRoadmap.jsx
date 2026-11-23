@@ -99,12 +99,13 @@ function PlansList({ plans, onSelect, onCreateNew, canCreate, loading }) {
       {/* Plans grid */}
       {plans.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {[...plans].reverse().map((plan, idx) => {
+          {[...plans].sort((a, b) => (b.plan_number ?? 0) - (a.plan_number ?? 0) || new Date(b.created_at) - new Date(a.created_at)).map((plan, idx) => {
             const cfg     = STATUS_CFG[plan.status] || STATUS_CFG.pending;
             const approved = plan.approved_count ?? 0;
             const total    = plan.total_count    ?? 11;
             const pct      = total > 0 ? Math.round((approved / total) * 100) : 0;
-            const planNum  = plans.length - idx;
+            // رقم ثابت يُحدَّد عند إنشاء الخطة (من الخادم) ولا يتغير بإنشاء خطط لاحقة
+            const planNum  = plan.plan_number ?? (idx + 1);
             const stepLabel = STEPS[plan.current_step]?.label ?? '';
             const isDone   = plan.status === 'completed';
 

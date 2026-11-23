@@ -1,6 +1,7 @@
 import DfIcon from '../../../components/ui/DfIcon';
 import { useState, useEffect } from 'react';
 import { strategicApi } from '../../../api/strategic';
+import { unitTimeLabel } from '../../../utils/duration';
 
 const colors = { primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amber: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
 
@@ -53,14 +54,14 @@ export default function StepWork({ setActiveUnit, workflowId, refreshWorkflow, r
     <div className="animate-in">
       {/* شريط التقدم */}
       <div style={{ background: '#fff', borderRadius: 12, padding: 20, marginBottom: 20, boxShadow: '0 1px 8px rgba(14,42,61,0.06)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <span style={{ fontSize: 14, fontWeight: 700, color: colors.ink }}>التقدم الكلي</span>
-          <span style={{ fontSize: 14, fontWeight: 700, color: colors.amberText }}>أُرسل {sentCount} · اعتُمد {approved} من {total} {total === 1 ? 'وحدة' : 'وحدات'}</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
+          <span style={{ fontSize: 14, fontWeight: 700, color: colors.ink }}>نسبة الوحدات المعتمدة: {percent}٪</span>
+          <span data-progress-counter style={{ fontSize: 13, fontWeight: 700, color: colors.amberText }}>أرسلتَ {sentCount} من {total} {total === 1 ? 'وحدة' : 'وحدة'}، واعتمد المستشار {approved} من {total}</span>
         </div>
-        <div style={{ background: '#E8E3DA', borderRadius: 20, height: 10 }}>
+        <div style={{ background: '#E8E3DA', borderRadius: 20, height: 10 }} role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label="نسبة الوحدات المعتمدة">
           <div style={{ background: `linear-gradient(90deg, ${colors.primary}, ${colors.amber})`, height: '100%', borderRadius: 20, width: `${percent}%`, transition: 'width 0.5s' }} />
         </div>
-        <div style={{ fontSize: 12, color: '#8C97A3', marginTop: 4, textAlign: 'left' }}>{percent}%</div>
+        <div style={{ fontSize: 11.5, color: '#8C97A3', marginTop: 6 }}>تُحدَّث النسبة مع كل اعتماد من المستشار؛ الإرسال وحده لا يرفعها.</div>
       </div>
 
       {/* شبكة الوحدات */}
@@ -91,7 +92,7 @@ export default function StepWork({ setActiveUnit, workflowId, refreshWorkflow, r
                 <span style={{ fontSize: 10, padding: '3px 8px', borderRadius: 20, fontWeight: 600, background: st.bg, color: st.color }}>{locked ? 'مقفل' : st.label}</span>
               </div>
               <div style={{ fontSize: 13, fontWeight: 700, color: locked ? '#8C97A3' : colors.ink }}>{unit.name}</div>
-              <div style={{ fontSize: 11, color: '#8C97A3', marginTop: 4 }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />{unit.video_duration}</div>
+              {unit.video_duration && <div style={{ fontSize: 11, color: '#8C97A3', marginTop: 4 }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />{unitTimeLabel(unit.video_duration)}</div>}
               {!locked && STATUS_LINE[unit.submission_status] && (
                 <div data-unit-status={unit.submission_status} style={{ fontSize: 11.5, fontWeight: 700, marginTop: 8, color: STATUS_LINE[unit.submission_status].color, lineHeight: 1.6 }}>
                   {STATUS_LINE[unit.submission_status].text}

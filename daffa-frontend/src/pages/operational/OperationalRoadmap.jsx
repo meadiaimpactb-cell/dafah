@@ -10,6 +10,8 @@ import { PaymentMethodPicker, ApplePayButton, SecurePaymentBadge, CardNetworkLog
 import { IcClock, IcUpload, IcCheckCircle, IcArrowPath, IcSearch, IcWarning, IcLock, IcCog, IcLightbulb, IcSave, IcDocument, IcUser, IcCalendar, IcSparkles, IcCheck, IcChat, IcXMark, IcBeaker } from '../../utils/icons';
 import { OpSection, OpFormIntro, OpLabel, hasOpSection } from './OpContent';
 import UnitVideo from '../shared/UnitVideo';
+import { useIsPhone } from '../../utils/useMediaQuery';
+import { parseAmount, isNonNegativeAmount, NUMBER_MSG } from '../../utils/numbers';
 
 // ─── Colors ─────────────────────────────────────────────────────
 const colors = { amber: '#EF6A2C', amberText: '#A33F12',
@@ -87,12 +89,12 @@ function OpPlansList({ plans, onSelect, onCreateNew, loading }) {
 
       {plans.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {[...plans].reverse().map((plan, idx) => {
+          {[...plans].sort((a, b) => (b.plan_number ?? 0) - (a.plan_number ?? 0) || new Date(b.created_at) - new Date(a.created_at)).map((plan, idx) => {
             const cfg      = OP_STATUS_CFG[plan.status] || OP_STATUS_CFG.pending;
             const approved = plan.approved_count ?? 0;
             const total    = plan.total_count    ?? 5;
             const pct      = total > 0 ? Math.round((approved / total) * 100) : 0;
-            const planNum  = plans.length - idx;
+            const planNum  = plan.plan_number ?? (idx + 1);
             const isDone   = plan.status === 'completed';
 
             return (
@@ -465,9 +467,11 @@ const STATUS_ICONS = {
 const StatusBar = ({ status }) => {
   const map = {
     not_submitted: { bg: colors.grayLight,   color: colors.gray,   text: "لم يُرسل بعد" },
+    in_progress:   { bg: colors.amberSoft,   color: colors.amberText, text: "محفوظة كمسودة — لم تُرسل للمراجعة بعد" },
     submitted:     { bg: colors.blueLight,   color: colors.blue,   text: "تم الإرسال للمراجعة — بانتظار المستشار" },
+    reviewing:     { bg: colors.blueLight,   color: colors.blue,   text: "قيد المراجعة — المستشار يراجعها الآن" },
     approved:      { bg: colors.greenLight,  color: colors.green,  text: "معتمد — يمكنك الانتقال للوحدة التالية" },
-    revision:      { bg: colors.amberSoft, color: colors.amberText, text: "يحتاج تعديل — راجع ملاحظات المستشار" },
+    revision:      { bg: colors.amberSoft, color: colors.amberText, text: "يحتاج تعديل — راجع ملاحظة المستشار أدناه ثم أعد الإرسال" },
   };
   const s = map[status] || map.not_submitted;
   return (
@@ -477,10 +481,12 @@ const StatusBar = ({ status }) => {
   );
 };
 
+// آخر حالة فعلية لكل وحدة كما في قاعدة البيانات («لم يبدأ» للوحدة التي لم تُفتح فقط)
 const statusMap = {
-  approved:    { badge: "معتمد",         color: "green"  },
+  approved:    { badge: "معتمدة",        color: "green"  },
   revision:    { badge: "يحتاج تعديل",  color: "orange" },
-  submitted:   { badge: "أُرسلت ✓ — بانتظار المستشار", color: "blue"   },
+  reviewing:   { badge: "قيد المراجعة", color: "blue"   },
+  submitted:   { badge: "أُرسلت للمراجعة", color: "blue" },
   in_progress: { badge: "مسودة — لم تُرسل",            color: "yellow" },
   not_started: { badge: "لم يبدأ",      color: "gray"   },
 };
@@ -572,6 +578,16 @@ const trialFillFor = (ttype, current) => {
 };
 
 // أرقام التكلفة: تقبل فواصل الآلاف والأرقام العربية (٢٠٠ أو ۲۰۰)
+/** إجمالي بند التكلفة: null إن لم يُدخل شيء، NaN إن كانت إحدى القيمتين نصًا أو سالبة */
+export const opRowTotal = (r = {}) => {
+  const u = parseAmount(r.unitCost); const c = parseAmount(r.count);
+  if (u === null && c === null) return null;
+  if (Number.isNaN(u) || Number.isNaN(c) || (u ?? 0) < 0 || (c ?? 0) < 0) return NaN;
+  return (u ?? 0) * (c ?? 0);
+};
+/** عدد البنود التي تحمل قيمة غير صالحة في «تكلفة الوحدة» أو «العدد» */
+export const opBudgetIssues = (formData) => (formData?.rows || []).filter(r => !isNonNegativeAmount(r.unitCost) || !isNonNegativeAmount(r.count)).length;
+
 const toNumber = v => parseFloat(String(v ?? '')
   .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
   .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
@@ -677,17 +693,21 @@ const OpWorkflowStepper = ({ opStep, setOpStep, workflow }) => {
 export const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly, sync }) => {
   const templateType = unit.template_type || unit.templateType;
   const [newItem, setNewItem] = useState('');
-  const iStyle = { width: "100%", padding: "6px 8px", border: `1px solid ${readOnly ? 'transparent' : colors.grayBorder}`, borderRadius: 6, fontSize: 12, fontFamily: "inherit", background: readOnly ? 'transparent' : 'white', outline: 'none' };
+  const [confirmGroup, setConfirmGroup] = useState(null);
+  const isPhone = useIsPhone();
+  const iStyle = { width: "100%", padding: "6px 8px", border: `1px solid ${readOnly ? 'transparent' : colors.grayBorder}`, borderRadius: 6, fontSize: 12, fontFamily: "inherit", background: readOnly ? 'transparent' : 'white', outline: 'none', boxSizing: 'border-box' };
+  const delBtn = { background: 'none', border: '1px solid #F1B2B2', borderRadius: 6, color: '#C53A3A', cursor: 'pointer', fontSize: 11, padding: '3px 8px', fontFamily: 'inherit', whiteSpace: 'nowrap' };
   const emptyState = (emoji, msg) => (
     <div style={{ textAlign: 'center', padding: '28px 16px', background: colors.grayLight, borderRadius: 10, marginBottom: 14 }}>
       <div style={{ fontSize: 30, marginBottom: 6 }}>{emoji}</div>
       <div style={{ fontSize: 13, color: colors.gray }}>{msg}</div>
     </div>
   );
+  // الحقل والزر يتسعان داخل عرض الشاشة؛ وعند ضيق المساحة ينزل الزر تحت الحقل كاملًا
   const addRowInput = (placeholder, onAdd) => !readOnly && (
-    <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-      <input value={newItem} onChange={e => setNewItem(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onAdd(newItem); } }} placeholder={placeholder} style={{ flex: 1, padding: "8px 12px", borderRadius: 8, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none' }} />
-      <button onClick={() => onAdd(newItem)} style={{ padding: "8px 16px", background: colors.primary, color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit", whiteSpace: 'nowrap' }}>+ إضافة</button>
+    <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+      <input value={newItem} onChange={e => setNewItem(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onAdd(newItem); } }} placeholder={placeholder} aria-label={placeholder} style={{ flex: '1 1 200px', minWidth: 0, padding: "8px 12px", borderRadius: 8, border: `1.5px solid ${colors.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none', boxSizing: 'border-box' }} />
+      <button onClick={() => onAdd(newItem)} style={{ flex: '0 0 auto', padding: "8px 16px", background: colors.primary, color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "inherit", whiteSpace: 'nowrap' }}>+ إضافة</button>
     </div>
   );
 
@@ -754,6 +774,13 @@ export const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly, sync
       setFormData({ ...formData, groups: [...groups, { initiative: n, activities: [{ id: newActId(), name: '', desc: '', output: '' }] }] });
       setNewItem('');
     };
+    const groupHasContent = (g) => (g.activities || []).some(a => a?.name || a?.desc || a?.output);
+    const askRemoveGroup = (gi) => { if (readOnly) return; if (groupHasContent(groups[gi])) setConfirmGroup(gi); else removeGroup(gi); };
+    const removeGroup = (gi) => {
+      if (readOnly) return;
+      setConfirmGroup(null);
+      setFormData({ ...formData, groups: groups.filter((_, idx) => idx !== gi) });
+    };
     const FIELDS = [['name', 'اسم النشاط', 'مثال: ورشة تدريبية...'], ['desc', 'وصف النشاط', 'ماذا يتضمن؟'], ['output', 'المخرج المتوقع', 'ما الناتج؟']];
     return (
       <div>
@@ -765,7 +792,19 @@ export const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly, sync
         {groups.length === 0 && emptyState(<DfIcon name="pin" size={20} />, readOnly ? 'لم يتم إضافة أي مبادرات' : 'تظهر هنا المبادرات التي اخترتها في الجزء الأول، ويمكنك إضافة مبادرة في الحقل أدناه.')}
         {groups.map((g, gi) => (
           <div key={gi} style={{ marginBottom: 20, border: `1.5px solid ${colors.grayBorder}`, borderRadius: 12, overflow: "hidden" }}>
-            <div style={{ padding: "10px 16px", background: colors.primaryDeep, color: "white", fontWeight: 600, fontSize: 14 }}>المبادرة: {g.initiative}</div>
+            <div style={{ padding: "10px 16px", background: colors.primaryDeep, color: "white", fontWeight: 600, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
+              <span style={{ overflowWrap: 'anywhere' }}>المبادرة: {g.initiative}</span>
+              {!readOnly && (
+                <button type="button" onClick={() => askRemoveGroup(gi)} aria-label={`حذف المبادرة: ${g.initiative}`} style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.4)', color: '#fff', borderRadius: 6, padding: '3px 10px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>حذف المبادرة</button>
+              )}
+            </div>
+            {confirmGroup === gi && (
+              <div role="alertdialog" aria-label="تأكيد حذف المبادرة" style={{ padding: '10px 16px', background: '#FCEBEB', borderBottom: '1px solid #F1B2B2', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', fontSize: 13, color: '#7F1D1D' }}>
+                <span style={{ flex: '1 1 220px' }}>هل تريد حذف هذه المبادرة وجميع أنشطتها؟</span>
+                <button type="button" onClick={() => removeGroup(gi)} style={{ background: '#C53A3A', color: '#fff', border: 'none', borderRadius: 6, padding: '5px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>حذف</button>
+                <button type="button" onClick={() => setConfirmGroup(null)} style={{ background: '#fff', border: `1px solid ${colors.grayBorder}`, borderRadius: 6, padding: '5px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', color: colors.ink }}>إلغاء</button>
+              </div>
+            )}
             <div style={{ padding: 16 }}>
               {g.activities.map((a, ai) => (
                 <div key={a.id || ai} style={{ position: 'relative', display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 10, marginBottom: 10, padding: readOnly ? 10 : '10px 10px 10px 34px', background: colors.grayLight, borderRadius: 8 }}>
@@ -813,12 +852,25 @@ export const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly, sync
       if ((a?.name || months12(a).some(Boolean)) && !window.confirm('حذف هذا النشاط من الجدول الزمني؟')) return;
       setFormData({ ...formData, activities: acts.filter((_, i) => i !== ai) });
     };
+    const renameManual = (ai, v) => setFormData({ ...formData, activities: acts.map((x, i) => i !== ai ? x : { ...x, name: v }) });
     const linkedCount = acts.filter(a => a.source_id && !a.source_missing).length;
     const syncNotes = !readOnly && sync ? [
       sync.added > 0   && `أنشطة جديدة نُقلت من «المبادرات التشغيلية»: ${sync.added}. حدّد أشهرها ثم احفظ.`,
       sync.renamed > 0 && `حُدّثت أسماء أنشطة وفق «المبادرات التشغيلية» مع الإبقاء على أشهرها المحددة: ${sync.renamed}.`,
       sync.linked > 0  && `رُبطت صفوف محفوظة سابقًا بأنشطتها في «المبادرات التشغيلية» دون تكرار: ${sync.linked}.`,
     ].filter(Boolean) : [];
+    const nameCell = (a, ai) => (a.source_id || readOnly ? (
+      <div>
+        <div style={{ fontSize: 11.5, fontWeight: 600, color: '#0E2A3D', overflowWrap: 'anywhere' }}>{a.name || '—'}</div>
+        {a.initiative && <div style={{ fontSize: 10, color: colors.gray }}>{a.initiative}</div>}
+        {a.source_missing && !readOnly && <div style={{ fontSize: 10, color: '#A33F12', fontWeight: 600 }}>لم يعد ضمن «المبادرات التشغيلية» — احذفه إن لم يعد مطلوبًا</div>}
+      </div>
+    ) : (
+      <div>
+        <input value={a.name || ''} onChange={e => renameManual(ai, e.target.value)} placeholder="اسم النشاط" aria-label={`اسم النشاط المضاف يدويًا ${ai + 1}`} style={{ ...iStyle, width: "92%" }} />
+        <div style={{ fontSize: 10, color: colors.gray, marginTop: 2 }}>مضاف يدويًا</div>
+      </div>
+    ));
     return (
       <div>
         <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 10 }}>مخطط جانت — الجدول الزمني</h4>
@@ -828,7 +880,31 @@ export const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly, sync
           </div>
         )}
         {acts.length === 0 && emptyState(<DfIcon name="calendar" size={20} />, readOnly ? 'لم يتم إضافة أي أنشطة' : 'لا توجد أنشطة بعد. أضف الأنشطة في «المبادرات التشغيلية» لتظهر هنا تلقائيًا، أو أضف نشاطًا يدويًا.')}
-        {acts.length > 0 && (
+        {acts.length > 0 && isPhone && (
+          // الجوال: بطاقة لكل نشاط يبدأ عنوانها باسمه، فتبقى الأشهر المختارة مرتبطة بصاحبها
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {acts.map((a, ai) => {
+              const removable = !a.source_id || a.source_missing;
+              return (
+                <div key={a.source_id || `manual-${ai}`} data-gantt-card style={{ border: `1px solid ${colors.grayBorder}`, borderRadius: 10, padding: 10, background: a.source_missing ? '#FEF3EC' : 'white' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>{nameCell(a, ai)}</div>
+                    {!readOnly && removable && <button type="button" onClick={() => removeAct(ai)} aria-label={`حذف النشاط: ${a.name || ai + 1}`} style={delBtn}>حذف</button>}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginTop: 8 }}>
+                    {months12(a).map((active, mi) => (
+                      <button key={mi} type="button" onClick={() => toggleM(ai, mi)} disabled={readOnly} aria-pressed={!!active} aria-label={`${a.name || 'النشاط'} — ${mths[mi]}`}
+                        style={{ padding: '6px 2px', borderRadius: 6, fontSize: 10.5, fontFamily: 'inherit', cursor: readOnly ? 'default' : 'pointer', background: active ? barCols[ai % barCols.length] : '#f3f4f6', color: active ? '#fff' : colors.gray, border: active ? 'none' : `1px dashed ${colors.grayBorder}`, fontWeight: 600 }}>
+                        {mths[mi]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {acts.length > 0 && !isPhone && (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900 }}>
               <thead>
@@ -844,20 +920,7 @@ export const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly, sync
                   const rowBg = a.source_missing ? '#FEF3EC' : 'white';
                   return (
                     <tr key={a.source_id || `manual-${ai}`} style={{ borderBottom: `1px solid ${colors.grayBorder}`, background: rowBg }}>
-                      <td style={{ padding: 6, background: rowBg, position: "sticky", right: 0, minWidth: 170 }}>
-                        {a.source_id || readOnly ? (
-                          <div>
-                            <div style={{ fontSize: 11.5, fontWeight: 600, color: '#0E2A3D', overflowWrap: 'anywhere' }}>{a.name || '—'}</div>
-                            {a.initiative && <div style={{ fontSize: 10, color: colors.gray }}>{a.initiative}</div>}
-                            {a.source_missing && !readOnly && <div style={{ fontSize: 10, color: '#A33F12', fontWeight: 600 }}>لم يعد ضمن «المبادرات التشغيلية» — احذفه إن لم يعد مطلوبًا</div>}
-                          </div>
-                        ) : (
-                          <div>
-                            <input value={a.name || ''} onChange={e => setFormData({ ...formData, activities: acts.map((x, i) => i !== ai ? x : { ...x, name: e.target.value }) })} placeholder="اسم النشاط" aria-label={`اسم النشاط المضاف يدويًا ${ai + 1}`} style={{ ...iStyle, width: "92%" }} />
-                            <div style={{ fontSize: 10, color: colors.gray, marginTop: 2 }}>مضاف يدويًا</div>
-                          </div>
-                        )}
-                      </td>
+                      <td style={{ padding: 6, background: rowBg, position: "sticky", right: 0, minWidth: 170 }}>{nameCell(a, ai)}</td>
                       {months12(a).map((active, mi) => (
                         <td key={mi} style={{ padding: 2, textAlign: "center" }}>
                           <button type="button" onClick={() => toggleM(ai, mi)} disabled={readOnly} aria-pressed={!!active} aria-label={`${a.name || 'النشاط'} — ${mths[mi]}`} title={mths[mi]}
@@ -880,7 +943,7 @@ export const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly, sync
           <p style={{ fontSize: 11, color: colors.gray, margin: '8px 0 0' }}>أسماء الأنشطة المنقولة تُعدَّل من «المبادرات التشغيلية»، وتبقى أشهرها المحددة هنا.</p>
         )}
         {!readOnly && (
-          <button onClick={addAct} style={{ marginTop: 8, fontSize: 12, color: colors.primary, background: "none", border: "none", cursor: "pointer", fontFamily: "'Cairo', sans-serif" }}>+ إضافة نشاط يدويًا</button>
+          <button onClick={addAct} style={{ marginTop: 8, fontSize: 12, color: colors.primary, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>+ إضافة نشاط يدويًا</button>
         )}
       </div>
     );
@@ -889,27 +952,59 @@ export const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly, sync
   // ── op_responsible ──
   if (templateType === "op_responsible") {
     const rows = formData.rows?.length ? formData.rows : [];
+    const COLS = [['activity', 'النشاط', 'اسم النشاط...'], ['initiative', 'المبادرة', 'المبادرة...'], ['responsible', 'مسؤول التنفيذ', 'اسم المسؤول...'], ['department', 'القسم / الإدارة', 'القسم...']];
     const updRow = (i, field, val) => {
       if (readOnly) return;
       setFormData({ ...formData, rows: rows.map((r, idx) => idx !== i ? r : { ...r, [field]: val }) });
     };
+    const removeRow = (i) => {
+      if (readOnly) return;
+      const r = rows[i] || {};
+      if ((r.activity || r.initiative || r.responsible || r.department) && !window.confirm(`حذف صف «${r.activity || 'بلا اسم'}»؟`)) return;
+      setFormData({ ...formData, rows: rows.filter((_, idx) => idx !== i) });
+    };
+    const addRow = () => setFormData({ ...formData, rows: [...rows, { activity: '', initiative: '', responsible: '', department: '' }] });
     return (
       <div>
         <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 12 }}>تعيين المسؤولين</h4>
         {rows.length === 0 && emptyState(<DfIcon name="user" size={20} />, readOnly ? 'لم يتم إضافة أي صفوف' : 'اضغط + إضافة صف أو استخدم زر التعبئة التجريبية')}
-        {rows.length > 0 && (
+        {rows.length > 0 && isPhone && (
+          // الجوال: بطاقة لكل صف تبدأ باسم النشاط ومبادرته فلا يضيع السياق أثناء التعيين
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {rows.map((r, i) => (
+              <div key={i} data-resp-card style={{ border: `1px solid ${colors.grayBorder}`, borderRadius: 10, padding: 10, background: 'white' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <div style={{ fontSize: 12.5, fontWeight: 700, color: colors.ink, overflowWrap: 'anywhere' }}>{r.activity || `صف ${i + 1}`}{r.initiative ? <span style={{ fontWeight: 400, color: colors.gray }}> — {r.initiative}</span> : null}</div>
+                  {!readOnly && <button type="button" onClick={() => removeRow(i)} aria-label={`حذف الصف: ${r.activity || i + 1}`} style={delBtn}>حذف الصف</button>}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 8 }}>
+                  {COLS.map(([k, label, ph]) => (
+                    <label key={k} style={{ fontSize: 11, fontWeight: 600, color: colors.ink, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                      <OpLabel unit={unit} label={label} />
+                      <input value={r[k] || ''} onChange={e => updRow(i, k, e.target.value)} readOnly={readOnly} style={iStyle} placeholder={ph} aria-label={`${label} — ${r.activity || `صف ${i + 1}`}`} />
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {rows.length > 0 && !isPhone && (
           <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
             <thead>
-              <tr>{["النشاط","المبادرة","مسؤول التنفيذ","القسم / الإدارة"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.primaryDeep, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}><OpLabel unit={unit} label={h} /></th>)}</tr>
+              <tr>
+                {COLS.map(([, h]) => <th key={h} style={{ padding: "10px 8px", background: colors.primaryDeep, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}><OpLabel unit={unit} label={h} /></th>)}
+                {!readOnly && <th aria-label="حذف" style={{ background: colors.primaryDeep, width: 80 }} />}
+              </tr>
             </thead>
             <tbody>
               {rows.map((r, i) => (
                 <tr key={i} style={{ borderBottom: `1px solid ${colors.grayBorder}` }}>
-                  <td style={{ padding: 6 }}><input value={r.activity || ''} onChange={e => updRow(i, 'activity', e.target.value)} readOnly={readOnly} style={iStyle} placeholder="اسم النشاط..." /></td>
-                  <td style={{ padding: 6 }}><input value={r.initiative || ''} onChange={e => updRow(i, 'initiative', e.target.value)} readOnly={readOnly} style={iStyle} placeholder="المبادرة..." /></td>
-                  <td style={{ padding: 6 }}><input value={r.responsible || ''} onChange={e => updRow(i, 'responsible', e.target.value)} readOnly={readOnly} style={iStyle} placeholder="اسم المسؤول..." /></td>
-                  <td style={{ padding: 6 }}><input value={r.department || ''} onChange={e => updRow(i, 'department', e.target.value)} readOnly={readOnly} style={iStyle} placeholder="القسم..." /></td>
+                  {COLS.map(([k, label, ph]) => (
+                    <td key={k} style={{ padding: 6 }}><input value={r[k] || ''} onChange={e => updRow(i, k, e.target.value)} readOnly={readOnly} style={iStyle} placeholder={ph} aria-label={`${label} — صف ${i + 1}`} /></td>
+                  ))}
+                  {!readOnly && <td style={{ padding: 6, textAlign: 'center' }}><button type="button" onClick={() => removeRow(i)} aria-label={`حذف الصف: ${r.activity || i + 1}`} style={delBtn}>حذف الصف</button></td>}
                 </tr>
               ))}
             </tbody>
@@ -917,7 +1012,7 @@ export const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly, sync
           </div>
         )}
         {!readOnly && (
-          <button onClick={() => setFormData({ ...formData, rows: [...rows, { activity: '', initiative: '', responsible: '', department: '' }] })} style={{ marginTop: 8, fontSize: 12, color: colors.primary, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>+ إضافة صف</button>
+          <button onClick={addRow} style={{ marginTop: 8, fontSize: 12, color: colors.primary, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>+ إضافة صف</button>
         )}
       </div>
     );
@@ -926,49 +1021,93 @@ export const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly, sync
   // ── op_budget ──
   if (templateType === "op_budget") {
     const rows = formData.rows?.length ? formData.rows : [];
+    const invalidField = (v) => !isNonNegativeAmount(v);
+    const rowTotal = (r) => opRowTotal(r);
+    const fmtTotal = (t) => (t === null ? '' : Number.isFinite(t) ? t.toLocaleString('en-US') : '—');
     const updRow = (i, field, val) => {
       if (readOnly) return;
-      const updated = rows.map((r, idx) => {
+      setFormData({ ...formData, rows: rows.map((r, idx) => {
         if (idx !== i) return r;
         const nr = { ...r, [field]: val };
-        if (field === 'unitCost' || field === 'count') {
-          nr.total = (toNumber(nr.unitCost) * toNumber(nr.count)).toLocaleString('en-US');
-        }
+        if (field === 'unitCost' || field === 'count') { const t = rowTotal(nr); nr.total = Number.isFinite(t) && t !== null ? t.toLocaleString('en-US') : ''; }
         return nr;
-      });
-      setFormData({ ...formData, rows: updated });
+      }) });
     };
-    const grandTotal = rows.reduce((s, r) => s + toNumber(r.total), 0);
+    const removeRow = (i) => {
+      if (readOnly) return;
+      const r = rows[i] || {};
+      if ((r.activity || r.item || r.unitCost || r.count) && !window.confirm(`حذف بند «${r.item || r.activity || 'بلا اسم'}»؟`)) return;
+      setFormData({ ...formData, rows: rows.filter((_, idx) => idx !== i) });
+    };
+    const addRow = () => setFormData({ ...formData, rows: [...rows, { activity: '', item: '', unitCost: '', count: '', total: '' }] });
+    const invalidCount = opBudgetIssues(formData);
+    const grandTotal = rows.reduce((sum, r) => { const t = rowTotal(r); return sum + (Number.isFinite(t) && t !== null ? t : 0); }, 0);
+    const numInput = (r, i, field, label) => (
+      <div>
+        <input value={r[field] || ''} onChange={e => updRow(i, field, e.target.value)} readOnly={readOnly} inputMode="decimal" aria-label={`${label} — ${r.item || r.activity || `بند ${i + 1}`}`} aria-invalid={invalidField(r[field]) || undefined}
+          style={{ ...iStyle, textAlign: "center", borderColor: invalidField(r[field]) ? '#E88E8E' : undefined }} placeholder="0" />
+        {invalidField(r[field]) && <div role="alert" style={{ fontSize: 10.5, color: '#C53A3A', marginTop: 3, lineHeight: 1.5 }}>{NUMBER_MSG}</div>}
+      </div>
+    );
+    const totalCell = (r) => <input value={fmtTotal(rowTotal(r))} readOnly aria-label="إجمالي البند" title={Number.isNaN(rowTotal(r)) ? 'الإجمالي غير مكتمل حتى تصحيح القيمة' : undefined} style={{ ...iStyle, textAlign: "center", fontWeight: 700, background: "#FBF9F5", color: Number.isNaN(rowTotal(r)) ? '#C53A3A' : undefined }} />;
+    const grandRow = (
+      <div data-grand-total data-incomplete={invalidCount > 0 || undefined} style={{ background: colors.primaryDeep, color: 'white', borderRadius: 8, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 8 }}>
+        <span style={{ fontWeight: 700, fontSize: 14 }}>الإجمالي الكلي</span>
+        <span style={{ fontWeight: 800, fontSize: 16 }}>{grandTotal.toLocaleString('en-US')} ريال{invalidCount > 0 && <span style={{ fontSize: 11, fontWeight: 600, color: '#FBC3A3', marginInlineStart: 8 }}>غير مكتمل — صحّح {invalidCount === 1 ? 'القيمة المعلَّمة' : 'القيم المعلَّمة'} بالأحمر</span>}</span>
+      </div>
+    );
     return (
       <div>
         <h4 style={{ fontSize: 14, fontWeight: 600, color: colors.primary, marginBottom: 12 }}>الميزانية التشغيلية</h4>
         {rows.length === 0 && emptyState(<DfIcon name="money" size={20} />, readOnly ? 'لم يتم إضافة أي بنود' : 'اضغط + إضافة بند أو استخدم زر التعبئة التجريبية')}
-        {rows.length > 0 && (
+        {rows.length > 0 && isPhone && (
+          // الجوال: بطاقة لكل بند تجمع اسم النشاط والبند والقيم والإجمالي
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 12 }}>
+            {rows.map((r, i) => (
+              <div key={i} data-budget-card style={{ border: `1px solid ${colors.grayBorder}`, borderRadius: 10, padding: 10, background: 'white' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <div style={{ fontSize: 12.5, fontWeight: 700, color: colors.ink, overflowWrap: 'anywhere' }}>{r.item || `بند ${i + 1}`}{r.activity ? <span style={{ fontWeight: 400, color: colors.gray }}> — {r.activity}</span> : null}</div>
+                  {!readOnly && <button type="button" onClick={() => removeRow(i)} aria-label={`حذف البند: ${r.item || i + 1}`} style={delBtn}>حذف البند</button>}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  <label style={{ gridColumn: '1 / -1', fontSize: 11, fontWeight: 600, color: colors.ink }}><OpLabel unit={unit} label="النشاط" /><input value={r.activity || ''} onChange={e => updRow(i, 'activity', e.target.value)} readOnly={readOnly} style={iStyle} placeholder="النشاط..." /></label>
+                  <label style={{ gridColumn: '1 / -1', fontSize: 11, fontWeight: 600, color: colors.ink }}><OpLabel unit={unit} label="بند التكلفة" /><input value={r.item || ''} onChange={e => updRow(i, 'item', e.target.value)} readOnly={readOnly} style={iStyle} placeholder="بند التكلفة..." /></label>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: colors.ink }}><OpLabel unit={unit} label="تكلفة الوحدة" />{numInput(r, i, 'unitCost', 'تكلفة الوحدة')}</div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: colors.ink }}><OpLabel unit={unit} label="العدد" />{numInput(r, i, 'count', 'العدد')}</div>
+                  <div style={{ gridColumn: '1 / -1', fontSize: 11, fontWeight: 600, color: colors.ink }}><OpLabel unit={unit} label="الإجمالي" />{totalCell(r)}</div>
+                </div>
+              </div>
+            ))}
+            {grandRow}
+          </div>
+        )}
+        {rows.length > 0 && !isPhone && (
           <div style={{ overflowX: "auto", marginBottom: 12 }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 620 }}>
             <thead>
-              <tr>{["النشاط","بند التكلفة","تكلفة الوحدة","العدد","الإجمالي"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.primaryDeep, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}><OpLabel unit={unit} label={h} /></th>)}</tr>
+              <tr>
+                {["النشاط","بند التكلفة","تكلفة الوحدة","العدد","الإجمالي"].map(h => <th key={h} style={{ padding: "10px 8px", background: colors.primaryDeep, color: "white", fontSize: 11, fontWeight: 600, textAlign: "right" }}><OpLabel unit={unit} label={h} /></th>)}
+                {!readOnly && <th aria-label="حذف" style={{ background: colors.primaryDeep, width: 80 }} />}
+              </tr>
             </thead>
             <tbody>
               {rows.map((r, i) => (
-                <tr key={i} style={{ borderBottom: `1px solid ${colors.grayBorder}` }}>
-                  <td style={{ padding: 6 }}><input value={r.activity || ''} onChange={e => updRow(i, 'activity', e.target.value)} readOnly={readOnly} style={iStyle} placeholder="النشاط..." /></td>
-                  <td style={{ padding: 6 }}><input value={r.item || ''} onChange={e => updRow(i, 'item', e.target.value)} readOnly={readOnly} style={iStyle} placeholder="بند التكلفة..." /></td>
-                  <td style={{ padding: 6 }}><input value={r.unitCost || ''} onChange={e => updRow(i, 'unitCost', e.target.value)} readOnly={readOnly} style={{ ...iStyle, textAlign: "center" }} placeholder="0" /></td>
-                  <td style={{ padding: 6 }}><input value={r.count || ''} onChange={e => updRow(i, 'count', e.target.value)} readOnly={readOnly} style={{ ...iStyle, textAlign: "center" }} placeholder="0" /></td>
-                  <td style={{ padding: 6 }}><input value={r.total || ''} readOnly style={{ ...iStyle, textAlign: "center", fontWeight: 700, background: "#FBF9F5" }} /></td>
+                <tr key={i} style={{ borderBottom: `1px solid ${colors.grayBorder}`, verticalAlign: 'top' }}>
+                  <td style={{ padding: 6 }}><input value={r.activity || ''} onChange={e => updRow(i, 'activity', e.target.value)} readOnly={readOnly} style={iStyle} placeholder="النشاط..." aria-label={`النشاط — بند ${i + 1}`} /></td>
+                  <td style={{ padding: 6 }}><input value={r.item || ''} onChange={e => updRow(i, 'item', e.target.value)} readOnly={readOnly} style={iStyle} placeholder="بند التكلفة..." aria-label={`بند التكلفة — بند ${i + 1}`} /></td>
+                  <td style={{ padding: 6, minWidth: 110 }}>{numInput(r, i, 'unitCost', 'تكلفة الوحدة')}</td>
+                  <td style={{ padding: 6, minWidth: 90 }}>{numInput(r, i, 'count', 'العدد')}</td>
+                  <td style={{ padding: 6 }}>{totalCell(r)}</td>
+                  {!readOnly && <td style={{ padding: 6, textAlign: 'center' }}><button type="button" onClick={() => removeRow(i)} aria-label={`حذف البند: ${r.item || i + 1}`} style={delBtn}>حذف البند</button></td>}
                 </tr>
               ))}
-              <tr style={{ background: colors.primaryDeep }}>
-                <td colSpan={4} style={{ padding: 10, color: "white", fontWeight: 700, fontSize: 14, textAlign: "center" }}>الإجمالي الكلي</td>
-                <td style={{ padding: 10, color: "white", fontWeight: 800, fontSize: 16, textAlign: "center" }}>{grandTotal.toLocaleString('en-US')} ريال</td>
-              </tr>
             </tbody>
           </table>
+          {grandRow}
           </div>
         )}
         {!readOnly && (
-          <button onClick={() => setFormData({ ...formData, rows: [...rows, { activity: '', item: '', unitCost: '', count: '', total: '' }] })} style={{ fontSize: 12, color: colors.primary, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>+ إضافة بند</button>
+          <button onClick={addRow} style={{ fontSize: 12, color: colors.primary, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>+ إضافة بند</button>
         )}
       </div>
     );
@@ -1025,7 +1164,8 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
     return () => { alive = false; };
   }, [unitNum]);
 
-  const showMsg = (type, text) => { setMsg({ type, text }); setTimeout(() => setMsg(null), 3500); };
+  const msgTimer = useRef(null);
+  const showMsg = (type, text) => { clearTimeout(msgTimer.current); setMsg({ type, text }); msgTimer.current = setTimeout(() => setMsg(null), 3500); };
 
   const ttype = unitData?.unit?.template_type || unitSummary.template_type;
   // معرّف ثابت لكل نشاط قبل الإرسال حتى تبقى صفوف «الجدول الزمني للتنفيذ» مرتبطة بأنشطتها
@@ -1038,15 +1178,22 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
   const handleSave = async () => {
     setSaving(true);
     try {
-      await operationalApi.saveUnit(workflowId, unitNum, { form_data: preparedData() });
-      setUnitData(prev => (prev ? { ...prev, sync: null } : prev));
-      showMsg('success', 'تم حفظ البيانات بنجاح');
+      const res = await operationalApi.saveUnit(workflowId, unitNum, { form_data: preparedData() });
+      const sub = res.data?.submission;
+      setUnitData(prev => (prev ? { ...prev, submission: sub || prev.submission, sync: null } : prev));
+      showMsg('success', sub?.status === 'revision'
+        ? 'حُفظت تعديلاتك كمسودة. راجع ملاحظة المستشار، ثم اضغط إعادة الإرسال للمراجعة.'
+        : 'حُفظت إجاباتك كمسودة. يمكنك إكمالها لاحقًا أو إرسالها للمراجعة.');
     } catch (e) {
-      showMsg('error', e.response?.data?.message || 'حدث خطأ في الحفظ');
+      showMsg('error', e.response?.data?.message || 'تعذّر حفظ المسودة. حاول مرة أخرى.');
     } finally { setSaving(false); }
   };
 
   const handleSubmit = async () => {
+    if (ttype === 'op_budget' && opBudgetIssues(formData) > 0) {
+      showMsg('error', `صحّح قيم التكلفة المعلَّمة بالأحمر قبل الإرسال: ${NUMBER_MSG}.`);
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await operationalApi.submitUnit(workflowId, unitNum, { form_data: preparedData() });
@@ -1080,6 +1227,13 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
         <Badge text={`الوحدة ${unitNum} من ${totalUnits || '؟'}`} color="primary" small />
       </div>
       <StatusBar status={status === 'not_started' ? 'not_submitted' : status} />
+      {status === 'revision' && (
+        <div role="alert" data-consultant-note style={{ marginTop: 10, background: '#FCEBEB', border: '1px solid #F1B2B2', borderRadius: 10, padding: '12px 16px', fontSize: 13, color: '#7F1D1D', lineHeight: 1.8 }}>
+          <div style={{ fontWeight: 700, color: '#C53A3A', marginBottom: 4 }}>ملاحظة المستشار</div>
+          <div>{submission?.consultant_notes || 'طلب المستشار تعديل هذه الوحدة.'}</div>
+          {tab !== 5 && <button type="button" onClick={() => setTab(5)} style={{ marginTop: 8, padding: '7px 16px', background: colors.amber, color: '#0E2A3D', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>فتح نماذج العمل ←</button>}
+        </div>
+      )}
       <div style={{ margin: "12px 0 16px" }}><Tab tabs={tabs} active={tab} onChange={setTab} /></div>
 
       {msg && (
@@ -1176,6 +1330,11 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
                 </div>
               );
             })()}
+            {status === 'revision' && submission?.consultant_notes && (
+              <div style={{ background: '#FCEBEB', border: '1px solid #F1B2B2', borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 13, color: '#7F1D1D', lineHeight: 1.8 }}>
+                <span style={{ fontWeight: 700, color: '#C53A3A' }}>ملاحظة المستشار: </span>{submission.consultant_notes}
+              </div>
+            )}
             <OpTemplateRenderer unit={unit} formData={formData} setFormData={isReadOnly ? () => {} : setFormData} readOnly={isReadOnly} sync={unitData?.sync} />
             {!isReadOnly && (
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20, gap: 10, flexWrap: "wrap" }}>
@@ -1195,7 +1354,7 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
                   <Btn
                     onClick={handleSubmit}
                     disabled={submitting || ['submitted','reviewing','approved'].includes(status)}>
-                    {submitting ? "جاري الإرسال..." : status === 'submitted' ? "تم الإرسال" : "إرسال للمراجعة ←"}
+                    {submitting ? "جاري الإرسال..." : status === 'submitted' || status === 'reviewing' ? "تم الإرسال" : status === 'revision' ? "إعادة الإرسال للمراجعة ←" : "إرسال للمراجعة ←"}
                   </Btn>
                   {nextUnit && (
                     <Btn
@@ -1678,21 +1837,38 @@ const OpStepReview = ({ units, setOpStep, refreshData }) => {
 };
 
 // ─── Step 4: OpStepApproval ──────────────────────────────────────
-const OpStepApproval = ({ workflow, setWorkflow, setOpStep, navigate, workflowId }) => {
-  const [downloading,        setDownloading]        = React.useState(false);
-  const [requestingArbitration, setRequestingArbitration] = React.useState(false);
+const ARB_PRICE = 2500;
+const arbAmounts = (pricing) => { const rate = Number(pricing?.tax_rate ?? 15); const tax = Math.round(ARB_PRICE * rate) / 100; return { rate, tax, total: ARB_PRICE + tax }; };
+const fmtSar = (n) => Number(n).toLocaleString('en-US');
 
+// فتح الوثيقة المعتمدة: نفتح التبويب فورًا ثم نوجّهه إلى الرابط الموقّع؛ وعند التعذّر رسالة وزر إعادة المحاولة
+const useOpPdf = (workflowId) => {
+  const [downloading, setDownloading] = React.useState(false);
+  const [pdfError, setPdfError] = React.useState('');
   const handleDownload = async () => {
-    setDownloading(true);
+    setDownloading(true); setPdfError('');
+    const win = window.open('', '_blank');
     try {
       const res = await operationalApi.getPdfLink(workflowId);
-      window.open(res.data.url, '_blank');
+      if (win) win.location.href = res.data.url; else window.open(res.data.url, '_blank');
     } catch {
-      alert('تعذّر تحميل الوثيقة، يرجى المحاولة مرة أخرى.');
-    } finally {
-      setDownloading(false);
-    }
+      if (win) win.close();
+      setPdfError('تعذّر تجهيز الوثيقة. حاول مرة أخرى.');
+    } finally { setDownloading(false); }
   };
+  const PdfError = () => pdfError ? (
+    <div role="alert" style={{ marginTop: 8, fontSize: 12.5, color: '#C53A3A', background: '#FCEBEB', padding: '8px 12px', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+      <span style={{ flex: 1 }}>{pdfError}</span>
+      <button type="button" onClick={handleDownload} style={{ padding: '5px 12px', background: '#fff', border: '1px solid #E88E8E', color: '#C53A3A', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>إعادة المحاولة</button>
+    </div>
+  ) : null;
+  return { downloading, handleDownload, PdfError };
+};
+
+const OpStepApproval = ({ workflow, setWorkflow, setOpStep, navigate, workflowId, pricing }) => {
+  const { downloading, handleDownload, PdfError } = useOpPdf(workflowId);
+  const [requestingArbitration, setRequestingArbitration] = React.useState(false);
+  const arb = arbAmounts(pricing);
 
   const handleRequestArbitration = async () => {
     setRequestingArbitration(true);
@@ -1741,6 +1917,7 @@ const OpStepApproval = ({ workflow, setWorkflow, setOpStep, navigate, workflowId
             {downloading ? "جارٍ التحميل..." : "تحميل PDF"}
           </Btn>
         </div>
+        <PdfError />
       </Card>
 
       {/* تقييم المستشار */}
@@ -1768,18 +1945,18 @@ const OpStepApproval = ({ workflow, setWorkflow, setOpStep, navigate, workflowId
         </p>
         <div style={{ background: "#FBF9F5", borderRadius: 10, padding: "14px 16px", marginBottom: 16, textAlign: "right" }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 6 }}>
-            <span>تحكيم الخطة التشغيلية</span><span style={{ fontWeight: 600 }}>2,500 ريال</span>
+            <span>تحكيم الخطة التشغيلية</span><span style={{ fontWeight: 600 }}>{fmtSar(ARB_PRICE)} ريال</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: colors.gray, marginBottom: 6 }}>
-            <span>ضريبة القيمة المضافة 15%</span><span>375 ريال</span>
+            <span>ضريبة القيمة المضافة ({arb.rate}%)</span><span>{fmtSar(arb.tax)} ريال</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 15, fontWeight: 800, color: colors.ink, borderTop: `1px solid ${colors.grayBorder}`, paddingTop: 8 }}>
-            <span>الإجمالي</span><span>2,875 ريال</span>
+            <span>الإجمالي</span><span>{fmtSar(arb.total)} ريال</span>
           </div>
         </div>
         <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
           <Btn onClick={handleRequestArbitration} disabled={requestingArbitration}>
-            {requestingArbitration ? "جاري الطلب..." : "نعم — طلب التحكيم (2,875 ريال)"}
+            {requestingArbitration ? "جاري الطلب..." : `نعم — طلب التحكيم (${fmtSar(arb.total)} ريال)`}
           </Btn>
           <Btn variant="secondary" onClick={() => navigate ? navigate('client-dash') : setOpStep(6)}>لا — متابعة بدون تحكيم</Btn>
         </div>
@@ -1853,15 +2030,16 @@ const OpStepArbitration = ({ setOpStep, setWorkflow, workflowId }) => {
 };
 
 // ─── Step 6: OpStepDone — payment form → completion ──────────────
-const OpStepDone = ({ workflow, setWorkflow, navigate, onComplete, units, workflowId }) => {
+const OpStepDone = ({ workflow, setWorkflow, navigate, onComplete, units, workflowId, pricing }) => {
   const EMPTY_CARD  = { number: '', expiry: '', cvv: '', name: '' };
   const alreadyPaid = (workflow?.arbitration_step ?? 0) >= 3;
   const [paid,        setPaid]        = React.useState(alreadyPaid);
   const [paying,      setPaying]      = React.useState(false);
   const [payMethod,   setPayMethod]   = React.useState(0);
   const [card,        setCard]        = React.useState(EMPTY_CARD);
-  const [downloading, setDownloading] = React.useState(false);
+  const { downloading, handleDownload, PdfError } = useOpPdf(workflowId);
   const [payError,    setPayError]    = React.useState(null);
+  const arb = arbAmounts(pricing);
 
   const methodKey = PAY_METHODS[payMethod]?.key ?? 'card';
 
@@ -1877,16 +2055,6 @@ const OpStepDone = ({ workflow, setWorkflow, navigate, onComplete, units, workfl
     } catch (e) {
       setPayError(e.response?.data?.message || e.message || 'حدث خطأ في عملية الدفع، يرجى المحاولة مرة أخرى.');
     } finally { setPaying(false); }
-  };
-
-  const handleDownload = async () => {
-    setDownloading(true);
-    try {
-      const res = await operationalApi.getPdfLink(workflowId);
-      window.open(res.data.url, '_blank');
-    } catch {
-      alert('تعذّر تحميل الوثيقة، يرجى المحاولة مرة أخرى.');
-    } finally { setDownloading(false); }
   };
 
   const completedAt = workflow?.completed_at
@@ -1920,13 +2088,13 @@ const OpStepDone = ({ workflow, setWorkflow, navigate, onComplete, units, workfl
           <Card>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>ملخص التحكيم</h3>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "8px 0", borderBottom: `1px solid ${colors.grayLight}` }}>
-              <span>تحكيم الخطة التشغيلية</span><span style={{ fontWeight: 600 }}>2,500 ريال</span>
+              <span>تحكيم الخطة التشغيلية</span><span style={{ fontWeight: 600 }}>{fmtSar(ARB_PRICE)} ريال</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: colors.gray, padding: "8px 0", borderBottom: `1px solid ${colors.grayLight}` }}>
-              <span>ضريبة القيمة المضافة 15%</span><span>375 ريال</span>
+              <span>ضريبة القيمة المضافة ({arb.rate}%)</span><span>{fmtSar(arb.tax)} ريال</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 16, fontWeight: 800, color: colors.ink, padding: "12px 0" }}>
-              <span>الإجمالي</span><span>2,875 ريال</span>
+              <span>الإجمالي</span><span>{fmtSar(arb.total)} ريال</span>
             </div>
             <div style={{ padding: "10px 14px", background: "#EEF5F9", borderRadius: 8, fontSize: 12, color: colors.primary, marginTop: 4 }}>
               الجهة: شركة الاستشارات الاستراتيجية
@@ -1957,7 +2125,7 @@ const OpStepDone = ({ workflow, setWorkflow, navigate, onComplete, units, workfl
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Btn variant="secondary" onClick={() => {}}>→ رجوع لاختيار الجهة</Btn>
           <Btn onClick={handlePay} disabled={paying}>
-            {paying ? "جاري معالجة الدفع..." : <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><IcLock width={14} height={14}/>ادفع وابدأ التحكيم — 2,875 ريال</span>}
+            {paying ? "جاري معالجة الدفع..." : <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><IcLock width={14} height={14}/>ادفع وابدأ التحكيم — {fmtSar(arb.total)} ريال</span>}
           </Btn>
 
         </div>
@@ -1997,6 +2165,7 @@ const OpStepDone = ({ workflow, setWorkflow, navigate, onComplete, units, workfl
             {downloading ? "..." : "تحميل"}
           </Btn>
         </div>
+        <PdfError />
       </Card>
 
       {/* تقييم المستشار في شاشة الاكتمال */}
@@ -2027,7 +2196,7 @@ const OpStepDone = ({ workflow, setWorkflow, navigate, onComplete, units, workfl
 };
 
 // ─── Main Component ───────────────────────────────────────────────
-export default function OperationalRoadmap({ navigate, workflowId, onWorkflowSelect }) {
+export default function OperationalRoadmap({ navigate, workflowId, onWorkflowSelect, openUnit, onOpenedUnit }) {
   const [workflow,           setWorkflow]           = useState(null);
   const [units,              setUnits]              = useState(null);
   const [catalog,            setCatalog]            = useState(null);
@@ -2061,6 +2230,13 @@ export default function OperationalRoadmap({ navigate, workflowId, onWorkflowSel
     const res = await operationalApi.getPageData(workflowId);
     applyPageData(res.data);
   };
+
+  // «افتح الملاحظات» من لوحة التحكم: تُفتح الوحدة المطلوبة بعد تحميل وحدات الخطة
+  useEffect(() => {
+    if (!openUnit || !Array.isArray(units) || activeUnit) return;
+    const u = units.find(x => (x.unit_number || x.id) === openUnit.unit_number);
+    if (u) { setActiveUnit(u); if (onOpenedUnit) onOpenedUnit(); }
+  }, [openUnit, units]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // جلب قائمة الخطط عند دخول الصفحة بدون workflowId
   useEffect(() => {
@@ -2193,9 +2369,9 @@ export default function OperationalRoadmap({ navigate, workflowId, onWorkflowSel
       {opStep === 1 && <OpStepPayment workflow={workflow} setOpStep={setOpStep} onPay={handlePay} strategicConsultant={strategicConsultant} onWorkflowUpdate={setWorkflow} />}
       {opStep === 2 && <OpStepWork units={units} setOpStep={setOpStep} setActiveUnit={setActiveUnit} readOnly={opStep < mapStep(workflow)} />}
       {opStep === 3 && <OpStepReview units={units} setOpStep={setOpStep} refreshData={refreshData} />}
-      {opStep === 4 && <OpStepApproval workflow={workflow} setWorkflow={setWorkflow} setOpStep={setOpStep} navigate={navigate} workflowId={workflowId} />}
+      {opStep === 4 && <OpStepApproval workflow={workflow} setWorkflow={setWorkflow} setOpStep={setOpStep} navigate={navigate} workflowId={workflowId} pricing={pricing} />}
       {opStep === 5 && <OpStepArbitration setOpStep={setOpStep} setWorkflow={setWorkflow} workflowId={workflowId} />}
-      {(opStep === 6 || opStep === 7) && <OpStepDone workflow={workflow} setWorkflow={setWorkflow} navigate={navigate} onComplete={() => setOpStep(7)} units={units} workflowId={workflowId} />}
+      {(opStep === 6 || opStep === 7) && <OpStepDone workflow={workflow} setWorkflow={setWorkflow} navigate={navigate} onComplete={() => setOpStep(7)} units={units} workflowId={workflowId} pricing={pricing} />}
     </div>
   );
 }

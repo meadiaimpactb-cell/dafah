@@ -1,13 +1,14 @@
 import { Help } from '../../components/ui/Help';
 import DfIcon from '../../components/ui/DfIcon';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { strategicApi } from '../../api/strategic';
 import TemplateRenderer from './TemplateRenderer';
 import { DEMO_DATA } from './demoData';
-import { validateTemplate } from './templateValidation';
+import { validateTemplate, hasAnyInput } from './templateValidation';
 import { OverviewContent, ExplanationContent, GuidelinesContent, templateLabel } from './UnitContent';
 import UnitVideo from '../shared/UnitVideo';
+import { unitTimeLabel } from '../../utils/duration';
 
 const colors = { amber: '#EF6A2C', primary: '#235D7F', ink: '#0E2A3D', orange: '#EF6A2C', amberText: '#A33F12', amberLine: '#E05A1F' };
 
@@ -42,13 +43,28 @@ const TABS = [
   { id: 5, label: 'نماذج العمل' },
 ];
 
-const STATUS_MAP = {
+// التسمية نفسها في رأس الوحدة وبطاقة الخطة: «مسودة» بعد أول حفظ
+export const STATUS_MAP = {
   not_started: { label: 'لم يبدأ',      color: '#5E6B78' },
-  in_progress: { label: 'قيد العمل',    color: '#A33F12' },
+  in_progress: { label: 'مسودة',        color: '#A33F12' },
   submitted:   { label: 'مُرسل',        color: '#1F74C4' },
   reviewing:   { label: 'قيد المراجعة', color: '#235D7F' },
   revision:    { label: 'يحتاج تعديل',  color: '#C53A3A' },
   approved:    { label: 'معتمد',        color: '#0B7F5D' },
+};
+
+const SUBMITTED_STATUSES = ['submitted', 'reviewing', 'revision', 'approved'];
+const AUTOSAVE_DELAY = 1500;
+const draftKey = (wid, num) => `df_draft_${wid || 'cur'}_${num}`;
+const readBackup = (k) => { try { const v = sessionStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } };
+const writeBackup = (k, data) => { try { sessionStorage.setItem(k, JSON.stringify(data)); } catch { /* المتصفح يمنع التخزين */ } };
+const clearBackup = (k) => { try { sessionStorage.removeItem(k); } catch { /* تجاهل */ } };
+
+// رسالة ما بعد الحفظ بحسب حالة الوحدة
+const savedMessage = (status) => {
+  if (status === 'revision') return 'حُفظت تعديلاتك كمسودة. راجع ملاحظة المستشار، ثم اضغط إعادة الإرسال للمراجعة.';
+  if (status === 'submitted' || status === 'reviewing') return 'حُفظت المسودة. اضغط «إعادة الإرسال» ليراجع المستشار النسخة المحدّثة.';
+  return 'حُفظت إجاباتك كمسودة. يمكنك إكمالها لاحقًا أو إرسالها للمراجعة.';
 };
 
 export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workflowId }) {
@@ -61,6 +77,19 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
   const [formData,   setFormData]   = useState({});
   const [msg,        setMsg]        = useState(null);
   const [demoConfirm, setDemoConfirm] = useState(false);
+  // حالة المسودة: idle | dirty | saving | saved | error | restored
+  const [draft,      setDraft]      = useState('idle');
+  const [showErrors, setShowErrors] = useState(false);
+  const [preview,    setPreview]    = useState(null);
+
+  const savedJsonRef  = useRef('{}');          // آخر نسخة وصلت إلى الخادم
+  const formRef       = useRef(formData);      // أحدث بيانات النموذج (للحفظ المؤجّل وعند المغادرة)
+  const timerRef      = useRef(null);
+  const lockedRef     = useRef(false);
+  const formAreaRef   = useRef(null);
+  formRef.current = formData;
+
+  const key = draftKey(workflowId, unitSummary.unit_number);
 
   useEffect(() => {
     Promise.all([
@@ -68,39 +97,129 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
       strategicApi.getUnits(workflowId),
     ]).then(([unitRes, unitsRes]) => {
       setUnitData(unitRes.data);
-      setFormData(unitRes.data.submission?.form_data || {});
-      setAllUnits(unitsRes.data);
+      const saved = unitRes.data.submission?.form_data || {};
+      savedJsonRef.current = JSON.stringify(saved);
+      lockedRef.current = unitRes.data.submission?.status === 'approved';
+      // ما كُتب قبل انقطاع الحفظ يبقى في هذا المتصفح ويُستعاد عند العودة
+      const backup = lockedRef.current ? null : readBackup(key);
+      if (backup && JSON.stringify(backup) !== savedJsonRef.current) {
+        setFormData(backup);
+        setDraft('restored');
+      } else {
+        clearBackup(key);
+        setFormData(saved);
+        setDraft('idle');
+      }
+      setAllUnits(Array.isArray(unitsRes.data) ? unitsRes.data : []);
     }).finally(() => setLoading(false));
-  }, [workflowId, unitSummary.unit_number]);
+  }, [workflowId, unitSummary.unit_number]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const msgTimer = useRef(null);
   const showMsg = (type, text) => {
+    clearTimeout(msgTimer.current);
     setMsg({ type, text });
-    setTimeout(() => setMsg(null), 3500);
+    msgTimer.current = setTimeout(() => setMsg(null), 4000);
   };
 
-  const handleSave = async () => {
+  const isDirty = JSON.stringify(formData) !== savedJsonRef.current;
+
+  // حفظ المسودة (تلقائي أو يدوي): يُعيد true عند النجاح
+  const doSave = useCallback(async (manual = false) => {
+    if (lockedRef.current) return true;
+    const data = formRef.current;
+    const json = JSON.stringify(data);
+    if (!manual && json === savedJsonRef.current) return true;
+    clearTimeout(timerRef.current);
     setSaving(true);
-    setMsg(null);
+    setDraft('saving');
     try {
-      await strategicApi.saveUnit(workflowId, unitSummary.unit_number, { form_data: formData });
-      showMsg('success', 'تم حفظ البيانات بنجاح');
+      const res = await strategicApi.saveUnit(workflowId, unitSummary.unit_number, { form_data: data });
+      savedJsonRef.current = json;
+      clearBackup(key);
+      const sub = res.data?.submission;
+      if (sub) {
+        setUnitData(prev => (prev ? { ...prev, submission: sub } : prev));
+        setAllUnits(prev => prev.map(u => (u.unit_number === unitSummary.unit_number ? { ...u, submission_status: sub.status } : u)));
+      }
+      setDraft(JSON.stringify(formRef.current) === json ? 'saved' : 'dirty');
+      if (manual) showMsg('success', savedMessage(sub?.status));
+      return true;
     } catch (e) {
-      showMsg('error', e.response?.data?.message || 'حدث خطأ في الحفظ');
+      writeBackup(key, data);
+      setDraft('error');
+      if (manual) showMsg('error', e.response?.data?.message || 'تعذّر حفظ المسودة. حاول مرة أخرى — ما كتبته محفوظ في هذا المتصفح.');
+      return false;
     } finally {
       setSaving(false);
     }
+  }, [workflowId, unitSummary.unit_number, key]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // الحفظ التلقائي بعد توقف الكتابة
+  useEffect(() => {
+    if (loading || lockedRef.current) return undefined;
+    if (!isDirty) return undefined;
+    if (!hasAnyInput(formData)) return undefined;
+    setDraft(d => (d === 'saving' ? d : 'dirty'));
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => { doSave(false); }, AUTOSAVE_DELAY);
+    return () => clearTimeout(timerRef.current);
+  }, [formData, isDirty, loading, doSave]);
+
+  // تنبيه قبل إغلاق الصفحة إذا بقي تعديل غير محفوظ
+  useEffect(() => {
+    const handler = (e) => {
+      if (lockedRef.current) return;
+      if (JSON.stringify(formRef.current) === savedJsonRef.current) return;
+      writeBackup(key, formRef.current);
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [key]);
+
+  // المغادرة (رجوع أو وحدة أخرى): نحفظ أولًا، وعند تعذّر الحفظ نسأل قبل المغادرة ونحتفظ بالنص في المتصفح
+  const leave = async (go) => {
+    if (!lockedRef.current && JSON.stringify(formRef.current) !== savedJsonRef.current) {
+      const ok = await doSave(false);
+      if (!ok) {
+        const proceed = window.confirm('تعذّر حفظ المسودة. ما كتبته سيبقى في هذا المتصفح لتعيد المحاولة لاحقًا. هل تريد المغادرة الآن؟');
+        if (!proceed) return;
+      }
+    }
+    go();
   };
+  const handleBack = () => leave(() => onBack && onBack());
+  const goToUnit = (target) => leave(() => onNavigate && onNavigate(target));
+
+  const handleSave = () => doSave(true);
+
+  // يجب حساب هذا قبل أي return مبكر لأن validateTemplate ليست hook
+  const unit       = unitData?.unit || {};
+  const submission = unitData?.submission || {};
+  const validation = validateTemplate(unit.template_type, formData, unit);
 
   const handleSubmit = async () => {
+    if (!validation.valid) {
+      setShowErrors(true);
+      showMsg('error', 'أكمل الحقول المطلوبة أولًا، ثم أعد الإرسال. مسودتك محفوظة.');
+      return;
+    }
+    clearTimeout(timerRef.current);
     setSubmitting(true);
     setMsg(null);
+    const wasRevision = submission.status === 'revision';
     try {
-      const res = await strategicApi.submitUnit(workflowId, unitSummary.unit_number, { form_data: formData });
+      const data = formRef.current;
+      const res = await strategicApi.submitUnit(workflowId, unitSummary.unit_number, { form_data: data });
+      savedJsonRef.current = JSON.stringify(data);
+      clearBackup(key);
+      setDraft('saved');
       const updatedSub = res.data.submission;
       setUnitData(prev => ({ ...prev, submission: updatedSub }));
       const unitsRes = await strategicApi.getUnits(workflowId);
-      setAllUnits(unitsRes.data);
-      showMsg('success', 'تم إرسال الوحدة للمراجعة بنجاح ✓');
+      setAllUnits(Array.isArray(unitsRes.data) ? unitsRes.data : []);
+      showMsg('success', wasRevision ? 'أُعيد إرسال الوحدة. يراجعها المستشار الآن ✓' : 'تم إرسال الوحدة للمراجعة بنجاح ✓');
     } catch (e) {
       showMsg('error', e.response?.data?.message || 'حدث خطأ في الإرسال');
     } finally {
@@ -108,10 +227,18 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
     }
   };
 
-  // يجب حساب هذا قبل أي return مبكر لأن validateTemplate ليست hook
-  const unit       = unitData?.unit || {};
-  const submission = unitData?.submission || {};
-  const validation = validateTemplate(unit.template_type, formData, unit);
+  // معاينة مخرجات وحدة سابقة من داخل «الوثيقة الاستراتيجية» (للقراءة فقط)
+  const openUnitPreview = async (stageName) => {
+    const target = allUnits.find(u => u.name === stageName) || allUnits.find(u => (u.name || '').includes(stageName));
+    if (!target) return;
+    setPreview({ name: stageName, loading: true });
+    try {
+      const res = await strategicApi.getUnit(workflowId, target.unit_number);
+      setPreview({ name: stageName, loading: false, unit: res.data.unit, submission: res.data.submission });
+    } catch {
+      setPreview({ name: stageName, loading: false, error: 'تعذّر تحميل مخرجات هذه الوحدة. حاول مرة أخرى.' });
+    }
+  };
 
   if (loading) return (
     <div style={{ textAlign: 'center', padding: 80, color: colors.primary }}>جاري تحميل الوحدة...</div>
@@ -120,45 +247,60 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
   const st       = STATUS_MAP[submission.status] || STATUS_MAP.not_started;
   // فقط الوحدة المعتمدة نهائياً (approved) تُقفل — باقي الحالات قابلة للتعديل
   const isLocked = submission.status === 'approved';
+  lockedRef.current = isLocked;
 
   // الوحدة التالية تُتاح فقط بعد إرسال الحالية (submitted أو أعلى)
-  const SUBMITTED_STATUSES = ['submitted', 'reviewing', 'revision', 'approved'];
   const currentSubmitted   = SUBMITTED_STATUSES.includes(submission.status);
 
   const currentIdx = allUnits.findIndex(u => u.unit_number === unitSummary.unit_number);
   const prevUnit   = currentIdx > 0 ? allUnits[currentIdx - 1] : null;
   const nextUnit   = currentIdx < allUnits.length - 1 ? allUnits[currentIdx + 1] : null;
 
-  const goToUnit = (target) => {
-    if (onNavigate) onNavigate(target);
+  const openForms = () => {
+    setTab(5);
+    setTimeout(() => formAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   };
+
+  const submitLabel = submission.status === 'revision'
+    ? 'إعادة الإرسال للمراجعة ←'
+    : (submission.status === 'submitted' || submission.status === 'reviewing' ? 'إعادة الإرسال ←' : 'إرسال للمراجعة ←');
+
+  const DRAFT_LINE = {
+    dirty:    { text: 'تغييرات غير محفوظة — تُحفظ تلقائيًا خلال لحظات', color: '#8C97A3' },
+    saving:   { text: 'جارٍ حفظ المسودة…', color: '#1B5E9E' },
+    saved:    { text: 'حُفظت المسودة', color: '#0B7F5D' },
+    error:    { text: 'تعذّر حفظ المسودة — ما كتبته محفوظ في هذا المتصفح، اضغط «حفظ» لإعادة المحاولة', color: '#C53A3A' },
+    restored: { text: 'استعدنا ما كتبته قبل انقطاع الحفظ — اضغط «حفظ» لإرساله إلى حسابك', color: '#A33F12' },
+  };
+  const draftLine = !isLocked ? DRAFT_LINE[draft] : null;
 
   return (
     <div className="animate-in">
       {/* رأس الصفحة */}
       <div style={{ background: '#fff', borderRadius: 12, padding: '14px 20px', marginBottom: 14, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', display: 'flex', alignItems: 'center', gap: 12 }}>
         <button
-          onClick={onBack}
+          onClick={handleBack}
           style={{ padding: '7px 14px', background: '#F3EFE8', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontFamily: "inherit", color: '#334452', whiteSpace: 'nowrap' }}
         >
           ← رجوع
         </button>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
             <div style={{ width: 30, height: 30, borderRadius: '50%', background: colors.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>
               {unitSummary.unit_number}
             </div>
             <h2 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, margin: 0, display: 'flex', alignItems: 'center' }}>{unit.name}<Help term={unit.template_type} /></h2>
             <span style={{ fontSize: 11, color: '#8C97A3' }}>الوحدة {unitSummary.unit_number} من {allUnits.length || '?'}</span>
           </div>
-          <div style={{ fontSize: 11, color: '#8C97A3', marginTop: 3, marginRight: 40 }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />{unit.video_duration}</div>
+          {unit.video_duration && (
+            <div style={{ fontSize: 11, color: '#8C97A3', marginTop: 3, marginRight: 40 }}><DfIcon name="timer" size={14} style={{ marginInlineEnd: 6 }} />{unitTimeLabel(unit.video_duration)}</div>
+          )}
         </div>
-        <span style={{ fontSize: 11, padding: '4px 12px', borderRadius: 20, fontWeight: 600, color: st.color, background: st.color + '18', whiteSpace: 'nowrap' }}>{st.label}</span>
+        <span data-unit-badge={submission.status || 'not_started'} style={{ fontSize: 11, padding: '4px 12px', borderRadius: 20, fontWeight: 600, color: st.color, background: st.color + '18', whiteSpace: 'nowrap' }}>{st.label}</span>
       </div>
 
       {/* التنقل بين الوحدات */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
-        {/* زر الوحدة السابقة — متاح دائماً */}
         {prevUnit ? (
           <button
             onClick={() => goToUnit(prevUnit)}
@@ -168,7 +310,6 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
           </button>
         ) : <div />}
 
-        {/* زر الوحدة التالية — يظهر فقط بعد إرسال الحالية */}
         {nextUnit && currentSubmitted ? (
           <button
             onClick={() => goToUnit(nextUnit)}
@@ -185,7 +326,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
         )}
       </div>
 
-      {/* حالة الوحدة بوضوح: أُرسلت وبانتظار المستشار / معتمدة / مسودة لم تُرسل */}
+      {/* حالة الوحدة بوضوح */}
       {['submitted', 'reviewing'].includes(submission.status) && (
         <div role="status" style={{ background: '#CFE5FA', border: '1.5px solid #9CC9F2', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#1B5E9E', fontWeight: 700, lineHeight: 1.8, display: 'flex', alignItems: 'center', gap: 8 }}>
           <DfIcon name="check" size={18} />
@@ -198,20 +339,26 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
         </div>
       )}
       {submission.status === 'in_progress' && (
-        <div role="status" style={{ background: '#FEF3EC', border: '1.5px solid #FBC3A3', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#A33F12', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <DfIcon name="save" size={18} />بياناتك محفوظة كمسودة ولم تُرسل للمراجعة بعد — أكملها ثم اضغط «إرسال للمراجعة» في تبويب «نماذج العمل».
+        <div role="status" style={{ background: '#FEF3EC', border: '1.5px solid #FBC3A3', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#A33F12', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <DfIcon name="save" size={18} />
+          <span style={{ flex: 1 }}>حُفظت إجاباتك كمسودة ولم تُرسل للمراجعة بعد — يمكنك إكمالها لاحقًا أو إرسالها للمراجعة من تبويب «نماذج العمل».</span>
         </div>
       )}
 
-      {/* ملاحظة المستشار — تظهر فقط عند status=revision */}
-      {submission.status === 'revision' && submission.consultant_notes && (
-        <div style={{ background: '#FCEBEB', border: '1px solid #F1B2B2', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#C53A3A' }}>
-          <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />ملاحظة المستشار: {submission.consultant_notes}
+      {/* ملاحظة المستشار — تبقى ظاهرة مع حالة «يحتاج تعديل» حتى يُعاد الإرسال */}
+      {submission.status === 'revision' && (
+        <div role="alert" data-consultant-note style={{ background: '#FCEBEB', border: '1px solid #F1B2B2', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#C53A3A', lineHeight: 1.8 }}>
+          <div style={{ fontWeight: 700, marginBottom: 4 }}><DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />ملاحظة المستشار</div>
+          <div style={{ color: '#7F1D1D' }}>{submission.consultant_notes || 'طلب المستشار تعديل هذه الوحدة.'}</div>
+          <div style={{ marginTop: 8, display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+            <button type="button" onClick={openForms} style={{ padding: '7px 16px', background: colors.amber, color: '#0E2A3D', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>فتح نماذج العمل ←</button>
+            <span style={{ fontSize: 12, color: '#7F1D1D' }}>عدّل المطلوب ثم اضغط «إعادة الإرسال للمراجعة».</span>
+          </div>
         </div>
       )}
 
       {/* التبويبات */}
-      <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', overflow: 'hidden' }}>
+      <div ref={formAreaRef} style={{ background: '#fff', borderRadius: 12, boxShadow: '0 1px 8px rgba(14,42,61,0.06)', overflow: 'hidden' }}>
         <div style={{ display: 'flex', borderBottom: '2px solid #F3EFE8', overflowX: 'auto' }}>
           {TABS.map(t => (
             <button
@@ -243,7 +390,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
               formData={formData}
               setFormData={setFormData}
               disabled={isLocked}
-              context={{ plan_period: unitData?.plan_period }}
+              context={{ plan_period: unitData?.plan_period, workflowId, openUnitPreview: unit.template_type === 'document' ? openUnitPreview : undefined }}
             />
           )}
         </div>
@@ -251,18 +398,18 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
 
       {/* رسائل — عبر Portal تختفي تلقائياً */}
       {msg && ReactDOM.createPortal(
-        <div style={{
+        <div role="status" style={{
           position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)',
           background: msg.type === 'success' ? '#0B7F5D' : '#C53A3A',
-          color: '#fff', borderRadius: 12, padding: '14px 32px',
-          fontSize: 15, fontWeight: 700,
+          color: '#fff', borderRadius: 12, padding: '14px 24px',
+          fontSize: 14, fontWeight: 700, maxWidth: 'min(92vw, 560px)', lineHeight: 1.7,
           boxShadow: '0 8px 30px rgba(14,42,61,0.25)',
-          zIndex: 999999, whiteSpace: 'nowrap',
+          zIndex: 999999,
           display: 'flex', alignItems: 'center', gap: 10,
           animation: 'fadeInUp 0.3s ease',
         }}>
-          <span style={{ fontSize: 18 }}>{msg.type === 'success' ? <DfIcon name="check" size={20} /> : <DfIcon name="x" size={20} />}</span>
-          {msg.text}
+          <span style={{ fontSize: 18, flexShrink: 0 }}>{msg.type === 'success' ? <DfIcon name="check" size={20} /> : <DfIcon name="x" size={20} />}</span>
+          <span>{msg.text}</span>
         </div>,
         document.body
       )}
@@ -270,11 +417,11 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
       {/* أزرار الحفظ والإرسال */}
       {tab === 5 && (
         <div style={{ marginTop: 20 }}>
-          {/* رسالة الحقول المطلوبة */}
+          {/* الحقول اللازمة للإرسال (حفظ المسودة متاح دائمًا) */}
           {!isLocked && !validation.valid && (
-            <div style={{ background: '#FEF3EC', border: '1.5px solid #FBC3A3', borderRadius: 10, padding: '12px 16px', marginBottom: 14, direction: 'rtl' }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#A33F12', marginBottom: 6 }}>
-                <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />يجب تعبئة الحقول التالية قبل الحفظ:
+            <div data-missing-fields style={{ background: showErrors ? '#FCEBEB' : '#FEF3EC', border: `1.5px solid ${showErrors ? '#F1B2B2' : '#FBC3A3'}`, borderRadius: 10, padding: '12px 16px', marginBottom: 14, direction: 'rtl' }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: showErrors ? '#C53A3A' : '#A33F12', marginBottom: 6 }}>
+                <DfIcon name="warning" size={18} style={{ marginInlineEnd: 6 }} />يجب إكمال ما يلي قبل «الإرسال للمراجعة» — ويمكنك حفظ المسودة الآن:
               </div>
               <ul style={{ margin: 0, padding: '0 20px', fontSize: 12, color: '#7F310E', lineHeight: 2 }}>
                 {validation.errors.map((err, i) => (
@@ -283,11 +430,15 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
               </ul>
             </div>
           )}
+          {!isLocked && validation.warnings?.length > 0 && (
+            <div data-soft-warning style={{ background: '#EAF4FD', border: '1px solid #A9D2F5', borderRadius: 10, padding: '10px 16px', marginBottom: 14, fontSize: 12.5, color: '#1A65AD', lineHeight: 1.8 }}>
+              {validation.warnings.map((w, i) => <div key={i}>{w}</div>)}
+            </div>
+          )}
 
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', alignItems: 'center' }}>
             {!isLocked && (
               <>
-                {/* زر التعبئة التجريبية */}
                 {DEMO_DATA[unit.template_type] && (
                   <>
                     <button
@@ -307,44 +458,39 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
                 )}
                 <button
                   onClick={handleSave}
-                  disabled={saving || !validation.valid}
-                  title={!validation.valid ? 'يجب تعبئة جميع الحقول المطلوبة أولاً' : ''}
+                  disabled={saving}
+                  title="يحفظ ما كتبته كمسودة حتى لو بقيت خانات فارغة"
                   style={{
                     padding: '11px 28px',
-                    background: validation.valid ? '#F3EFE8' : '#E8E3DA',
-                    color: validation.valid ? '#334452' : '#8C97A3',
+                    background: '#F3EFE8', color: '#334452',
                     border: '1.5px solid #E8E3DA',
                     borderRadius: 10, fontSize: 14, fontWeight: 600,
-                    cursor: validation.valid && !saving ? 'pointer' : 'not-allowed',
+                    cursor: saving ? 'wait' : 'pointer',
                     fontFamily: "inherit",
-                    opacity: validation.valid ? 1 : 0.65,
+                    opacity: saving ? 0.75 : 1,
                     transition: 'all 0.2s',
                   }}
                 >
-                  {saving ? 'جاري الحفظ...' : 'حفظ'}
+                  {saving ? 'جارٍ حفظ المسودة…' : 'حفظ'}
                 </button>
                 <button
                   onClick={handleSubmit}
-                  disabled={submitting || !validation.valid}
-                  title={!validation.valid ? 'يجب تعبئة جميع الحقول المطلوبة أولاً' : ''}
+                  disabled={submitting}
+                  title={!validation.valid ? 'أكمل الحقول المطلوبة أولاً' : ''}
+                  data-can-submit={validation.valid ? '1' : '0'}
                   style={{
                     padding: '11px 28px',
                     background: validation.valid ? colors.amber : '#E8E3DA',
                     color: validation.valid ? '#0E2A3D' : '#8C97A3',
                     border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700,
-                    cursor: validation.valid && !submitting ? 'pointer' : 'not-allowed',
+                    cursor: submitting ? 'wait' : 'pointer',
                     fontFamily: "inherit",
-                    opacity: validation.valid ? 1 : 0.65,
+                    opacity: validation.valid ? 1 : 0.75,
                     transition: 'all 0.2s',
                   }}
                 >
-                  {submitting ? 'جاري الإرسال...' : (
-                    submission.status === 'submitted' || submission.status === 'reviewing'
-                      ? 'إعادة الإرسال ←'
-                      : 'إرسال للمراجعة ←'
-                  )}
+                  {submitting ? 'جاري الإرسال...' : submitLabel}
                 </button>
-                {/* زر الانتقال للتالي متاح بعد الإرسال */}
                 {currentSubmitted && nextUnit && (
                   <button
                     onClick={() => goToUnit(nextUnit)}
@@ -355,7 +501,6 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
                 )}
               </>
             )}
-            {/* وحدة معتمدة — فقط التالي */}
             {isLocked && nextUnit && (
               <button
                 onClick={() => goToUnit(nextUnit)}
@@ -365,6 +510,11 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
               </button>
             )}
           </div>
+          {draftLine && (
+            <div data-draft-state={draft} role="status" style={{ textAlign: 'center', fontSize: 12, color: draftLine.color, marginTop: 10, fontWeight: 600 }}>
+              {draftLine.text}
+            </div>
+          )}
         </div>
       )}
 
@@ -372,6 +522,33 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
         <div style={{ background: '#C9EFE1', border: '1px solid #7FD3B5', borderRadius: 10, padding: '10px 16px', marginTop: 14, fontSize: 13, color: '#0B7F5D', textAlign: 'center' }}>
           <DfIcon name="check" size={18} style={{ marginInlineEnd: 6 }} />هذه الوحدة معتمدة نهائياً من المستشار
         </div>
+      )}
+
+      {/* لوحة معاينة مخرجات وحدة سابقة (من نموذج الوثيقة) */}
+      {preview && ReactDOM.createPortal(
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9998, display: 'flex', justifyContent: 'flex-start' }} onClick={() => setPreview(null)}>
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(14,42,61,0.35)' }} />
+          <aside role="dialog" aria-label={`مخرجات ${preview.name}`} onClick={e => e.stopPropagation()}
+            style={{ position: 'relative', width: 'min(640px, 100%)', height: '100%', background: '#fff', boxShadow: '0 0 40px rgba(14,42,61,0.25)', display: 'flex', flexDirection: 'column', direction: 'rtl' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #E8E3DA', gap: 10 }}>
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: colors.ink }}>{preview.name}</div>
+                <div style={{ fontSize: 11.5, color: '#8C97A3' }}>مخرجاتك المحفوظة في هذه الخطة — للقراءة فقط، ونصّ الوثيقة الذي تكتبه يبقى كما هو</div>
+              </div>
+              <button type="button" onClick={() => setPreview(null)} style={{ padding: '7px 14px', background: '#F3EFE8', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit', color: '#334452' }}>إغلاق ✕</button>
+            </div>
+            <div style={{ flex: 1, overflow: 'auto', padding: 18 }}>
+              {preview.loading && <div style={{ textAlign: 'center', padding: 40, color: colors.primary }}>جارٍ تحميل المخرجات…</div>}
+              {preview.error && <div style={{ color: '#C53A3A', fontSize: 13 }}>{preview.error}</div>}
+              {!preview.loading && !preview.error && preview.unit && (
+                preview.submission?.form_data && Object.keys(preview.submission.form_data).length > 0
+                  ? <TemplateRenderer unit={preview.unit} formData={preview.submission.form_data} setFormData={() => {}} disabled context={{}} />
+                  : <div style={{ fontSize: 13, color: '#8C97A3', padding: 20, textAlign: 'center' }}>لم تُحفظ إجابات بعد في هذه الوحدة.</div>
+              )}
+            </div>
+          </aside>
+        </div>,
+        document.body
       )}
     </div>
   );
@@ -406,15 +583,11 @@ function TabDescription({ unit }) {
   return (
     <div>
       <div style={{ fontSize: 15, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>الشرح المكتوب</div>
-
-      {/* نص الشرح المكتوب من الأدمين */}
       {hasText && (
         <p style={{ fontSize: 14, color: '#334452', lineHeight: 1.9, marginBottom: hasTopics ? 20 : 0, whiteSpace: 'pre-line' }}>
           {unit.written_description}
         </p>
       )}
-
-      {/* محاور منظمة (بيانات ثابتة من DB) */}
       {hasTopics && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {topics.map((topic, i) => (
@@ -425,8 +598,6 @@ function TabDescription({ unit }) {
           ))}
         </div>
       )}
-
-      {/* حالة فارغة */}
       {!hasText && !hasTopics && (
         <p style={{ color: '#8C97A3', fontSize: 13 }}>لا يوجد شرح مكتوب لهذه الوحدة بعد</p>
       )}

@@ -16,9 +16,9 @@ export default function StepApproval({ workflow, navigate, workflowId }) {
     try {
       const res = await strategicApi.getPdfLink(workflowId);
       win.location.href = res.data.url;
-    } catch (err) {
+    } catch {
       win.close();
-      setError('حدث خطأ أثناء توليد الوثيقة. حاول مرة أخرى.');
+      setError('تعذّر تجهيز الوثيقة. حاول مرة أخرى.');
     } finally {
       setGenerating(false);
     }
@@ -56,8 +56,9 @@ export default function StepApproval({ workflow, navigate, workflowId }) {
           {generating ? 'جارٍ التحضير…' : '⬇ تحميل الوثيقة PDF'}
         </button>
         {error && (
-          <div style={{ marginTop: 12, fontSize: 13, color: '#C53A3A', background: '#FCEBEB', padding: '8px 14px', borderRadius: 8 }}>
-            {error}
+          <div role="alert" style={{ marginTop: 12, fontSize: 13, color: '#C53A3A', background: '#FCEBEB', padding: '8px 14px', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <span>{error}</span>
+            <button type="button" onClick={handleDownload} style={{ padding: '6px 14px', background: '#fff', border: '1px solid #E88E8E', color: '#C53A3A', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>إعادة المحاولة</button>
           </div>
         )}
       </div>

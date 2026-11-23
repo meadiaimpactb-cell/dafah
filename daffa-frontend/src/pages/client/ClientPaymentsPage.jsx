@@ -29,7 +29,7 @@ const ClientPaymentsPage = () => {
       win.location.href = res.data.url;
     } catch {
       win.close();
-      alert('حدث خطأ أثناء تحميل الفاتورة، حاول مرة أخرى.');
+      alert('تعذّر فتح الفاتورة. حاول مرة أخرى.');
     } finally {
       setDownloading(null);
     }

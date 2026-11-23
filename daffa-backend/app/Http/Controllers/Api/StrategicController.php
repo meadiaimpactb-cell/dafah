@@ -33,6 +33,9 @@ class StrategicController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // رقم ثابت لكل خطة بترتيب إنشائها (لا يتغير عند إنشاء خطة جديدة)
+        $workflows = $this->withPlanNumbers($workflows);
+
         // منع إنشاء خطة جديدة إذا كانت هناك خطة لم تُستكمل تعبئة جميع وحداتها
         $unitCount = StrategicUnit::count();
         $hasIncomplete = $workflows->contains(
@@ -331,16 +334,15 @@ class StrategicController extends Controller
             return response()->json(['message' => 'الوحدة معتمدة نهائياً ولا يمكن تعديلها.'], 422);
         }
 
-        $newStatus = in_array($submission->status, ['not_started', 'revision'])
-            ? 'in_progress'
-            : $submission->status;
+        // حفظ المسودة لا يغيّر حالة وحدة «تحتاج تعديل»: تبقى الملاحظة والحالة ظاهرتين حتى يعيد العميل الإرسال
+        $newStatus = $submission->status === 'not_started' ? 'in_progress' : $submission->status;
 
         $submission->update([
             'form_data' => $request->form_data,
             'status' => $newStatus,
         ]);
 
-        return response()->json(['submission' => $submission]);
+        return response()->json(['submission' => $submission->fresh()]);
     }
 
     // ── POST /api/strategic/units/{id}/submit ─────────────────────────────────
@@ -395,20 +397,28 @@ class StrategicController extends Controller
     // ── GET /api/strategic/workflow/progress ──────────────────────────────────
     public function progress(Request $request)
     {
-        $workflow = $this->userWorkflow($request);
+        $workflow = $this->currentWorkflow($request);
         $workflow->load('consultant');
 
-        $total = UnitSubmission::where('workflow_id', $workflow->id)->count();
-        $approved = UnitSubmission::where('workflow_id', $workflow->id)->where('status', 'approved')->count();
+        $subs = UnitSubmission::with('unit:id,name,unit_number')->where('workflow_id', $workflow->id)->orderBy('unit_number')->get();
+        $total = $subs->count();
+        $approved = $subs->where('status', 'approved')->count();
         $percent = $total > 0 ? round(($approved / $total) * 100) : 0;
+        $brief = fn ($s) => ['unit_number' => $s->unit_number, 'name' => $s->unit?->name, 'status' => $s->status, 'consultant_notes' => $s->consultant_notes, 'revision_count' => (int) $s->revision_count];
 
         return response()->json([
+            'workflow_id' => $workflow->id,
             'current_step' => $workflow->current_step,
             'status' => $workflow->status,
             'total_units' => $total,
             'approved_units' => $approved,
+            'submitted_units' => $subs->whereIn('status', ['submitted', 'reviewing', 'approved'])->count(),
             'progress_percent' => $percent,
             'consultant' => $workflow->consultant,
+            // لوحة التحكم تبني «خطوتك التالية» من الحالة الفعلية للوحدات لا من الإشعارات
+            'revision_units' => $subs->where('status', 'revision')->map($brief)->values(),
+            'in_review_units' => $subs->whereIn('status', ['submitted', 'reviewing'])->map($brief)->values(),
+            'next_unit' => ($n = $subs->first(fn ($s) => in_array($s->status, ['not_started', 'in_progress']))) ? $brief($n) : null,
         ]);
     }
 
@@ -524,6 +534,27 @@ class StrategicController extends Controller
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    /** الخطة التي يعمل عليها العميل الآن: الجارية أولًا ثم أحدث مكتملة (للوحة التحكم عند غياب workflow_id) */
+    private function currentWorkflow(Request $request): StrategicWorkflow
+    {
+        if ($request->input('workflow_id')) {
+            return $this->userWorkflow($request);
+        }
+
+        return StrategicWorkflow::where('user_id', $request->user()->id)
+            ->orderByRaw("(status = 'completed') ASC")
+            ->orderBy('id', 'desc')
+            ->firstOrFail();
+    }
+
+    /** رقم الخطة = ترتيبها بين خطط المستخدم حسب تاريخ الإنشاء (ثابت مهما تغيّر ترتيب العرض) */
+    private function withPlanNumbers($workflows)
+    {
+        $order = $workflows->sortBy([['created_at', 'asc'], ['id', 'asc']])->values()->pluck('id')->flip();
+
+        return $workflows->each(fn ($wf) => $wf->setAttribute('plan_number', ($order[$wf->id] ?? 0) + 1));
+    }
 
     // يعيد workflow محدد أو null إن لم يوجد (للـ page-data/getWorkflow)
     private function resolveWorkflow(Request $request): ?StrategicWorkflow

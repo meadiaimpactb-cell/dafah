@@ -98,7 +98,8 @@ export default function Logo({ variant = 'horizontal', tone = 'light', size = 40
 /** شكل الدفّة للزخرفة (علامة مائية، مؤشر تحميل، علامة قبل العناوين) */
 export function RosetteShape({ size = 120, color = BRAND.blue, hub, opacity = 1, className, style }) {
   return (
-    <svg aria-hidden="true" className={className} width={size} height={size} viewBox={`0 0 ${R.w} ${R.w}`} style={{ display: 'block', opacity, flexShrink: 0, ...style }}>
+    // زخرفة بحتة: لا تلتقط النقر حتى لا تحجب الأزرار التي تعلوها (مثل «افتح الملاحظات» في لوحة التحكم)
+    <svg aria-hidden="true" className={className} width={size} height={size} viewBox={`0 0 ${R.w} ${R.w}`} style={{ display: 'block', opacity, flexShrink: 0, pointerEvents: 'none', ...style }}>
       <RosetteArt fill={color} hub={hub} />
     </svg>
   );
