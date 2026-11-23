@@ -20,6 +20,48 @@ use Illuminate\Support\Facades\Storage;
 
 class PortalController extends Controller
 {
+    /** @var array<string, array> رقم كل خطة محسوب مرة واحدة لكل طلب */
+    private array $planCache = [];
+
+    /**
+     * هوية الخطة التي يتبعها الطلب: اسمها برقمها الثابت (ترتيب إنشائها بين خطط العميل كما يراه العميل)،
+     * ومرجع لا يتغير، وتاريخ إنشائها — حتى يميّز المستشار بين خطتين للعميل نفسه.
+     */
+    private function planMeta(?object $workflow, string $kind): array
+    {
+        if (! $workflow) {
+            return [];
+        }
+        $key = $kind.':'.$workflow->id;
+        if (! isset($this->planCache[$key])) {
+            [$class, $label, $prefix] = match ($kind) {
+                'operational' => [OperationalWorkflow::class, 'الخطة التشغيلية', 'OP'],
+                'policies' => [PolicyWorkflow::class, 'خطة السياسات', 'PL'],
+                default => [StrategicWorkflow::class, 'الخطة الاستراتيجية', 'ST'],
+            };
+            $number = $class::where('user_id', $workflow->user_id)
+                ->where(fn ($q) => $q->where('created_at', '<', $workflow->created_at)
+                    ->orWhere(fn ($q2) => $q2->where('created_at', $workflow->created_at)->where('id', '<=', $workflow->id)))
+                ->count();
+            $this->planCache[$key] = [
+                'plan_number' => $number,
+                'plan_label' => "{$label} #{$number}",
+                'plan_ref' => $prefix.'-'.$workflow->id,
+                'plan_created_at' => $workflow->created_at?->format('Y/m/d'),
+            ];
+        }
+
+        return $this->planCache[$key];
+    }
+
+    /** ملاحظة الجولة السابقة: تُعرض للمستشار عند مراجعة نسخة أعاد العميل إرسالها، ولا تُوضع في خانة الرد الجديد */
+    private function previousNotes(object $s): ?string
+    {
+        return in_array($s->status, ['submitted', 'reviewing'], true) && (int) $s->revision_count > 0 && $s->consultant_notes
+            ? $s->consultant_notes
+            : null;
+    }
+
     private function consultant(Request $request): Consultant
     {
         return Consultant::where('user_id', $request->user()->id)->firstOrFail();
@@ -542,7 +584,8 @@ class PortalController extends Controller
             'org_type' => $s->workflow?->user?->org_type,
             'avatar' => mb_substr($s->workflow?->user?->org_name ?? '?', 0, 1),
             'service_type' => 'operational',
-        ];
+            'previous_notes' => $this->previousNotes($s),
+        ] + $this->planMeta($s->workflow, 'operational');
     }
 
     private function checkOpWorkflowCompletion(int $workflowId): void
@@ -585,7 +628,10 @@ class PortalController extends Controller
             'org_type' => $s->workflow?->user?->org_type,
             'avatar' => mb_substr($s->workflow?->user?->org_name ?? '?', 0, 1),
             'service_type' => 'strategic',
-        ];
+            // صفوف الجدول بالترتيب الذي يراه العميل — يُشتق منها ملخص القوة والضعف عند المستشار
+            'unit_rows' => $s->unit?->table_rows ?: null,
+            'previous_notes' => $this->previousNotes($s),
+        ] + $this->planMeta($s->workflow, 'strategic');
     }
 
     private function formatPolSelection(PolicySelection $s, $typeMap): array
@@ -611,7 +657,8 @@ class PortalController extends Controller
             'org_type' => $s->workflow?->user?->org_type,
             'avatar' => mb_substr($s->workflow?->user?->org_name ?? '?', 0, 1),
             'service_type' => 'policy',
-        ];
+            'previous_notes' => $this->previousNotes($s),
+        ] + $this->planMeta($s->workflow, 'policies');
     }
 
     private function checkPolWorkflowCompletion(int $workflowId): void

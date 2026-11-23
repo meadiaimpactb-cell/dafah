@@ -9,6 +9,19 @@ import { isVisible as policyQuestionVisible } from '../policies/questionRules';
 import { usePermissions } from '../../utils/permissions';
 import { IcCheckCircle, IcArrowPath, IcWarning, IcXMark, IcSparkles, IcClipboard, IcPalette, IcLock, IcEye, IcDocument } from '../../utils/icons';
 import { asObject } from '../../utils/apiData';
+import { useIsPhone } from '../../utils/useMediaQuery';
+
+/** هوية الخطة التي يتبعها الطلب: اسمها برقمها الثابت ومرجعها وتاريخ إنشائها */
+const PlanTag = ({ item, compact }) => {
+  if (!item?.plan_label) return null;
+  return (
+    <span data-plan-tag style={{ display: 'inline-flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, fontSize: compact ? 10.5 : 11.5, color: '#1A65AD', fontWeight: 600 }}>
+      <span style={{ padding: '1px 8px', borderRadius: 10, background: '#EAF4FD', border: '1px solid #A9D2F5' }}>{item.plan_label}</span>
+      {item.plan_ref && <span style={{ color: colors.gray, fontWeight: 500 }} title="مرجع الخطة الثابت">المرجع {item.plan_ref}</span>}
+      {item.plan_created_at && <span style={{ color: colors.gray, fontWeight: 500 }}>· أُنشئت {item.plan_created_at}</span>}
+    </span>
+  );
+};
 
 const colors = {
   primary: '#235D7F', ink: '#0E2A3D',
@@ -196,10 +209,11 @@ const ConfirmModal = ({ type, unitName, orgName, onConfirm, onCancel }) => {
 };
 
 // ── Detail Panel ───────────────────────────────────────────────────────────────
-const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, onReviewed }) => {
+const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, onReviewed, isPhone }) => {
   const [sub,                  setSub]                  = useState(initialData || null);
   const [subLoading,           setSubLoading]           = useState(!initialData?.form_data);
-  const [notes,                setNotes]                = useState(initialData?.consultant_notes || '');
+  // خانة الرد تبدأ فارغة دائمًا؛ ملاحظة الجولة السابقة تُعرض منفصلة (previous_notes)
+  const [notes,                setNotes]                = useState('');
   const [saving,               setSaving]               = useState(false);
   const [toast,                setToast]                = useState(null);
   const [confirm,              setConfirm]              = useState(null);
@@ -224,7 +238,6 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
       .then(r => {
         const d = asObject(r.data);
         setSub(d);
-        setNotes(d?.consultant_notes || '');
         setSubLoading(false);
         if (isPol && r.data.policy_type_id) {
           api.get(`/questionnaire/${r.data.policy_type_id}`)
@@ -275,9 +288,16 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
 
   return (
     <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* على الجوال: التفاصيل بعرض الشاشة مع زر واضح للعودة إلى القائمة */}
+      {isPhone && (
+        <button type="button" onClick={onClose} data-back-to-list
+          style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '12px 14px 0', padding: '8px 14px', borderRadius: 10, border: `1.5px solid ${colors.primary}`, background: 'white', color: colors.primary, fontSize: 13, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', alignSelf: 'flex-start' }}>
+          → {mode === 'pending' ? 'العودة إلى المراجعات المعلقة' : 'العودة إلى المراجعات المكتملة'}
+        </button>
+      )}
       {/* Header */}
-      <div style={{ padding: '14px 20px', borderBottom: `1px solid ${colors.grayBorder}`, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0 }}>
-        <div>
+      <div style={{ padding: '14px 20px', borderBottom: `1px solid ${colors.grayBorder}`, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0, gap: 10 }}>
+        <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: colors.ink }}>
             {sub ? isPol ? sub.policy_name : `${sub.unit_number}. ${sub.unit_name}` : '…'}
           </div>
@@ -286,6 +306,7 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
             {isOp && <span style={{ marginRight: 8, padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: '#FEF3EC', color: '#A33F12' }}>تشغيلي</span>}
             {isPol && <span style={{ marginRight: 8, padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: '#E8F8F2', color: '#0B7F5D' }}>سياسة</span>}
           </div>
+          {sub?.plan_label && <div style={{ marginTop: 6 }}><PlanTag item={sub} /></div>}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           {sub && <StatusBadge status={sub.status} />}
@@ -303,7 +324,7 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
             <h4 style={{ fontSize: 13, fontWeight: 700, color: colors.ink, margin: '0 0 12px' }}>{isPol ? 'إجابات استبيان السياسة' : 'عمل العميل'}</h4>
             {subLoading
               ? <div style={{ padding: 20, textAlign: 'center', color: colors.gray, fontSize: 13 }}>جارٍ تحميل بيانات العمل…</div>
-              : isPol ? <PolicyFormViewer formData={sub.form_data} questionnaireSections={questionnaireSections} /> : <FormDataViewer data={sub.form_data} template={sub.unit_template} />
+              : isPol ? <PolicyFormViewer formData={sub.form_data} questionnaireSections={questionnaireSections} /> : <FormDataViewer data={sub.form_data} template={sub.unit_template} unitRows={sub.unit_rows} />
             }
           </div>
 
@@ -339,12 +360,30 @@ const DetailPanel = ({ submissionId, initialData, mode, serviceType, onClose, on
               ) : (
                 /* حالة: submitted / reviewing — أدوات المراجعة */
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: colors.ink, display: 'block', marginBottom: 6 }}>الملاحظات</label>
+                  {sub.previous_notes && (
+                    <div data-previous-note style={{ marginBottom: 12 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>ملاحظتك في المراجعة السابقة</div>
+                      <div style={{ padding: '10px 14px', background: colors.grayLight, borderRadius: 8, border: `1px solid ${colors.grayBorder}`, fontSize: 13, color: '#334452', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+                        {sub.previous_notes}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 6, flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: 11, color: colors.gray }}>أعاد العميل إرسال الوحدة بعد هذه الملاحظة. راجع النسخة المصححة أعلاه.</span>
+                        <button type="button" onClick={() => setNotes(sub.previous_notes)}
+                          style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontFamily: 'inherit', background: 'white', color: colors.primary, border: `1px solid ${colors.primary}`, cursor: 'pointer', fontWeight: 600 }}>
+                          استخدام الملاحظة السابقة
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  <label htmlFor={`review-notes-${submissionId}`} style={{ fontSize: 12, fontWeight: 600, color: colors.ink, display: 'block', marginBottom: 6 }}>
+                    {sub.previous_notes ? 'ملاحظة جديدة للعميل' : 'الملاحظات'}
+                  </label>
                   <textarea
+                    id={`review-notes-${submissionId}`}
                     value={notes}
                     onChange={e => setNotes(e.target.value)}
                     rows={4}
-                    placeholder="اكتب ملاحظاتك هنا…"
+                    placeholder={sub.previous_notes ? 'اكتب ملاحظتك على النسخة المصححة…' : 'اكتب ملاحظاتك هنا…'}
                     style={{ width: '100%', padding: 10, borderRadius: 8, border: `1px solid ${colors.grayBorder}`, fontFamily: "inherit", fontSize: 13, resize: 'vertical', boxSizing: 'border-box', marginBottom: 8 }}
                   />
 
@@ -593,6 +632,19 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
   const [selectedData, setSelectedData] = useState(null);
   const [search,       setSearch]       = useState('');
   const prefetchCache  = React.useRef({});
+  const rowRefs        = React.useRef({});
+  const isPhone        = useIsPhone();
+
+  // فتح/إغلاق التفاصيل؛ عند الإغلاق يعود التركيز إلى الصف نفسه (لوحة المفاتيح وقارئ الشاشة)
+  const openRow = (s) => {
+    if (selectedId === s.id) { closeDetail(); return; }
+    setSelectedId(s.id); setSelectedData(prefetchCache.current[s.id] || s);
+  };
+  const closeDetail = () => {
+    const id = selectedId;
+    setSelectedId(null); setSelectedData(null);
+    if (id) setTimeout(() => rowRefs.current[id]?.focus(), 30);
+  };
 
   const prefetch = (id, data) => {
     prefetchCache.current[id] = data;
@@ -635,9 +687,12 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
   const filtered = submissions.filter(s => {
     if (clientFilter && s.user_id !== clientFilter.userId) return false;
     if (!search) return true;
-    return s.org_name?.toLowerCase().includes(search.toLowerCase())
-        || s.unit_name?.toLowerCase().includes(search.toLowerCase())
-        || s.policy_name?.toLowerCase().includes(search.toLowerCase());
+    const q = search.toLowerCase();
+    return s.org_name?.toLowerCase().includes(q)
+        || s.unit_name?.toLowerCase().includes(q)
+        || s.policy_name?.toLowerCase().includes(q)
+        || s.plan_label?.toLowerCase().includes(q)
+        || s.plan_ref?.toLowerCase().includes(q);
   });
 
   const isDesign = serviceType === 'design';
@@ -712,9 +767,11 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
       {/* Design requests — standalone panel */}
       {isDesign && <DesignRequestsPanel />}
 
-      {!isDesign && <div style={{ display: 'grid', gridTemplateColumns: selectedId ? '1fr 1fr' : '1fr', gap: 16, flex: 1, minHeight: 0 }}>
+      <style>{`.df-review-row:focus{outline:none}.df-review-row:focus-visible{outline:3px solid ${colors.primary} !important;outline-offset:-3px;background:${colors.primary}10 !important}`}</style>
+      {/* على الجوال: القائمة أو التفاصيل بعرض الشاشة (لا جنبًا إلى جنب) */}
+      {!isDesign && <div style={{ display: 'grid', gridTemplateColumns: selectedId && !isPhone ? '1fr 1fr' : '1fr', gap: 16, flex: 1, minHeight: 0 }}>
         {/* List */}
-        <div style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        {!(isPhone && selectedId) && <div role="list" aria-label={title} style={{ background: 'white', borderRadius: 14, boxShadow: '0 1px 4px rgba(14,42,61,0.07)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           {filtered.length === 0 ? (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: colors.gray, padding: 40 }}>
               <div style={{ marginBottom: 8, color: colors.gray }}>{isPending ? <IcSparkles width={32} height={32}/> : <IcClipboard width={32} height={32}/>}</div>
@@ -724,12 +781,17 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
             <div style={{ flex: 1, overflowY: 'auto' }}>
               {filtered.map((s, i) => (
                 <div key={s.id}
-                  onClick={() => {
-                    if (selectedId === s.id) { setSelectedId(null); setSelectedData(null); }
-                    else { setSelectedId(s.id); setSelectedData(prefetchCache.current[s.id] || s); }
-                  }}
+                  ref={el => { rowRefs.current[s.id] = el; }}
+                  role="button"
+                  tabIndex={0}
+                  className="df-review-row"
+                  aria-expanded={selectedId === s.id}
+                  aria-label={`${s.org_name || ''} — ${isPol ? s.policy_name : `${s.unit_number}. ${s.unit_name}`}${s.plan_label ? ` — ${s.plan_label}` : ''}`}
+                  onClick={() => openRow(s)}
+                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRow(s); } }}
                   style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    display: 'flex', alignItems: isPhone ? 'flex-start' : 'center', justifyContent: 'space-between',
+                    flexDirection: isPhone ? 'column' : 'row', gap: isPhone ? 8 : 0,
                     padding: '14px 18px',
                     borderBottom: i < filtered.length - 1 ? `1px solid ${colors.grayBorder}` : 'none',
                     borderRight: selectedId === s.id ? `3px solid ${colors.primary}` : '3px solid transparent',
@@ -742,18 +804,19 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
                   }}
                   onMouseLeave={e => { if (selectedId !== s.id) e.currentTarget.style.background = 'transparent'; }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, width: isPhone ? '100%' : undefined }}>
                     <div style={{ width: 38, height: 38, borderRadius: 10, background: colors.primary, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 15, flexShrink: 0 }}>
                       {s.avatar}
                     </div>
                     <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: colors.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.org_name}</div>
-                      <div style={{ fontSize: 11, color: colors.gray, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: colors.ink, whiteSpace: isPhone ? 'normal' : 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.org_name}</div>
+                      <div data-unit-name style={{ fontSize: 12, color: '#334452', fontWeight: 600, whiteSpace: isPhone ? 'normal' : 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {isPol ? s.policy_name : `${s.unit_number}. ${s.unit_name}`}
                       </div>
+                      <div style={{ marginTop: 3 }}><PlanTag item={s} compact /></div>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, paddingRight: isPhone ? 50 : 0 }}>
                     <StatusBadge status={s.status} />
                     {s.is_late && <span style={{ color: colors.red, display: 'inline-flex' }}><IcWarning width={12} height={12}/></span>}
                     <span style={{ fontSize: 10, color: colors.gray }}>{isPending ? s.submitted_at : s.reviewed_at}</span>
@@ -762,7 +825,7 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
               ))}
             </div>
           )}
-        </div>
+        </div>}
 
         {/* Detail Panel */}
         {selectedId && (
@@ -772,7 +835,8 @@ export default function ConsultantReviewsPage({ mode = 'pending' }) {
             initialData={selectedData}
             mode={mode}
             serviceType={serviceType}
-            onClose={() => { setSelectedId(null); setSelectedData(null); }}
+            isPhone={isPhone}
+            onClose={closeDetail}
             onReviewed={() => {
               load(true);
               setSelectedId(null);

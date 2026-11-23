@@ -1,4 +1,5 @@
 import DfIcon from '../../components/ui/DfIcon';
+import { useIsPhone } from '../../utils/useMediaQuery';
 
 const colors = {
   primary: '#235D7F', ink: '#0E2A3D', primarySoft: '#D9E8F1',
@@ -28,7 +29,7 @@ const LABELS = {
 
   // BMC
   customer_segments: 'شرائح العملاء / المستفيدين',
-  value_proposition: 'القيمة المقدمة', channels: 'قنوات الوصول',
+  value_proposition: 'القيمة المقترحة للمستفيدين', channels: 'قنوات الوصول',
   relationships: 'علاقات المستفيدين', revenue_streams: 'مصادر التمويل',
   key_resources: 'الموارد الرئيسية', key_activities: 'الأنشطة الرئيسية',
   partners: 'الشركاء الرئيسيون', cost_structure: 'هيكل التكاليف',
@@ -49,10 +50,13 @@ const LABELS = {
   title: 'المسمى الوظيفي', dept: 'القسم / الإدارة',
   reports_to: 'يرفع إلى',
 
-  // وثيقة
+  // وثيقة (بأسماء الحقول نفسها في نموذج العميل)
   executive_summary: 'الملخص التنفيذي',
-  key_findings: 'أبرز النتائج',
-  implementation: 'خطة التنفيذ',
+  key_findings: 'أبرز النتائج والتحليلات',
+  implementation: 'الخطة التنفيذية (ملخص)',
+  monitoring: 'آلية المتابعة والتقييم',
+  closing_notes: 'ملاحظات ختامية',
+  stakeholders_extra: 'أصحاب مصلحة أضافهم العميل',
 
   // PESTEL / احتياجات — لواحق مزدوجة
   desc: 'الوصف', priority: 'الأولوية', source: 'المصدر',
@@ -99,7 +103,31 @@ const ListValue = ({ items }) => (
 );
 
 // ── جدول عام ──────────────────────────────────────────────────────────────────
-const TableView = ({ headers, rows }) => (
+// على الجوال يُعرض كل صف بطاقةً عنوانها الخانة الأولى (المجال/النشاط) وتحته بقية الخانات بأسمائها
+const TableView = ({ headers, rows }) => {
+  const isPhone = useIsPhone();
+  if (isPhone) {
+    return (
+      <div data-viewer-cards style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {rows.map((row, i) => (
+          <div key={i} style={{ border: `1px solid ${colors.grayBorder}`, borderRadius: 8, overflow: 'hidden', background: 'white' }}>
+            <div style={{ padding: '7px 12px', background: colors.primarySoft, fontSize: 12.5, fontWeight: 700, color: colors.ink, overflowWrap: 'anywhere' }}>
+              {row[0] || '—'}
+            </div>
+            <div style={{ padding: '6px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {row.slice(1).map((cell, j) => (
+                <div key={j} style={{ fontSize: 12, lineHeight: 1.7, overflowWrap: 'anywhere' }}>
+                  <span style={{ color: colors.gray, fontWeight: 600 }}>{headers[j + 1]}: </span>
+                  <span style={{ color: '#334452', whiteSpace: 'pre-wrap' }}>{cell || '—'}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return (
   <div style={{ overflowX: 'auto', borderRadius: 8, border: `1px solid ${colors.grayBorder}` }}>
     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
       <thead>
@@ -120,19 +148,23 @@ const TableView = ({ headers, rows }) => (
       </tbody>
     </table>
   </div>
-);
+  );
+};
 
 // ── عارض بيانات SWOT table ────────────────────────────────────────────────────
-const SwotTableViewer = ({ data }) => {
-  const groups = {};
-  Object.entries(data).forEach(([k, v]) => {
-    const [rowKey, colKey] = k.split('__');
-    if (!groups[rowKey]) groups[rowKey] = {};
-    groups[rowKey][colKey] = v;
-  });
-  const rows = Object.entries(groups).map(([row, cols]) => [row, cols.strength || '—', cols.weakness || '—', cols.notes || '—']);
-  return <TableView headers={['المحور', 'نقطة قوة', 'نقطة ضعف', 'ملاحظات']} rows={rows} />;
+/** صفوف جدول الموارد بترتيب الوحدة كما يراه العميل؛ وصفوف إضافية (إن وُجدت) بعدها */
+const swotRowOrder = (table, unitRows) => {
+  const fromData = [...new Set(Object.keys(table || {}).map(k => k.split('__')[0]))];
+  const base = Array.isArray(unitRows) && unitRows.length ? unitRows : [];
+  return [...base, ...fromData.filter(r => !base.includes(r))];
 };
+const SwotTableViewer = ({ data, unitRows }) => {
+  const rows = swotRowOrder(data, unitRows).map(row => [row, data[`${row}__strength`] || '—', data[`${row}__weakness`] || '—', data[`${row}__notes`] || '—']);
+  return <TableView headers={['المجال', 'نقطة القوة', 'نقطة الضعف', 'الملاحظات']} rows={rows} />;
+};
+/** نقاط القوة/الضعف في الملخص تُشتق من صفوف الجدول المرسل (كما تظهر للعميل تلقائيًا) لا من نسخة مخزّنة قديمة */
+const swotPoints = (table, unitRows, col) => swotRowOrder(table, unitRows)
+  .map(r => String(table?.[`${r}__${col}`] ?? '').replace(/\s+/g, ' ').trim()).filter(Boolean);
 
 // ── عارض PESTEL / احتياجات بلواحق مزدوجة ─────────────────────────────────────
 const SuffixTableViewer = ({ data, colKeys, colLabels }) => {
@@ -331,12 +363,22 @@ function OperationalViewer({ template, data }) {
 }
 
 // ── المكوّن الرئيسي ────────────────────────────────────────────────────────────
-export default function FormDataViewer({ data, template }) {
-  if (!data || Object.keys(data).length === 0) {
+const DOC_ORDER = ['executive_summary', 'key_findings', 'implementation', 'monitoring', 'closing_notes'];
+
+export default function FormDataViewer({ data: rawData, template, unitRows }) {
+  if (!rawData || Object.keys(rawData).length === 0) {
     return <p style={{ color: colors.gray, fontSize: 13, textAlign: 'center', padding: 20 }}>لا توجد بيانات</p>;
   }
   if (['op_import', 'op_activities', 'op_gantt', 'op_responsible', 'op_budget'].includes(template)) {
-    return <OperationalViewer template={template} data={data} />;
+    return <OperationalViewer template={template} data={rawData} />;
+  }
+  // تحليل البيئة الداخلية: الملخص من الجدول المرسل بترتيب صفوفه (نفس ما يراه العميل)
+  let data = rawData;
+  if ((template === 'swot' || rawData.table) && rawData.table && typeof rawData.table === 'object' && rawData.matrix) {
+    const bullet = pts => pts.map(p => `• ${p}`).join('\n');
+    data = { ...rawData, matrix: { ...rawData.matrix,
+      strengths: bullet(swotPoints(rawData.table, unitRows, 'strength')),
+      weaknesses: bullet(swotPoints(rawData.table, unitRows, 'weakness')) } };
   }
 
   const renderSection = (key, value) => {
@@ -347,6 +389,15 @@ export default function FormDataViewer({ data, template }) {
       if (value.length === 0) return null;
       const firstItem = value[0];
       // تحديد النوع
+      if (key === 'stakeholders_extra') {
+        const rowsX = value.filter(r => r && typeof r === 'object' && `${r.name || ''}${r.impact || ''}${r.interest || ''}${r.strategy || ''}`.trim());
+        if (!rowsX.length) return null;
+        return (
+          <Section key={key} title={sectionLabel}>
+            <TableView headers={['صاحب المصلحة', 'مستوى التأثير', 'مستوى الاهتمام', 'استراتيجية التعامل']} rows={rowsX.map(r => [r.name, r.impact, r.interest, r.strategy])} />
+          </Section>
+        );
+      }
       const type = key === 'positions' ? 'orgchart'
                  : key === 'kpis'      ? 'kpis'
                  : key === 'initiatives' ? 'initiatives'
@@ -395,7 +446,7 @@ export default function FormDataViewer({ data, template }) {
         if (suffixes.includes('strength') || suffixes.includes('weakness')) {
           return (
             <Section key={key} title={sectionLabel}>
-              <SwotTableViewer data={value} />
+              <SwotTableViewer data={value} unitRows={unitRows} />
             </Section>
           );
         }
@@ -472,10 +523,10 @@ export default function FormDataViewer({ data, template }) {
       if ('executive_summary' in value || 'key_findings' in value) {
         return (
           <Section key={key} title={sectionLabel}>
-            {Object.entries(value).map(([k, v]) => (
+            {[...DOC_ORDER.filter(k => k in value), ...Object.keys(value).filter(k => !DOC_ORDER.includes(k))].map(k => (
               <div key={k} style={{ marginBottom: 14 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: colors.ink, marginBottom: 6 }}>{LABELS[k] || k}</div>
-                <TextValue value={v} />
+                <TextValue value={value[k] || '—'} />
               </div>
             ))}
           </Section>
