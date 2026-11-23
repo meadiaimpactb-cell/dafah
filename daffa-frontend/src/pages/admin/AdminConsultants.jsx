@@ -17,7 +17,7 @@ const SPECIALTIES = [
 ];
 
 const emptyForm = {
-  name: '', specialty: '', bio: '',
+  name: '', specialty: '', bio: '', phone: '',
   experience_years: 5, completed_projects: 0,
   rating: 5.0, available: true, avatar_initial: '',
   email: '', password: '',
@@ -91,7 +91,7 @@ export default function AdminConsultants() {
   const openEdit = (c, e) => {
     e.stopPropagation();
     setForm({
-      name: c.name, specialty: c.specialty, bio: c.bio || '',
+      name: c.name, specialty: c.specialty, bio: c.bio || '', phone: c.phone || c.user?.phone || '',
       experience_years: c.experience_years, completed_projects: c.completed_projects,
       rating: c.rating, available: c.available, avatar_initial: c.avatar_initial || '',
       email: '', password: '',
@@ -429,6 +429,9 @@ export default function AdminConsultants() {
                   {SPECIALTIES.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </FormField>
+              <FormField label="رقم الجوال">
+                <input type="tel" inputMode="tel" dir="ltr" value={form.phone} onChange={e => setF('phone', e.target.value)} placeholder="05xxxxxxxx" aria-label="رقم الجوال" style={{ ...inputStyle, textAlign: 'left' }} />
+              </FormField>
               <FormField label="سنوات الخبرة">
                 <input type="number" min="0" max="50" value={form.experience_years} onChange={e => setF('experience_years', +e.target.value)} style={inputStyle} />
               </FormField>
@@ -521,6 +524,7 @@ export default function AdminConsultants() {
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-3)', gap: 12, marginBottom: 16 }}>
+              <InfoBox label="رقم الجوال"       value={selected.phone || selected.user?.phone || '—'} />
               <InfoBox label="سنوات الخبرة"     value={selected.experience_years} />
               <InfoBox label="المشاريع المنجزة" value={selected.completed_projects} />
               <InfoBox label="الحالة"           value={selected.available ? 'متاح' : 'غير متاح'} valueColor={selected.available ? '#0B7F5D' : '#C53A3A'} />

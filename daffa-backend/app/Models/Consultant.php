@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Consultant extends Model
 {
     protected $fillable = [
-        'user_id', 'name', 'specialty', 'rating', 'experience_years',
+        'user_id', 'name', 'specialty', 'phone', 'rating', 'experience_years',
         'completed_projects', 'available', 'bio', 'avatar_initial', 'avatar',
     ];
 

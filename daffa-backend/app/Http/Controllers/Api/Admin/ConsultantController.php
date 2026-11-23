@@ -35,6 +35,7 @@ class ConsultantController extends Controller
         $request->validate([
             'name' => 'required|string|max:100',
             'specialty' => 'required|string|max:100',
+            'phone' => 'nullable|string|max:20',
             'bio' => 'nullable|string',
             'experience_years' => 'required|integer|min:0|max:50',
             'completed_projects' => 'required|integer|min:0',
@@ -58,7 +59,7 @@ class ConsultantController extends Controller
                 'rep_name' => $request->name,
                 'org_name' => $request->name,
                 'org_type' => 'مستشار',
-                'phone' => '0000000000',
+                'phone' => $request->phone ?: '0000000000',
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => 'consultant',
@@ -70,6 +71,7 @@ class ConsultantController extends Controller
             'user_id' => $userId,
             'name' => $request->name,
             'specialty' => $request->specialty,
+            'phone' => $request->phone ?: null,
             'bio' => $request->bio,
             'experience_years' => $request->experience_years,
             'completed_projects' => $request->completed_projects,
@@ -97,6 +99,7 @@ class ConsultantController extends Controller
         $request->validate([
             'name' => 'sometimes|string|max:100',
             'specialty' => 'sometimes|string|max:100',
+            'phone' => 'nullable|string|max:20',
             'bio' => 'nullable|string',
             'experience_years' => 'sometimes|integer|min:0|max:50',
             'completed_projects' => 'sometimes|integer|min:0',
@@ -117,7 +120,7 @@ class ConsultantController extends Controller
                 'rep_name' => $consultant->name,
                 'org_name' => $consultant->name,
                 'org_type' => 'مستشار',
-                'phone' => '0000000000',
+                'phone' => $request->phone ?: ($consultant->phone ?: '0000000000'),
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => 'consultant',
@@ -129,7 +132,18 @@ class ConsultantController extends Controller
             'name', 'specialty', 'bio', 'experience_years',
             'completed_projects', 'rating', 'available', 'avatar_initial',
         ]);
+        if ($request->has('phone')) {
+            $data['phone'] = $request->phone ?: null;
+        }
         $consultant->update(array_filter($data, fn ($v) => $v !== null));
+
+        // حساب الدخول المرتبط يحمل الاسم والجوال نفسيهما
+        if ($consultant->user_id && ($request->filled('phone') || $request->filled('name'))) {
+            $sync = array_filter(['phone' => $request->input('phone'), 'rep_name' => $request->input('name'), 'org_name' => $request->input('name')]);
+            if ($sync) {
+                User::where('id', $consultant->user_id)->update($sync);
+            }
+        }
 
         return response()->json($this->withAvatarUrl($consultant->fresh(['user'])));
     }

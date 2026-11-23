@@ -207,6 +207,25 @@ const PermissionsModal = ({ user, onClose, onSaved }) => {
   );
 };
 
+// ── خانة إدخال مستقلة (لا تُعاد تعريفها داخل النموذج) ───────────────────────────
+const UserField = ({ label, name, type = 'text', placeholder, required, value, error, onChange }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+    <label htmlFor={`user-field-${name}`} style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>{label}{required && <span style={{ color: C.red }}> *</span>}</label>
+    <input
+      id={`user-field-${name}`}
+      type={type} name={name} value={value ?? ''} onChange={onChange}
+      placeholder={placeholder || label}
+      inputMode={type === 'tel' ? 'tel' : undefined}
+      dir={type === 'tel' || type === 'email' ? 'ltr' : undefined}
+      autoComplete={type === 'password' ? 'new-password' : 'off'}
+      style={{ padding: '9px 12px', borderRadius: 10, border: `1.5px solid ${error ? C.red : C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', outline: 'none', textAlign: type === 'tel' || type === 'email' ? 'left' : undefined }}
+      onFocus={e => e.target.style.borderColor = C.primary}
+      onBlur={e => e.target.style.borderColor = error ? C.red : C.grayBorder}
+    />
+    {error && <div style={{ fontSize: 11, color: C.red }}>• {error}</div>}
+  </div>
+);
+
 // ── User Form Modal ────────────────────────────────────────────────────────────
 const UserModal = ({ mode, user, onClose, onSaved }) => {
   const isEdit = mode === 'edit';
@@ -274,19 +293,8 @@ const UserModal = ({ mode, user, onClose, onSaved }) => {
     }
   };
 
-  const Field = ({ label, name, type = 'text', placeholder, required }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-      <label style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>{label}{required && <span style={{ color: C.red }}> *</span>}</label>
-      <input
-        type={type} name={name} value={form[name]} onChange={handleChange}
-        placeholder={placeholder || label}
-        style={{ padding: '9px 12px', borderRadius: 10, border: `1.5px solid ${errors[name] ? C.red : C.grayBorder}`, fontSize: 13, fontFamily: 'inherit', outline: 'none' }}
-        onFocus={e => e.target.style.borderColor = C.primary}
-        onBlur={e => e.target.style.borderColor = errors[name] ? C.red : C.grayBorder}
-      />
-      {errors[name] && <div style={{ fontSize: 11, color: C.red }}>• {errors[name][0]}</div>}
-    </div>
-  );
+  // لا تُعرَّف مكوّنات داخل النموذج (كانت تُعاد إنشاؤها مع كل حرف فيفقد الحقل التركيز ولا يُكتب إلا حرف واحد)
+  const fieldProps = (name) => ({ value: form[name], error: errors[name]?.[0], onChange: handleChange });
 
   const previewSrc = avatarPreview || user?.avatar_url || null;
   const initials   = (form.rep_name || '?')[0];
@@ -332,12 +340,12 @@ const UserModal = ({ mode, user, onClose, onSaved }) => {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 12 }}>
-            <Field label="الاسم الكامل" name="rep_name" required />
-            <Field label="البريد الإلكتروني" name="email" type="email" required />
+            <UserField label="الاسم الكامل" name="rep_name" required {...fieldProps('rep_name')} />
+            <UserField label="البريد الإلكتروني" name="email" type="email" required {...fieldProps('email')} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 12 }}>
-            <Field label="رقم الجوال" name="phone" type="tel" placeholder="05xxxxxxxx" />
-            <Field label="اسم المنظمة" name="org_name" placeholder="اختياري للمستشار/المدير" />
+            <UserField label="رقم الجوال" name="phone" type="tel" placeholder="05xxxxxxxx" {...fieldProps('phone')} />
+            <UserField label="اسم المنظمة" name="org_name" placeholder="اختياري للمستشار/المدير" {...fieldProps('org_name')} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
@@ -350,13 +358,12 @@ const UserModal = ({ mode, user, onClose, onSaved }) => {
             </select>
           </div>
 
-          <Field
+          <UserField
             label={isEdit ? 'كلمة مرور جديدة (اتركها فارغة إن لم تريد التغيير)' : 'كلمة المرور'}
             name="password"
             type="password"
             placeholder="••••••••"
-            required={!isEdit}
-          />
+            required={!isEdit} {...fieldProps('password')} />
         </div>
 
         <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>

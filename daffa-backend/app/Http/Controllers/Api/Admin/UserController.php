@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Consultant;
 use App\Models\User;
 use App\Rules\RealEmail;
 use Illuminate\Http\Request;
@@ -57,8 +58,40 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->role,
         ]);
+        $this->syncConsultantProfile($user);
 
         return response()->json($this->format($user->load('consultant')), 201);
+    }
+
+    /**
+     * المستخدم بدور «مستشار» يملك دائمًا ملف مستشار (يظهر في صفحة المستشارين ويمكن للعملاء اختياره)،
+     * ويبقى اسمه وجواله متطابقين مع حسابه.
+     */
+    private function syncConsultantProfile(User $user): void
+    {
+        if ($user->role !== 'consultant') {
+            return;
+        }
+        $name = $user->rep_name ?: ($user->org_name ?: $user->email);
+        $phone = ($user->phone && ! preg_match('/^0+$/', $user->phone)) ? $user->phone : null;
+        $profile = Consultant::firstOrNew(['user_id' => $user->id]);
+        if (! $profile->exists) {
+            $profile->fill([
+                'name' => $name,
+                'specialty' => 'تخطيط استراتيجي',
+                'rating' => 0,
+                'experience_years' => 0,
+                'completed_projects' => 0,
+                'available' => true,
+                'avatar_initial' => mb_substr($name, 0, 1),
+            ]);
+        } else {
+            $profile->name = $name;
+        }
+        if ($phone) {
+            $profile->phone = $phone;
+        }
+        $profile->save();
     }
 
     // PUT /api/admin/users/{id}
@@ -88,6 +121,7 @@ class UserController extends Controller
         }
 
         $user->update(array_filter($data, fn ($v) => $v !== null));
+        $this->syncConsultantProfile($user->fresh());
 
         return response()->json($this->format($user->fresh(['consultant'])));
     }
