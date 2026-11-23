@@ -30,11 +30,13 @@ const PDF_UNIT_NAMES = {
 };
 /** رابط ملف PDF: الملف المرفوع من لوحة التحكم إن وُجد، وإلا الملف المعتمد الافتراضي */
 export const unitPdfUrl = (unit, kind) => unit?.pdf_urls?.[kind] || pdfUrl(unit?.template_type, kind);
+// رقم إصدار للملفات: يتخطى نسخ CDN والمتصفح المخزّنة (30 يومًا) عند تحديث محتوى الملفات — يُرفع مع كل تعديل عليها
+export const GUIDES_VERSION = '20261123';
 export const pdfUrl = (templateType, kind) => {
   const name = PDF_UNIT_NAMES[templateType];
-  if (!name) return `/guides/strategic/${templateType}-${kind}.pdf`;
+  if (!name) return `/guides/strategic/${templateType}-${kind}.pdf?v=${GUIDES_VERSION}`;
   const prefix = kind === 'guidelines' ? 'الإرشادات التفصيلية' : 'الشرح التفصيلي';
-  return `/guides/strategic/${encodeURIComponent(`${prefix} — ${name}.pdf`)}`;
+  return `/guides/strategic/${encodeURIComponent(`${prefix} — ${name}.pdf`)}?v=${GUIDES_VERSION}`;
 };
 
 // اسم «نوع النموذج» بالعربية عند غياب قيمة محددة في المواصفات
