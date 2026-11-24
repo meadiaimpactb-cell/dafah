@@ -275,7 +275,7 @@ const ChatWindow = ({ conversation, currentUserId, onMessageSent, canSend = true
 };
 
 // ── الصفحة الرئيسية ────────────────────────────────────────────────────────
-export default function ChatPage({ role, userId, canSend = true, autoStart = false }) {
+export default function ChatPage({ role, userId, canSend = true, autoStart = false, openConversation = null }) {
   const [conversations, setConversations] = useState([]);
   const [selected,      setSelected]      = useState(null);
   const [loading,       setLoading]       = useState(true);
@@ -291,7 +291,12 @@ export default function ChatPage({ role, userId, canSend = true, autoStart = fal
         const list = Array.isArray(r.data) ? r.data : Array.isArray(r.data?.data) ? r.data.data : [];
         setConversations(list);
         setLoading(false);
-        if (autoSelectId) {
+        if (autoSelectId && typeof autoSelectId === 'object') {
+          // من إشعار رسالة: المحادثة برقمها، أو باسم المرسل في الإشعارات القديمة
+          const conv = list.find(c => c.id === autoSelectId.id) || (autoSelectId.name ? list.find(c => c.other_name && autoSelectId.name.includes(c.other_name)) : null);
+          if (conv) setSelected(conv);
+          else if (list.length === 1) setSelected(list[0]);
+        } else if (autoSelectId) {
           const conv = list.find(c => c.id === autoSelectId);
           if (conv) setSelected(conv);
           else if (list.length > 0) setSelected(list[0]);
@@ -318,6 +323,12 @@ export default function ChatPage({ role, userId, canSend = true, autoStart = fal
     }, 8000);
     return () => clearInterval(listPollRef.current);
   }, [loadConversations]);
+
+  // فتح محادثة بعينها عند الضغط على إشعار رسالة (حتى لو كانت الصفحة محمّلة مسبقًا)
+  useEffect(() => {
+    if (!openConversation) return;
+    loadConversations(false, { id: openConversation.id, name: openConversation.name });
+  }, [openConversation?.n]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleStart = () => {
     setStarting(true);

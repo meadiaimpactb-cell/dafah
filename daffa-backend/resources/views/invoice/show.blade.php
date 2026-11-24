@@ -257,7 +257,7 @@ table.items .amount { text-align: left; font-weight: 700; }
 
 <!-- Print Bar -->
 <div class="print-bar">
-    <img src="/logo-white.png" alt="منصة دافة" style="height:34px; max-width:110px; object-fit:contain;" />
+    <img src="/logo-white.png" alt="منصة دفة" style="height:34px; max-width:110px; object-fit:contain;" />
     <span class="print-bar-title">فاتورة ضريبية — {{ $order->order_number }}</span>
     <button class="print-btn" onclick="window.print()">🖨&nbsp; طباعة / تحميل PDF</button>
 </div>
@@ -268,7 +268,7 @@ table.items .amount { text-align: left; font-weight: 700; }
     <!-- Header -->
     <div class="inv-header">
       <div class="inv-header-topbar">
-        <img src="/logo-white.png" alt="منصة دافة" style="height:46px; max-width:150px; object-fit:contain;" />
+        <img src="/logo-white.png" alt="منصة دفة" style="height:46px; max-width:150px; object-fit:contain;" />
         <div class="inv-badge">فاتورة ضريبية</div>
       </div>
       <div class="inv-meta-grid">
@@ -390,9 +390,9 @@ table.items .amount { text-align: left; font-weight: 700; }
       </div>
 
       <div style="margin-top:28px; padding-top:16px; border-top:1px solid #E8E3DA; display:flex; justify-content:space-between; align-items:center;">
-        <img src="/logo.png" alt="منصة دافة" style="height:38px; max-width:120px; object-fit:contain; opacity:0.85;" />
+        <img src="/logo.png" alt="منصة دفة" style="height:38px; max-width:120px; object-fit:contain; opacity:0.85;" />
         <div style="font-size:11px; color:#8C97A3; text-align:left;">
-          منصة دافة للتخطيط الاستراتيجي والمؤسسي<br>
+          منصة دفة للتخطيط الاستراتيجي والمؤسسي<br>
           {{ $supportEmail ?? '' }}
         </div>
       </div>

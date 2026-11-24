@@ -5,7 +5,7 @@ import api from '../../api/axios';
 import { consultantApi } from '../../api/consultant';
 import { consultantPoliciesApi } from '../../api/policies';
 import FormDataViewer from './FormDataViewer';
-import { isVisible as policyQuestionVisible } from '../policies/questionRules';
+import { isVisible as policyQuestionVisible, summarize as summarizePolicy } from '../policies/questionRules';
 import { usePermissions } from '../../utils/permissions';
 import { IcCheckCircle, IcArrowPath, IcWarning, IcXMark, IcSparkles, IcClipboard, IcPalette, IcLock, IcEye, IcDocument } from '../../utils/icons';
 import { asObject } from '../../utils/apiData';
@@ -51,33 +51,33 @@ const PolicyFormViewer = ({ formData, questionnaireSections }) => {
     return <p style={{ color: colors.gray, fontSize: 13, textAlign: 'center', padding: 20 }}>لا توجد بيانات</p>;
 
   if (questionnaireSections && questionnaireSections.length > 0) {
-    const answeredCount = Object.keys(formData).filter(k => {
-      const v = formData[k]; return v !== '' && v !== null && v !== undefined && !(Array.isArray(v) && v.length === 0);
-    }).length;
+    // العدّ بقاعدة العميل نفسها: الأسئلة المنطبقة (الظاهرة) فقط، والمستبعدة بإجابات الجهة لا تُحسب ناقصة
+    const overall = summarizePolicy(questionnaireSections, formData);
+    const allQs = questionnaireSections.flatMap(s => s.questions || []);
+    const excludedCount = allQs.length - overall.total;
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {/* Summary bar */}
         <div style={{ padding: '8px 14px', background: '#D9E8F1', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: 12, fontWeight: 700, color: colors.ink }}>
-            {questionnaireSections.length} أقسام — {answeredCount} إجابة
+            {questionnaireSections.length} أقسام — أجاب العميل عن {overall.answered} من {overall.total} سؤالًا منطبقًا
           </span>
+          {excludedCount > 0 && <span data-excluded-count style={{ fontSize: 11, color: colors.gray }}>{excludedCount} {excludedCount === 1 ? 'سؤال لا ينطبق' : 'أسئلة لا تنطبق'} على الجهة بحسب إجاباتها (غير محتسبة)</span>}
         </div>
 
         {questionnaireSections.map((section) => {
           const questions = section.questions || [];
-          const answered = questions.filter(q => {
-            const v = formData[`q${q.id}`];
-            return v !== undefined && v !== '' && v !== null && !(Array.isArray(v) && v.length === 0);
-          });
+          const sum = summarizePolicy([section], formData);
+          const complete = sum.answered === sum.total;
 
           return (
             <div key={section.id} style={{ border: `1.5px solid ${colors.grayBorder}`, borderRadius: 10, overflow: 'hidden' }}>
               {/* Section header */}
               <div style={{ padding: '10px 14px', background: '#D9E8F1', borderBottom: `1px solid ${colors.grayBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 13, fontWeight: 700, color: colors.ink }}>{section.name}</span>
-                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: answered.length === questions.length ? '#C9EFE1' : '#FDE2D2', color: answered.length === questions.length ? colors.green : '#7F310E', fontWeight: 600 }}>
-                  {answered.length}/{questions.length} مكتمل
+                <span data-section-counter style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: complete ? '#C9EFE1' : '#FDE2D2', color: complete ? colors.green : '#7F310E', fontWeight: 600 }}>
+                  {sum.total === 0 ? 'لا ينطبق' : `${sum.answered}/${sum.total} مكتمل`}
                 </span>
               </div>
 

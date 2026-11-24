@@ -3,7 +3,9 @@
 //       show_if{q,in|not_in|has|not_has} | {any:[..]} | {all:[..]}
 //       fields[{key,label,input,min,max,integer,unit,options,required,show_if_opt}]
 //       checks[{lte:[a,b]}|{eq_product:[a,b,c]}|{sum_eq:[[keys],total]}|{lte_q:[field,qid,qfield?]}] (+msg)
-//       force{q?,in?,options} · require{all,or_any,msg} · conflicts[{q,in|has|not_has,self_in|self_has,msg}] · info{title,headers,rows}
+//       force{q?,in?,options} · require{all,or_any,msg} · conflicts[{q,in|has|not_has,self_in|self_has,msg}]
+//       عرض فقط: info{title,button?,note?,headers?,rows?,items?,links?[{label,url}]} · option_notes{خيار: توضيح}
+//       ref_policy{id,name,in_plan,missing} · covers_all: «خيار يشمل بقية خيارات الاختيار المتعدد»
 
 const AR = '٠١٢٣٤٥٦٧٨٩';
 const FA = '۰۱۲۳۴۵۶۷۸۹';
@@ -188,6 +190,10 @@ export const toggleMultiple = (q, answers, option) => {
   const m = meta(q); const vals = Array.isArray(answers?.[`q${q.id}`]) ? answers[`q${q.id}`] : [];
   const forced = forcedOptions(q, answers); const excl = m.exclusive || [];
   if (forced.includes(option)) return vals.includes(option) ? vals : [...vals, option];
+  // خيار شامل (مثل «جميع الحسابات والأنظمة»): يحلّ محل البقية، وتبقى الخيارات الفردية معطلة حتى يُلغى
+  const all = m.covers_all;
+  if (all && option === all) return vals.includes(all) ? vals.filter(x => forced.includes(x)) : Array.from(new Set([...forced, all]));
+  if (all && vals.includes(all)) return vals;
   if (vals.includes(option)) return vals.filter(x => x !== option);
   if (excl.includes(option)) return [option];               // خيار النفي يُلغي البقية
   return [...vals.filter(x => !excl.includes(x)), option];   // أي اختيار يُلغي خيار النفي

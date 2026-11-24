@@ -572,7 +572,7 @@ class OperationalController extends Controller
             ->sortBy('unit_number')
             ->values();
 
-        $html = view('pdf.operational', compact('workflow', 'submissions'))->render();
+        $html = view('pdf.operational', compact('workflow', 'submissions'), ['forMpdf' => true])->render();
 
         set_error_handler(fn () => true, E_WARNING | E_NOTICE);
         try {

@@ -191,7 +191,7 @@ body {
 <div class="header">
     <div class="header-top">
         <div>
-            <div class="brand-name">دافة</div>
+            <div class="brand-name">دفة</div>
             <div class="brand-sub">منصة التخطيط الاستراتيجي والمؤسسي</div>
         </div>
         <div class="invoice-badge">فاتورة ضريبية</div>
@@ -340,7 +340,7 @@ body {
 @endif
 
 <div class="footer">
-    <div>شكراً لثقتكم بمنصة دافة للتخطيط الاستراتيجي والمؤسسي</div>
+    <div>شكراً لثقتكم بمنصة دفة للتخطيط الاستراتيجي والمؤسسي</div>
     <div style="margin-top:4px;">هذه الفاتورة صادرة إلكترونياً ولا تحتاج إلى توقيع أو ختم</div>
 </div>
 

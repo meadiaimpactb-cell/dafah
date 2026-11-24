@@ -58,7 +58,7 @@ class OrderController extends Controller
         $contentMap = SiteContent::map();
         $taxRate = (float) ($pricingMap['tax_rate'] ?? 15);
         $vatNumber = $contentMap['payment_vat_number'] ?? null;
-        $companyName = $contentMap['system_platform_name'] ?? 'منصة دافة';
+        $companyName = $contentMap['system_platform_name'] ?? 'منصة دفة';
         $supportEmail = $contentMap['email_from_address'] ?? null;
 
         $user = $order->user;

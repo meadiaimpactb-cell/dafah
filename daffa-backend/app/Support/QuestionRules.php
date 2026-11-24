@@ -17,6 +17,8 @@ namespace App\Support;
  *  force:  {q?, in?:[..], options:[..]}  → خيارات إلزامية مثبّتة
  *  require: {all:[..], or_any:[..], msg} → خيارات يجب أن يشملها الاختيار المتعدد (أو أحد بدائلها)
  *  conflicts: [{q, in|has|not_has:[..], self_in|self_has:[..], msg}] → تعارض مع إجابة سؤال آخر
+ *  للعرض فقط (لا أثر لها في التحقق): info{title,button,note,headers,rows,items,links} · option_notes{خيار: توضيح}
+ *  · ref_policy{id,name,in_plan,missing} · covers_all (خيار شامل يغني عن بقية خيارات الاختيار المتعدد)
  */
 class QuestionRules
 {

@@ -91,6 +91,15 @@ class PolicyController extends Controller
                 'selections_count' => $sels->count(),
                 'approved_count' => $sels->where('status', 'approved')->count(),
                 'approved_names' => $approvedNames,
+                // مخرجات الخطة المعتمدة لمركز التحميلات (كل سياسة باسمها ورمزها وتاريخ اعتمادها)
+                'approved_items' => $sels->where('status', 'approved')->sortBy('policy_type_id')->map(fn ($s) => [
+                    'id' => $s->id,
+                    'policy_type_id' => $s->policy_type_id,
+                    'name' => $typeMap->get($s->policy_type_id)['name'] ?? 'سياسة',
+                    'code' => $typeMap->get($s->policy_type_id)['code'] ?? null,
+                    'approved_at' => optional($s->reviewed_at ?? $s->updated_at)->toIso8601String(),
+                ])->values(),
+                'design_file_url' => $wf->design_file ? url('storage/'.$wf->design_file) : null,
             ]);
         });
 
@@ -376,7 +385,8 @@ class PolicyController extends Controller
             return response()->json(['message' => 'السياسة معتمدة نهائياً ولا يمكن تعديلها.'], 422);
         }
 
-        $newStatus = in_array($selection->status, ['not_started', 'revision']) ? 'in_progress' : $selection->status;
+        // السياسة المعادة تبقى «يحتاج تعديل» مع ملاحظة المستشار حتى يُعاد إرسالها فعلًا (حفظ المسودة لا يُخفيها)
+        $newStatus = $selection->status === 'not_started' ? 'in_progress' : $selection->status;
 
         $selection->update(['form_data' => $request->form_data, 'status' => $newStatus]);
 
@@ -411,7 +421,7 @@ class PolicyController extends Controller
             // نحفظ ما عُبّئ حتى لا يضيع، ونوضّح ما ينقص
             $selection->update([
                 'form_data' => $request->form_data,
-                'status' => in_array($selection->status, ['not_started', 'revision'], true) ? 'in_progress' : $selection->status,
+                'status' => $selection->status === 'not_started' ? 'in_progress' : $selection->status,
             ]);
 
             return response()->json([
@@ -620,7 +630,7 @@ class PolicyController extends Controller
         $policyType = $typeMap->get($selection->policy_type_id);
         $questionnaire = self::questionnaireFor($selection->policy_type_id);
 
-        $html = view('pdf.policy', compact('workflow', 'selection', 'policyType', 'questionnaire'))->render();
+        $html = view('pdf.policy', compact('workflow', 'selection', 'policyType', 'questionnaire'), ['forMpdf' => true])->render();
 
         set_error_handler(fn () => true, E_WARNING | E_NOTICE);
         try {

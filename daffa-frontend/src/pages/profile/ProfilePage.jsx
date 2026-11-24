@@ -28,9 +28,9 @@ const Toast = ({ toast }) =>
   ) : null;
 
 // ── Field input ────────────────────────────────────────────────────────────────
-const Field = ({ label, name, value, onChange, type = 'text', placeholder, disabled, textarea }) => (
+const Field = ({ label, name, value, onChange, type = 'text', placeholder, disabled, textarea, error }) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-    <label style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>{label}</label>
+    <label htmlFor={`pf-${name}`} style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>{label}</label>
     {textarea ? (
       <textarea
         name={name} value={value || ''} onChange={onChange}
@@ -42,14 +42,16 @@ const Field = ({ label, name, value, onChange, type = 'text', placeholder, disab
       />
     ) : (
       <input
-        type={type} name={name} value={value || ''} onChange={onChange}
+        id={`pf-${name}`} type={type} name={name} value={value || ''} onChange={onChange}
         placeholder={placeholder || label}
-        style={{ padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none', transition: 'border 0.2s', background: disabled ? C.grayLight : 'white', color: disabled ? C.gray : '#0E2A3D' }}
+        aria-invalid={error ? 'true' : undefined} aria-describedby={error ? `pf-${name}-err` : undefined}
+        style={{ padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${error ? '#C53A3A' : C.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none', transition: 'border 0.2s', background: disabled ? C.grayLight : 'white', color: disabled ? C.gray : '#0E2A3D' }}
         onFocus={e => !disabled && (e.target.style.borderColor = C.primary)}
-        onBlur={e => (e.target.style.borderColor = C.grayBorder)}
+        onBlur={e => (e.target.style.borderColor = error ? '#C53A3A' : C.grayBorder)}
         disabled={disabled}
       />
     )}
+    {error && <div id={`pf-${name}-err`} role="alert" style={{ fontSize: 12, color: '#C53A3A', fontWeight: 600 }}>{error}</div>}
   </div>
 );
 
@@ -114,7 +116,7 @@ const SectionTitle = ({ children }) => (
 );
 
 // ── Main Component ─────────────────────────────────────────────────────────────
-export default function ProfilePage({ authUser, onUpdate }) {
+export default function ProfilePage({ authUser, onUpdate, active = true }) {
   const role = authUser?.role || 'client';
 
   const [tab,        setTab]       = useState('profile');
@@ -140,8 +142,10 @@ export default function ProfilePage({ authUser, onUpdate }) {
     if (authUser?.logo_url) setAvatarUrl(authUser.logo_url);
   }, [authUser?.logo_url]);
 
+  // عند فتح الصفحة من جديد تُعرض البيانات المحفوظة (لا مسودة لم تُحفظ أو رُفض حفظها)
   useEffect(() => {
-    if (!authUser) return;
+    if (!authUser || !active) return;
+    setErrors({});
     setForm({
       rep_name:         authUser.rep_name         || '',
       email:            authUser.email            || '',
@@ -153,7 +157,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
       bio:              authUser.bio              || '',
       experience_years: authUser.experience_years || '',
     });
-  }, [authUser]);
+  }, [authUser, active]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -195,10 +199,22 @@ export default function ProfilePage({ authUser, onUpdate }) {
   };
 
   const handleSaveProfile = async () => {
+    // الحقول الإلزامية لا تُحفظ فارغة أو بمسافات فقط، ويبقى الاسم المحفوظ كما هو حتى إدخال قيمة صالحة
+    const required = role === 'client'
+      ? { org_name: 'اسم المنظمة مطلوب. أدخل اسم منظمتك ثم احفظ — يبقى الاسم المحفوظ سابقًا كما هو.', rep_name: 'اسم الممثل مطلوب.' }
+      : { rep_name: 'الاسم مطلوب.' };
+    const local = {};
+    for (const [k, msg] of Object.entries(required)) if (!String(form[k] ?? '').trim()) local[k] = [msg];
+    if (Object.keys(local).length) {
+      setErrors(local);
+      showToast('error', 'لم يُحفظ التغيير — أكمل الحقول المطلوبة');
+      document.getElementById(`pf-${Object.keys(local)[0]}`)?.focus();
+      return;
+    }
     setSaving(true);
     setErrors({});
     try {
-      const res = await api.put('/auth/profile', form);
+      const res = await api.put('/auth/profile', { ...form, org_name: String(form.org_name ?? '').trim(), rep_name: String(form.rep_name ?? '').trim() });
       const { email_change: change, ...fresh } = res.data;
       const updated = { ...authUser, ...fresh };
       localStorage.setItem('user', JSON.stringify(updated));
@@ -319,7 +335,7 @@ export default function ProfilePage({ authUser, onUpdate }) {
             <>
               <SectionTitle>بيانات المنظمة</SectionTitle>
               <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginBottom: 24 }}>
-                <Field label="اسم المنظمة *" name="org_name" value={form.org_name} onChange={handleChange} />
+                <Field label="اسم المنظمة *" name="org_name" value={form.org_name} onChange={handleChange} error={errors.org_name?.[0]} />
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 600, color: C.ink, display: 'block', marginBottom: 6 }}>نوع المنظمة</label>
                   <select
@@ -343,9 +359,9 @@ export default function ProfilePage({ authUser, onUpdate }) {
               </div>
               <SectionTitle>بيانات الممثل</SectionTitle>
               <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginBottom: 24 }}>
-                <Field label="اسم الممثل *" name="rep_name" value={form.rep_name} onChange={handleChange} />
-                <Field label="البريد الإلكتروني *" name="email" value={form.email} onChange={handleChange} type="email" />
-                <Field label="رقم الجوال" name="phone" value={form.phone} onChange={handleChange} type="tel" placeholder="05xxxxxxxx" />
+                <Field label="اسم الممثل *" name="rep_name" value={form.rep_name} onChange={handleChange} error={errors.rep_name?.[0]} />
+                <Field label="البريد الإلكتروني *" name="email" value={form.email} onChange={handleChange} error={errors.email?.[0]} type="email" />
+                <Field label="رقم الجوال" name="phone" value={form.phone} onChange={handleChange} error={errors.phone?.[0]} type="tel" placeholder="05xxxxxxxx" />
               </div>
             </>
           )}
@@ -355,11 +371,11 @@ export default function ProfilePage({ authUser, onUpdate }) {
             <>
               <SectionTitle>المعلومات الشخصية</SectionTitle>
               <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginBottom: 24 }}>
-                <Field label="الاسم الكامل *" name="rep_name" value={form.rep_name} onChange={handleChange} />
-                <Field label="البريد الإلكتروني *" name="email" value={form.email} onChange={handleChange} type="email" />
-                <Field label="رقم الجوال" name="phone" value={form.phone} onChange={handleChange} type="tel" placeholder="05xxxxxxxx" />
-                <Field label="التخصص" name="specialty" value={form.specialty} onChange={handleChange} placeholder="مثال: التخطيط الاستراتيجي" />
-                <Field label="سنوات الخبرة" name="experience_years" value={form.experience_years} onChange={handleChange} type="number" placeholder="مثال: 8" />
+                <Field label="الاسم الكامل *" name="rep_name" value={form.rep_name} onChange={handleChange} error={errors.rep_name?.[0]} />
+                <Field label="البريد الإلكتروني *" name="email" value={form.email} onChange={handleChange} error={errors.email?.[0]} type="email" />
+                <Field label="رقم الجوال" name="phone" value={form.phone} onChange={handleChange} error={errors.phone?.[0]} type="tel" placeholder="05xxxxxxxx" />
+                <Field label="التخصص" name="specialty" value={form.specialty} onChange={handleChange} error={errors.specialty?.[0]} placeholder="مثال: التخطيط الاستراتيجي" />
+                <Field label="سنوات الخبرة" name="experience_years" value={form.experience_years} onChange={handleChange} error={errors.experience_years?.[0]} type="number" placeholder="مثال: 8" />
               </div>
               <SectionTitle>النبذة التعريفية</SectionTitle>
               <div style={{ marginBottom: 24 }}>
@@ -373,9 +389,9 @@ export default function ProfilePage({ authUser, onUpdate }) {
             <>
               <SectionTitle>بيانات المدير</SectionTitle>
               <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginBottom: 24 }}>
-                <Field label="الاسم الكامل *" name="rep_name" value={form.rep_name} onChange={handleChange} />
-                <Field label="البريد الإلكتروني *" name="email" value={form.email} onChange={handleChange} type="email" />
-                <Field label="رقم الجوال" name="phone" value={form.phone} onChange={handleChange} type="tel" placeholder="05xxxxxxxx" />
+                <Field label="الاسم الكامل *" name="rep_name" value={form.rep_name} onChange={handleChange} error={errors.rep_name?.[0]} />
+                <Field label="البريد الإلكتروني *" name="email" value={form.email} onChange={handleChange} error={errors.email?.[0]} type="email" />
+                <Field label="رقم الجوال" name="phone" value={form.phone} onChange={handleChange} error={errors.phone?.[0]} type="tel" placeholder="05xxxxxxxx" />
                 <Field label="الدور" name="_role" value="مدير النظام" disabled />
               </div>
             </>

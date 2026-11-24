@@ -68,9 +68,11 @@ class ChatController extends Controller
             ->update(['read_at' => now()]);
 
         // تعليم إشعارات الرسائل كمقروءة عند فتح المحادثة
+        // إشعارات هذه المحادثة (والإشعارات القديمة التي لا تحمل رقم محادثة)
         Notification::where('user_id', $user->id)
             ->where('type', 'message')
             ->whereNull('read_at')
+            ->where(fn ($q) => $q->whereNull('data')->orWhere('data->conversation_id', $id))
             ->update(['read_at' => now()]);
 
         return response()->json($messages);
@@ -99,7 +101,7 @@ class ChatController extends Controller
         // Notify the other party
         $recipientId = ($conv->client_id === $user->id) ? $conv->consultant_user_id : $conv->client_id;
         $senderName = $user->org_name ?? $user->rep_name ?? $user->email;
-        Notification::notify($recipientId, 'message', "رسالة جديدة من {$senderName}", mb_substr($request->body, 0, 80));
+        Notification::notify($recipientId, 'message', "رسالة جديدة من {$senderName}", mb_substr($request->body, 0, 80), ['conversation_id' => $conv->id]);
 
         return response()->json($this->formatMessage($message->load('sender'), $user->id), 201);
     }

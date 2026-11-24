@@ -172,6 +172,9 @@ export default function DaffaPlatform() {
   const [policyWorkflowId, setPolicyWorkflowId] = useState(null);
   const [opOpenUnit, setOpOpenUnit] = useState(null);
   const [chatAutoStart, setChatAutoStart] = useState(false);
+  // فتح محادثة أو سياسة بعينها من إشعار أو من «خطوتك التالية»
+  const [chatOpen, setChatOpen] = useState(null);         // { id, name, n }
+  const [policyOpenReq, setPolicyOpenReq] = useState(null); // { workflowId, selId, n }
   const [modal, setModal] = useState(null);
   const [dashPhases,     setDashPhases]     = useState(null);
   const [dashConsultant, setDashConsultant] = useState(null);
@@ -242,10 +245,10 @@ export default function DaffaPlatform() {
     const load = async () => {
       setDownloadsData(null);
       // كل الخطط المكتملة للعميل (لا آخر خطة فقط)، وكل بطاقة تحمل رقم خطتها ورابط وثيقتها المعتمدة
-      const [stList, opList, polPg] = await Promise.allSettled([
+      const [stList, opList, polList] = await Promise.allSettled([
         strategicApi.listWorkflows(),
         operationalApi.listWorkflows(),
-        policiesApi.getPageData(),
+        policiesApi.workflows(),
       ]);
       const items = [];
       const completedOf = (res) => {
@@ -259,15 +262,18 @@ export default function DaffaPlatform() {
       const opDone = completedOf(opList);
       opDone.forEach(wf => items.push({ id: 'operational', workflowId: wf.id, name: `الخطة التشغيلية${opDone.length > 1 ? ` — الخطة #${wf.plan_number ?? ''}` : ''}`, icon: 'cog', date: fmtDate(wf.completed_at), consultant: wf.consultant?.name || '—' }));
 
-      if (polPg.status === 'fulfilled' && polPg.value.data.workflow) {
-        const wf  = polPg.value.data.workflow;
-        const sels = polPg.value.data.selections || [];
-        sels.filter(s => s.status === 'approved').forEach(sel => {
-          items.push({ id: `policy-${sel.id}`, selId: sel.id, name: sel.policy_type?.name || 'سياسة', icon: 'clipboard', date: fmtDate(sel.updated_at || sel.created_at), consultant: wf.consultant?.name || '—' });
+      if (polList.status === 'fulfilled') {
+        const d = polList.value.data;
+        const list = (Array.isArray(d) ? d : Array.isArray(d?.workflows) ? d.workflows : [])
+          .filter(w => (w.approved_items || []).length > 0 || w.design_file_url)
+          .sort((a, b) => (b.plan_number ?? 0) - (a.plan_number ?? 0));
+        list.forEach(wf => {
+          const plan = `خطة السياسات #${wf.plan_number ?? ''}`;
+          (wf.approved_items || []).forEach(sel => {
+            items.push({ id: `policy-${sel.id}`, workflowId: wf.id, selId: sel.id, name: `${sel.name} — ${plan}`, plan, code: sel.code, icon: 'clipboard', date: fmtDate(sel.approved_at), dateLabel: 'اعتُمدت', consultant: wf.consultant?.name || '—' });
+          });
+          if (wf.design_file_url) items.push({ id: `policy-design-${wf.id}`, name: `ملف التصميم الاحترافي — ${plan}`, icon: 'palette', date: '—', consultant: wf.consultant?.name || '—', directUrl: wf.design_file_url });
         });
-        if (polPg.value.data.design_file_url) {
-          items.push({ id: 'policy-design', name: 'ملف التصميم الاحترافي', icon: 'palette', date: '—', consultant: wf.consultant?.name || '—', directUrl: polPg.value.data.design_file_url });
-        }
       }
 
       setDownloadsData(items);
@@ -310,7 +316,7 @@ export default function DaffaPlatform() {
       let res;
       if (item.id === 'strategic')          res = await strategicApi.getPdfLink(item.workflowId);
       else if (item.id === 'operational')   res = await operationalApi.getPdfLink(item.workflowId);
-      else if (item.id.startsWith('policy-')) res = await policiesApi.getPdfLink(item.selId);
+      else if (item.id.startsWith('policy-')) res = await policiesApi.getPdfLink(item.workflowId, item.selId);
       win.location.href = res.data.url;
     } catch { win.close(); alert('تعذّر تجهيز الوثيقة. حاول مرة أخرى.'); }
   };
@@ -318,56 +324,76 @@ export default function DaffaPlatform() {
   useEffect(() => {
     if (currentView !== 'client-dash') return;
     const load = async () => {
+      // السياسات: الخطة الجارية أولًا (لا أحدث خطة مكتملة) حتى تظهر طلبات التعديل في «خطوتك التالية»
+      const currentPolicyPlan = async () => {
+        const l = await policiesApi.workflows();
+        const list = Array.isArray(l.data?.workflows) ? l.data.workflows : [];
+        const wf = list.find(w => (w.selections || []).some(x => x.status === 'revision'))
+          || list.find(w => w.status !== 'completed') || list[0];
+        if (!wf) throw new Error('no-plan');
+        return policiesApi.getPageData(wf.id);
+      };
       const [stRes, opRes, polRes] = await Promise.allSettled([
         strategicApi.getProgress(),
         operationalApi.getProgress(),
-        policiesApi.getPageData(),
+        currentPolicyPlan(),
       ]);
 
       const buildPhase = (title, pct, approved, total, unit, statusText, statusColor, onClick) => ({
         title, progress: pct, sub: `${approved}/${total} ${unit}`, status: statusText, statusColor, onClick,
       });
+      // المرحلة الفعلية للخطة الجارية (لا عدد المعتمد فقط): يحتاج تعديل ← قيد المراجعة ← قيد العمل
+      const planStage = (d) => {
+        if (d.status === 'completed') return ['مكتمل', 'green'];
+        if ((d.revision_units || []).length) return ['يحتاج تعديل', 'yellow'];
+        if ((d.in_review_units || []).length) return ['قيد المراجعة', 'blue'];
+        if (d.current_step && d.current_step < 3) return ['بانتظار إكمال الاشتراك', 'gray'];
+        if ((d.approved_units || 0) > 0 || (d.submitted_units || 0) > 0 || d.next_unit?.status === 'in_progress') return ['قيد العمل', 'yellow'];
+        return d.workflow_id ? ['جاهزة للبدء', 'gray'] : ['لم يبدأ بعد', 'gray'];
+      };
 
       let stPhase;
       if (stRes.status === 'rejected') {
-        stPhase = buildPhase('التخطيط الاستراتيجي', 0, 0, 11, 'وحدات', 'لم يبدأ بعد', 'gray', () => navigate('strategic-roadmap'));
+        stPhase = buildPhase('التخطيط الاستراتيجي', 0, 0, 11, 'وحدات معتمدة', 'لم يبدأ بعد', 'gray', () => navigate('strategic-roadmap'));
       } else {
         const d = stRes.value.data;
         const approved = d.approved_units || 0;
         const pct = d.status === 'completed' ? 100 : (d.progress_percent || 0);
-        const st = d.status === 'completed' ? 'مكتمل' : (approved > 0 ? 'قيد العمل' : 'لم يبدأ بعد');
-        const sc = d.status === 'completed' ? 'green' : (approved > 0 ? 'yellow' : 'gray');
-        stPhase = buildPhase('التخطيط الاستراتيجي', pct, approved, 11, 'وحدات', st, sc, () => navigate('strategic-roadmap'));
+        const [st, sc] = planStage(d);
+        stPhase = buildPhase('التخطيط الاستراتيجي', pct, approved, d.total_units || 11, 'وحدات معتمدة', st, sc, () => navigate('strategic-roadmap'));
         if (d.consultant) setDashConsultant(d.consultant);
       }
 
       let opPhase;
       if (opRes.status === 'rejected') {
-        opPhase = buildPhase('التخطيط التشغيلي', 0, 0, 5, 'وحدات', 'لم يبدأ بعد', 'gray', () => navigate('operational-roadmap'));
+        opPhase = buildPhase('التخطيط التشغيلي', 0, 0, 5, 'وحدات معتمدة', 'لم يبدأ بعد', 'gray', () => navigate('operational-roadmap'));
       } else {
         const d = opRes.value.data;
         const approved = d.approved_units || 0;
         const pct = d.status === 'completed' ? 100 : (d.progress_percent || 0);
-        const st = d.status === 'completed' ? 'مكتمل' : (approved > 0 ? 'قيد العمل' : 'لم يبدأ بعد');
-        const sc = d.status === 'completed' ? 'green' : (approved > 0 ? 'yellow' : 'gray');
-        opPhase = buildPhase('التخطيط التشغيلي', pct, approved, 5, 'وحدات', st, sc, () => navigate('operational-roadmap'));
+        const [st, sc] = planStage(d);
+        opPhase = buildPhase('التخطيط التشغيلي', pct, approved, d.total_units || 5, 'وحدات معتمدة', st, sc, () => navigate('operational-roadmap'));
       }
 
       let polPhase;
       if (polRes.status === 'rejected') {
-        polPhase = buildPhase('السياسات واللوائح', 0, 0, 7, 'سياسات', 'لم يبدأ بعد', 'gray', () => navigate('policies-select'));
+        polPhase = buildPhase('السياسات واللوائح', 0, 0, 0, 'سياسات معتمدة', 'لم يبدأ بعد', 'gray', () => navigate('policies-select'));
       } else {
         const d = polRes.value.data;
         const wf = d.workflow;
         const sels = d.selections || [];
-        const total = wf?.selected_policies?.length || sels.length || 7;
+        const total = wf?.selected_policies?.length || sels.length || 0;
         const approved = sels.filter(s => s.status === 'approved').length;
         const isCompleted = wf?.status === 'completed';
         const hasStarted = !!wf;
         const pct = isCompleted ? 100 : (total > 0 ? Math.round(approved / total * 100) : 0);
-        const st = isCompleted ? 'مكتمل' : (hasStarted && approved > 0 ? 'قيد العمل' : (hasStarted ? 'جارٍ المعالجة' : 'لم يبدأ بعد'));
-        const sc = isCompleted ? 'green' : (hasStarted && approved > 0 ? 'yellow' : (hasStarted ? 'blue' : 'gray'));
-        polPhase = buildPhase('السياسات واللوائح', pct, approved, total || 7, 'سياسات', st, sc, () => navigate('policies-select'));
+        const inReview = sels.some(s => ['submitted', 'reviewing'].includes(s.status));
+        const [st, sc] = isCompleted ? ['مكتمل', 'green']
+          : sels.some(s => s.status === 'revision') ? ['يحتاج تعديل', 'yellow']
+          : inReview ? ['قيد المراجعة', 'blue']
+          : hasStarted && (approved > 0 || (wf?.current_step ?? 0) >= 3) ? ['قيد العمل', 'yellow']
+          : hasStarted ? ['بانتظار إكمال الاشتراك', 'gray'] : ['لم يبدأ بعد', 'gray'];
+        polPhase = buildPhase('السياسات واللوائح', pct, approved, total, 'سياسات معتمدة', st, sc, () => navigate('policies-select'));
       }
 
       const raw = (r) => (r.status === 'fulfilled' ? r.value.data : null);
@@ -533,6 +559,23 @@ export default function DaffaPlatform() {
       navigate('policies-select');
     }
     window.scrollTo(0, 0);
+  };
+
+  // يفتح سياسة محددة داخل خطتها (المعادة للتعديل مع ملاحظة المستشار، والمعتمدة للعرض)
+  const openPolicyDeep = ({ workflowId, selId }) => {
+    setActiveUnit(null);
+    setCurrentView('policies-select');
+    sessionStorage.setItem('currentView', 'policies-select');
+    setPolicyWorkflowId(workflowId || null);
+    if (selId) setPolicyOpenReq({ workflowId, selId, n: Date.now() });
+    window.scrollTo(0, 0);
+  };
+  // يفتح محادثة المرسل مباشرة (برقمها، أو باسم المرسل للإشعارات القديمة)
+  const openChatDeep = ({ id, name } = {}) => {
+    const view = currentRole === 'consultant' ? 'con-chat' : 'client-chat';
+    setChatAutoStart(!id && !name && view === 'client-chat');
+    setChatOpen({ id: id || null, name: name || null, n: Date.now() });
+    navigate(view);
   };
 
   const handleUnitNavigate = (target) => {
@@ -791,7 +834,7 @@ export default function DaffaPlatform() {
           {[
             { title: "التخطيط الاستراتيجي", price: sc('strategic_price','5,000'),   icon: <IcTarget width={36} height={36}/>, features: ["11 وحدة تخطيطية", "فيديوهات تعليمية", "شرح مكتوب وإرشادات", "نماذج عمل تفاعلية", "دردشة مع المستشار", "مراجعة واعتماد المستشار", "وثيقة استراتيجية نهائية"], popular: true },
             { title: "التخطيط التشغيلي",    price: sc('operational_price','3,500'), icon: <IcCog width={36} height={36}/>,    features: ["5 وحدات تخطيطية", "استيراد من الخطة الاستراتيجية", "مخطط جانت 12 شهر", "تعيين المسؤولين", "ميزانية تفصيلية", "مراجعة واعتماد المستشار", "وثيقة تشغيلية نهائية"], popular: false },
-            { title: "السياسات واللوائح",    price: `من ${sc('policies_min_price','1,000')}`, icon: <IcClipboard width={36} height={36}/>, features: ["7 سياسات متاحة", "استبيانات ذكية موجهة", "توليد تلقائي للسياسة", "فيديوهات تعليمية", "مراجعة مستشار", "تسعير مستقل لكل سياسة", "تحميل PDF / Word"], popular: false },
+            { title: "السياسات واللوائح",    price: `من ${sc('policies_min_price','1,000')}`, icon: <IcClipboard width={36} height={36}/>, features: [`${sc('comp_policies_badge','19 سياسة ولائحة')} — حزمة دفة v3.0`, "استبيانات ذكية موجهة", "توليد تلقائي للسياسة", "فيديوهات تعليمية", "مراجعة مستشار", "تسعير مستقل لكل سياسة", "تحميل PDF / Word"], popular: false },
           ].map((p, i) => (
             <Card key={i} style={{ padding: 28, border: p.popular ? `2px solid ${colors.amberLine}` : `1px solid ${colors.grayBorder}`, position: "relative", overflow: "visible" }}>
               {p.popular && <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: colors.amber, color: "#0E2A3D", padding: "4px 16px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>الأكثر طلباً</div>}
@@ -941,7 +984,7 @@ export default function DaffaPlatform() {
       if (!r) continue;
       if (p.key === 'policies') {
         const sel = (r.selections || []).find(x => x.status === 'revision');
-        if (sel) return { tone: 'amber', title: 'مستشارك طلب تعديلًا بسيطًا', text: `طلب تعديل على «${sel.policy_type?.name || 'إحدى السياسات'}». اقرأ الملاحظة، عدّل المطلوب، ثم أعد الإرسال — التعديل جزء طبيعي من الرحلة.`, cta: 'افتح الملاحظات', go: view('policies'), sys: 'policies' };
+        if (sel) return { tone: 'amber', title: 'مستشارك طلب تعديلًا بسيطًا', text: `طلب تعديل على «${sel.policy_type?.name || 'إحدى السياسات'}». اقرأ الملاحظة، عدّل المطلوب، ثم أعد الإرسال — التعديل جزء طبيعي من الرحلة.`, cta: 'فتح السياسة للتعديل', openPolicy: { workflowId: r.workflow?.id, selId: sel.id }, go: view('policies'), sys: 'policies' };
       } else {
         const u = (r.revision_units || [])[0];
         if (u) return { tone: 'amber', title: 'مستشارك طلب تعديلًا بسيطًا', text: `طلب تعديل على «${u.name}» في ${label(p.key)}${u.consultant_notes ? `: ${u.consultant_notes}` : ''}. عدّل المطلوب ثم اضغط «إعادة الإرسال للمراجعة».`, cta: 'افتح الملاحظات', open: { sys: p.key, workflowId: r.workflow_id, unit: u }, go: view(p.key), sys: p.key };
@@ -963,7 +1006,7 @@ export default function DaffaPlatform() {
         if (nextUnit) return { tone: 'primary', title: `تابع ${label(p.key)}`, text: `${nextUnit.status === 'in_progress' ? 'أكمل' : 'ابدأ'} «${nextUnit.name}»: اتبع الشرح والفيديو ثم عبّئ النموذج — يُحفظ عملك تلقائيًا كمسودة.`, cta: nextUnit.status === 'in_progress' ? 'أكمل الوحدة' : 'ابدأ الوحدة', open: { sys: p.key, workflowId: r.workflow_id, unit: nextUnit }, go: view(p.key), sys: p.key };
         if (inReview.length) {
           const resent = inReview.find(u => (u.revision_count || 0) > 0);
-          return { tone: 'primary', title: resent ? 'أُعيد إرسال الوحدة. يراجعها المستشار الآن' : 'وحداتك لدى المستشار', text: resent ? `«${resent.name}» وصلت المستشار بعد تعديلك. سيصلك إشعار عند اعتمادها أو عند أي ملاحظة جديدة.` : `المستشار يراجع ${inReview.length === 1 ? 'وحدة واحدة' : `${inReview.length} وحدات`} في ${label(p.key)}. سيصلك إشعار عند الرد.`, cta: 'عرض حالة المراجعة', go: view(p.key), sys: p.key };
+          return { tone: 'primary', title: resent ? 'أُعيد إرسال الوحدة. يراجعها المستشار الآن' : 'وحداتك لدى المستشار', text: resent ? `«${resent.name}» وصلت المستشار بعد تعديلك. سيصلك إشعار عند اعتمادها أو عند أي ملاحظة جديدة.` : `المستشار يراجع ${inReview.length === 1 ? 'وحدة واحدة' : `${inReview.length} وحدات`} في ${label(p.key)}. سيصلك إشعار عند الرد.`, cta: 'عرض حالة المراجعة', open: { sys: p.key, workflowId: r.workflow_id, unit: resent || inReview[0] }, go: view(p.key), sys: p.key };
         }
       }
       return { tone: 'primary', title: `تابع ${label(p.key)}`, text: `أنجزت ${p.sub}. افتح الوحدة التالية واتبع الشرح والفيديو ثم عبّئ النموذج — يُحفظ عملك تلقائيًا.`, cta: 'تابع من حيث توقفت', go: view(p.key), sys: p.key };
@@ -1000,7 +1043,7 @@ export default function DaffaPlatform() {
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{next.title}</div>
                 <div style={{ fontSize: 14, lineHeight: 1.9, color: '#D9E8F1' }}>{next.text}</div>
               </div>
-              <Btn large onClick={() => (next.open ? openUnitDeep(next.open) : navigate(next.go))} iconEnd={<span style={{ fontSize: 18 }}>←</span>}>{next.cta}</Btn>
+              <Btn large onClick={() => (next.open ? openUnitDeep(next.open) : next.openPolicy ? openPolicyDeep(next.openPolicy) : navigate(next.go))} iconEnd={<span style={{ fontSize: 18 }}>←</span>}>{next.cta}</Btn>
             </div>
           ) : <Loading text="نجهّز لك خطوتك التالية…" pad={20} />}
         </div>
@@ -1211,13 +1254,19 @@ export default function DaffaPlatform() {
                         if (!n.read) handleMarkRead(n.id);
                         const d = n.data || {};
                         if (d.unit_number && (d.system === 'strategic' || d.system === 'operational')) openUnitDeep({ sys: d.system, workflowId: d.workflow_id, unit: { unit_number: d.unit_number, name: (n.title || '').replace(/^(طلب تعديل على|تم اعتماد)\s*/, '') } });
+                        else if (d.system === 'policies' && d.selection_id) openPolicyDeep({ workflowId: d.workflow_id, selId: d.selection_id });
+                        else if (n.type === 'policy_revision' || n.type === 'policy_approved') navigate('policies-select');
+                        else if (n.type === 'message') openChatDeep({ id: d.conversation_id, name: (n.title || '').replace(/^رسالة جديدة من\s*/, '') });
                       }}
-                      style={{ marginBottom: 8, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, cursor: (!n.read || n.data?.unit_number) ? "pointer" : "default", borderRight: `3px solid ${meta.border}`, background: n.read ? colors.white : `${meta.border}08`, transition: "background 0.2s" }}
+                      data-notif-type={n.type}
+                      style={{ marginBottom: 8, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, cursor: "pointer", borderRight: `3px solid ${meta.border}`, background: n.read ? colors.white : `${meta.border}08`, transition: "background 0.2s" }}
                     >
                       <NotifIcon type={n.type} />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 14, fontWeight: n.read ? 500 : 700, color: colors.ink }}>{n.title}</div>
                         {n.body && <div style={{ fontSize: 12, color: colors.gray, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.body}</div>}
+                        {n.type === 'policy_revision' && <div style={{ fontSize: 12, color: colors.primary, fontWeight: 700, marginTop: 4 }}>فتح السياسة للتعديل ←</div>}
+                        {n.type === 'message' && <div style={{ fontSize: 12, color: colors.primary, fontWeight: 700, marginTop: 4 }}>فتح المحادثة والرد ←</div>}
                       </div>
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flexShrink: 0 }}>
                         <span style={{ fontSize: 11, color: colors.gray }}>{n.time}</span>
@@ -1252,7 +1301,7 @@ export default function DaffaPlatform() {
                     <div style={{ width: 48, height: 48, borderRadius: 12, background: colors.primaryDeep, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>{dlIconMap[d.icon] || <IcDocument width={24} height={24}/>}</div>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 600, color: colors.ink }}>{d.name}</div>
-                      <div style={{ fontSize: 11, color: colors.gray }}>PDF • {d.date} • {d.consultant}</div>
+                      <div style={{ fontSize: 11, color: colors.gray }}>PDF • {d.dateLabel ? `${d.dateLabel} ${d.date}` : d.date} • {d.consultant}</div>
                     </div>
                   </div>
                   <Btn small onClick={() => handleDocDownload(d)}>تحميل</Btn>
@@ -1265,7 +1314,7 @@ export default function DaffaPlatform() {
       );
 
       // ======= CLIENT: المساعدة =======
-      case "client-help": return <ClientHelpPage />;
+      case "client-help": return <ClientHelpPage onOpenChat={(id) => openChatDeep({ id })} onOpenPolicies={() => navigate('policies-select')} />;
       case "con-help":   return <GenericPage title="دليل الاستخدام"><RoleGuide role="consultant" /></GenericPage>;
       case "admin-help": return <GenericPage title="دليل الاستخدام"><RoleGuide role="admin" /></GenericPage>;
 
@@ -1473,7 +1522,7 @@ export default function DaffaPlatform() {
           </KeepAlive>
           <KeepAlive active={currentView === 'policies-select'}>
             {currentRole !== 'client' || can('client.policies.view')
-              ? <PoliciesRoadmapDynamic navigate={navigate} workflowId={policyWorkflowId} onWorkflowSelect={setPolicyWorkflowId} />
+              ? <PoliciesRoadmapDynamic navigate={navigate} workflowId={policyWorkflowId} onWorkflowSelect={setPolicyWorkflowId} openRequest={policyOpenReq} />
               : <AccessDenied />}
           </KeepAlive>
 
@@ -1495,7 +1544,7 @@ export default function DaffaPlatform() {
           <KeepAlive active={currentView === 'client-chat' || currentView === 'con-chat'}>
             {currentRole === 'client' && !can('client.chat.view')
               ? <AccessDenied />
-              : <ChatPage role={currentRole} userId={authUser?.id} canSend={currentRole !== 'client' || can('client.chat.send')} autoStart={chatAutoStart} />}
+              : <ChatPage role={currentRole} userId={authUser?.id} canSend={currentRole !== 'client' || can('client.chat.send')} autoStart={chatAutoStart} openConversation={chatOpen} />}
           </KeepAlive>
 
           {/* ── صفحات المستشار ── */}
@@ -1564,7 +1613,7 @@ export default function DaffaPlatform() {
 
           {/* ── الإعدادات (مشترك بين جميع الأدوار) ── */}
           <KeepAlive active={['client-settings', 'con-settings', 'admin-profile'].includes(currentView)}>
-            <ProfilePage authUser={authUser} onUpdate={(updated) => { localStorage.setItem('user', JSON.stringify(updated)); setAuthUser(updated); }} />
+            <ProfilePage active={['client-settings', 'con-settings', 'admin-profile'].includes(currentView)} authUser={authUser} onUpdate={(updated) => { localStorage.setItem('user', JSON.stringify(updated)); setAuthUser(updated); }} />
           </KeepAlive>
 
           {/* ── الصفحات التي لا تحتاج keep-alive ── */}

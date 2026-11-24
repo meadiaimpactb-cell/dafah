@@ -16,7 +16,7 @@ function HeroPreview() {
   const rows = [
     { k: 'strategic', p: 64, s: '7 من 11 وحدة', st: 'قيد العمل' },
     { k: 'operational', p: 100, s: '5 من 5 وحدات', st: 'مكتمل' },
-    { k: 'policies', p: 30, s: '2 من 7 سياسات', st: 'قيد العمل' },
+    { k: 'policies', p: 30, s: '2 من 19 سياسة', st: 'قيد العمل' },
   ];
   return (
     <div aria-hidden="true" style={{ position: 'relative', width: '100%', maxWidth: 440, marginInline: 'auto' }}>
@@ -59,7 +59,7 @@ export default function Landing({ sc, navigate, onRegister, PublicNav, PublicFoo
   const comps = [
     { k: 'strategic', title: 'نظام التخطيط الاستراتيجي', desc: sc('comp_strategic_desc', '11 وحدة تخطيطية لبناء خطة استراتيجية متكاملة'), badge: sc('comp_strategic_badge', '11 وحدة'), icon: <IcTarget width={26} height={26} /> },
     { k: 'operational', title: 'نظام التخطيط التشغيلي', desc: sc('comp_operational_desc', '5 وحدات لتحويل الاستراتيجية إلى خطة تنفيذية'), badge: sc('comp_operational_badge', '5 وحدات'), icon: <IcCog width={26} height={26} /> },
-    { k: 'policies', title: 'نظام بناء السياسات واللوائح', desc: sc('comp_policies_desc', '7 سياسات ولوائح تُبنى عبر استبيانات ذكية موجهة'), badge: sc('comp_policies_badge', '7 سياسات'), icon: <IcClipboard width={26} height={26} /> },
+    { k: 'policies', title: 'نظام بناء السياسات واللوائح', desc: sc('comp_policies_desc', '19 سياسة ولائحة ضمن «حزمة دفة v3.0» تُبنى عبر استبيانات ذكية موجهة'), badge: sc('comp_policies_badge', '19 سياسة ولائحة'), icon: <IcClipboard width={26} height={26} /> },
   ];
   const points = [1, 2, 3, 4, 5].map((i) => sc(`pricing_point${i}`, [
     'يتم وضع أسعار قليلة التكلفة وللجهة اختيار المستشار عن بعد من القائمة',

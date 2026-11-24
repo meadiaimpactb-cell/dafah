@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import { strategicApi } from '../../api/strategic';
 import TemplateRenderer from './TemplateRenderer';
 import { DEMO_DATA } from './demoData';
-import { validateTemplate, hasAnyInput } from './templateValidation';
+import { validateTemplate, hasAnyInput, ORG_CYCLE_MSG } from './templateValidation';
 import { OverviewContent, ExplanationContent, GuidelinesContent, templateLabel } from './UnitContent';
 import UnitVideo from '../shared/UnitVideo';
 import { unitTimeLabel } from '../../utils/duration';
@@ -198,8 +198,11 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
   const unit       = unitData?.unit || {};
   const submission = unitData?.submission || {};
   const validation = validateTemplate(unit.template_type, formData, unit);
+  // تبعية ذاتية أو دائرية في الهيكل التنظيمي: زر الإرسال معطّل بصريًا ووظيفيًا حتى تصحيح العلاقة
+  const submitBlocked = (validation.errors || []).includes(ORG_CYCLE_MSG);
 
   const handleSubmit = async () => {
+    if (submitBlocked) { setShowErrors(true); return; }
     if (!validation.valid) {
       setShowErrors(true);
       showMsg('error', 'أكمل الحقول المطلوبة أولًا، ثم أعد الإرسال. مسودتك محفوظة.');
@@ -475,15 +478,18 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
                 </button>
                 <button
                   onClick={handleSubmit}
-                  disabled={submitting}
-                  title={!validation.valid ? 'أكمل الحقول المطلوبة أولاً' : ''}
+                  disabled={submitting || submitBlocked}
+                  aria-disabled={submitBlocked ? 'true' : undefined}
+                  aria-describedby={submitBlocked ? 'submit-blocked-msg' : undefined}
+                  title={submitBlocked ? 'صحّح علاقات التبعية في الهيكل أولًا' : !validation.valid ? 'أكمل الحقول المطلوبة أولاً' : ''}
                   data-can-submit={validation.valid ? '1' : '0'}
+                  data-submit-blocked={submitBlocked ? '1' : undefined}
                   style={{
                     padding: '11px 28px',
                     background: validation.valid ? colors.amber : '#E8E3DA',
                     color: validation.valid ? '#0E2A3D' : '#8C97A3',
                     border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700,
-                    cursor: submitting ? 'wait' : 'pointer',
+                    cursor: submitBlocked ? 'not-allowed' : submitting ? 'wait' : 'pointer',
                     fontFamily: "inherit",
                     opacity: validation.valid ? 1 : 0.75,
                     transition: 'all 0.2s',
@@ -491,6 +497,11 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
                 >
                   {submitting ? 'جاري الإرسال...' : submitLabel}
                 </button>
+                {submitBlocked && (
+                  <span id="submit-blocked-msg" role="status" style={{ fontSize: 12, color: '#C53A3A', fontWeight: 700, alignSelf: 'center' }}>
+                    الإرسال معطّل: صحّح التبعية الذاتية أو الدائرية في الهيكل، ثم يتفعّل الزر. حفظ المسودة متاح.
+                  </span>
+                )}
                 {currentSubmitted && nextUnit && (
                   <button
                     onClick={() => goToUnit(nextUnit)}

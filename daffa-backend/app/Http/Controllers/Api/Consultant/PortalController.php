@@ -523,7 +523,7 @@ class PortalController extends Controller
 
         $userId = $sel->workflow->user_id;
         $policyName = $typeMap->get($sel->policy_type_id)['name'] ?? 'السياسة';
-        Notification::notify($userId, 'policy_approved', "تم اعتماد {$policyName}", $request->notes ?: null);
+        Notification::notify($userId, 'policy_approved', "تم اعتماد {$policyName}", $request->notes ?: null, ['system' => 'policies', 'workflow_id' => $sel->workflow_id, 'selection_id' => $sel->id]);
 
         $this->checkPolWorkflowCompletion($sel->workflow_id);
 
@@ -551,7 +551,7 @@ class PortalController extends Controller
         ]);
 
         $policyName = $typeMap->get($sel->policy_type_id)['name'] ?? 'السياسة';
-        Notification::notify($sel->workflow->user_id, 'policy_revision', "طلب تعديل على {$policyName}", $request->notes);
+        Notification::notify($sel->workflow->user_id, 'policy_revision', "طلب تعديل على {$policyName}", $request->notes, ['system' => 'policies', 'workflow_id' => $sel->workflow_id, 'selection_id' => $sel->id]);
 
         ActivityLog::record($request->user()->id, 'طلب تعديل — سياسة', 'review', 'consultant',
             $policyName.' — '.($sel->workflow->user->org_name ?: $sel->workflow->user->email));

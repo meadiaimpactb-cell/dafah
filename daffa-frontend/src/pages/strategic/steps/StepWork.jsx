@@ -18,6 +18,8 @@ export default function StepWork({ setActiveUnit, workflowId, refreshWorkflow, r
   const [units,   setUnits]   = useState([]);
   const [loading, setLoading] = useState(true);
   const [proceeding, setProceeding] = useState(false);
+  const [docBusy, setDocBusy] = useState(false);
+  const [docErr,  setDocErr]  = useState('');
 
   useEffect(() => {
     setLoading(true);
@@ -36,6 +38,20 @@ export default function StepWork({ setActiveUnit, workflowId, refreshWorkflow, r
   const sentCount    = units.filter(u => SUBMITTED_ST.includes(u.submission_status)).length;
   const nextUnit     = units.find(u => !SUBMITTED_ST.includes(u.submission_status));
   const revisionN    = units.filter(u => u.submission_status === 'revision').length;
+  const inReviewN    = units.filter(u => ['submitted', 'reviewing'].includes(u.submission_status)).length;
+  const allApproved  = units.length > 0 && approved === units.length;
+  // الوثيقة النهائية بعد اعتماد جميع الوحدات
+  const openFinalDoc = async () => {
+    setDocBusy(true); setDocErr('');
+    const win = window.open('', '_blank');
+    try {
+      const res = await strategicApi.getPdfLink(workflowId);
+      win.location.href = res.data.url;
+    } catch {
+      win?.close();
+      setDocErr('تعذّر تجهيز الوثيقة. حاول مرة أخرى.');
+    } finally { setDocBusy(false); }
+  };
   // سطر واضح تحت كل وحدة يشرح حالتها
   const STATUS_LINE = {
     in_progress: { text: 'محفوظة كمسودة — لم تُرسل بعد', color: '#A33F12' },
@@ -103,13 +119,28 @@ export default function StepWork({ setActiveUnit, workflowId, refreshWorkflow, r
         })}
       </div>
 
-      {allSubmitted ? (
+      {allApproved ? (
+        <div data-all-approved style={{ background: '#C9EFE1', border: '1.5px solid #7FD3B5', borderRadius: 12, padding: '16px 20px', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 20 }}><DfIcon name="check" size={20} /></span>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#086449' }}>اعتمد المستشار جميع وحدات الخطة</div>
+              <div style={{ fontSize: 12, color: '#086449', marginTop: 2 }}>الوثيقة الاستراتيجية النهائية جاهزة؛ افتحها ثم اضغط فيها «طباعة / حفظ PDF» لحفظها.</div>
+              {docErr && <div role="alert" style={{ fontSize: 12, color: '#C53A3A', marginTop: 4, fontWeight: 700 }}>{docErr}</div>}
+            </div>
+          </div>
+          <button onClick={openFinalDoc} disabled={docBusy}
+            style={{ padding: '10px 22px', background: docBusy ? '#8C97A3' : colors.primary, color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: docBusy ? 'not-allowed' : 'pointer', fontFamily: "inherit", whiteSpace: 'nowrap' }}>
+            {docBusy ? 'جارٍ التجهيز…' : 'فتح الوثيقة النهائية'}
+          </button>
+        </div>
+      ) : allSubmitted && inReviewN > 0 && revisionN === 0 ? (
         <div style={{ background: '#C9EFE1', border: '1.5px solid #7FD3B5', borderRadius: 12, padding: '16px 20px', marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 20 }}><DfIcon name="check" size={20} /></span>
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: '#086449' }}>تم إرسال جميع الوحدات الـ {total} للمراجعة</div>
-              <div style={{ fontSize: 12, color: '#086449', marginTop: 2 }}>المستشار يراجع الآن — ستصلك إشعارات عند اعتماد كل وحدة</div>
+              <div data-review-message style={{ fontSize: 12, color: '#086449', marginTop: 2 }}>المستشار يراجع الآن {inReviewN === 1 ? 'وحدة واحدة' : `${inReviewN} وحدات`} — ستصلك إشعارات عند اعتماد كل وحدة</div>
             </div>
           </div>
           <button

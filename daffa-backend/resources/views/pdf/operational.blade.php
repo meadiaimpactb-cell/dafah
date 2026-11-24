@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>الخطة التشغيلية — {{ $workflow->user->org_name ?? 'المنظمة' }} — OP-{{ $workflow->id }}</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -336,6 +337,21 @@ body {
 .spacer     { height: 14px; }
 .unit-sep   { height: 32px; }
 </style>
+
+@if(empty($forMpdf))
+<style>
+@page { size: A4 portrait; margin: 0; }
+@media print {
+    html, body { margin: 0 !important; }
+    .page-wrapper { padding: 10mm 12mm !important; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+}
+.print-btn { display: inline-flex; align-items: center; gap: 6px; }
+.print-btn .print-ic { flex-shrink: 0; }
+.print-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; max-width: 60%; }
+.print-hint { font-size: 10.5px; color: #B5D2E3; line-height: 1.6; text-align: left; }
+@media (max-width: 640px) { .print-btn-bar { flex-wrap: wrap; gap: 8px; } .print-actions { max-width: 100%; align-items: stretch; } .print-hint { text-align: right; } }
+</style>
+@endif
 </head>
 <body>
 
@@ -359,7 +375,10 @@ body {
 {{-- ════ شريط الطباعة (شاشة فقط) ════ --}}
 <div class="print-btn-bar">
     <span class="print-bar-title">الخطة التشغيلية — {{ $orgName }}</span>
-    <button class="print-btn" onclick="window.print()">&#0B7F5D; طباعة / حفظ PDF</button>
+    <div class="print-actions">
+        <button class="print-btn" type="button" onclick="window.print()"><svg class="print-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span>طباعة / حفظ PDF</span></button>
+        <span class="print-hint">في نافذة الطباعة اختر الوجهة «حفظ بصيغة PDF»، وإن ظهر خيار «الرؤوس والتذييلات» في الإعدادات الإضافية فألغِ تحديده.</span>
+    </div>
 </div>
 
 {{-- ════ غلاف ════ --}}

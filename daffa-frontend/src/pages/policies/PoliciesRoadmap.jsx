@@ -1,5 +1,5 @@
 import DfIcon from '../../components/ui/DfIcon';
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import ReactDOM from "react-dom";
 import { policiesApi, policiesDesignApi } from "../../api/policies";
 import api from "../../api/axios";
@@ -73,8 +73,8 @@ const ConfirmModal = ({ open, title, message, onConfirm, onCancel }) => {
 };
 
 // ── Shared UI helpers ─────────────────────────────────────────────────────────
-const Card = ({ children, style, onClick }) => (
-  <div onClick={onClick} style={{ background: C.white, borderRadius: 14, padding: 20, boxShadow: "0 1px 4px rgba(14,42,61,0.06)", ...style }}>
+const Card = ({ children, style, onClick, ...rest }) => (
+  <div {...rest} onClick={onClick} style={{ background: C.white, borderRadius: 14, padding: 20, boxShadow: "0 1px 4px rgba(14,42,61,0.06)", ...style }}>
     {children}
   </div>
 );
@@ -756,8 +756,50 @@ const PolicyInfoPanel = ({ policyType }) => {
   );
 };
 
+// ── مرجع بجوار السؤال: جدول أو قائمة أو روابط من الوثيقة المعتمدة (يُطوى خلف زر عند وجود button) ──
+const QuestionInfo = ({ info, qid }) => {
+  const [open, setOpen] = useState(!info?.button);
+  if (!info) return null;
+  const panelId = `qinfo-${qid}`;
+  return (
+    <div style={{ margin: "6px 0 12px" }} data-qinfo={qid}>
+      {info.button && (
+        <button type="button" onClick={() => setOpen(v => !v)} aria-expanded={open} aria-controls={panelId}
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 8, border: `1px solid ${C.primary}40`, background: `${C.primary}0D`, color: C.primary, fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", marginBottom: open ? 8 : 0 }}>
+          <IcDocument width={13} height={13}/>{info.button}<span aria-hidden="true" style={{ fontSize: 10 }}>{open ? "▲" : "▼"}</span>
+        </button>
+      )}
+      {open && (
+        <div id={panelId} role="region" aria-label={info.title || info.button} style={{ border: `1px solid ${C.primary}30`, borderRadius: 10, overflow: "hidden" }}>
+          {info.title && <div style={{ padding: "8px 12px", background: `${C.primary}10`, fontSize: 12, fontWeight: 700, color: C.primary }}>{info.title}</div>}
+          {info.headers || info.rows ? (
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                {info.headers && <thead><tr>{info.headers.map((h, i) => <th key={i} style={{ padding: "6px 10px", textAlign: "right", background: C.grayLight, color: C.ink, fontWeight: 700, whiteSpace: "nowrap" }}>{h}</th>)}</tr></thead>}
+                <tbody>{(info.rows || []).map((r, i) => <tr key={i} style={{ borderTop: `1px solid ${C.grayBorder}` }}>{r.map((c, j) => <td key={j} style={{ padding: "6px 10px", color: "#334452", verticalAlign: "top", fontWeight: j === 0 ? 600 : 400 }}>{c}</td>)}</tr>)}</tbody>
+              </table>
+            </div>
+          ) : null}
+          {info.items?.length > 0 && (
+            <ul style={{ margin: 0, padding: "8px 28px 8px 12px", fontSize: 12, color: "#334452", lineHeight: 1.9 }}>
+              {info.items.map((t, i) => <li key={i}>{t}</li>)}
+            </ul>
+          )}
+          {info.note && <div style={{ padding: "8px 12px", fontSize: 12, color: C.gray, borderTop: `1px solid ${C.grayBorder}`, lineHeight: 1.8 }}>{info.note}</div>}
+          {info.links?.length > 0 && (
+            <div style={{ padding: "8px 12px", borderTop: `1px solid ${C.grayBorder}`, display: "flex", flexDirection: "column", gap: 4 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: C.ink }}>المرجع المعتمد:</span>
+              {info.links.map((l, i) => <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: C.blue, fontWeight: 600 }}>{l.label} ↗</a>)}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ── Questionnaire section for a single policy ─────────────────────────────────
-const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, loading, readOnly = false }) => {
+const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, loading, readOnly = false, planSelections = [], planPolicyTypes = [], onOpenRef, initialSection = 0, backLabel }) => {
   const [apiSections, setApiSections] = useState([]);
   const [loadingQ,    setLoadingQ]    = useState(true);
   const [section,     setSection]     = useState(0);
@@ -769,13 +811,30 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
     if (!policyType?.id) return;
     setLoadingQ(true);
     api.get(`/questionnaire/${policyType.id}`)
-      .then(r => { setApiSections(Array.isArray(r.data) ? r.data : []); setSection(0); })
+      .then(r => { const list = Array.isArray(r.data) ? r.data : []; setApiSections(list); setSection(Math.min(Math.max(0, initialSection || 0), Math.max(0, list.length - 1))); })
       .catch(() => setApiSections([]))
       .finally(() => setLoadingQ(false));
   }, [policyType?.id]);
 
+  // أسئلة أُخفيت ثم ظهرت من جديد وما زالت تحمل إجابة سابقة: ننبّه العميل لمراجعتها قبل الإرسال
+  const visRef = useRef(null);
+  const [restored, setRestored] = useState(() => new Set());
+  useEffect(() => {
+    const qs = apiSections.flatMap(sec => sec.questions || []);
+    const now = {};
+    qs.forEach(q => { now[q.id] = isVisible(q, answers); });
+    const prev = visRef.current;
+    if (prev && !readOnly) {
+      const back = qs.filter(q => prev[q.id] === false && now[q.id] && (isFilled(answers[`q${q.id}`]) || Object.values(answers[`q${q.id}__parts`] || {}).some(v => isFilled(v))));
+      const gone = qs.filter(q => prev[q.id] && now[q.id] === false);
+      if (back.length || gone.length) setRestored(old => { const n = new Set(old); back.forEach(q => n.add(q.id)); gone.forEach(q => n.delete(q.id)); return n; });
+    }
+    visRef.current = now;
+  }, [answers, apiSections, readOnly]);
+  const touch = (qId) => setRestored(old => { if (!old.has(qId)) return old; const n = new Set(old); n.delete(qId); return n; });
+
   // التمييز الأحمر يبقى على الأسئلة الناقصة فقط ويختفي عن كل سؤال فور الإجابة عنه
-  const setAns = (qId, value) => { setAnswers(prev => ({ ...prev, [`q${qId}`]: value })); };
+  const setAns = (qId, value) => { touch(qId); setAnswers(prev => ({ ...prev, [`q${qId}`]: value })); };
   const setExtra = (key, value) => { setAnswers(prev => ({ ...prev, [key]: value })); };
   const getAns = (qId) => answers[`q${qId}`] ?? "";
   const allQuestionsRef = apiSections.flatMap(s => s.questions || []);
@@ -853,7 +912,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
     );
     if (kind === 'number') return (
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <input type="text" inputMode="decimal" value={value || ""} onChange={e => onChange(e.target.value)} placeholder={spec.placeholder || (spec.min !== undefined ? `${spec.min} فأكثر` : "0")} style={{ ...inputBox, direction: "ltr", textAlign: "right", maxWidth: 220 }} aria-label={opts.label} />
+        <input type="text" inputMode="decimal" value={value || ""} onChange={e => onChange(e.target.value)} placeholder={spec.placeholder || (spec.max !== undefined ? `من ${spec.min ?? 0} إلى ${spec.max}` : spec.min !== undefined ? `${spec.min} فأكثر` : "0")} style={{ ...inputBox, direction: "ltr", textAlign: "right", maxWidth: 220 }} aria-label={opts.label} />
         {unitTag(spec.unit)}
       </div>
     );
@@ -874,17 +933,27 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
     const m    = q.meta || {};
     const label = <label style={{ fontSize: 14, fontWeight: 600, color: C.ink, display: "block", marginBottom: 8 }}>{q.question}{q.required && <span style={{ color: C.red }}> *</span>}</label>;
     const hint  = q.hint && <div style={{ fontSize: 12, color: C.gray, marginBottom: 6 }}>{q.hint}</div>;
-    const info  = m.info && (
-      <div style={{ margin: "6px 0 12px", border: `1px solid ${C.primary}30`, borderRadius: 10, overflow: "hidden" }}>
-        <div style={{ padding: "8px 12px", background: `${C.primary}10`, fontSize: 12, fontWeight: 700, color: C.primary }}>{m.info.title}</div>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
-            {m.info.headers && <thead><tr>{m.info.headers.map((h, i) => <th key={i} style={{ padding: "6px 10px", textAlign: "right", background: C.grayLight, color: C.ink, fontWeight: 700, whiteSpace: "nowrap" }}>{h}</th>)}</tr></thead>}
-            <tbody>{(m.info.rows || []).map((r, i) => <tr key={i} style={{ borderTop: `1px solid ${C.grayBorder}` }}>{r.map((c, j) => <td key={j} style={{ padding: "6px 10px", color: "#334452", verticalAlign: "top" }}>{c}</td>)}</tr>)}</tbody>
-          </table>
-        </div>
+    // سياسة مرجعية من الخطة نفسها (مثل مصفوفة الصلاحيات بجوار سقف العهدة): رابط إن كانت مشمولة، وإرشاد بديل إن لم تكن
+    const refSel = m.ref_policy ? planSelections.find(x => x.policy_type_id === m.ref_policy.id && x.id !== selection?.id) : null;
+    const refName = m.ref_policy ? (planPolicyTypes.find(p => p.id === m.ref_policy.id)?.name || m.ref_policy.name) : null;
+    const refBox = m.ref_policy && (
+      <div data-ref-policy={refSel ? "in-plan" : "missing"} style={{ margin: "6px 0 12px", padding: "10px 12px", borderRadius: 10, background: `${C.blue}0D`, border: `1px solid ${C.blue}30`, fontSize: 12, color: "#1B5E9E", lineHeight: 1.8, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+        <span style={{ flex: "1 1 260px" }}>{refSel ? (m.ref_policy.in_plan || `«${refName}» مشمولة في خطتك.`) : m.ref_policy.missing}</span>
+        {refSel && onOpenRef && (
+          <button type="button" onClick={async () => { if (!readOnly) await autoSave(); onOpenRef(refSel, { fromId: selection.id, section, readOnly }); }}
+            style={{ pointerEvents: "auto", padding: "6px 12px", borderRadius: 8, border: "none", background: C.blue, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}>
+            فتح «{refName}» من خطتك
+          </button>
+        )}
       </div>
     );
+    const restoredNote = restored.has(q.id) && (
+      <div data-restored-note role="status" style={{ margin: "0 0 10px", padding: "8px 12px", borderRadius: 8, background: C.amberSoft, border: `1px dashed ${C.amber}`, fontSize: 12, color: C.amberText, fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
+        <IcWarning width={14} height={14}/>
+        {(m.unit === 'ريال' || (m.fields || []).some(f => f.unit === 'ريال')) ? 'هذه مبالغ سبق إدخالها. راجعها وعدّل ما يلزم قبل إرسال السياسة.' : 'هذه إجابة سبق إدخالها. راجعها وعدّل ما يلزم قبل إرسال السياسة.'}
+      </div>
+    );
+    const info = <>{refBox}{m.info && <QuestionInfo info={m.info} qid={q.id} />}{restoredNote}</>;
     // حقل «أخرى»: يظهر فور اختيار خيار يستلزم توضيحًا
     const otherBox = (() => {
       if (!m.other?.options?.length) return null;
@@ -902,10 +971,10 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
     // سؤال مركّب بعدة خانات
     if (m.fields?.length) {
       const parts = (answers[`${key}__parts`] && typeof answers[`${key}__parts`] === 'object') ? answers[`${key}__parts`] : {};
-      const setPart = (fk, v) => setAnswers(prev => {
+      const setPart = (fk, v) => { touch(q.id); setAnswers(prev => {
         const np = { ...((prev[`${key}__parts`] && typeof prev[`${key}__parts`] === 'object') ? prev[`${key}__parts`] : {}), [fk]: v };
         return { ...prev, [`${key}__parts`]: np, [key]: assembleParts(q, prev, np) };
-      });
+      }); };
       const fields = visibleFields(q, answers);
       return (
         <div key={q.id}>{label}{hint}{info}
@@ -932,8 +1001,8 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
       <div key={q.id}>{label}{hint}{info}
         {(q.options || []).map((o, i) => (
           <label key={i} onClick={() => setAns(q.id, o)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, marginBottom: 4, cursor: "pointer", border: `1.5px solid ${getAns(q.id) === o ? C.primary : C.grayBorder}`, background: getAns(q.id) === o ? `${C.primary}08` : "transparent" }}>
-            <input type="radio" checked={getAns(q.id) === o} onChange={() => setAns(q.id, o)} style={{ accentColor: C.primary }} />
-            <span style={{ fontSize: 13 }}>{o}</span>
+            <input type="radio" checked={getAns(q.id) === o} onChange={() => setAns(q.id, o)} style={{ accentColor: C.primary, alignSelf: m.option_notes?.[o] ? "flex-start" : "center", marginTop: m.option_notes?.[o] ? 4 : 0 }} />
+            <span style={{ fontSize: 13 }}>{o}{m.option_notes?.[o] && <span data-option-note style={{ display: "block", fontSize: 11.5, color: C.gray, lineHeight: 1.7, marginTop: 2 }}>{m.option_notes[o]}</span>}</span>
           </label>
         ))}
         {otherBox}
@@ -943,22 +1012,27 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
       const vals = Array.isArray(getAns(q.id)) ? getAns(q.id) : [];
       const forced = forcedOptions(q, answers);
       // التبديل من آخر حالة (لا من نسخة قديمة)، والنقر على النص يصل إلى خانة الاختيار عبر <label> نفسها فلا نكرّر المعالجة
-      const toggle = (o) => setAnswers(prev => ({ ...prev, [key]: toggleMultiple(q, prev, o) }));
+      const toggle = (o) => { touch(q.id); setAnswers(prev => ({ ...prev, [key]: toggleMultiple(q, prev, o) })); };
       const excl = m.exclusive || [];
+      const allOpt = m.covers_all; const allOn = !!allOpt && vals.includes(allOpt);
       return (
         <div key={q.id}>{label}{hint}{info}
           {forced.length > 0 && <div style={{ fontSize: 12, color: C.amberText, marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}><IcLock width={12} height={12}/> خيارات إلزامية في حالتكم ولا يمكن إلغاؤها: {forced.join("، ")}</div>}
           {(q.options || []).map((o, i) => {
-            const on = vals.includes(o) || forced.includes(o); const locked = forced.includes(o); const isNeg = excl.includes(o);
+            const covered = allOn && o !== allOpt;
+            const on = vals.includes(o) || forced.includes(o) || covered; const locked = forced.includes(o) || covered; const isNeg = excl.includes(o);
             return (
-              <label key={i} title={locked ? "خيار إلزامي" : isNeg ? "اختياره يلغي بقية الخيارات" : ""}
+              <label key={i} title={covered ? `مشمول ضمن «${allOpt}»` : locked ? "خيار إلزامي" : isNeg ? "اختياره يلغي بقية الخيارات" : ""}
+                data-covered={covered ? "1" : undefined}
                 style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, marginBottom: 4, cursor: locked ? "not-allowed" : "pointer", border: `1.5px solid ${on ? C.primary : C.grayBorder}`, background: on ? `${C.primary}08` : "transparent", opacity: locked ? 0.85 : 1, marginTop: isNeg ? 8 : 0 }}>
                 <input type="checkbox" checked={on} disabled={locked} onChange={() => !locked && toggle(o)} style={{ accentColor: C.primary }} />
                 <span style={{ fontSize: 13 }}>{o}</span>
-                {locked && <span style={{ marginInlineStart: "auto", color: C.gray, display: "inline-flex" }}><IcLock width={12} height={12}/></span>}
+                {covered && <span style={{ marginInlineStart: "auto", fontSize: 11, color: C.gray }}>مشمول</span>}
+                {locked && !covered && <span style={{ marginInlineStart: "auto", color: C.gray, display: "inline-flex" }}><IcLock width={12} height={12}/></span>}
               </label>
             );
           })}
+          {allOn && <div data-covers-all-note style={{ fontSize: 12, color: C.primary, fontWeight: 600, marginTop: 4, lineHeight: 1.7 }}>اخترت «{allOpt}»، فهي تشمل جميع الفئات أعلاه. لاختيار فئات بعينها ألغِ تحديد «{allOpt}» أولًا.</div>}
           {otherBox}
         </div>
       );
@@ -1016,7 +1090,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", color: C.primary, fontSize: 20 }}>←</button>
+          <button onClick={onBack} aria-label={backLabel || "رجوع"} style={{ background: "none", border: "none", cursor: "pointer", color: C.primary, fontSize: backLabel ? 13 : 20, fontWeight: 700, fontFamily: "inherit" }}>{backLabel ? `← ${backLabel}` : "←"}</button>
           <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink }}>{policyType?.name}</h2>
         </div>
         {!readOnly && (
@@ -1078,6 +1152,12 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
       {selection?.status === "revision" && (
         <div style={{ marginBottom: 12, padding: "10px 14px", background: C.amberSoft, borderRadius: 8, fontSize: 12, color: C.amberText, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
           <IcArrowPath width={14} height={14}/> طلب المستشار تعديلاً — عدّل الإجابات وأعد الإرسال
+        </div>
+      )}
+      {selection?.status === "revision" && selection?.consultant_notes && (
+        <div data-revision-note style={{ marginBottom: 12, padding: "12px 16px", background: "#FFF8F0", border: `1.5px solid ${C.amber}`, borderRadius: 10, fontSize: 13, color: "#5E240A", lineHeight: 1.9 }}>
+          <div style={{ fontWeight: 800, color: C.amberText, marginBottom: 4, display: "flex", alignItems: "center", gap: 6 }}><IcChat width={14} height={14}/> ملاحظة المستشار على هذه السياسة</div>
+          <div style={{ whiteSpace: "pre-line" }}>{selection.consultant_notes}</div>
         </div>
       )}
       {!readOnly && validErr && missingNow.length > 0 && (
@@ -1157,7 +1237,7 @@ const WORK_STATE = {
   approved: { label: "معتمدة",                           color: C.green,     bg: C.greenLight, border: `${C.green}60` },
 };
 
-const StepWork = ({ policyTypes, selections, onSave, onSubmit, loading, externalEditId, onExternalEditDone, onView, notice, onDismissNotice, onGoReview }) => {
+const StepWork = ({ policyTypes, selections, onSave, onSubmit, loading, externalEditId, onExternalEditDone, onView, notice, onDismissNotice, onGoReview, onOpenRef }) => {
   const [active, setActive] = useState(externalEditId || null);
   const [sendingId, setSendingId] = useState(null);
 
@@ -1193,7 +1273,7 @@ const StepWork = ({ policyTypes, selections, onSave, onSubmit, loading, external
   if (active) {
     const sel     = selections.find(s => s.id === active);
     const polType = policyTypes.find(p => p.id === sel?.policy_type_id);
-    return <QuestionnaireView selection={sel} policyType={polType} onSave={onSave} onSubmit={handleSubmitAndClose} onBack={handleClose} loading={loading} />;
+    return <QuestionnaireView selection={sel} policyType={polType} onSave={onSave} onSubmit={handleSubmitAndClose} onBack={handleClose} loading={loading} planSelections={selections} planPolicyTypes={policyTypes} onOpenRef={onOpenRef ? (target, ctx) => { setActive(null); onOpenRef(target, ctx); } : undefined} />;
   }
 
   const states   = selections.map(workState);
@@ -1222,7 +1302,7 @@ const StepWork = ({ policyTypes, selections, onSave, onSubmit, loading, external
       {/* ملخّص التقدّم والخطوة التالية */}
       <Card style={{ marginBottom: 18, border: `1.5px solid ${ready.length ? C.amber : allSent ? `${C.green}50` : C.grayBorder}` }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
-          <div style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>أُرسل {sentN} من {selections.length} {selections.length === 1 ? "سياسة" : "سياسات"} للمراجعة</div>
+          <div data-sent-counter style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>السياسات المرسلة للمراجعة: {sentN} من أصل {selections.length}</div>
           {ready.length > 1 && (
             <Btn onClick={() => sendAllReady(ready)} disabled={loading || !!sendingId}>إرسال جميع المكتملة ({ready.length})</Btn>
           )}
@@ -1306,6 +1386,8 @@ const StepReview = ({ policyTypes, selections, onEdit, onView, refreshData }) =>
   }, [refreshData]);
 
   const allApproved = selections.length > 0 && selections.every(s => s.status === 'approved');
+  const revisions   = selections.filter(s => s.status === 'revision');
+  const polName     = (sel) => (policyTypes.find(x => x.id === sel.policy_type_id) || sel.policy_type)?.name || "سياسة";
 
   const handleProceed = async () => {
     setProceeding(true);
@@ -1315,6 +1397,29 @@ const StepReview = ({ policyTypes, selections, onEdit, onView, refreshData }) =>
   return (
   <div className="animate-in">
     <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 6 }}>مراجعة المستشار — السياسات واللوائح</h2>
+    {revisions.length > 0 && (
+      <Card data-revision-banner style={{ marginBottom: 16, padding: "16px 20px", background: C.amberSoft, borderRight: `4px solid ${C.amber}` }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+          <span style={{ color: C.amberText, flexShrink: 0 }}><IcWarning width={24} height={24}/></span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.amberText }}>{revisions.length === 1 ? "لديك سياسة تحتاج إلى تعديل" : `لديك ${revisions.length} سياسات تحتاج إلى تعديل`}</div>
+            <div style={{ fontSize: 12, color: "#7F310E", lineHeight: 1.8, marginBottom: 10 }}>طلب المستشار تعديلًا. افتح السياسة، اقرأ ملاحظته، عدّل الإجابات ثم أعد إرسالها.</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {revisions.map(sel => (
+                <div key={sel.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", background: C.white, borderRadius: 10, padding: "10px 12px", border: `1px solid ${C.amber}60` }}>
+                  <div style={{ minWidth: 0, flex: "1 1 220px" }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>{polName(sel)}</div>
+                    {sel.consultant_notes && <div style={{ fontSize: 12, color: C.amberText, lineHeight: 1.7 }}>ملاحظة المستشار: {sel.consultant_notes}</div>}
+                  </div>
+                  <Btn small onClick={() => onEdit(sel.id)}>فتح السياسة للتعديل</Btn>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Card>
+    )}
+    {revisions.length === 0 && !allApproved && (
     <Card style={{ marginBottom: 16, padding: "16px 20px", background: C.blueLight, borderRight: `4px solid ${C.blue}` }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -1329,6 +1434,7 @@ const StepReview = ({ policyTypes, selections, onEdit, onView, refreshData }) =>
         </div>
       </div>
     </Card>
+    )}
 
     <Card style={{ padding: 0, overflow: "hidden" }}>
       {selections.map((sel, i) => {
@@ -1438,6 +1544,9 @@ const StepDownload = ({ policyTypes, selections, workflow, onNext, onDownload, o
       لكل سياسة ملف بحقول التخصيص الخاصة بجهتك، والنموذج المرجعي الكامل (الإصدار 3.0) بصيغتي Word وPDF.
       <br/>الوثائق نماذج استرشادية تصبح نافذة بعد صدور قرار الاعتماد من صاحب الصلاحية في جهتك.
     </p>
+    <div data-download-hint style={{ fontSize: 12, color: "#1B5E9E", background: C.blueLight, border: `1px solid ${C.blue}30`, borderRadius: 10, padding: "10px 14px", marginBottom: 16, lineHeight: 1.9 }}>
+      <strong>للحصول على ملف PDF:</strong> اضغط «فتح وثيقة التخصيص وحفظها PDF» فتُفتح الوثيقة في تبويب جديد، ثم اضغط فيها «طباعة / حفظ PDF» واختر الوجهة «حفظ بصيغة PDF». أما «عرض إجابات الاستبيان» فيعرض إجاباتك داخل المنصة.
+    </div>
     {selections.map(sel => {
       const p = policyTypes.find(x => x.id === sel.policy_type_id) || sel.policy_type;
       const canTemplate = p?.has_template && sel.status === "approved" && onTemplateDownload;
@@ -1460,11 +1569,11 @@ const StepDownload = ({ policyTypes, selections, workflow, onNext, onDownload, o
             {onView && (
               <button onClick={() => onView(sel.id)}
                 style={{ fontSize: 11, color: C.primary, background: `${C.primary}10`, border: `1px solid ${C.primary}30`, borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontFamily: "inherit", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 3 }}>
-                <IcEye width={11} height={11}/>عرض
+                <IcEye width={11} height={11}/>عرض إجابات الاستبيان
               </button>
             )}
             <Btn small onClick={() => onDownload(sel.id)} disabled={loadingId === sel.id}>
-              {loadingId === sel.id ? "جارٍ التحميل..." : "تحميل PDF"}
+              {loadingId === sel.id ? "جارٍ الفتح..." : "فتح وثيقة التخصيص وحفظها PDF"}
             </Btn>
           </div>
         </Card>
@@ -2321,7 +2430,7 @@ const WorkflowsList = ({ onSelect, onNew }) => {
 
 // ── Main PoliciesRoadmap component ───────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════════════════
-export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect }) {
+export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect, openRequest }) {
   const [pageData,   setPageData]   = useState(null);
   const [loading,    setLoading]    = useState(!!workflowId);
   const [actLoading, setActLoading] = useState(false);
@@ -2331,6 +2440,10 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
   const [viewingId,  setViewingId]  = useState(null);
   // رسالة تأكيد بعد الإرسال (تختفي تلقائيًا)
   const [notice,     setNotice]     = useState(null);
+  // فتح سياسة مرجعية من داخل استبيان (مثل مصفوفة الصلاحيات) ثم العودة إلى الاستبيان نفسه والقسم نفسه
+  const [refReturn,  setRefReturn]  = useState(null);
+  const [editStart,  setEditStart]  = useState({ id: null, section: 0 });
+  const handledOpenRef = useRef(null);
   useEffect(() => {
     if (!notice) return undefined;
     const t = setTimeout(() => setNotice(null), 9000);
@@ -2361,9 +2474,33 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
     // Reset overlay state whenever the active workflow changes
     setViewingId(null);
     setEditingId(null);
+    setRefReturn(null);
     if (workflowId) load();
     else setPageData(null);
   }, [workflowId, load]);
+
+  // فتح سياسة بعينها عند الوصول من إشعار أو من «خطوتك التالية»: المعادة للتعديل، والمعتمدة للعرض
+  useEffect(() => {
+    if (!openRequest?.selId || !pageData?.selections || handledOpenRef.current === openRequest.n) return;
+    if (pageData.workflow && openRequest.workflowId && pageData.workflow.id !== openRequest.workflowId) return;
+    handledOpenRef.current = openRequest.n;
+    const sel = pageData.selections.find(x => x.id === openRequest.selId);
+    if (!sel) return;
+    if (sel.status === "approved" || sel.status === "submitted" || sel.status === "reviewing") setViewingId(sel.id);
+    else setEditingId(sel.id);
+  }, [openRequest, pageData]);
+
+  const openRef = (target, ctx) => {
+    setRefReturn({ id: ctx.fromId, section: ctx.section, readOnly: !!ctx.readOnly });
+    setEditingId(null);
+    setViewingId(target.id);
+  };
+  const closeRef = () => {
+    const r = refReturn;
+    setRefReturn(null);
+    setViewingId(r?.readOnly ? r.id : null);
+    if (r && !r.readOnly) { setEditStart({ id: r.id, section: r.section || 0 }); setEditingId(r.id); }
+  };
 
   const handleStart = async () => {
     setActLoading(true);
@@ -2555,13 +2692,19 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
         </div>
         <Stepper step={currentStep} allDone={workflow?.status === 'completed'} />
         <QuestionnaireView
+          key={`view-${viewSel.id}`}
           selection={viewSel}
           policyType={viewPol}
           onSave={handleSave}
           onSubmit={handleSubmit}
-          onBack={() => setViewingId(null)}
+          onBack={refReturn ? closeRef : () => setViewingId(null)}
+          backLabel={refReturn ? `العودة إلى «${policyTypes.find(p => p.id === selections.find(s => s.id === refReturn.id)?.policy_type_id)?.name || "الاستبيان"}»` : undefined}
           loading={actLoading}
           readOnly={true}
+          planSelections={selections}
+          planPolicyTypes={policyTypes}
+          onOpenRef={openRef}
+          initialSection={refReturn?.readOnly && refReturn.id === viewSel.id ? refReturn.section : 0}
         />
       </div>
     );
@@ -2583,12 +2726,17 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
         </div>
         <Stepper step={currentStep} allDone={workflow?.status === 'completed'} />
         <QuestionnaireView
+          key={`edit-${editSel.id}`}
           selection={editSel}
           policyType={editPol}
           onSave={handleSave}
           onSubmit={async (id, data) => { const ok = await handleSubmit(id, data); if (ok) setEditingId(null); return ok; }}
           onBack={() => setEditingId(null)}
           loading={actLoading}
+          planSelections={selections}
+          planPolicyTypes={policyTypes}
+          onOpenRef={openRef}
+          initialSection={editStart.id === editSel.id ? editStart.section : 0}
         />
       </div>
     );
@@ -2641,7 +2789,7 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
           onSave={handleSave} onSubmit={handleSubmit}
           notice={notice} onDismissNotice={() => setNotice(null)}
           onGoReview={workflow?.current_step >= 4 ? () => setViewStep(null) : undefined}
-          loading={actLoading} onView={setViewingId} />
+          loading={actLoading} onView={setViewingId} onOpenRef={openRef} />
       )}
 
       {displayStep === 4 && (

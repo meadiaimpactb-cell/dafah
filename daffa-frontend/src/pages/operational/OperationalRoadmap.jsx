@@ -2231,11 +2231,23 @@ export default function OperationalRoadmap({ navigate, workflowId, onWorkflowSel
     applyPageData(res.data);
   };
 
-  // «افتح الملاحظات» من لوحة التحكم: تُفتح الوحدة المطلوبة بعد تحميل وحدات الخطة
+  // تبديل الخطة (مثل «استمرار» من قائمة الخطط): لا تبقى وحدة الخطة السابقة مفتوحة، فقد تكون مقفلة في الخطة الجديدة
+  const prevWorkflowRef = useRef(workflowId);
+  useEffect(() => {
+    if (prevWorkflowRef.current === workflowId) return;
+    prevWorkflowRef.current = workflowId;
+    setActiveUnit(null);
+    setUnits(null);
+  }, [workflowId]);
+
+  // «افتح الملاحظات» من لوحة التحكم: تُفتح الوحدة المطلوبة بعد تحميل وحدات الخطة — إن كانت متاحة فعلًا
   useEffect(() => {
     if (!openUnit || !Array.isArray(units) || activeUnit) return;
-    const u = units.find(x => (x.unit_number || x.id) === openUnit.unit_number);
-    if (u) { setActiveUnit(u); if (onOpenedUnit) onOpenedUnit(); }
+    const i = units.findIndex(x => (x.unit_number || x.id) === openUnit.unit_number);
+    const OPEN_ST = ['submitted', 'reviewing', 'revision', 'approved'];
+    const accessible = i >= 0 && units.slice(0, i).every(u => OPEN_ST.includes(u.submission_status));
+    if (accessible) setActiveUnit(units[i]);
+    if (onOpenedUnit) onOpenedUnit();
   }, [openUnit, units]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // جلب قائمة الخطط عند دخول الصفحة بدون workflowId
