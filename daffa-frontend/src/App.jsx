@@ -1542,6 +1542,13 @@ export default function DaffaPlatform() {
         bottomTabs={bottomTabs.map(id => menu.find(m => m.id === id)).filter(Boolean)}
       >
           <Suspense fallback={<Loading />}>
+          {/* تذكير باستكمال الملف (حساب عميل أُنشئ عبر Google ولم تكتمل بيانات منظمته) — يبقى حتى الاستكمال */}
+          {currentRole === 'client' && authUser && !authUser.profile_completed_at && currentView !== 'client-settings' && (
+            <div role="status" data-complete-profile-strip style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', background: '#FEF3EC', border: '1.5px solid #FBC3A3', borderRadius: 14, padding: '12px 16px', marginBottom: 16, color: '#7F310E' }}>
+              <span style={{ fontSize: 14, lineHeight: 1.8 }}><strong>ملف منظمتك غير مكتمل.</strong> أضف اسم المنظمة ونوعها ورقم الجوال حتى تبدأ خدماتك ويتواصل معك مستشارك.</span>
+              <Btn small onClick={() => navigate('client-settings')}>أكمل الملف الآن</Btn>
+            </div>
+          )}
           {/* شريط التحميل العلوي — يظهر عند كل تنقل */}
           <div
             key={`nav-${currentView}-${activeUnit?.id ?? 0}`}
@@ -1663,7 +1670,7 @@ export default function DaffaPlatform() {
 
           {/* ── الإعدادات (مشترك بين جميع الأدوار) ── */}
           <KeepAlive active={['client-settings', 'con-settings', 'admin-profile'].includes(currentView)}>
-            <ProfilePage active={['client-settings', 'con-settings', 'admin-profile'].includes(currentView)} authUser={authUser} onUpdate={(updated) => { localStorage.setItem('user', JSON.stringify(updated)); setAuthUser(updated); }} />
+            <ProfilePage active={['client-settings', 'con-settings', 'admin-profile'].includes(currentView)} authUser={authUser} onUpdate={(updated) => { localStorage.setItem('user', JSON.stringify(updated)); setAuthUser(updated); }} onCompleted={() => navigate('client-dash')} />
           </KeepAlive>
 
           {/* ── الصفحات التي لا تحتاج keep-alive ── */}

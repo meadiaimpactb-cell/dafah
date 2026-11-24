@@ -57,7 +57,7 @@ class SocialAuthController extends Controller
 
         try {
             $profile = SocialLogin::fetchProfile($provider, (string) $request->query('code'));
-            [$user, $isNew] = SocialLogin::resolveUser($provider, $profile['id'], $profile['email'], $profile['verified'], $profile['name']);
+            [$user, $isNew] = SocialLogin::resolveUser($provider, $profile['id'], $profile['email'], $profile['verified'], $profile['name'], $profile['picture'] ?? null);
         } catch (RuntimeException $e) {
             return $this->backToApp(['social_error' => $e->getMessage(), 'social_intent' => $intent]);
         } catch (Throwable $e) {

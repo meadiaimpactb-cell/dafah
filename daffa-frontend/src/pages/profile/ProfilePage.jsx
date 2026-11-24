@@ -116,7 +116,11 @@ const SectionTitle = ({ children }) => (
 );
 
 // ── Main Component ─────────────────────────────────────────────────────────────
-export default function ProfilePage({ authUser, onUpdate, active = true }) {
+// أنواع المنظمات: قائمة نموذج التسجيل وقائمة الإعدادات معًا (حتى لا تختفي قيمة حساب قائم)
+const ORG_TYPES = ['جمعية أهلية', 'جمعية خيرية', 'مؤسسة أهلية', 'مؤسسة غير ربحية', 'جمعية تعاونية', 'وقف', 'اتحاد', 'جمعية', 'مؤسسة', 'غير ربحية', 'هيئة حكومية', 'أخرى'];
+const MISSING_LABEL = { org_name: 'اسم المنظمة', org_type: 'نوع المنظمة', phone: 'رقم الجوال' };
+
+export default function ProfilePage({ authUser, onUpdate, active = true, onCompleted }) {
   const role = authUser?.role || 'client';
 
   const [tab,        setTab]       = useState('profile');
@@ -126,6 +130,9 @@ export default function ProfilePage({ authUser, onUpdate, active = true }) {
   const [pwSaving,   setPwSaving]  = useState(false);
   const [toast,      setToast]     = useState(null);
   const [errors,     setErrors]    = useState({});
+  // حساب عميل لم يكمل بيانات منظمته بعد (أُنشئ عبر Google وأخواتها)
+  const completing = role === 'client' && !!authUser && !authUser.profile_completed_at;
+  const [justCompleted, setJustCompleted] = useState(false);
   // تغيير البريد بانتظار التأكيد برمز يُرسل إلى البريد الجديد: { email, message, retryAfter, sendFailed }
   const [emailChange, setEmailChange] = useState(null);
   const [pwErrors,   setPwErrors]  = useState({});
@@ -201,7 +208,8 @@ export default function ProfilePage({ authUser, onUpdate, active = true }) {
   const handleSaveProfile = async () => {
     // الحقول الإلزامية لا تُحفظ فارغة أو بمسافات فقط، ويبقى الاسم المحفوظ كما هو حتى إدخال قيمة صالحة
     const required = role === 'client'
-      ? { org_name: 'اسم المنظمة مطلوب. أدخل اسم منظمتك ثم احفظ — يبقى الاسم المحفوظ سابقًا كما هو.', rep_name: 'اسم الممثل مطلوب.' }
+      ? { org_name: 'اسم المنظمة مطلوب. أدخل اسم منظمتك ثم احفظ — يبقى الاسم المحفوظ سابقًا كما هو.', rep_name: 'اسم الممثل مطلوب.',
+          org_type: 'اختر نوع المنظمة.', phone: 'رقم الجوال مطلوب للتواصل معك بخصوص خططك.' }
       : { rep_name: 'الاسم مطلوب.' };
     const local = {};
     for (const [k, msg] of Object.entries(required)) if (!String(form[k] ?? '').trim()) local[k] = [msg];
@@ -219,6 +227,7 @@ export default function ProfilePage({ authUser, onUpdate, active = true }) {
       const updated = { ...authUser, ...fresh };
       localStorage.setItem('user', JSON.stringify(updated));
       onUpdate?.(updated);
+      if (completing && updated.profile_completed_at) setJustCompleted(true);
       if (change) {
         setEmailChange({
           email: change.pending,
@@ -262,6 +271,9 @@ export default function ProfilePage({ authUser, onUpdate, active = true }) {
   };
 
   const displayName = role === 'client' ? (authUser?.org_name || authUser?.rep_name) : authUser?.rep_name;
+  const orgTypes = form.org_type && !ORG_TYPES.includes(form.org_type) ? [form.org_type, ...ORG_TYPES] : ORG_TYPES;
+  // ما ينقص الآن (يتحدّث مع الكتابة) — للحساب المنشأ عبر Google وأخواتها
+  const missingNow = Object.keys(MISSING_LABEL).filter((k) => !String(form[k] ?? '').trim());
 
   return (
     <div className="animate-in" style={{ maxWidth: 800, margin: '0 auto' }}>
@@ -323,10 +335,24 @@ export default function ProfilePage({ authUser, onUpdate, active = true }) {
       {tab === 'profile' && (
         <div style={{ background: 'white', borderRadius: 16, padding: 28, boxShadow: '0 1px 4px rgba(14,42,61,0.07)' }}>
 
-          {/* تنبيه إكمال البيانات (حساب جديد عبر Google بلا رقم جوال) */}
-          {role === 'client' && !authUser?.phone && (
-            <div role="status" style={{ background: '#FEF3EC', border: '1px solid #FBC3A3', borderRadius: 12, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#7F310E', lineHeight: 1.8 }}>
-              <strong>أكمل بيانات منظمتك:</strong> راجع اسم المنظمة ونوعها وأضف رقم الجوال، ثم اضغط «حفظ التغييرات».
+          {/* استكمال الملف: حساب أُنشئ عبر Google ببياناته الأساسية فقط */}
+          {completing && (
+            <div role="status" data-profile-completion style={{ background: '#FEF3EC', border: '1.5px solid #FBC3A3', borderRadius: 14, padding: '16px 18px', marginBottom: 22, color: '#5E240A', lineHeight: 1.9 }}>
+              <div style={{ fontSize: 16, fontWeight: 800, color: '#7F310E', marginBottom: 4 }}>أهلًا {authUser?.rep_name || ''}، خطوة أخيرة لإكمال حسابك</div>
+              <div style={{ fontSize: 13.5 }}>أخذنا من حسابك البيانات الأساسية (الاسم والبريد{authUser?.logo_url ? ' والصورة' : ''}). أكمل بيانات منظمتك حتى تبدأ خدماتك ويتواصل معك مستشارك:</div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '10px 0 0', display: 'flex', flexWrap: 'wrap', gap: '6px 18px', fontSize: 13.5, fontWeight: 700 }}>
+                {Object.entries(MISSING_LABEL).map(([k, l]) => {
+                  const ok = !missingNow.includes(k);
+                  return <li key={k} data-missing={ok ? undefined : k} style={{ color: ok ? '#0B7F5D' : '#A33F12' }}>{ok ? '✓' : '○'} {l}</li>;
+                })}
+              </ul>
+              <div style={{ fontSize: 12.5, marginTop: 8 }}>ثم اضغط «حفظ التغييرات» أسفل الصفحة.</div>
+            </div>
+          )}
+          {justCompleted && (
+            <div role="status" data-profile-completed style={{ background: '#C9EFE1', border: '1.5px solid #7FD3B5', borderRadius: 14, padding: '14px 18px', marginBottom: 22, color: '#086449', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+              <span style={{ fontWeight: 800 }}>اكتمل ملف منظمتك. يمكنك الآن اختيار خدمتك والبدء.</span>
+              {onCompleted && <button type="button" onClick={onCompleted} style={{ padding: '9px 20px', borderRadius: 10, border: 'none', background: '#0B7F5D', color: '#fff', fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer' }}>الانتقال إلى لوحة التحكم ←</button>}
             </div>
           )}
 
@@ -337,14 +363,16 @@ export default function ProfilePage({ authUser, onUpdate, active = true }) {
               <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginBottom: 24 }}>
                 <Field label="اسم المنظمة *" name="org_name" value={form.org_name} onChange={handleChange} error={errors.org_name?.[0]} />
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: C.ink, display: 'block', marginBottom: 6 }}>نوع المنظمة</label>
+                  <label htmlFor="pf-org_type" style={{ fontSize: 12, fontWeight: 600, color: C.ink, display: 'block', marginBottom: 6 }}>نوع المنظمة *</label>
                   <select
-                    name="org_type" value={form.org_type || ''} onChange={handleChange}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${C.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none', background: 'white' }}
+                    id="pf-org_type" name="org_type" value={form.org_type || ''} onChange={handleChange}
+                    aria-invalid={errors.org_type ? 'true' : undefined}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${errors.org_type ? '#C53A3A' : C.grayBorder}`, fontSize: 13, fontFamily: "inherit", outline: 'none', background: 'white' }}
                   >
                     <option value="">اختر النوع</option>
-                    {['جمعية خيرية', 'مؤسسة غير ربحية', 'وقف', 'هيئة حكومية', 'أخرى'].map(o => <option key={o} value={o}>{o}</option>)}
+                    {orgTypes.map(o => <option key={o} value={o}>{o}</option>)}
                   </select>
+                  {errors.org_type?.[0] && <div role="alert" style={{ fontSize: 12, color: '#C53A3A', fontWeight: 600, marginTop: 6 }}>{errors.org_type[0]}</div>}
                 </div>
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 600, color: C.ink, display: 'block', marginBottom: 6 }}>القطاع</label>
@@ -361,7 +389,7 @@ export default function ProfilePage({ authUser, onUpdate, active = true }) {
               <div style={{ display: 'grid', gridTemplateColumns: 'var(--g-2)', gap: 16, marginBottom: 24 }}>
                 <Field label="اسم الممثل *" name="rep_name" value={form.rep_name} onChange={handleChange} error={errors.rep_name?.[0]} />
                 <Field label="البريد الإلكتروني *" name="email" value={form.email} onChange={handleChange} error={errors.email?.[0]} type="email" />
-                <Field label="رقم الجوال" name="phone" value={form.phone} onChange={handleChange} error={errors.phone?.[0]} type="tel" placeholder="05xxxxxxxx" />
+                <Field label="رقم الجوال *" name="phone" value={form.phone} onChange={handleChange} error={errors.phone?.[0]} type="tel" placeholder="05xxxxxxxx" />
               </div>
             </>
           )}

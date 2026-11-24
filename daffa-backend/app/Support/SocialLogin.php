@@ -138,6 +138,7 @@ class SocialLogin
             'email' => $info->json('email'),
             'verified' => filter_var($info->json('email_verified') ?? false, FILTER_VALIDATE_BOOLEAN),
             'name' => $name ?: null,
+            'picture' => $info->json('picture') ?: null,
         ];
     }
 
@@ -148,7 +149,7 @@ class SocialLogin
      *
      * @throws RuntimeException برسالة عربية جاهزة للعرض
      */
-    public static function resolveUser(string $provider, ?string $providerId, ?string $email, bool $verified, ?string $name): array
+    public static function resolveUser(string $provider, ?string $providerId, ?string $email, bool $verified, ?string $name, ?string $picture = null): array
     {
         $label = self::LABELS[$provider];
         $column = self::COLUMNS[$provider];
@@ -179,9 +180,10 @@ class SocialLogin
                 throw new RuntimeException("لا يُقبل البريد المؤقت أو الوهمي — استخدم حساب $label ببريد حقيقي.");
             }
             $isNew = true;
+            // البيانات الأساسية من الحساب فقط؛ اسم المنظمة ونوعها والجوال يكملها العميل في «استكمال الملف»
             $user = User::create([
-                'org_name' => $name,
-                'org_type' => 'غير ربحية',
+                'org_name' => '',
+                'org_type' => '',
                 'rep_name' => $name,
                 'email' => $email,
                 $column => $providerId,
@@ -191,6 +193,7 @@ class SocialLogin
                 'email_verified_at' => now(),
             ]);
             ActivityLog::record($user->id, "تسجيل حساب جديد عبر $label", 'auth', 'client', $email);
+            self::savePicture($user, $picture);
         } else {
             $updates = [];
             if (! $user->{$column}) {
@@ -211,16 +214,42 @@ class SocialLogin
         return [$user, $isNew];
     }
 
+    /** صورة الحساب من المزوّد تصبح صورة الملف (روابط Google/LinkedIn الرسمية فقط، حتى 2MB) — فشلها لا يمنع الدخول */
+    public static function savePicture(User $user, ?string $url): void
+    {
+        if (! $url || $user->logo || ! preg_match('#^https://([a-z0-9-]+\.)*(googleusercontent\.com|licdn\.com|fbcdn\.net)/#i', $url)) {
+            return;
+        }
+        try {
+            $res = Http::timeout(8)->withOptions(['allow_redirects' => false])->get($url);
+            $type = strtolower(explode(';', (string) $res->header('Content-Type'))[0]);
+            $ext = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'][$type] ?? null;
+            $body = $res->body();
+            if ($res->successful() && $ext && strlen($body) > 0 && strlen($body) <= 2 * 1024 * 1024 && @getimagesizefromstring($body)) {
+                $path = 'user-avatars/'.\Illuminate\Support\Str::random(40).'.'.$ext;
+                \Illuminate\Support\Facades\Storage::disk('public')->put($path, $body);
+                $user->update(['logo' => $path]);
+            }
+        } catch (\Throwable) {
+            // الصورة اختيارية
+        }
+    }
+
     /** الاستجابة الموحّدة للدخول (رمز Sanctum + بيانات المستخدم) */
     public static function loginPayload(User $user, bool $isNew, string $provider): array
     {
         $token = $user->createToken('auth_token')->plainTextToken;
         ActivityLog::record($user->id, 'تسجيل دخول عبر '.self::LABELS[$provider], 'auth', $user->role, $user->email);
 
+        $fresh = $user->fresh();
+        $data = $fresh->toArray();
+        $data['logo_url'] = $fresh->logo ? \Illuminate\Support\Facades\Storage::disk('public')->url($fresh->logo) : null;
+
         return [
-            'user' => $user->fresh(),
+            'user' => $data,
             'token' => $token,
-            'needs_profile' => $user->role === 'client' && ! $user->phone,
+            'needs_profile' => $fresh->role === 'client' && ! $fresh->profile_completed_at,
+            'missing' => $fresh->profileMissing(),
             'is_new' => $isNew,
         ];
     }

@@ -223,6 +223,7 @@ class AuthController extends Controller
                 $data['email'] ?? null,
                 filter_var($data['email_verified'] ?? false, FILTER_VALIDATE_BOOLEAN),
                 $data['name'] ?? ($data['given_name'] ?? null),
+                $data['picture'] ?? null,
             );
         } catch (\RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], $e->getCode() === 403 ? 403 : 422);
@@ -309,16 +310,22 @@ class AuthController extends Controller
         $rules = [
             'rep_name' => 'required|string|max:255',
             'email' => RealEmail::rules($user->id),
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20|unique:users,phone,'.$user->id,
         ];
 
         if ($user->role === 'client') {
+            // بيانات المنظمة الأساسية مطلوبة دائمًا كما في نموذج التسجيل (ولا يُفرَّغ ملف مكتمل)
             $rules['org_name'] = 'required|string|max:255';
-            $rules['org_type'] = 'nullable|string|max:100';
+            $rules['org_type'] = 'required|string|max:100';
+            $rules['phone'] = 'required|string|min:9|max:20|unique:users,phone,'.$user->id;
             $rules['sector'] = 'nullable|string|max:100';
         }
 
-        $validated = $request->validate($rules, RealEmail::messages());
+        $validated = $request->validate($rules, RealEmail::messages() + [
+            'org_name.required' => 'اسم المنظمة مطلوب.', 'org_type.required' => 'اختر نوع المنظمة.',
+            'phone.required' => 'رقم الجوال مطلوب للتواصل معك بخصوص خططك.', 'phone.min' => 'رقم الجوال غير مكتمل.',
+            'phone.unique' => 'رقم الجوال مسجّل في حساب آخر.',
+        ]);
 
         // تغيير البريد لا يُطبَّق مباشرة: يُرسل رمز إلى البريد الجديد ولا يتغير إلا بعد تأكيده
         $newEmail = $validated['email'];
