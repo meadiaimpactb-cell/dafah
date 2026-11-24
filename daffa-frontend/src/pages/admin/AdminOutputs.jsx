@@ -6,6 +6,8 @@ import { colors, systems, font, tones } from '../../theme/tokens';
 import { Badge, Btn, Card, ProgressBar, Loading, EmptyState, MetricCard, Tab } from '../../components/ui/kit';
 import { Help } from '../../components/ui/Help';
 import FormDataViewer from '../consultant/FormDataViewer';
+import { ReassignConsultantModal } from './AdminConsultantChanges';
+import { usePermissions } from '../../utils/permissions';
 import { IcSearch, IcDownload, IcXMark, IcCheckCircle, IcArrowPath, IcClock, IcUsers, IcDocument, IcStar, IcChat } from '../../utils/icons';
 import { asArray, asObject } from '../../utils/apiData';
 
@@ -37,6 +39,9 @@ function OutputDrawer({ row, onClose }) {
   const [d, setD] = useState(null);
   const [err, setErr] = useState(false);
   const [open, setOpen] = useState(null);
+  const [reassign, setReassign] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  const { can } = usePermissions();
 
   useEffect(() => {
     setD(null); setErr(false);
@@ -47,7 +52,7 @@ function OutputDrawer({ row, onClose }) {
       const first = d.items.find((i) => ['submitted', 'reviewing', 'revision'].includes(i.status)) || d.items.find((i) => i.form_data);
       setOpen(first?.number ?? null);
     }).catch(() => setErr(true));
-  }, [row]);
+  }, [row, reloadKey]);
 
   useEffect(() => {
     const k = (e) => { if (e.key === 'Escape') onClose(); };
@@ -72,10 +77,12 @@ function OutputDrawer({ row, onClose }) {
               {d?.org?.rep_name && <span>{d.org.rep_name} · </span>}<span dir="ltr">{row.email}</span>
             </div>
           </div>
+          {d && d.status !== 'completed' && can('admin.consultant_changes.reassign') && <Btn small variant="secondary" onClick={() => setReassign(true)}>تغيير المستشار</Btn>}
           {d?.pdf_url && <Btn small variant="brand" icon={<IcDownload width={16} height={16} />} onClick={() => window.open(d.pdf_url, '_blank')}>الوثيقة PDF</Btn>}
           <button onClick={onClose} aria-label="إغلاق" title="إغلاق" style={{ width: 38, height: 38, borderRadius: 12, border: 'none', background: colors.sunken, color: colors.gray, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><IcXMark width={18} height={18} /></button>
         </header>
 
+        {reassign && <ReassignConsultantModal system={row.system} workflowId={row.id} onClose={() => setReassign(false)} onDone={() => { setReassign(false); setReloadKey((k) => k + 1); }} />}
         <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
           {err && <EmptyState title="تعذّر تحميل التفاصيل" text="حاول مرة أخرى بعد قليل." />}
           {!d && !err && <Loading />}

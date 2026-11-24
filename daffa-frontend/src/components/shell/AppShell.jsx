@@ -118,7 +118,7 @@ function SidebarPanel({ compact, onToggle, showToggle, children, footer, onLogoC
 
 export default function AppShell({
   role, authUser, menu, currentView, onNavigate, onLogout, onProfile, onHome,
-  title, breadcrumb, unreadCount = 0, onNotifications, onPreview, onGlossary, onTour,
+  title, breadcrumb, unreadCount = 0, extraBadges = {}, onNotifications, onPreview, onGlossary, onTour,
   bottomTabs = [], children,
 }) {
   const vp = useViewport();
@@ -134,6 +134,7 @@ export default function AppShell({
 
   const badges = {};
   ['client-notifications', 'con-notifications', 'admin-notifications'].forEach((k) => { badges[k] = unreadCount; });
+  Object.assign(badges, extraBadges);
 
   const rail = vp.isTablet || (vp.isDesktop && collapsed);
   const sideW = vp.isPhone ? 0 : rail ? 76 : 264;

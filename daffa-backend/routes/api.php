@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\ActivityLogController as AdminActivityLogController;
+use App\Http\Controllers\Api\Admin\ConsultantChangeController as AdminConsultantChangeController;
 use App\Http\Controllers\Api\Admin\ConsultantController as AdminConsultantController;
 use App\Http\Controllers\Api\Admin\ContentController as AdminContentController;
 use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Api\Admin\SiteContentController as AdminSiteContentCont
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\ConsultantChangeController;
 use App\Http\Controllers\Api\Consultant\PortalController as ConsultantPortalController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\NotificationController;
@@ -155,6 +157,13 @@ Route::middleware('auth:sanctum')->prefix('policies')->group(function () {
 });
 
 // ── Chat (protected) ─────────────────────────────────────────────────────────
+// طلبات تغيير المستشار (العميل)
+Route::middleware(['auth:sanctum', 'role:client'])->prefix('consultant-changes')->group(function () {
+    Route::get('/', [ConsultantChangeController::class, 'index']);
+    Route::post('/', [ConsultantChangeController::class, 'store'])->middleware('throttle:10,1');
+    Route::post('/{id}/cancel', [ConsultantChangeController::class, 'cancel'])->whereNumber('id');
+});
+
 Route::middleware('auth:sanctum')->prefix('chat')->group(function () {
     Route::get('/conversations', [ChatController::class, 'conversations']);
     Route::post('/conversations/start', [ChatController::class, 'start']);
@@ -189,6 +198,14 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::get('/outputs/consultants', [OutputsController::class, 'consultants']);
     Route::get('/outputs/consultants/{consultant}/reviews', [OutputsController::class, 'consultantReviews'])->whereNumber('consultant');
     Route::get('/outputs/{system}/{id}', [OutputsController::class, 'show'])->whereIn('system', ['strategic', 'operational', 'policies'])->whereNumber('id');
+
+    // تغيير المستشار: دراسة طلبات العملاء والبتّ فيها، والتغيير المباشر، وسجل كل خطة
+    Route::get('/consultant-changes', [AdminConsultantChangeController::class, 'index']);
+    Route::get('/consultant-changes/pending-count', [AdminConsultantChangeController::class, 'pendingCount']);
+    Route::get('/consultant-changes/plan/{system}/{id}', [AdminConsultantChangeController::class, 'plan'])->whereIn('system', ['strategic', 'operational', 'policies'])->whereNumber('id');
+    Route::post('/consultant-changes/direct', [AdminConsultantChangeController::class, 'direct']);
+    Route::post('/consultant-changes/{id}/approve', [AdminConsultantChangeController::class, 'approve'])->whereNumber('id');
+    Route::post('/consultant-changes/{id}/reject', [AdminConsultantChangeController::class, 'reject'])->whereNumber('id');
 
     Route::get('/consultants', [AdminConsultantController::class, 'index']);
     Route::post('/consultants', [AdminConsultantController::class, 'store']);

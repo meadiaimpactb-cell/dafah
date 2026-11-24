@@ -7,6 +7,7 @@ import { strategicApi } from "./api/strategic";
 import { operationalApi } from "./api/operational";
 import { policiesApi } from "./api/policies";
 import { notificationsApi } from "./api/notifications";
+import { adminConsultantChangesApi } from "./api/consultantChanges";
 import { RosetteShape } from "./components/brand/Logo";
 import { colors as themeColors, systems } from "./theme/tokens";
 import { Badge, ProgressBar, Btn, Card, Input, Modal, GenericPage, Loading, SectionTitle } from "./components/ui/kit";
@@ -51,6 +52,8 @@ const AdminFinancePage = lazy(withChunkReload(() => import("./pages/admin/AdminF
 const AdminReportsPage = lazy(withChunkReload(() => import("./pages/admin/AdminReportsPage")));
 const AdminDashboardPage = lazy(withChunkReload(() => import("./pages/admin/AdminDashboardPage")));
 const ClientHelpPage = lazy(withChunkReload(() => import("./pages/client/ClientHelpPage")));
+const ClientConsultantChange = lazy(withChunkReload(() => import("./pages/client/ClientConsultantChange")));
+const AdminConsultantChanges = lazy(withChunkReload(() => import("./pages/admin/AdminConsultantChanges")));
 const ClientPaymentsPage = lazy(withChunkReload(() => import("./pages/client/ClientPaymentsPage")));
 const ConsultantEarningsPage = lazy(withChunkReload(() => import("./pages/consultant/ConsultantEarningsPage")));
 const ConsultantStatsPage = lazy(withChunkReload(() => import("./pages/consultant/ConsultantStatsPage")));
@@ -181,6 +184,7 @@ export default function DaffaPlatform() {
   const [downloadsData,  setDownloadsData]  = useState(null);
   const [notifications, setNotifications] = useState(null);
   const [unreadCount,   setUnreadCount]   = useState(0);
+  const [ccPending,     setCcPending]     = useState(0);   // طلبات تغيير المستشار قيد الدراسة (للمشرف)
   const notifPollRef                      = useRef(null);
   const { can }                           = usePermissions();
   const [siteContent,   setSiteContent]   = useState({});
@@ -288,6 +292,16 @@ export default function DaffaPlatform() {
     fetchUnread();
     notifPollRef.current = setInterval(fetchUnread, 30000);
     return () => clearInterval(notifPollRef.current);
+  }, [authUser]);
+
+  // عدّاد طلبات تغيير المستشار في قائمة المشرف
+  useEffect(() => {
+    if (authUser?.role !== 'admin') return undefined;
+    const f = () => adminConsultantChangesApi.pendingCount().then(r => setCcPending(r.data?.count || 0)).catch(() => {});
+    f();
+    const t = setInterval(f, 60000);
+    window.addEventListener('consultantChangesUpdated', f);
+    return () => { clearInterval(t); window.removeEventListener('consultantChangesUpdated', f); };
   }, [authUser]);
 
   useEffect(() => {
@@ -595,6 +609,7 @@ export default function DaffaPlatform() {
     { id: "policies-select",     label: "السياسات واللوائح",    icon: Icons.policies,    group: "رحلتي", short: "السياسات", permKey: "client.policies.view"    },
     { id: "client-chat",         label: "المحادثات",             icon: Icons.chat,        group: "التواصل", permKey: "client.chat.view" },
     { id: "client-notifications",label: "الإشعارات",             icon: Icons.bell,        group: "التواصل" },
+    { id: "client-consultants",  label: "مستشارو خططي",          icon: Icons.users,       group: "التواصل" },
     { id: "client-downloads",    label: "التحميلات",             icon: Icons.download,    group: "حسابي" },
     { id: "client-payments",     label: "المدفوعات",             icon: Icons.payments,    group: "حسابي" },
     { id: "client-help",         label: "المساعدة",              icon: Icons.help,        group: "حسابي" },
@@ -620,6 +635,7 @@ export default function DaffaPlatform() {
     { id: "admin-reports",        label: "التقارير",          icon: Icons.chart,    group: "نظرة عامة" },
     { id: "admin-orgs",           label: "المنظمات (العملاء)", icon: Icons.building, group: "الأشخاص", short: "المنظمات" },
     { id: "admin-consultants",    label: "المستشارون",        icon: Icons.users,    group: "الأشخاص" },
+    { id: "admin-consultant-changes", label: "طلبات تغيير المستشار", icon: Icons.users, group: "الأشخاص", permKey: "admin.consultant_changes.view" },
     { id: "admin-users",          label: "المستخدمون والصلاحيات", icon: Icons.key,  group: "الأشخاص" },
     { id: "admin-finance",        label: "الإدارة المالية",   icon: Icons.payments, group: "المال", short: "المالية" },
     { id: "admin-services",       label: "الخدمات والأسعار",  icon: Icons.services, group: "المحتوى والخدمات" },
@@ -1114,6 +1130,7 @@ export default function DaffaPlatform() {
                   {[1,2,3,4,5].map(s => <span key={s} style={{ opacity: s <= Math.round(dashConsultant.rating || 0) ? 1 : 0.25, display: 'flex' }}>{Icons.star}</span>)}
                 </div>
                 <Btn variant="secondary" full onClick={() => navigate("client-chat")} icon={Icons.chat}>راسل مستشارك</Btn>
+                <button onClick={() => navigate('client-consultants')} style={{ marginTop: 10, background: 'none', border: 'none', color: colors.gray, fontSize: 12.5, cursor: 'pointer', fontFamily: 'inherit', textDecoration: 'underline' }}>لم تسر الخطة كما تريد؟ اطلب تغيير المستشار</button>
               </div>
             )}
           </Card>
@@ -1202,6 +1219,9 @@ export default function DaffaPlatform() {
             op_revision:   () => revision(colors.amberText),
             policy_approved: () => approved(colors.green),
             policy_revision: () => revision(colors.amberText),
+            consultant_change: () => revision(colors.primary),
+            consultant_assigned: () => approved(colors.primary),
+            consultant_unassigned: () => revision(colors.gray),
             workflow_completed: () => completed(colors.green),
             op_workflow_completed: () => completed(colors.green),
             admin_message: adminMsg,
@@ -1222,6 +1242,9 @@ export default function DaffaPlatform() {
           op_revision:           { border: colors.amberLine },
           policy_approved:       { border: colors.green  },
           policy_revision:       { border: colors.amberLine },
+          consultant_change:     { border: colors.primary },
+          consultant_assigned:   { border: colors.primary },
+          consultant_unassigned: { border: colors.gray },
           workflow_completed:    { border: colors.green  },
           op_workflow_completed: { border: colors.green  },
           admin_message:         { border: colors.amberLine },
@@ -1257,6 +1280,9 @@ export default function DaffaPlatform() {
                         else if (d.system === 'policies' && d.selection_id) openPolicyDeep({ workflowId: d.workflow_id, selId: d.selection_id });
                         else if (n.type === 'policy_revision' || n.type === 'policy_approved') navigate('policies-select');
                         else if (n.type === 'message') openChatDeep({ id: d.conversation_id, name: (n.title || '').replace(/^رسالة جديدة من\s*/, '') });
+                        else if (n.type === 'consultant_change') navigate('client-consultants');
+                        else if (n.type === 'consultant_assigned') navigate('con-pending');
+                        else if (n.type === 'consultant_unassigned') navigate('con-clients');
                       }}
                       data-notif-type={n.type}
                       style={{ marginBottom: 8, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, cursor: "pointer", borderRight: `3px solid ${meta.border}`, background: n.read ? colors.white : `${meta.border}08`, transition: "background 0.2s" }}
@@ -1314,6 +1340,8 @@ export default function DaffaPlatform() {
       );
 
       // ======= CLIENT: المساعدة =======
+      case "client-consultants": return <ClientConsultantChange onOpenChat={() => openChatDeep({})} />;
+      case "admin-consultant-changes": return <AdminConsultantChanges />;
       case "client-help": return <ClientHelpPage onOpenChat={(id) => openChatDeep({ id })} onOpenPolicies={() => navigate('policies-select')} />;
       case "con-help":   return <GenericPage title="دليل الاستخدام"><RoleGuide role="consultant" /></GenericPage>;
       case "admin-help": return <GenericPage title="دليل الاستخدام"><RoleGuide role="admin" /></GenericPage>;
@@ -1485,6 +1513,7 @@ export default function DaffaPlatform() {
         title={menu.find(m => m.id === currentView)?.label || activeUnit?.name || "لوحة التحكم"}
         breadcrumb={activeUnit ? "التخطيط الاستراتيجي" : undefined}
         unreadCount={unreadCount}
+        extraBadges={currentRole === 'admin' ? { 'admin-consultant-changes': ccPending } : {}}
         onNotifications={() => navigate(currentRole === 'client' ? 'client-notifications' : currentRole === 'consultant' ? 'con-notifications' : 'admin-notifications')}
         onPreview={() => window.open(window.location.origin + '?preview=1', '_blank')}
         onGlossary={() => setGlossaryOpen(true)}

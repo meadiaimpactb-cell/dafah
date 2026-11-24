@@ -16,6 +16,16 @@ export const PERMISSIONS_BY_ROLE = {
       ],
     },
     {
+      module: 'admin.consultant_changes',
+      label:  'تغيير المستشار',
+      icon:   'briefcase',
+      actions: [
+        { key: 'view',     label: 'عرض الطلبات' },
+        { key: 'decide',   label: 'اعتماد/رفض طلبات العملاء' },
+        { key: 'reassign', label: 'تغيير مستشار خطة مباشرة' },
+      ],
+    },
+    {
       module: 'admin.users',
       label:  'إدارة المستخدمين',
       icon:   'users',
