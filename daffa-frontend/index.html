@@ -3,22 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!--seo-head-->
     <title>منصة دفة | التخطيط الاستراتيجي والتشغيلي وصناعة السياسات للمنظمات غير الربحية</title>
     <meta name="description" content="منصة دفة تساعد الجمعيات والمؤسسات غير الربحية على بناء الخطة الاستراتيجية والخطة التشغيلية وإعداد السياسات واللوائح خطوة بخطوة، مع مراجعة واعتماد من مستشار متخصص." />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://daffah.org/" />
-    <meta name="theme-color" content="#0E2A3D" />
-    <meta name="application-name" content="منصة دفة" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/manifest.webmanifest" />
-
-    <!-- الخطوط الأساسية تُحمَّل مبكرًا لتقليل وقت ظهور النص بخطّه النهائي -->
-    <link rel="preload" href="/fonts/Alexandria-VF.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/IBMPlexSansArabic-Regular.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/IBMPlexSansArabic-Bold.woff2" as="font" type="font/woff2" crossorigin />
-
     <!-- بطاقات المشاركة (Open Graph / Twitter) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="منصة دفة" />
@@ -35,6 +24,21 @@
     <meta name="twitter:description" content="ابنِ خطة منظمتك الاستراتيجية والتشغيلية وسياساتها خطوة بخطوة، بإشراف مستشار متخصص." />
     <meta name="twitter:image" content="https://daffah.org/og-image.png" />
 
+    <!--/seo-head-->
+    <meta name="theme-color" content="#0E2A3D" />
+    <meta name="google-site-verification" content="Zme9alewB3DVUoct6ZcIWAgYS1yDNgqS_7kU1r3nE7M" />
+    <meta name="application-name" content="منصة دفة" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- الخطوط الأساسية تُحمَّل مبكرًا لتقليل وقت ظهور النص بخطّه النهائي -->
+    <link rel="preload" href="/fonts/Alexandria-VF.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/IBMPlexSansArabic-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/IBMPlexSansArabic-Bold.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!--seo-ld-->
     <!-- بيانات منظّمة لمحركات البحث -->
     <script type="application/ld+json">
     {
@@ -60,6 +64,8 @@
     }
     </script>
 
+    <!--/seo-ld-->
+
     <!-- هيكل أولي يظهر فورًا قبل تحميل JavaScript، ويستبدله التطبيق عند تشغيله -->
     <style>
       html { background: #FBF9F5; }
@@ -77,11 +83,28 @@
       .df-shell-cta a { display: inline-flex; align-items: center; height: 54px; padding: 0 30px; border-radius: 14px; font-weight: 700; font-size: 16.5px; text-decoration: none; }
       .df-shell-cta .primary { background: #EF6A2C; color: #0E2A3D; }
       .df-shell-cta .ghost { color: #fff; border: 1.5px solid rgba(255,255,255,0.35); }
+      .df-shell-band { background: linear-gradient(135deg, #235D7F, #123247); color: #fff; padding: 50px clamp(16px, 4vw, 40px); text-align: center; }
+      .df-shell-band h1 { font-family: 'Alexandria', 'IBM Plex Sans Arabic', sans-serif; font-size: clamp(26px, 3.2vw, 34px); font-weight: 800; margin: 0; }
+      .df-shell-band p { color: #D6E4EE; margin: 10px auto 0; max-width: 680px; line-height: 1.9; }
+      .df-crumbs { max-width: 1100px; margin: 0 auto; padding: 12px clamp(16px, 4vw, 40px) 0; font-size: 13.5px; color: #5E6B78; }
+      .df-crumbs ol { list-style: none; display: flex; gap: 6px; padding: 0; margin: 0; flex-wrap: wrap; }
+      .df-crumbs li + li::before { content: '‹'; margin-left: 6px; }
+      .df-crumbs a { color: #235D7F; text-decoration: none; }
+      .df-shell-main { max-width: 1100px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 40px) 56px; line-height: 1.9; }
+      .df-shell-main h2 { font-size: 22px; margin: 28px 0 10px; }
+      .df-shell-main h3 { font-size: 17px; margin: 18px 0 6px; }
+      .df-shell-main p, .df-shell-main li { color: #334452; font-size: 15px; }
+      .df-shell-main a { color: #235D7F; }
+      .df-shell-main table { width: 100%; border-collapse: collapse; font-size: 14px; }
+      .df-shell-main th, .df-shell-main td { border-bottom: 1px solid #E8E3DA; padding: 8px 10px; text-align: right; }
+      .df-shell-foot { background: #0E2A3D; color: #D6E4EE; padding: 28px clamp(16px, 4vw, 40px); font-size: 14px; }
+      .df-shell-foot nav { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 10px; }
+      .df-shell-foot a { color: #fff; text-decoration: none; }
       @media (max-width: 760px) { .df-shell-nav { height: 64px; } .df-shell-nav nav { display: none; } }
     </style>
   </head>
   <body>
-    <div id="root">
+    <div id="root"><!--seo-body-->
       <div class="df-shell">
         <header class="df-shell-nav">
           <a class="brand" href="/" aria-label="منصة دفة — الرئيسية">منصة دفة</a>
@@ -104,7 +127,7 @@
           </div>
         </main>
       </div>
-    </div>
+    <!--/seo-body--></div>
     <noscript>
       <p style="padding:16px;text-align:center;font-family:system-ui,sans-serif">يحتاج هذا الموقع إلى تفعيل JavaScript في المتصفح لعرض المنصة كاملة.</p>
     </noscript>

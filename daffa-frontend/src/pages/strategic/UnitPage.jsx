@@ -1,3 +1,4 @@
+import useDemoFill from '../../utils/useDemoFill';
 import { Help } from '../../components/ui/Help';
 import DfIcon from '../../components/ui/DfIcon';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -68,6 +69,7 @@ const savedMessage = (status) => {
 };
 
 export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workflowId }) {
+  const demoFill = useDemoFill();
   const [tab,        setTab]        = useState(0);
   const [unitData,   setUnitData]   = useState(null);
   const [allUnits,   setAllUnits]   = useState([]);
@@ -285,7 +287,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
           onClick={handleBack}
           style={{ padding: '7px 14px', background: '#F3EFE8', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontFamily: "inherit", color: '#334452', whiteSpace: 'nowrap' }}
         >
-          ← رجوع
+          → رجوع
         </button>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
@@ -442,7 +444,7 @@ export default function UnitPage({ unit: unitSummary, onBack, onNavigate, workfl
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', alignItems: 'center' }}>
             {!isLocked && (
               <>
-                {DEMO_DATA[unit.template_type] && (
+                {demoFill && DEMO_DATA[unit.template_type] && (
                   <>
                     <button
                       onClick={() => setDemoConfirm(true)}

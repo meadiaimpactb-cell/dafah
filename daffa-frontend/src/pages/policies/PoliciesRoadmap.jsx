@@ -10,6 +10,7 @@ import { PaymentMethodPicker, ApplePayButton, SecurePaymentBadge, CardNetworkLog
 import { IcCheckCircle, IcArrowPath, IcSearch, IcWarning, IcLock, IcLightbulb, IcSave, IcDocument, IcUser, IcCalendar, IcCreditCard, IcSparkles, IcCheck, IcPencil, IcEye, IcPalette, IcBeaker, IcChat, IcScroll, IcClock } from '../../utils/icons';
 import UnitVideo from '../shared/UnitVideo';
 import { useSiteContent } from '../auth/AuthShell';
+import useDemoFill from '../../utils/useDemoFill';
 import { isVisible, evaluate, toggleMultiple, forcedOptions, visibleFields, assembleParts, pruneAnswers, summarize, filled as isFilled } from './questionRules';
 
 // ── Payment Gateway Mock ──────────────────────────────────────────────────────
@@ -800,6 +801,7 @@ const QuestionInfo = ({ info, qid }) => {
 
 // ── Questionnaire section for a single policy ─────────────────────────────────
 const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, loading, readOnly = false, planSelections = [], planPolicyTypes = [], onOpenRef, initialSection = 0, backLabel }) => {
+  const demoFill = useDemoFill();
   const [apiSections, setApiSections] = useState([]);
   const [loadingQ,    setLoadingQ]    = useState(true);
   const [section,     setSection]     = useState(0);
@@ -1067,7 +1069,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
 
   if (apiSections.length === 0) return (
     <div>
-      <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", color: C.primary, fontSize: 20, marginBottom: 12 }}>←</button>
+      <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", color: C.primary, fontSize: 20, marginBottom: 12 }}>→</button>
       <div style={{ padding: 40, textAlign: "center", color: C.gray, fontSize: 13 }}>لم يتم إعداد أسئلة لهذه السياسة بعد. يمكن للمشرف إضافتها من لوحة التحكم.</div>
     </div>
   );
@@ -1090,10 +1092,10 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button onClick={onBack} aria-label={backLabel || "رجوع"} style={{ background: "none", border: "none", cursor: "pointer", color: C.primary, fontSize: backLabel ? 13 : 20, fontWeight: 700, fontFamily: "inherit" }}>{backLabel ? `← ${backLabel}` : "←"}</button>
+          <button onClick={onBack} aria-label={backLabel || "رجوع"} style={{ background: "none", border: "none", cursor: "pointer", color: C.primary, fontSize: backLabel ? 13 : 20, fontWeight: 700, fontFamily: "inherit" }}>{backLabel ? `→ ${backLabel}` : "→"}</button>
           <h2 style={{ fontSize: 20, fontWeight: 700, color: C.ink }}>{policyType?.name}</h2>
         </div>
-        {!readOnly && (
+        {!readOnly && demoFill && (
           <button onClick={() => setDemoConfirm(true)} style={{ fontSize: 12, color: C.blue, background: C.blueLight, border: "none", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: "inherit", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
             <IcBeaker width={14} height={14}/> تعبئة تجريبية
           </button>
@@ -1193,7 +1195,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
         )}
 
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
-          <Btn variant="secondary" disabled={section === 0} onClick={async () => { if (!readOnly) await autoSave(); setValidErr(false); setSection(s => s - 1); }}>← القسم السابق</Btn>
+          <Btn variant="secondary" disabled={section === 0} onClick={async () => { if (!readOnly) await autoSave(); setValidErr(false); setSection(s => s - 1); }}>→ القسم السابق</Btn>
 
           {readOnly ? (
             <Btn variant="ghost" onClick={onBack}>إغلاق</Btn>
@@ -1202,7 +1204,7 @@ const QuestionnaireView = ({ selection, policyType, onSave, onSubmit, onBack, lo
           )}
 
           {section < apiSections.length - 1 ? (
-            <Btn onClick={async () => { if (readOnly) { setSection(s => s + 1); } else { await handleNextSection(); } }}>القسم التالي →</Btn>
+            <Btn onClick={async () => { if (readOnly) { setSection(s => s + 1); } else { await handleNextSection(); } }}>القسم التالي ←</Btn>
           ) : (
             !readOnly && (
               <Btn onClick={submitNow} disabled={loading}>
@@ -2142,7 +2144,7 @@ const StepDesign = ({
         <button
           onClick={() => briefPage === 1 ? setSubStep('choice') : setBriefPage(1)}
           style={{ padding: '10px 20px', background: 'none', border: `1.5px solid ${C.grayBorder}`, borderRadius: 10, fontSize: 13, color: C.gray, cursor: 'pointer', fontFamily: "inherit" }}>
-          ← رجوع
+          → رجوع
         </button>
         <Btn full
           disabled={briefPage === 1 ? !isPage1Valid : !isPage2Valid}
@@ -2221,7 +2223,7 @@ const StepDesign = ({
         <Btn full onClick={handlePay} disabled={loading || paying}>
           {(loading || paying) ? "جارٍ معالجة الدفع…" : <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><IcLock width={14} height={14}/>ادفع الآن — {total.toLocaleString('en-US')} ريال</span>}
         </Btn>
-        <button onClick={() => setSubStep('brief')} style={{ width: '100%', marginTop: 8, background: 'none', border: 'none', color: C.gray, cursor: 'pointer', fontSize: 11, fontFamily: "inherit", padding: '6px 0' }}>← العودة لتعديل المتطلبات</button>
+        <button onClick={() => setSubStep('brief')} style={{ width: '100%', marginTop: 8, background: 'none', border: 'none', color: C.gray, cursor: 'pointer', fontSize: 11, fontFamily: "inherit", padding: '6px 0' }}>→ العودة لتعديل المتطلبات</button>
       </Card>
     </div>
   );
@@ -2671,7 +2673,7 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
       <p style={{ color: C.red, fontSize: 14, marginBottom: 16 }}>{error}</p>
       <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
         <Btn onClick={load}>إعادة المحاولة</Btn>
-        <Btn variant="ghost" onClick={() => onWorkflowSelect && onWorkflowSelect(null)}>← العودة للقائمة</Btn>
+        <Btn variant="ghost" onClick={() => onWorkflowSelect && onWorkflowSelect(null)}>→ العودة للقائمة</Btn>
       </div>
     </div>
   );
@@ -2687,7 +2689,7 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
         <div style={{ marginBottom: 16 }}>
           <button onClick={() => { setViewingId(null); onWorkflowSelect && onWorkflowSelect(null); }}
             style={{ background: 'none', border: 'none', color: C.primary, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: "inherit", display: 'flex', alignItems: 'center', gap: 4 }}>
-            ← خططي للسياسات
+            → خططي للسياسات
           </button>
         </div>
         <Stepper step={currentStep} allDone={workflow?.status === 'completed'} />
@@ -2721,7 +2723,7 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
         <div style={{ marginBottom: 16 }}>
           <button onClick={() => { setEditingId(null); onWorkflowSelect && onWorkflowSelect(null); }}
             style={{ background: 'none', border: 'none', color: C.primary, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: "inherit", display: 'flex', alignItems: 'center', gap: 4 }}>
-            ← خططي للسياسات
+            → خططي للسياسات
           </button>
         </div>
         <Stepper step={currentStep} allDone={workflow?.status === 'completed'} />
@@ -2750,7 +2752,7 @@ export default function PoliciesRoadmap({ navigate, workflowId, onWorkflowSelect
       <div style={{ marginBottom: 14 }}>
         <button onClick={() => onWorkflowSelect && onWorkflowSelect(null)}
           style={{ background: 'none', border: 'none', color: C.primary, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: "inherit", display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          ← خططي للسياسات
+          → خططي للسياسات
         </button>
       </div>
 

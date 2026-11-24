@@ -107,7 +107,22 @@ export default function AdminSettings() {
         {hasFields ? (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 16 }}>
-              {items.map(item => (
+              {items.map(item => item.type === "toggle" ? (
+                <label key={item.key} data-setting={item.key} style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "14px 16px", borderRadius: 12, border: `1.5px solid ${colors.grayBorder}`, cursor: "pointer" }}>
+                  <span>
+                    <span style={{ display: "block", fontSize: 13.5, fontWeight: 700, color: colors.ink }}>{item.label}</span>
+                    <span style={{ display: "block", fontSize: 12, color: colors.gray, marginTop: 4, lineHeight: 1.7 }}>
+                      {edits[item.key] === "0" ? "مخفي عن جميع المستخدمين." : "ظاهر للمستخدمين."}{item.key === "demo_fill_enabled" ? " يملأ النموذج ببيانات تجريبية للاختبار؛ أوقفه عندما تصبح المنصة جاهزة للعملاء الفعليين. يسري على الاستراتيجي والتشغيلي والسياسات." : ""}
+                    </span>
+                  </span>
+                  <span style={{ position: "relative", width: 46, height: 26, flexShrink: 0 }}>
+                    <input type="checkbox" role="switch" aria-label={item.label} checked={edits[item.key] !== "0"} onChange={e => handleChange(item.key, e.target.checked ? "1" : "0")}
+                      style={{ position: "absolute", inset: 0, opacity: 0, margin: 0, cursor: "pointer" }} />
+                    <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", inset: 0, borderRadius: 999, background: edits[item.key] !== "0" ? colors.green : colors.grayBorder, transition: "background 0.2s" }} />
+                    <span aria-hidden="true" style={{ pointerEvents: "none", position: "absolute", top: 3, right: edits[item.key] !== "0" ? 3 : 23, width: 20, height: 20, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.2)", transition: "right 0.2s" }} />
+                  </span>
+                </label>
+              ) : (
                 <div key={item.key} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   <label style={{ fontSize: 13, fontWeight: 600, color: colors.ink }}>
                     {item.label}

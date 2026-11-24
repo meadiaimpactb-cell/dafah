@@ -507,6 +507,7 @@ class OperationalController extends Controller
             'approved_units' => $approved,
             'submitted_units' => $subs->whereIn('status', ['submitted', 'reviewing', 'approved'])->count(),
             'progress_percent' => $percent,
+            'consultant' => $workflow->consultant,
             'status' => $workflow->status,
             // لوحة التحكم تبني «خطوتك التالية» من الحالة الفعلية للوحدات لا من الإشعارات
             'revision_units' => $subs->where('status', 'revision')->map($brief)->values(),

@@ -19,6 +19,24 @@ const btn = (primary) => ({
   background: primary ? colors.amber : '#fff', color: colors.ink, whiteSpace: 'nowrap',
 });
 
+const LABELS = { landing: 'الرئيسية', about: 'عن دفة', services: 'الخدمات', pricing: 'الأسعار', contact: 'تواصل معنا', privacy: 'سياسة الخصوصية', terms: 'شروط الاستخدام' };
+
+/** مسار التنقل الظاهر (الرئيسية ‹ الصفحة) — يطابق BreadcrumbList في البيانات المنظّمة */
+export function Breadcrumbs({ current, navigate }) {
+  return (
+    <nav aria-label="مسار التنقل" style={{ maxWidth: 1100, margin: '0 auto', padding: '12px clamp(16px, 4vw, 40px) 0', fontSize: 13.5, color: colors.gray }}>
+      <ol style={{ listStyle: 'none', display: 'flex', gap: 6, padding: 0, margin: 0, flexWrap: 'wrap' }}>
+        <li><a href="/" onClick={(e) => { e.preventDefault(); navigate('landing'); window.scrollTo({ top: 0 }); }} style={{ color: colors.primary, textDecoration: 'none' }}>{LABELS.landing}</a></li>
+        <li aria-hidden="true">‹</li>
+        <li aria-current="page" style={{ color: colors.ink, fontWeight: 600 }}>{LABELS[current]}</li>
+      </ol>
+    </nav>
+  );
+}
+
+/** رقم هاتف حقيقي فقط (لا يُعرض الرقم الافتراضي الوهمي) */
+export const realPhone = (p) => (p && !/x/i.test(p) && /\d{6,}/.test(String(p).replace(/\D/g, '')) ? p : '');
+
 export function PublicNav({ current, navigate, onLogin, onRegister }) {
   const vp = useViewport();
   const [open, setOpen] = useState(false);
@@ -88,18 +106,18 @@ export function PublicFooter({ sc, navigate }) {
           <p style={{ fontSize: 14, color: '#D6E4EE', marginTop: 16, lineHeight: 1.9, maxWidth: 300 }}>{sc('footer_desc', 'منصة دفة للتخطيط الاستراتيجي وصناعة السياسات')}</p>
         </div>
         <div>
-          <h4 style={{ color: '#fff', fontSize: 15, marginBottom: 12 }}>روابط سريعة</h4>
-          {LINKS.slice(0, 4).map((n) => <a key={n.v} href={PUBLIC_PATHS[n.v]} onClick={(e) => { e.preventDefault(); go(n.v); }} style={col}>{n.l}</a>)}
+          <h2 style={{ color: '#fff', fontSize: 15, marginBottom: 12 }}>روابط سريعة</h2>
+          {[...LINKS.slice(0, 4), { l: 'سياسة الخصوصية', v: 'privacy' }, { l: 'شروط الاستخدام', v: 'terms' }].map((n) => <a key={n.v} href={PUBLIC_PATHS[n.v]} onClick={(e) => { e.preventDefault(); go(n.v); }} style={col}>{n.l}</a>)}
         </div>
         <div>
-          <h4 style={{ color: '#fff', fontSize: 15, marginBottom: 12 }}>الخدمات</h4>
+          <h2 style={{ color: '#fff', fontSize: 15, marginBottom: 12 }}>الخدمات</h2>
           {['التخطيط الاستراتيجي', 'التخطيط التشغيلي', 'السياسات واللوائح'].map((l) => <a key={l} href={PUBLIC_PATHS.services} onClick={(e) => { e.preventDefault(); go('services'); }} style={col}>{l}</a>)}
         </div>
         <div>
-          <h4 style={{ color: '#fff', fontSize: 15, marginBottom: 12 }}>تواصل معنا</h4>
+          <h2 style={{ color: '#fff', fontSize: 15, marginBottom: 12 }}>تواصل معنا</h2>
           <div style={{ fontSize: 14, color: '#BFD6E5', lineHeight: 2.1 }}>
             <div dir="ltr" style={{ textAlign: 'right' }}>{sc('contact_email', 'info@daffa.sa')}</div>
-            <div dir="ltr" style={{ textAlign: 'right' }}>{sc('contact_phone', '+966 55 XXX XXXX')}</div>
+            {realPhone(sc('contact_phone', '')) && <div dir="ltr" style={{ textAlign: 'right' }}>{sc('contact_phone', '')}</div>}
             <div>{sc('contact_address', 'الرياض، المملكة العربية السعودية')}</div>
           </div>
         </div>

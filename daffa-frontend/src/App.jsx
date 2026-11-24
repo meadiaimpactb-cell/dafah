@@ -13,7 +13,9 @@ import { colors as themeColors, systems } from "./theme/tokens";
 import { Badge, ProgressBar, Btn, Card, Input, Modal, GenericPage, Loading, SectionTitle } from "./components/ui/kit";
 import { Help, TipLayer } from "./components/ui/Help";
 import AppShell from "./components/shell/AppShell";
-import { PublicNav as PublicNavBar, PublicFooter as PublicFooterBar } from "./pages/public/PublicLayout";
+import { PublicNav as PublicNavBar, PublicFooter as PublicFooterBar, Breadcrumbs, realPhone } from "./pages/public/PublicLayout";
+import LegalPage from "./pages/public/LegalPage";
+import ContactForm from "./pages/public/ContactForm";
 import Landing from "./pages/public/Landing";
 import { Icons } from "./utils/navIcons";
 import { PUBLIC_PATHS, viewFromPath, applySeo } from "./utils/publicRoutes";
@@ -215,6 +217,24 @@ export default function DaffaPlatform() {
     return () => window.removeEventListener('session:expired', handler);
   }, []);
 
+  // ── GA4: معرّف القياس من «محتوى الموقع ← الظهور في البحث»؛ يُحمَّل متأخرًا ومرة واحدة
+  useEffect(() => {
+    const id = String(siteContent.ga4_measurement_id || '').trim();
+    if (!/^G-[A-Z0-9]{4,}$/.test(id) || window.__dfGa) return;
+    window.__dfGa = true;
+    const boot = () => {
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function gtag() { window.dataLayer.push(arguments); }; // eslint-disable-line prefer-rest-params
+      window.gtag('js', new Date());
+      window.gtag('config', id, { anonymize_ip: true });
+      const sc2 = document.createElement('script');
+      sc2.async = true; sc2.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
+      document.head.appendChild(sc2);
+    };
+    const later = () => (window.requestIdleCallback ? window.requestIdleCallback(boot, { timeout: 4000 }) : setTimeout(boot, 2500));
+    if (document.readyState === 'complete') later(); else window.addEventListener('load', later, { once: true });
+  }, [siteContent.ga4_measurement_id]);
+
   // ── fetch site content + public policy types (no auth needed) ────────────
   useEffect(() => {
     // في وضع المعاينة نتجاوز ذاكرة المتصفح المؤقتة (60 ثانية) لنرى آخر تعديل فورًا
@@ -411,6 +431,9 @@ export default function DaffaPlatform() {
       }
 
       const raw = (r) => (r.status === 'fulfilled' ? r.value.data : null);
+      // «مستشارك»: مستشار الخطة الاستراتيجية، وإلا التشغيلية، وإلا السياسات (الأنظمة مستقلة)
+      const cons = raw(stRes)?.consultant || raw(opRes)?.consultant || raw(polRes)?.workflow?.consultant || null;
+      if (cons) setDashConsultant(cons);
       setDashPhases([
         { ...stPhase,  key: 'strategic',   raw: raw(stRes) },
         { ...opPhase,  key: 'operational', raw: raw(opRes) },
@@ -652,7 +675,7 @@ export default function DaffaPlatform() {
   ];
 
   const menu = currentRole === "admin" ? adminMenu : currentRole === "consultant" ? consultantMenu : clientMenu;
-  const isDashboard = !["landing", "about", "services", "pricing", "contact", "login", "register", "not-found"].includes(currentView);
+  const isDashboard = !["landing", "about", "services", "pricing", "contact", "privacy", "terms", "login", "register", "not-found"].includes(currentView);
 
   // ============== PUBLIC PAGES NAV / FOOTER / LANDING (src/pages/public) ==============
   const PublicNav = () => <PublicNavBar current={currentView} navigate={navigate} onLogin={() => setAuthPage("login")} onRegister={() => setAuthPage("register")} />;
@@ -680,11 +703,12 @@ export default function DaffaPlatform() {
   const AboutPage = () => (
     <div style={{ width: "100%", minHeight: "100vh" }} className="geo-bg">
       <PublicNav />
-      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px 40px", textAlign: "center" }}>
+      <Breadcrumbs current="about" navigate={navigate} />
+      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px clamp(16px, 4vw, 40px)", textAlign: "center", marginTop: 12 }}>
         <h1 style={{ color: "white", fontSize: 32, fontWeight: 800 }}>عن منصة دفة</h1>
         <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginTop: 10 }}>{sc('about_hero_subtitle','للتخطيط الاستراتيجي وصناعة السياسات')}</p>
       </div>
-      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "50px 40px" }}>
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "50px clamp(16px, 4vw, 40px)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 40, marginBottom: 50 }}>
           <div>
             <h2 style={{ fontSize: 22, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>رؤيتنا</h2>
@@ -762,14 +786,15 @@ export default function DaffaPlatform() {
   const ServicesPage = () => (
     <div style={{ width: "100%", minHeight: "100vh" }} className="geo-bg">
       <PublicNav />
-      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px 40px", textAlign: "center" }}>
+      <Breadcrumbs current="services" navigate={navigate} />
+      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px clamp(16px, 4vw, 40px)", textAlign: "center", marginTop: 12 }}>
         <h1 style={{ color: "white", fontSize: 32, fontWeight: 800 }}>خدمات منصة دفة</h1>
         <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginTop: 10 }}>{sc('services_hero_subtitle','ثلاثة أنظمة متكاملة لبناء منظمتك')}</p>
       </div>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "50px 40px" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "50px clamp(16px, 4vw, 40px)" }}>
         {/* Service 1 */}
         <Card accent style={{ padding: 32, marginBottom: 24 }}>
-          <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
+          <div style={{ display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
             <div style={{ width: 80, height: 80, borderRadius: 16, background: colors.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: colors.amberText }}><IcTarget width={36} height={36}/></div>
             <div style={{ flex: 1 }}>
               <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.ink, marginBottom: 6 }}>نظام التخطيط الاستراتيجي</h2>
@@ -777,7 +802,7 @@ export default function DaffaPlatform() {
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
                 {strategicUnits.map(u => <Badge key={u.id} text={u.name} color="primary" small />)}
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
                 <span style={{ fontSize: 24, fontWeight: 800, color: colors.primary }}>{sc('strategic_service_price','5,000')} ريال</span>
                 <Btn small onClick={() => navigate("register")}>ابدأ الآن</Btn>
               </div>
@@ -787,7 +812,7 @@ export default function DaffaPlatform() {
 
         {/* Service 2 */}
         <Card accent style={{ padding: 32, marginBottom: 24 }}>
-          <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
+          <div style={{ display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
             <div style={{ width: 80, height: 80, borderRadius: 16, background: colors.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: colors.amberText }}><IcCog width={36} height={36}/></div>
             <div style={{ flex: 1 }}>
               <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.ink, marginBottom: 6 }}>نظام التخطيط التشغيلي</h2>
@@ -795,7 +820,7 @@ export default function DaffaPlatform() {
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
                 {operationalUnits.map(u => <Badge key={u.id} text={u.name} color="primary" small />)}
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
                 <span style={{ fontSize: 24, fontWeight: 800, color: colors.primary }}>{sc('operational_service_price','3,500')} ريال</span>
                 <Btn small onClick={() => navigate("register")}>ابدأ الآن</Btn>
               </div>
@@ -805,7 +830,7 @@ export default function DaffaPlatform() {
 
         {/* Service 3 */}
         <Card accent style={{ padding: 32, marginBottom: 24 }}>
-          <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
+          <div style={{ display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
             <div style={{ width: 80, height: 80, borderRadius: 16, background: colors.amberSoft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: colors.amberText }}><IcClipboard width={36} height={36}/></div>
             <div style={{ flex: 1 }}>
               <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.ink, marginBottom: 6 }}>نظام بناء السياسات واللوائح</h2>
@@ -813,7 +838,7 @@ export default function DaffaPlatform() {
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
                 {allPolicies.map(p => <Badge key={p.id} text={p.name} color="primary" small />)}
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
                 <span style={{ fontSize: 14, color: colors.gray }}>تسعير مستقل لكل سياسة — يبدأ من</span>
                 <span style={{ fontSize: 24, fontWeight: 800, color: colors.primary }}>{sc('policies_min_price','1,000')} ريال</span>
                 <Btn small onClick={() => navigate("register")}>ابدأ الآن</Btn>
@@ -841,11 +866,12 @@ export default function DaffaPlatform() {
   const PricingPage = () => (
     <div style={{ width: "100%", minHeight: "100vh" }} className="geo-bg">
       <PublicNav />
-      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px 40px", textAlign: "center" }}>
+      <Breadcrumbs current="pricing" navigate={navigate} />
+      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px clamp(16px, 4vw, 40px)", textAlign: "center", marginTop: 12 }}>
         <h1 style={{ color: "white", fontSize: 32, fontWeight: 800 }}>الأسعار</h1>
         <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginTop: 10 }}>{sc('pricing_hero_subtitle','أسعار مناسبة لجميع المنظمات غير الربحية')}</p>
       </div>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "50px 40px" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "50px clamp(16px, 4vw, 40px)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "var(--g-3)", gap: 20, marginBottom: 40 }}>
           {[
             { title: "التخطيط الاستراتيجي", price: sc('strategic_price','5,000'),   icon: <IcTarget width={36} height={36}/>, features: ["11 وحدة تخطيطية", "فيديوهات تعليمية", "شرح مكتوب وإرشادات", "نماذج عمل تفاعلية", "دردشة مع المستشار", "مراجعة واعتماد المستشار", "وثيقة استراتيجية نهائية"], popular: true },
@@ -856,7 +882,7 @@ export default function DaffaPlatform() {
               {p.popular && <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: colors.amber, color: "#0E2A3D", padding: "4px 16px", borderRadius: 20, fontSize: 11, fontWeight: 700 }}>الأكثر طلباً</div>}
               <div style={{ textAlign: "center", marginBottom: 20 }}>
                 <span style={{ color: colors.primary }}>{p.icon}</span>
-                <h3 style={{ fontSize: 18, fontWeight: 800, color: colors.ink, marginTop: 8 }}>{p.title}</h3>
+                <h2 style={{ fontSize: 18, fontWeight: 800, color: colors.ink, marginTop: 8 }}>{p.title}</h2>
                 <div style={{ marginTop: 12 }}><span style={{ fontSize: 32, fontWeight: 800, color: colors.primary }}>{p.price}</span><span style={{ fontSize: 14, color: colors.gray }}> ريال</span></div>
               </div>
               {p.features.map((f, fi) => (
@@ -871,7 +897,7 @@ export default function DaffaPlatform() {
         </div>
 
         <Card style={{ padding: 24, marginBottom: 20 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: colors.ink, marginBottom: 14, textAlign: "center" }}>الخدمات الإضافية</h3>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: colors.ink, marginBottom: 14, textAlign: "center" }}>الخدمات الإضافية</h2>
           <div style={{ display: "grid", gridTemplateColumns: "var(--g-3)", gap: 16 }}>
             {[
               {t: sc('addon1_title','اعتماد الخطة من جهة استشارية'), p: sc('addon1_price','2,000'), d: sc('addon1_desc','اعتماد رسمي من جهة معتمدة')},
@@ -888,8 +914,9 @@ export default function DaffaPlatform() {
         </Card>
 
         <Card style={{ padding: 24 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>تسعير السياسات واللوائح (مستقل)</h3>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: colors.ink, marginBottom: 14 }}>تسعير السياسات واللوائح (مستقل)</h2>
+          <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 520 }}>
             <thead><tr>{["الرمز", "السياسة", "المجموعة", "السعر"].map(h => <th key={h} style={{ padding: "10px 12px", background: colors.primaryDeep, color: "white", fontSize: 12, textAlign: "right" }}>{h}</th>)}</tr></thead>
             <tbody>{publicPolicies.map((p, i) => (
               <tr key={p.id ?? i} style={{ borderBottom: `1px solid ${colors.grayLight}` }}>
@@ -900,6 +927,7 @@ export default function DaffaPlatform() {
               </tr>
             ))}</tbody>
           </table>
+          </div>
         </Card>
       </div>
       <PublicFooter />
@@ -910,43 +938,24 @@ export default function DaffaPlatform() {
   const ContactPage = () => (
     <div style={{ width: "100%", minHeight: "100vh" }} className="geo-bg">
       <PublicNav />
-      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px 40px", textAlign: "center" }}>
+      <Breadcrumbs current="contact" navigate={navigate} />
+      <div style={{ background: `linear-gradient(135deg, ${colors.primary}, #123247)`, padding: "50px clamp(16px, 4vw, 40px)", textAlign: "center", marginTop: 12 }}>
         <h1 style={{ color: "white", fontSize: 32, fontWeight: 800 }}>تواصل معنا</h1>
         <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginTop: 10 }}>{sc('contact_hero_subtitle','نسعد بتواصلكم والإجابة على استفساراتكم')}</p>
       </div>
-      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "50px 40px" }}>
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "50px clamp(16px, 4vw, 40px)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 30 }}>
           <Card style={{ padding: 28 }}>
             <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.ink, marginBottom: 20 }}>أرسل رسالة</h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "var(--g-2)", gap: 14 }}>
-                <Input label="الاسم" placeholder="اسمك الكامل" />
-                <Input label="المنظمة" placeholder="اسم المنظمة" />
-              </div>
-              <Input label="البريد الإلكتروني" placeholder="email@example.com" type="email" />
-              <Input label="رقم الجوال" placeholder="+966 5X XXX XXXX" />
-              <div>
-                <label style={{ fontSize: 13, fontWeight: 600, color: colors.ink, display: "block", marginBottom: 6 }}>الموضوع</label>
-                <select style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${colors.grayBorder}`, fontSize: 14, fontFamily: "inherit" }}>
-                  <option>استفسار عام</option>
-                  <option>استفسار عن الأسعار</option>
-                  <option>طلب عرض تقديمي</option>
-                  <option>مشكلة تقنية</option>
-                  <option>اقتراح تطوير</option>
-                  <option>أخرى</option>
-                </select>
-              </div>
-              <Input label="الرسالة" textarea placeholder="اكتب رسالتك هنا بالتفصيل..." />
-              <Btn full>إرسال الرسالة</Btn>
-            </div>
+            <ContactForm />
           </Card>
 
           <div>
             <Card style={{ padding: 24, marginBottom: 16 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>معلومات التواصل</h3>
+              <h2 style={{ fontSize: 16, fontWeight: 700, color: colors.ink, marginBottom: 16 }}>معلومات التواصل</h2>
               {[
                 { icon: <IcMail width={20} height={20}/>,  title: "البريد الإلكتروني", value: sc('contact_email','info@daffa.sa') },
-                { icon: <IcPhone width={20} height={20}/>, title: "الهاتف",             value: sc('contact_phone','+966 55 XXX XXXX') },
+                realPhone(sc('contact_phone', '')) && { icon: <IcPhone width={20} height={20}/>, title: "الهاتف", value: sc('contact_phone', '') },
                 { icon: <IcMapPin width={20} height={20}/>,title: "العنوان",            value: sc('contact_address','الرياض، المملكة العربية السعودية') },
                 { icon: <IcClock width={20} height={20}/>, title: "ساعات العمل",        value: sc('contact_hours','الأحد - الخميس: 8 ص - 5 م') },
               ].map((c, i) => (
@@ -1164,6 +1173,7 @@ export default function DaffaPlatform() {
       case "services": return <ServicesPage />;
       case "pricing": return <PricingPage />;
       case "contact": return <ContactPage />;
+      case "privacy": case "terms": return <LegalPage kind={currentView} sc={sc} navigate={navigate} PublicNav={PublicNav} PublicFooter={PublicFooter} />;
       case "login": case "register": return <LandingPage />;
       // ── جميع هذه الصفحات يديرها KeepAlive في الـ render ──
       case "client-dash":

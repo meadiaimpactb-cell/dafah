@@ -392,7 +392,7 @@ export default function StrategicRoadmap({ activeUnit, setActiveUnit, navigate, 
             onClick={() => setIsCreatingNew(false)}
             style={{ background: 'none', border: 'none', color: C.primary, cursor: 'pointer', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, padding: 0 }}
           >
-            ← العودة إلى قائمة الخطط
+            → العودة إلى قائمة الخطط
           </button>
         </div>
         <WorkflowStepper step={0} workflow={null} />
@@ -445,7 +445,7 @@ export default function StrategicRoadmap({ activeUnit, setActiveUnit, navigate, 
           onClick={() => onWorkflowSelect && onWorkflowSelect(null)}
           style={{ background: 'none', border: 'none', color: C.primary, cursor: 'pointer', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, padding: 0 }}
         >
-          ← العودة إلى قائمة الخطط
+          → العودة إلى قائمة الخطط
         </button>
       </div>
 

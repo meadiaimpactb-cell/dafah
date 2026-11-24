@@ -8,9 +8,18 @@ AddType font/woff2 .woff2
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # النطاق القانوني: www → بدون www (نسخة واحدة للمحركات)
+    # النطاق القانوني: www → بدون www (نسخة واحدة للمحركات)، مع إزالة الشرطة الأخيرة في الخطوة نفسها
     RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
-    RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+    RewriteRule ^(.*?)/?$ https://%1/$1 [R=301,L]
+
+    # /index.html → / (نسخة واحدة للصفحة الرئيسية)
+    RewriteCond %{THE_REQUEST} \s/index\.html[\s?] [NC]
+    RewriteRule ^ / [R=301,L]
+
+    # بلا شرطة أخيرة: /about/ → /about (ما عدا المجلدات الحقيقية ومسارات API)
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/api/
+    RewriteRule ^(.+)/$ /$1 [R=301,L]
 
     # Handle Authorization Header (required for Laravel API tokens)
     RewriteCond %{HTTP:Authorization} .
@@ -26,12 +35,15 @@ AddType font/woff2 .woff2
     RewriteCond %{REQUEST_URI} ^/(api|pdf)/
     RewriteRule ^ index.php [L]
 
+    # خريطة الموقع تُولَّد تلقائيًا من Laravel (الصفحات القابلة للفهرسة وتاريخ آخر تعديل)
+    RewriteRule ^sitemap\.xml$ index.php [L]
+
+    # الصفحات العامة → Laravel يحقن في index.html عنوان الصفحة ووصفها ورابطها القانوني وبياناتها المنظّمة ومحتواها
+    RewriteRule ^(about|services|pricing|contact|privacy|terms|login|register)?$ index.php [L]
+
     # Serve existing static files directly
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
-
-    # الصفحات العامة للواجهة (عناوين حقيقية تُفهرس) → index.html بحالة 200
-    RewriteRule ^(about|services|pricing|contact|login|register)/?$ index.html [L]
 </IfModule>
 
 # أي مسار آخر غير موجود → الواجهة نفسها بحالة 404 (تعرض صفحة «غير موجودة»)
@@ -64,7 +76,7 @@ ErrorDocument 404 /index.html
         Header set Cache-Control "public, max-age=2592000"
     </FilesMatch>
     # الصفحة الرئيسية وملفات الفهرسة → يُتحقق منها كل مرة حتى تظهر التحديثات فورًا
-    <FilesMatch "^(index\.html|manifest\.webmanifest|sitemap\.xml|robots\.txt)$">
+    <FilesMatch "^(index\.html|manifest\.webmanifest|robots\.txt)$">
         Header set Cache-Control "no-cache"
     </FilesMatch>
 </IfModule>

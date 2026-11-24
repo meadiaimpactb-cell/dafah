@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\Admin\SiteContentController as AdminSiteContentCont
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\ConsultantChangeController;
 use App\Http\Controllers\Api\Consultant\PortalController as ConsultantPortalController;
 use App\Http\Controllers\Api\FaqController;
@@ -35,6 +36,7 @@ use Illuminate\Support\Facades\Route;
 // تُخزَّن في المتصفح/CDN دقيقة واحدة مع ETag (304 بلا جسم عند عدم التغيّر)
 Route::get('/site-content', [AdminSiteContentController::class, 'publicIndex'])->middleware('cache.headers:public;max_age=60;etag');
 Route::get('/public/policy-types', [AdminContentController::class,     'publicPolicyTypes'])->middleware('cache.headers:public;max_age=60;etag');
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,10');
 Route::get('/faqs', [FaqController::class,              'index'])->middleware('cache.headers:public;max_age=60;etag');
 Route::post('/auth/forgot-password', [PasswordResetController::class, 'sendLink'])->middleware('throttle:5,1,pw-forgot');
 Route::post('/auth/reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:10,1,pw-reset');

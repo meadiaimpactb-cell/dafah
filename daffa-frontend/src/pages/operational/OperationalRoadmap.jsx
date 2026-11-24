@@ -1,6 +1,7 @@
 import { Help } from '../../components/ui/Help';
 import DfIcon from '../../components/ui/DfIcon';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import useDemoFill from '../../utils/useDemoFill';
 import { operationalApi } from '../../api/operational';
 import { chatApi } from '../../api/chat';
 import { ConsultantRating } from '../strategic/steps/StepApproval';
@@ -1118,6 +1119,7 @@ export const OpTemplateRenderer = ({ unit, formData, setFormData, readOnly, sync
 
 // ─── OpUnitPage (6 tabs — original design) ──────────────────────
 const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, onNext, onPrev, workflowId, totalUnits }) => {
+  const demoFill = useDemoFill();
   const [tab,        setTab]        = useState(0);
   const [unitData,   setUnitData]   = useState(null);
   const [loading,    setLoading]    = useState(true);
@@ -1312,7 +1314,7 @@ const OpUnitPage = ({ unitSummary, onBack, consultantName, nextUnit, prevUnit, o
         {tab === 5 && (
           <div>
             {(() => {
-              const trialBtn = !isReadOnly && TRIAL_FILL[ttype] ? (
+              const trialBtn = demoFill && !isReadOnly && TRIAL_FILL[ttype] ? (
                 <button
                   onClick={() => setFormData(prev => trialFillFor(ttype, prev))}
                   style={{ fontSize: 12, color: colors.blue, background: colors.blueLight, border: "none", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: "'Cairo', sans-serif", fontWeight: 600, display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
@@ -2373,7 +2375,7 @@ export default function OperationalRoadmap({ navigate, workflowId, onWorkflowSel
           }}
           style={{ background: 'none', border: 'none', color: colors.primary, cursor: 'pointer', fontSize: 14, fontWeight: 600, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, padding: 0 }}
         >
-          ← العودة إلى قائمة الخطط
+          → العودة إلى قائمة الخطط
         </button>
       </div>
       <OpWorkflowStepper opStep={opStep} setOpStep={setOpStep} workflow={workflow} />

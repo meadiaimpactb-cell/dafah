@@ -106,7 +106,7 @@ export default function Landing({ sc, navigate, onRegister, PublicNav, PublicFoo
           {easy.map((e) => (
             <div key={e.t} style={{ background: '#fff', borderRadius: 20, padding: 22, border: `1px solid ${colors.grayBorder}`, boxShadow: '0 12px 30px rgba(14,42,61,0.07)' }}>
               <div style={{ width: 46, height: 46, borderRadius: 14, background: colors.primaryTint, color: colors.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>{e.icon}</div>
-              <h3 style={{ fontSize: 17, marginBottom: 6 }}>{e.t}</h3>
+              <h2 style={{ fontSize: 17, marginBottom: 6 }}>{e.t}</h2>
               <p style={{ fontSize: 14.5, color: colors.gray, lineHeight: 1.9 }}>{e.d}</p>
             </div>
           ))}
