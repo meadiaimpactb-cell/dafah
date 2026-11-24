@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/site-content', [AdminSiteContentController::class, 'publicIndex'])->middleware('cache.headers:public;max_age=60;etag');
 Route::get('/public/policy-types', [AdminContentController::class,     'publicPolicyTypes'])->middleware('cache.headers:public;max_age=60;etag');
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,10');
+Route::get('/seo/meta', [\App\Http\Controllers\PublicPageController::class, 'meta']);
 Route::get('/faqs', [FaqController::class,              'index'])->middleware('cache.headers:public;max_age=60;etag');
 Route::post('/auth/forgot-password', [PasswordResetController::class, 'sendLink'])->middleware('throttle:5,1,pw-forgot');
 Route::post('/auth/reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:10,1,pw-reset');
@@ -202,6 +203,24 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::get('/outputs/{system}/{id}', [OutputsController::class, 'show'])->whereIn('system', ['strategic', 'operational', 'policies'])->whereNumber('id');
 
     // تغيير المستشار: دراسة طلبات العملاء والبتّ فيها، والتغيير المباشر، وسجل كل خطة
+    // الظهور والقياس: عناوين الصفحات وأوصافها، والكلمات المفتاحية، وrobots.txt، وخريطة الموقع، وأدوات القياس
+    Route::prefix('seo')->controller(\App\Http\Controllers\Api\Admin\SeoController::class)->group(function () {
+        Route::get('/pages', 'pages');
+        Route::put('/pages/{page}', 'savePage');
+        Route::post('/pages/{page}/image', 'uploadImage');
+        Route::put('/pages/{page}/keywords', 'saveKeywords');
+        Route::get('/pages/{page}/content', 'content');
+        Route::get('/robots', 'robots');
+        Route::put('/robots', 'saveRobots');
+        Route::put('/ai-bots', 'aiBots');
+        Route::get('/sitemap', 'sitemap');
+        Route::get('/status', 'status');
+        Route::put('/log', 'saveLog');
+        Route::post('/indexnow', 'indexNow')->middleware('throttle:6,1');
+        Route::get('/tracking', 'tracking');
+        Route::put('/tracking', 'saveTracking');
+    });
+
     Route::get('/consultant-changes', [AdminConsultantChangeController::class, 'index']);
     Route::get('/consultant-changes/pending-count', [AdminConsultantChangeController::class, 'pendingCount']);
     Route::get('/consultant-changes/plan/{system}/{id}', [AdminConsultantChangeController::class, 'plan'])->whereIn('system', ['strategic', 'operational', 'policies'])->whereNumber('id');

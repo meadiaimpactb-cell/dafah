@@ -16,6 +16,17 @@ export const PERMISSIONS_BY_ROLE = {
       ],
     },
     {
+      module: 'admin.seo',
+      label:  'الظهور والقياس',
+      icon:   'chart',
+      actions: [
+        { key: 'view',     label: 'عرض' },
+        { key: 'edit',     label: 'العناوين والأوصاف والكلمات وخريطة الموقع' },
+        { key: 'robots',   label: 'ملف robots.txt' },
+        { key: 'tracking', label: 'أدوات القياس ورموز التوثيق' },
+      ],
+    },
+    {
       module: 'admin.consultant_changes',
       label:  'تغيير المستشار',
       icon:   'briefcase',

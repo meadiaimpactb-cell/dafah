@@ -2,6 +2,7 @@
 // التنسيق: سطر فارغ بين الفقرات، و«## » لعنوان فرعي، وأسطر تبدأ بـ«- » لقائمة.
 import { colors } from '../../theme/tokens';
 import { Breadcrumbs } from './PublicLayout';
+import { MeasureChoice } from './Measurement';
 
 function Blocks({ text }) {
   const blocks = String(text || '').trim().split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
@@ -15,7 +16,7 @@ function Blocks({ text }) {
   });
 }
 
-export default function LegalPage({ kind, sc, navigate, PublicNav, PublicFooter }) {
+export default function LegalPage({ kind, sc, settings, navigate, PublicNav, PublicFooter }) {
   const isPrivacy = kind === 'privacy';
   const text = sc(isPrivacy ? 'privacy_policy' : 'terms_of_use', '');
   return (
@@ -28,6 +29,7 @@ export default function LegalPage({ kind, sc, navigate, PublicNav, PublicFooter 
       </div>
       <main style={{ maxWidth: 860, margin: '0 auto', padding: '40px clamp(16px, 4vw, 40px) 60px', fontSize: 15.5 }}>
         {text ? <Blocks text={text} /> : <p style={{ color: colors.gray }}>جارٍ تحميل المحتوى…</p>}
+        {isPrivacy && <MeasureChoice settings={settings} />}
       </main>
       <PublicFooter />
     </div>

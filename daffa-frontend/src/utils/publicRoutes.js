@@ -27,18 +27,23 @@ const DESC = 'منصة دفة تساعد الجمعيات والمؤسسات غ�
 
 // النصوص نفسها التي يرسلها الخادم في HTML (app/Support/SeoPages.php) — عدّلهما معًا
 export const SEO = {
-  landing: { title: 'منصة دفة | التخطيط الاستراتيجي والسياسات للمنظمات غير الربحية', description: 'ابنِ الخطة الاستراتيجية والتشغيلية وسياسات ولوائح جمعيتك خطوة بخطوة عبر منصة دفة، بفيديوهات ونماذج جاهزة ومراجعة واعتماد من مستشار متخصص عن بعد.' },
+  landing: { title: 'منصة دفة | التخطيط الاستراتيجي والسياسات للجمعيات الأهلية', description: 'ابنِ الخطة الاستراتيجية والتشغيلية وسياسات ولوائح جمعيتك خطوة بخطوة عبر منصة دفة، بفيديوهات ونماذج جاهزة ومراجعة واعتماد من مستشار متخصص عن بعد.' },
   about: { title: 'عن منصة دفة | كيف نبني خطط المنظمات غير الربحية', description: 'تعرّف على منصة دفة: رؤيتها ورسالتها وآلية عملها التي ترشد الجمعيات والمؤسسات غير الربحية لبناء خططها وسياساتها خطوة بخطوة بإشراف مستشار متخصص.' },
   services: { title: 'خدمات دفة: التخطيط الاستراتيجي والتشغيلي والسياسات', description: 'ثلاث خدمات مستقلة للمنظمات غير الربحية: خطة استراتيجية في 11 وحدة، وخطة تشغيلية في 5 وحدات، و19 سياسة ولائحة، مع مراجعة واعتماد مستشار متخصص.' },
   pricing: { title: 'أسعار منصة دفة | التخطيط الاستراتيجي والسياسات واللوائح', description: 'أسعار خدمات منصة دفة للتخطيط الاستراتيجي والتشغيلي والسياسات واللوائح، بسعر مستقل لكل سياسة، مع اختيار مستشارك قبل الدفع وخدمات إضافية اختيارية.' },
   contact: { title: 'تواصل مع منصة دفة | الاستفسارات والدعم الفني', description: 'تواصل مع فريق منصة دفة للاستفسار عن خدمات التخطيط الاستراتيجي والتشغيلي وبناء السياسات واللوائح، أو للدعم الفني وطلبات الشراكة مع منظمتك.' },
-  privacy: { title: 'سياسة الخصوصية | منصة دفة', description: 'كيف تجمع منصة دفة بيانات المنظمات ومستخدميها وتستخدمها وتحميها، ومع من تشاركها، وحقوقك في الوصول إليها وتصحيحها وحذفها وفق نظام حماية البيانات الشخصية.' },
-  terms: { title: 'شروط استخدام منصة دفة', description: 'الشروط التي تنظّم استخدام منصة دفة للتخطيط الاستراتيجي والتشغيلي وبناء السياسات: الحسابات، ودور المستشار، والمدفوعات، والملكية الفكرية للمخرجات، والمسؤولية.' },
+  privacy: { title: 'سياسة الخصوصية وحماية البيانات | منصة دفة', description: 'كيف تجمع منصة دفة بيانات المنظمات ومستخدميها وتستخدمها وتحميها، ومع من تشاركها، وحقوقك في الوصول إليها وتصحيحها وحذفها وفق نظام حماية البيانات الشخصية.' },
+  terms: { title: 'شروط استخدام منصة دفة للتخطيط والسياسات', description: 'الشروط التي تنظّم استخدام منصة دفة للتخطيط الاستراتيجي والتشغيلي وبناء السياسات: الحسابات، ودور المستشار، والمدفوعات، والملكية الفكرية للمخرجات، والمسؤولية.' },
   login: { title: 'تسجيل الدخول | منصة دفة', description: 'سجّل دخولك إلى منصة دفة لمتابعة خطط منظمتك وسياساتها.', noindex: true },
   register: { title: 'أنشئ حساب منظمتك | منصة دفة', description: 'أنشئ حساب منظمتك في منصة دفة وابدأ رحلة التخطيط الاستراتيجي والتشغيلي وبناء السياسات.', noindex: true },
   'not-found': { title: 'الصفحة غير موجودة | منصة دفة', description: DESC, noindex: true },
   app: { title: 'لوحة التحكم | منصة دفة', description: DESC, noindex: true },
 };
+
+// ما ضبطه المشرف في «الظهور والقياس» (من /api/seo/meta) يتقدّم على النصوص الافتراضية أعلاه
+let overrides = null;
+const KEY_OF = { landing: 'home' };
+export function setSeoOverrides(map) { overrides = map && typeof map === 'object' ? map : null; }
 
 function setMeta(attr, key, content) {
   let el = document.head.querySelector(`meta[${attr}="${key}"]`);
@@ -60,7 +65,9 @@ export function applySeo(view) {
     served.remove();
     if (same) return;
   }
-  const s = SEO[view] || SEO.landing;
+  const base = SEO[view] || SEO.landing;
+  const o = overrides?.[KEY_OF[view] || view];
+  const s = o ? { ...base, title: o.title || base.title, description: o.description || base.description, noindex: base.noindex || !!o.noindex, image: o.image } : base;
   const url = window.location.origin + (PUBLIC_PATHS[view] || '/');
   document.title = s.title;
   setMeta('name', 'description', s.description);
@@ -70,6 +77,7 @@ export function applySeo(view) {
   setMeta('property', 'og:url', url);
   setMeta('name', 'twitter:title', s.title);
   setMeta('name', 'twitter:description', s.description);
+  if (s.image) { setMeta('property', 'og:image', s.image); setMeta('name', 'twitter:image', s.image); }
   let link = document.head.querySelector('link[rel="canonical"]');
   if (!link) {
     link = document.createElement('link');

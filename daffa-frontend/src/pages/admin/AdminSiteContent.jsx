@@ -21,10 +21,9 @@ const GROUP_LABELS = {
   policies: "السياسات واللوائح",
   auth:     "الدخول والتسجيل",
   legal:    "الخصوصية والشروط",
-  seo:      "الظهور في البحث والتحليلات",
 };
 
-const GROUP_ORDER = ["landing", "about", "services", "pricing", "contact", "footer", "legal", "seo", "guides", "auth"];
+const GROUP_ORDER = ["landing", "about", "services", "pricing", "contact", "footer", "legal", "guides", "auth"];
 
 export default function AdminSiteContent() {
   const [grouped, setGrouped]   = useState({});

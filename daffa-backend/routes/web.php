@@ -22,6 +22,7 @@ foreach (['about', 'services', 'pricing', 'contact', 'privacy', 'terms', 'login'
     Route::get('/'.$seoPage, [PublicPageController::class, 'show'])->defaults('page', $seoPage)->withoutMiddleware($stateless);
 }
 Route::get('/sitemap.xml', [PublicPageController::class, 'sitemap'])->withoutMiddleware($stateless);
+Route::get('/robots.txt', [PublicPageController::class, 'robots'])->withoutMiddleware($stateless);
 
 // PDF download via signed URL (no session/token required — signature IS the auth)
 Route::get('/pdf/strategic', [StrategicController::class, 'downloadPDFSigned'])

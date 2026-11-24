@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SiteContent;
 use App\Support\SeoPages;
+use App\Support\SeoRules;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -40,15 +41,69 @@ class PublicPageController extends Controller
         } catch (\Throwable) {
             $last = null;
         }
-        $lastmod = $last ? date('Y-m-d', strtotime($last)) : date('Y-m-d', @filemtime((string) self::indexPath()) ?: time());
-        $prio = ['home' => '1.0', 'services' => '0.9', 'pricing' => '0.9', 'about' => '0.7', 'contact' => '0.6', 'privacy' => '0.3', 'terms' => '0.3'];
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
-        foreach (SeoPages::INDEXABLE as $p) {
-            $xml .= '  <url><loc>'.SeoPages::url($p).'</loc><lastmod>'.$lastmod.'</lastmod><priority>'.$prio[$p].'</priority></url>'."\n";
+        foreach (self::sitemapEntries($last) as $e) {
+            $xml .= '  <url><loc>'.$e['loc'].'</loc><lastmod>'.$e['lastmod'].'</lastmod><priority>'.$e['priority'].'</priority></url>'."\n";
         }
         $xml .= '</urlset>'."\n";
 
         return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8', 'Cache-Control' => 'public, max-age=3600']);
+    }
+
+    /** روابط خريطة الموقع: الصفحات العامة غير المخفية، وتاريخ آخر تعديل لكل منها */
+    public static function sitemapEntries($siteUpdated = null): array
+    {
+        $base = $siteUpdated ? date('Y-m-d', strtotime($siteUpdated)) : date('Y-m-d', @filemtime((string) self::indexPath()) ?: time());
+        $prio = ['home' => '1.0', 'services' => '0.9', 'pricing' => '0.9', 'about' => '0.7', 'contact' => '0.6', 'privacy' => '0.3', 'terms' => '0.3'];
+        $custom = SeoPages::custom();
+
+        return array_map(fn ($p) => [
+            'page' => $p, 'loc' => SeoPages::url($p), 'priority' => $prio[$p],
+            'lastmod' => max($base, (string) ($custom[$p]['updated_at'] ?? '')),
+        ], SeoPages::indexable());
+    }
+
+    /** robots.txt: القواعد الخاصة من لوحة الأدمن أو الافتراضية، مع قرار زواحف الذكاء الاصطناعي وسطر الخريطة دائمًا */
+    public function robots()
+    {
+        return response(self::robotsText(), 200, ['Content-Type' => 'text/plain; charset=UTF-8', 'Cache-Control' => 'public, max-age=600']);
+    }
+
+    /** العناوين والأوصاف الفعلية للصفحات العامة — يستعملها التطبيق عند التنقل داخل الموقع */
+    public function meta()
+    {
+        $c = SeoPages::content();
+        $out = [];
+        foreach (array_keys(SeoPages::PATHS) as $p) {
+            [$t, $d] = SeoPages::meta($p, $c);
+            $out[$p] = ['title' => $t, 'description' => $d, 'noindex' => SeoPages::noindex($p), 'image' => SeoPages::ogImage($p)];
+        }
+
+        return response()->json($out, 200, ['Cache-Control' => 'public, max-age=60']);
+    }
+
+    public static function robotsText(): string
+    {
+        $c = SeoPages::content();
+
+        return SeoRules::buildRobots($c['seo_robots_custom'] ?? '', ($c['seo_ai_bots'] ?? 'allow') === 'block', SeoPages::BASE);
+    }
+
+    /** نص الصفحة كما تقرؤه محركات البحث (لتحليل الكلمات المفتاحية) */
+    public static function pageContent(string $page): array
+    {
+        $c = SeoPages::content();
+        [$title, $desc] = SeoPages::meta($page, $c);
+        $html = view('seo.body', [
+            'page' => $page, 'c' => $c, 'units' => SeoPages::units(), 'policies' => SeoPages::policies(),
+            'email' => SeoPages::realEmail($c), 'phone' => SeoPages::realPhone($c),
+        ])->render();
+        preg_match('#<main.*</main>#su', $html, $m);
+        $main = $m[0] ?? $html;
+        preg_match_all('#<h[1-3][^>]*>(.*?)</h[1-3]>#su', $main, $h);
+        $clean = fn ($x) => trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($x), ENT_QUOTES, 'UTF-8')));
+
+        return ['title' => $title, 'description' => $desc, 'headings' => array_values(array_filter(array_map($clean, $h[1]))), 'body' => $clean($main)];
     }
 
     public static function indexPath(): ?string
@@ -75,7 +130,7 @@ class PublicPageController extends Controller
         [$title, $desc] = SeoPages::meta($page, $c);
         $url = SeoPages::url($page);
         $robots = SeoPages::noindex($page) ? 'noindex, follow' : 'index, follow, max-image-preview:large';
-        $img = SeoPages::BASE.'/og-image.png';
+        $img = SeoPages::ogImage($page);
         $e = fn ($s) => htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8');
 
         $head = "    <title>{$e($title)}</title>\n"
@@ -97,11 +152,13 @@ class PublicPageController extends Controller
             ."    <meta name=\"twitter:title\" content=\"{$e($title)}\" />\n"
             ."    <meta name=\"twitter:description\" content=\"{$e($desc)}\" />\n"
             ."    <meta name=\"twitter:image\" content=\"{$img}\" />\n";
-        if ($bing = trim((string) ($c['bing_site_verification'] ?? ''))) {
-            $head .= "    <meta name=\"msvalidate.01\" content=\"{$e($bing)}\" />\n";
+        // رموز التوثيق من «أدوات القياس والتتبّع» (الصالحة فقط)
+        $verify = SeoRules::validValues($c, SeoRules::VERIFY);
+        if (isset($verify['seo_verify_google'])) {
+            $head .= "    <meta name=\"google-site-verification\" content=\"{$e($verify['seo_verify_google'])}\" />\n";
         }
-        if ($ga = trim((string) ($c['ga4_measurement_id'] ?? ''))) {
-            $head .= "    <link rel=\"preconnect\" href=\"https://www.googletagmanager.com\" />\n";
+        if (isset($verify['seo_verify_bing'])) {
+            $head .= "    <meta name=\"msvalidate.01\" content=\"{$e($verify['seo_verify_bing'])}\" />\n";
         }
 
         $ld = "    <script type=\"application/ld+json\">".json_encode(SeoPages::jsonLd($page, $c), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG)."</script>\n";

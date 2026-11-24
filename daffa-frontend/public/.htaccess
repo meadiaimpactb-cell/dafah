@@ -35,8 +35,8 @@ AddType font/woff2 .woff2
     RewriteCond %{REQUEST_URI} ^/(api|pdf)/
     RewriteRule ^ index.php [L]
 
-    # خريطة الموقع تُولَّد تلقائيًا من Laravel (الصفحات القابلة للفهرسة وتاريخ آخر تعديل)
-    RewriteRule ^sitemap\.xml$ index.php [L]
+    # خريطة الموقع وrobots.txt يُولَّدان من Laravel ويُداران من لوحة الأدمن (الظهور والقياس)
+    RewriteRule ^(sitemap\.xml|robots\.txt)$ index.php [L]
 
     # الصفحات العامة → Laravel يحقن في index.html عنوان الصفحة ووصفها ورابطها القانوني وبياناتها المنظّمة ومحتواها
     RewriteRule ^(about|services|pricing|contact|privacy|terms|login|register)?$ index.php [L]
@@ -76,7 +76,7 @@ ErrorDocument 404 /index.html
         Header set Cache-Control "public, max-age=2592000"
     </FilesMatch>
     # الصفحة الرئيسية وملفات الفهرسة → يُتحقق منها كل مرة حتى تظهر التحديثات فورًا
-    <FilesMatch "^(index\.html|manifest\.webmanifest|robots\.txt)$">
+    <FilesMatch "^(index\.html|manifest\.webmanifest)$">
         Header set Cache-Control "no-cache"
     </FilesMatch>
 </IfModule>

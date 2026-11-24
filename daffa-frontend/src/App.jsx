@@ -15,10 +15,11 @@ import { Help, TipLayer } from "./components/ui/Help";
 import AppShell from "./components/shell/AppShell";
 import { PublicNav as PublicNavBar, PublicFooter as PublicFooterBar, Breadcrumbs, realPhone } from "./pages/public/PublicLayout";
 import LegalPage from "./pages/public/LegalPage";
+import { Measurement, PrivacyConsent } from "./pages/public/Measurement";
 import ContactForm from "./pages/public/ContactForm";
 import Landing from "./pages/public/Landing";
 import { Icons } from "./utils/navIcons";
-import { PUBLIC_PATHS, viewFromPath, applySeo } from "./utils/publicRoutes";
+import { PUBLIC_PATHS, viewFromPath, applySeo, setSeoOverrides } from "./utils/publicRoutes";
 import { withChunkReload } from "./utils/updateWatcher";
 
 // صفحات تُحمَّل عند أول زيارة فقط (تقسيم الحزمة): الدخول والتسجيل، الأنظمة الثلاثة، ولوحات المستشار والأدمن
@@ -56,6 +57,12 @@ const AdminDashboardPage = lazy(withChunkReload(() => import("./pages/admin/Admi
 const ClientHelpPage = lazy(withChunkReload(() => import("./pages/client/ClientHelpPage")));
 const ClientConsultantChange = lazy(withChunkReload(() => import("./pages/client/ClientConsultantChange")));
 const AdminConsultantChanges = lazy(withChunkReload(() => import("./pages/admin/AdminConsultantChanges")));
+const seoPage = (name) => lazy(withChunkReload(() => import("./pages/admin/AdminSeo").then(m => ({ default: m[name] }))));
+const SeoVisibilityPage = seoPage("SeoVisibilityPage");
+const SeoKeywordsPage = seoPage("SeoKeywordsPage");
+const SeoRobotsPage = seoPage("SeoRobotsPage");
+const SeoSitemapPage = seoPage("SeoSitemapPage");
+const SeoTrackingPage = seoPage("SeoTrackingPage");
 const ClientPaymentsPage = lazy(withChunkReload(() => import("./pages/client/ClientPaymentsPage")));
 const ConsultantEarningsPage = lazy(withChunkReload(() => import("./pages/consultant/ConsultantEarningsPage")));
 const ConsultantStatsPage = lazy(withChunkReload(() => import("./pages/consultant/ConsultantStatsPage")));
@@ -217,23 +224,11 @@ export default function DaffaPlatform() {
     return () => window.removeEventListener('session:expired', handler);
   }, []);
 
-  // ── GA4: معرّف القياس من «محتوى الموقع ← الظهور في البحث»؛ يُحمَّل متأخرًا ومرة واحدة
+  const seoRefresh = useRef(null);
+  // ── عناوين الصفحات العامة وأوصافها كما ضبطها المشرف («الظهور والقياس») — تُستعمل عند التنقل داخل الموقع
   useEffect(() => {
-    const id = String(siteContent.ga4_measurement_id || '').trim();
-    if (!/^G-[A-Z0-9]{4,}$/.test(id) || window.__dfGa) return;
-    window.__dfGa = true;
-    const boot = () => {
-      window.dataLayer = window.dataLayer || [];
-      window.gtag = function gtag() { window.dataLayer.push(arguments); }; // eslint-disable-line prefer-rest-params
-      window.gtag('js', new Date());
-      window.gtag('config', id, { anonymize_ip: true });
-      const sc2 = document.createElement('script');
-      sc2.async = true; sc2.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
-      document.head.appendChild(sc2);
-    };
-    const later = () => (window.requestIdleCallback ? window.requestIdleCallback(boot, { timeout: 4000 }) : setTimeout(boot, 2500));
-    if (document.readyState === 'complete') later(); else window.addEventListener('load', later, { once: true });
-  }, [siteContent.ga4_measurement_id]);
+    api.get('/seo/meta').then(r => { setSeoOverrides(r.data); seoRefresh.current?.(); }).catch(() => {});
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── fetch site content + public policy types (no auth needed) ────────────
   useEffect(() => {
@@ -477,6 +472,8 @@ export default function DaffaPlatform() {
   }, [authUser]);
 
   // عنوان الصفحة ووصفها ورابطها القانوني (SEO) حسب الصفحة المعروضة
+  // يُعاد تطبيقه على الصفحة الحالية (بما فيها الدخول والتسجيل) عند وصول نصوص المشرف
+  seoRefresh.current = () => applySeo(authPage || (authUser ? 'app' : currentView));
   useEffect(() => { applySeo(authPage || (authUser ? 'app' : currentView)); }, [authPage, authUser, currentView]);
 
   const closeAuth = () => {
@@ -666,6 +663,11 @@ export default function DaffaPlatform() {
     { id: "admin-questionnaires", label: "استبيانات السياسات", icon: Icons.policies, group: "المحتوى والخدمات" },
     { id: "admin-designs",        label: "طلبات التصميم",     icon: Icons.palette,  group: "المحتوى والخدمات" },
     { id: "admin-site-content",   label: "محتوى الموقع",      icon: Icons.globe,    group: "المحتوى والخدمات" },
+    { id: "admin-seo",            label: "الظهور في محركات البحث", icon: Icons.search, group: "الظهور والقياس", permKey: "admin.seo.view" },
+    { id: "admin-seo-keywords",   label: "الكلمات المفتاحية", icon: Icons.content,  group: "الظهور والقياس", permKey: "admin.seo.view" },
+    { id: "admin-seo-robots",     label: "ملف robots.txt",    icon: Icons.lock,     group: "الظهور والقياس", permKey: "admin.seo.view" },
+    { id: "admin-seo-sitemap",    label: "خريطة الموقع",      icon: Icons.outputs,  group: "الظهور والقياس", permKey: "admin.seo.view" },
+    { id: "admin-seo-tracking",   label: "أدوات القياس والتتبّع", icon: Icons.chart, group: "الظهور والقياس", permKey: "admin.seo.view" },
     { id: "admin-faqs",           label: "الأسئلة الشائعة",   icon: Icons.help,     group: "المحتوى والخدمات" },
     { id: "admin-notifications",  label: "إرسال الإشعارات",   icon: Icons.bell,     group: "النظام" },
     { id: "admin-log",            label: "سجل العمليات",      icon: Icons.log,      group: "النظام" },
@@ -1173,7 +1175,7 @@ export default function DaffaPlatform() {
       case "services": return <ServicesPage />;
       case "pricing": return <PricingPage />;
       case "contact": return <ContactPage />;
-      case "privacy": case "terms": return <LegalPage kind={currentView} sc={sc} navigate={navigate} PublicNav={PublicNav} PublicFooter={PublicFooter} />;
+      case "privacy": case "terms": return <LegalPage kind={currentView} sc={sc} settings={siteContent} navigate={navigate} PublicNav={PublicNav} PublicFooter={PublicFooter} />;
       case "login": case "register": return <LandingPage />;
       // ── جميع هذه الصفحات يديرها KeepAlive في الـ render ──
       case "client-dash":
@@ -1352,6 +1354,11 @@ export default function DaffaPlatform() {
       // ======= CLIENT: المساعدة =======
       case "client-consultants": return <ClientConsultantChange onOpenChat={() => openChatDeep({})} />;
       case "admin-consultant-changes": return <AdminConsultantChanges />;
+      case "admin-seo": return <SeoVisibilityPage />;
+      case "admin-seo-keywords": return <SeoKeywordsPage />;
+      case "admin-seo-robots": return <SeoRobotsPage />;
+      case "admin-seo-sitemap": return <SeoSitemapPage />;
+      case "admin-seo-tracking": return <SeoTrackingPage />;
       case "client-help": return <ClientHelpPage onOpenChat={(id) => openChatDeep({ id })} onOpenPolicies={() => navigate('policies-select')} />;
       case "con-help":   return <GenericPage title="دليل الاستخدام"><RoleGuide role="consultant" /></GenericPage>;
       case "admin-help": return <GenericPage title="دليل الاستخدام"><RoleGuide role="admin" /></GenericPage>;
@@ -1499,7 +1506,10 @@ export default function DaffaPlatform() {
     </div>
   );
 
-  if (!isDashboard) return <>{renderContent()}<ModalContent /><TipLayer />{sessionToastEl}</>;
+  // أدوات القياس: في الصفحات العامة فقط وبعد موافقة الزائر (لا تعمل في لوحات التحكم)
+  const trackable = !isDashboard && currentView !== "not-found";
+  const measure = <><Measurement settings={siteContent} trackable={trackable} path={PUBLIC_PATHS[currentView] || "/"} view={currentView} /><PrivacyConsent settings={siteContent} trackable={trackable} onPrivacy={() => { navigate("privacy"); window.scrollTo(0, 0); }} /></>;
+  if (!isDashboard) return <>{renderContent()}{measure}<ModalContent /><TipLayer />{sessionToastEl}</>;
 
   const bottomTabs = currentRole === "admin"
     ? ["admin-dash", "admin-outputs", "admin-orgs", "admin-finance"]
@@ -1511,6 +1521,7 @@ export default function DaffaPlatform() {
 
   return (
     <>
+      <Measurement settings={siteContent} trackable={false} path="" view={currentView} />
       <AppShell
         role={currentRole}
         authUser={authUser}

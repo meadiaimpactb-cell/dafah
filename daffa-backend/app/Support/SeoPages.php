@@ -18,6 +18,9 @@ final class SeoPages
 
     public const BRAND = 'منصة دفة';
 
+    /** مفتاح IndexNow (الملف نفسه منشور في جذر الموقع: /{key}.txt) */
+    public const INDEXNOW_KEY = 'ac4dcda9214e7340a57c69c1827ac03e';
+
     /** الصفحات القابلة للفهرسة (بترتيب خريطة الموقع) */
     public const INDEXABLE = ['home', 'about', 'services', 'pricing', 'contact', 'privacy', 'terms'];
 
@@ -30,6 +33,35 @@ final class SeoPages
         'home' => 'الرئيسية', 'about' => 'عن دفة', 'services' => 'الخدمات', 'pricing' => 'الأسعار', 'contact' => 'تواصل معنا',
         'privacy' => 'سياسة الخصوصية', 'terms' => 'شروط الاستخدام', 'login' => 'تسجيل الدخول', 'register' => 'إنشاء حساب',
     ];
+
+    /** ما كتبه المشرف في «الظهور والقياس» لكل صفحة (عنوان، وصف، صورة، كلمات، إخفاء) */
+    public static function custom(): array
+    {
+        try {
+            return PublicCache::remember('seo-pages', fn () => \App\Models\SeoPage::all()->keyBy('page')->map(fn ($p) => [
+                'title' => (string) $p->title, 'description' => (string) $p->description, 'og_image' => (string) $p->og_image,
+                'keywords' => $p->keywords ?: [], 'primary' => (string) $p->primary_keyword, 'noindex' => (bool) $p->noindex,
+                'updated_at' => optional($p->updated_at)->toDateString(),
+            ])->all());
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
+    /** الصفحات القابلة للفهرسة فعلًا (ما لم يُخفِه المشرف) */
+    public static function indexable(): array
+    {
+        $c = self::custom();
+
+        return array_values(array_filter(self::INDEXABLE, fn ($p) => empty($c[$p]['noindex'])));
+    }
+
+    public static function ogImage(string $page): string
+    {
+        $img = self::custom()[$page]['og_image'] ?? '';
+
+        return $img !== '' ? self::BASE.'/storage/'.ltrim($img, '/') : self::BASE.'/og-image.png';
+    }
 
     public static function content(): array
     {
@@ -84,8 +116,17 @@ final class SeoPages
         return filter_var($e, FILTER_VALIDATE_EMAIL) && ! str_contains($e, 'example.') ? $e : null;
     }
 
-    /** العنوان والوصف لكل صفحة (50–60 حرفًا للعنوان و140–160 للوصف تقريبًا) */
+    /** العنوان والوصف: ما كتبه المشرف، وإلا النص الافتراضي المبني من محتوى الصفحة */
     public static function meta(string $page, array $c): array
+    {
+        [$t, $d] = self::defaults($page, $c);
+        $own = self::custom()[$page] ?? [];
+
+        return [trim($own['title'] ?? '') !== '' ? trim($own['title']) : $t, trim($own['description'] ?? '') !== '' ? trim($own['description']) : $d];
+    }
+
+    /** النص الافتراضي لكل صفحة (50–60 حرفًا للعنوان و140–160 للوصف تقريبًا) */
+    public static function defaults(string $page, array $c): array
     {
         $sp = $c['strategic_price'] ?? '5,000';
         $op = $c['operational_price'] ?? '3,500';
@@ -93,7 +134,7 @@ final class SeoPages
         $count = count(self::policies()) ?: 19;
 
         return match ($page) {
-            'home' => ['منصة دفة | التخطيط الاستراتيجي والسياسات للمنظمات غير الربحية',
+            'home' => ['منصة دفة | التخطيط الاستراتيجي والسياسات للجمعيات الأهلية',
                 'ابنِ الخطة الاستراتيجية والتشغيلية وسياسات ولوائح جمعيتك خطوة بخطوة عبر منصة دفة، بفيديوهات ونماذج جاهزة ومراجعة واعتماد من مستشار متخصص عن بعد.'],
             'about' => ['عن منصة دفة | كيف نبني خطط المنظمات غير الربحية',
                 'تعرّف على منصة دفة: رؤيتها ورسالتها وآلية عملها التي ترشد الجمعيات والمؤسسات غير الربحية لبناء خططها وسياساتها خطوة بخطوة بإشراف مستشار متخصص.'],
@@ -103,9 +144,9 @@ final class SeoPages
                 "أسعار خدمات منصة دفة: الخطة الاستراتيجية {$sp} ريال، والخطة التشغيلية {$op} ريال، والسياسات واللوائح من {$pp} ريال للسياسة، مع اختيار مستشارك قبل الدفع."],
             'contact' => ['تواصل مع منصة دفة | الاستفسارات والدعم الفني',
                 'تواصل مع فريق منصة دفة للاستفسار عن خدمات التخطيط الاستراتيجي والتشغيلي وبناء السياسات واللوائح، أو للدعم الفني وطلبات الشراكة مع منظمتك.'],
-            'privacy' => ['سياسة الخصوصية | منصة دفة',
+            'privacy' => ['سياسة الخصوصية وحماية البيانات | منصة دفة',
                 'كيف تجمع منصة دفة بيانات المنظمات ومستخدميها وتستخدمها وتحميها، ومع من تشاركها، وحقوقك في الوصول إليها وتصحيحها وحذفها وفق نظام حماية البيانات الشخصية.'],
-            'terms' => ['شروط استخدام منصة دفة',
+            'terms' => ['شروط استخدام منصة دفة للتخطيط والسياسات',
                 'الشروط التي تنظّم استخدام منصة دفة للتخطيط الاستراتيجي والتشغيلي وبناء السياسات: الحسابات، ودور المستشار، والمدفوعات، والملكية الفكرية للمخرجات، والمسؤولية.'],
             'login' => ['تسجيل الدخول | منصة دفة', 'سجّل دخولك إلى منصة دفة لمتابعة خطط منظمتك وسياساتها.'],
             'register' => ['أنشئ حساب منظمتك | منصة دفة', 'أنشئ حساب منظمتك في منصة دفة وابدأ رحلة التخطيط الاستراتيجي والتشغيلي وبناء السياسات.'],
@@ -114,7 +155,7 @@ final class SeoPages
 
     public static function noindex(string $page): bool
     {
-        return in_array($page, ['login', 'register'], true);
+        return in_array($page, ['login', 'register'], true) || ! empty(self::custom()[$page]['noindex']);
     }
 
     public static function url(string $page): string
@@ -132,7 +173,7 @@ final class SeoPages
             'alternateName' => ['دفة', 'Daffah'],
             'url' => self::BASE.'/',
             'logo' => ['@type' => 'ImageObject', 'url' => self::BASE.'/logo.png', 'width' => 560, 'height' => 560],
-            'image' => self::BASE.'/og-image.png',
+            'image' => self::ogImage('home'),
             'description' => 'منصة للتخطيط الاستراتيجي والتشغيلي وبناء السياسات واللوائح للمنظمات غير الربحية بإشراف مستشارين متخصصين.',
             'areaServed' => ['@type' => 'Country', 'name' => 'المملكة العربية السعودية'],
             'address' => ['@type' => 'PostalAddress', 'addressLocality' => 'الرياض', 'addressCountry' => 'SA'],
